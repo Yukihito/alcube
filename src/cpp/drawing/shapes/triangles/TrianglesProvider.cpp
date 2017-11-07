@@ -1,5 +1,5 @@
 #include "TrianglesProvider.h"
 
-namespace drawing::shapes::triangles {
+namespace alcube::drawing::shapes::triangles {
   TrianglesProvider::TrianglesProvider() : sphere(32) {}
 }

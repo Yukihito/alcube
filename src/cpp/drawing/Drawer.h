@@ -7,7 +7,7 @@
 #include <vector>
 #include <unordered_map>
 
-namespace drawing {
+namespace alcube::drawing {
   class Drawer {
     public:
       explicit Drawer(

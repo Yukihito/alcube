@@ -1,6 +1,6 @@
 #include "Drawer.h"
 
-namespace drawing {
+namespace alcube::drawing {
   void Drawer::addInternal(Drawable* drawable) {
     if (drawables[drawable->shader] == nullptr) {
       drawables[drawable->shader] = new std::unordered_map<Shape*, std::vector<Drawable*>*>();

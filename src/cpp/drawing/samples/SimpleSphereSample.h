@@ -6,7 +6,7 @@
 #include "../shapes/Shapes.h"
 #include "../shaders/Shaders.h"
 
-namespace drawing::samples {
+namespace alcube::drawing::samples {
   class SimpleSphere : public Drawable {
     public:
       explicit SimpleSphere(glm::vec3& position, shapes::Shapes* shapes, shaders::Shaders* shaders);

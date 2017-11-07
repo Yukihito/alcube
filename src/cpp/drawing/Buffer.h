@@ -3,7 +3,7 @@
 #include <OpenGL/gl3.h>
 #include <cstddef>
 
-namespace drawing {
+namespace alcube::drawing {
   class Buffer {
     public:
       GLuint arrayId;

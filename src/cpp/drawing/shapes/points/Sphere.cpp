@@ -1,6 +1,6 @@
 #include "Sphere.h"
 
-namespace drawing::shapes::points {
+namespace alcube::drawing::shapes::points {
   void Sphere::draw() {
     glDrawArrays(GL_POINTS, 0, (int)splitCount * (int)splitCount * 3);
   };

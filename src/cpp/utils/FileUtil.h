@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 
-namespace utils {
+namespace alcube::utils {
   class FileUtil {
     public:
       std::string readFile(const char* filePath);

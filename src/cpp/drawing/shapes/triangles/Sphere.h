@@ -4,7 +4,7 @@
 #include "../../Shape.h"
 #include <cstddef>
 
-namespace drawing::shapes::triangles {
+namespace alcube::drawing::shapes::triangles {
   class Sphere : public Shape {
     public:
       void draw() override;

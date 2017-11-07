@@ -1,6 +1,6 @@
 #include "Buffer.h"
 
-namespace drawing {
+namespace alcube::drawing {
   Buffer::Buffer(size_t verticesSize, size_t indicesSize, size_t normalsSize) {
     this->vertexBufferId = 0;
     this->indexBufferId = 0;

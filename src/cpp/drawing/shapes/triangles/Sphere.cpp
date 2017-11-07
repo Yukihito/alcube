@@ -1,6 +1,6 @@
 #include "Sphere.h"
 
-namespace drawing::shapes::triangles {
+namespace alcube::drawing::shapes::triangles {
   void Sphere::draw() {
     glDrawElements(GL_TRIANGLES, (int)this->indicesLength, GL_UNSIGNED_INT, nullptr);
   };

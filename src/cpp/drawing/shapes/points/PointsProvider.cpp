@@ -1,6 +1,6 @@
 #include "PointsProvider.h"
 
-namespace drawing::shapes::points {
+namespace alcube::drawing::shapes::points {
   PointsProvider::PointsProvider() : sphere(32) {}
 }
 

@@ -4,7 +4,7 @@
 #include "SimpleShader.h"
 #include "StandardShader.h"
 
-namespace drawing::shaders {
+namespace alcube::drawing::shaders {
   class Shaders {
     public:
       SimpleShader simple;

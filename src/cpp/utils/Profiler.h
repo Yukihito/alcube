@@ -6,7 +6,7 @@
 #include <vector>
 #include <iostream>
 
-namespace utils {
+namespace alcube::utils {
   class ProfilingItem {
     public:
       std::chrono::system_clock::time_point startedTime;

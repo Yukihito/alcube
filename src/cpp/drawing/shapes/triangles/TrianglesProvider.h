@@ -3,7 +3,7 @@
 
 #include "Sphere.h"
 
-namespace drawing::shapes::triangles {
+namespace alcube::drawing::shapes::triangles {
   class TrianglesProvider {
     public:
       Sphere sphere;

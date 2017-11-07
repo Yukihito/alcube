@@ -3,7 +3,7 @@
 
 #include "Sphere.h"
 
-namespace drawing::shapes::points {
+namespace alcube::drawing::shapes::points {
   class PointsProvider {
     public:
       Sphere sphere;

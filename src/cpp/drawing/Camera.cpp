@@ -1,6 +1,6 @@
 #include "Camera.h"
 
-namespace drawing {
+namespace alcube::drawing {
   Camera::Camera(
     glm::vec3 position,
     glm::quat rotation,

@@ -6,7 +6,7 @@
 #include "Shader.h"
 #include "Context.h"
 
-namespace drawing {
+namespace alcube::drawing {
   class Drawable {
     public:
       void draw(Context& context);

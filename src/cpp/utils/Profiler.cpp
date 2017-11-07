@@ -1,6 +1,6 @@
 #include "Profiler.h"
 
-namespace utils {
+namespace alcube::utils {
   void ProfilingItem::update() {
     count = (int)intervals.size();
     max = 0;

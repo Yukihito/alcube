@@ -3,7 +3,7 @@
 
 #include "../Shader.h"
 
-namespace drawing::shaders {
+namespace alcube::drawing::shaders {
   class SimpleShader : public Shader {
     public:
       explicit SimpleShader(utils::FileUtil* fileUtil);

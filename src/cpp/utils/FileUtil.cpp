@@ -1,6 +1,6 @@
 #include "FileUtil.h"
 
-namespace utils {
+namespace alcube::utils {
   std::string FileUtil::readFile(const char *filePath) {
     std::string str;
     std::ifstream stream(filePath, std::ios::in);

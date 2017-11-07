@@ -10,7 +10,7 @@
 #include <glm/gtx/quaternion.hpp>
 #include <glm/gtx/euler_angles.hpp>
 
-namespace drawing {
+namespace alcube::drawing {
   class Camera {
     public:
       glm::vec3 position;

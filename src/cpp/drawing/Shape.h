@@ -5,7 +5,7 @@
 #include "Buffer.h"
 #include "Shader.h"
 
-namespace drawing {
+namespace alcube::drawing {
   class Shape {
     public:
       virtual void draw() = 0;

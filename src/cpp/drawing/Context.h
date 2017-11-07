@@ -3,7 +3,7 @@
 
 #include <glm/mat4x4.hpp>
 
-namespace drawing {
+namespace alcube::drawing {
   class Context {
     public:
       glm::mat4 mvp;

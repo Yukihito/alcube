@@ -1,6 +1,6 @@
 #include "SimpleShader.h"
 
-namespace drawing::shaders {
+namespace alcube::drawing::shaders {
   SimpleShader::SimpleShader(utils::FileUtil* fileUtil) {
     std::string vertexShaderCodeStr = fileUtil->readFile("../src/shaders/simple.vertexshader");
     std::string fragmentShaderCodeStr = fileUtil->readFile("../src/shaders/simple.fragmentshader");

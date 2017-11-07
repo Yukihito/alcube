@@ -8,7 +8,7 @@
 #include "Context.h"
 #include "Buffer.h"
 
-namespace drawing {
+namespace alcube::drawing {
   class Shader {
     public:
       GLuint programId = 0;

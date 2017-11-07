@@ -4,7 +4,7 @@
 #include "triangles/TrianglesProvider.h"
 #include "points/PointsProvider.h"
 
-namespace drawing::shapes {
+namespace alcube::drawing::shapes {
   class Shapes {
     public:
       triangles::TrianglesProvider triangles;

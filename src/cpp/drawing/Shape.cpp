@@ -1,6 +1,6 @@
 #include "Shape.h"
 
-namespace drawing {
+namespace alcube::drawing {
   void Shape::initialize() {
     this->buffer = createBuffer();
   }

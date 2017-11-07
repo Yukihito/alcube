@@ -1,5 +1,5 @@
 #include "Shaders.h"
 
-namespace drawing::shaders {
+namespace alcube::drawing::shaders {
   Shaders::Shaders(utils::FileUtil* fileUtil) : simple(fileUtil), standard(fileUtil) {}
 }

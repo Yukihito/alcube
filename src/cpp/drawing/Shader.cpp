@@ -1,6 +1,6 @@
 #include "Shader.h"
 
-namespace drawing {
+namespace alcube::drawing {
   using namespace std;
 
   void Shader::compile(
