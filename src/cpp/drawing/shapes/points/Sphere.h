@@ -18,5 +18,4 @@ namespace alcube::drawing::shapes::points {
   };
 }
 
-
 #endif //ALCUBE_POINTS_SPHERE_H

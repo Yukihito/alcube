@@ -11,31 +11,36 @@ namespace alcube::physics::opencl::dtos {
       unsigned int yCount;
       unsigned int zCount;
       unsigned int edgeLength;
+      cl_float3 origin;
+  };
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+  class GridAndCellRelation {
+    public:
+      unsigned int gridIndex;
+      unsigned int cellIndex;
+  };
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+  class RigidBodyState {
+    public:
+      cl_float3 position;
+      cl_float4 rotation;
+      cl_float3 linearMomentum;
+      cl_float3 angularMomentum;
+      unsigned int gridIndex;
   };
 #pragma pack(pop)
 
 #pragma pack(push, 1)
   class Cell {
     public:
-      int id;
       float radius;
       float weight;
-      cl_float3 position;
-      cl_float4 rotation;
-      cl_float3 linearMomentum;
-      cl_float3 angularMomentum;
       unsigned int springStartIndex;
       unsigned int springEndIndex;
-  };
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-  class CellUpdate {
-    public:
-      cl_float3 position;
-      cl_float4 rotation;
-      cl_float3 linearMomentum;
-      cl_float3 angularMomentum;
   };
 #pragma pack(pop)
 

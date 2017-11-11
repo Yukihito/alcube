@@ -22,8 +22,9 @@ namespace alcube::utils {
 
   class Profiler {
     public:
+      explicit Profiler();
       bool enabled;
-      int create(std::string &name);
+      int create(const char* name);
       void start(int id);
       void stop(int id);
       void setShowInterval(int msec);

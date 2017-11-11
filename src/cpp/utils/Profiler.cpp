@@ -27,7 +27,11 @@ namespace alcube::utils {
     std::cout << name << ":\tcount: " << count << ",\tavg: " << avg << ",\tmax: " << max << ",\tmin: " << min << std::endl;
   }
 
-  int Profiler::create(std::string& name) {
+  Profiler::Profiler() {
+    lastShowedTime = std::chrono::system_clock::now();
+  }
+
+  int Profiler::create(const char* name) {
     auto id = (int)items.size();
     auto item = new ProfilingItem();
     item->name = name;
