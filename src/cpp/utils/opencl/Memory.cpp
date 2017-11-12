@@ -7,24 +7,14 @@ namespace alcube::utils::opencl {
     size_t size,
     cl_context& context,
     void* hostPtr,
-    bool isReadable,
-    bool isWritable
+    cl_mem_flags memFlags
   ) {
     this->hostPtr = hostPtr;
     this->name = name;
     this->size = size;
     this->context = context;
     this->count = 1;
-
-    if (isReadable && !isWritable) {
-      this->memFlags = CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR;
-    } else if (!isReadable && isWritable) {
-      this->memFlags = CL_MEM_WRITE_ONLY;
-    } else if (isReadable) { // && isWritable
-      this->memFlags = CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR;
-    } else {
-      this->memFlags = 0;
-    }
+    this->memFlags = memFlags;
   }
 
   void Memory::allocate() {

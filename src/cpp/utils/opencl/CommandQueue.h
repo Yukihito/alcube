@@ -21,6 +21,7 @@ namespace alcube::utils::opencl {
     public:
       explicit CommandQueue(Resources* resources);
       void push(cl_kernel op, std::vector<size_t> ranges, std::initializer_list<KernelArg> args);
+      void pushZeroFill(Memory* mem);
       void read(Memory* memory, void* hostPtr);
     private:
       cl_command_queue queue;

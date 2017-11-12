@@ -34,7 +34,7 @@ namespace alcube::utils::opencl {
     cl_int status;
     cl_uint i = 0;
     for (KernelArg arg: args) {
-      status = clSetKernelArg(op, i, sizeof(cl_mem), arg.ptr);
+      status = clSetKernelArg(op, i, arg.size, arg.ptr);
       if (status != CL_SUCCESS) {
         std::cout << "clSetKernelArg failure: " << status << std::endl;
       }
@@ -53,6 +53,15 @@ namespace alcube::utils::opencl {
     );
     if (status != CL_SUCCESS) {
       std::cout << "clEnqueueNDRangeKernel failure: " << status << std::endl;
+    }
+  }
+
+  void CommandQueue::pushZeroFill(Memory *mem) {
+    cl_int status;
+    unsigned int zero = 0;
+    status = clEnqueueFillBuffer(queue, mem->mem, &zero, sizeof(unsigned int), 0, sizeof(unsigned int) * mem->count, 0, nullptr, nullptr);
+    if (status != CL_SUCCESS) {
+      std::cout << "clEnqueueFillBuffer failure: " << status << std::endl;
     }
   }
 

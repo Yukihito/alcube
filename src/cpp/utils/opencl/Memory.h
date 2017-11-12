@@ -20,8 +20,7 @@ namespace alcube::utils::opencl {
         size_t size,
         cl_context& context,
         void* hostPtr,
-        bool isReadable,
-        bool isWritable
+        cl_mem_flags memFlags
       );
     private:
       void* hostPtr;

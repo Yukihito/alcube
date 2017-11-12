@@ -9,16 +9,14 @@ namespace alcube::utils::opencl {
     const std::string &name,
     size_t size,
     void *hostPtr,
-    bool isReadable,
-    bool isWritable
+    cl_mem_flags memFlags
   ) {
     auto mem = new Memory(
       name,
       size,
       resources->context,
       hostPtr,
-      isReadable,
-      isWritable
+      memFlags
     );
     memories.push_back(mem);
     return mem;

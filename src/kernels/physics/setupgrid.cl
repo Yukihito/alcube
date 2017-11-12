@@ -26,6 +26,16 @@ typedef struct __attribute__ ((packed)) CellStruct {
   unsigned int springEndIndex;
 } Cell;
 
+__kernel void initGridAndCellRelations(
+  __global GridAndCellRelation* relations,
+  const uint gridIndex,
+  const uint cellIndex
+) {
+  size_t i = get_global_id(0);
+  relations[i].gridIndex = gridIndex;
+  relations[i].cellIndex = cellIndex;
+}
+
 __kernel void fillGridIndex(
   __global const Grid* grid,
   __global const Cell* cells,
@@ -42,10 +52,58 @@ __kernel void fillGridIndex(
   relations[cellIndex].gridIndex = gridIndex;
 }
 
-/*
 __kernel void merge(
-  __global GridAndCellRelation* relations
+  __global GridAndCellRelation* relations,
+  const uint distance
 ) {
+  uint index = get_global_id(0);
+  if (index % (distance << 1) < distance) {
+    GridAndCellRelation left = relations[index];
+    GridAndCellRelation right = relations[index + distance];
+    uint cmpMask = left.gridIndex < right.gridIndex ? 1 : 0;
 
+    relations[index].gridIndex = select(left.gridIndex, right.gridIndex, cmpMask);
+    relations[index].cellIndex = select(left.cellIndex, right.cellIndex, cmpMask);
+    relations[index + distance].gridIndex = select(right.gridIndex, left.gridIndex, cmpMask);
+    relations[index + distance].cellIndex = select(right.cellIndex, left.cellIndex, cmpMask);
+  }
 }
-*/
+
+__kernel void bitonic(
+  __global GridAndCellRelation* relations,
+  const uint distance,
+  const uint stageDistance
+) {
+  uint index = get_global_id(0);
+  if (index % (distance << 1) < distance) {
+    uint middleDistance = stageDistance << 1; // * 2
+    GridAndCellRelation left = relations[index];
+    GridAndCellRelation right = relations[index + distance];
+    uint cmpMask = left.gridIndex < right.gridIndex ? 1 : 0;
+
+    if (index % (middleDistance << 1) >= middleDistance) {
+      cmpMask = left.gridIndex < right.gridIndex ? 1 : 0;
+    } else {
+      cmpMask = left.gridIndex > right.gridIndex ? 1 : 0;
+    }
+    relations[index].gridIndex = select(left.gridIndex, right.gridIndex, cmpMask);
+    relations[index].cellIndex = select(left.cellIndex, right.cellIndex, cmpMask);
+    relations[index + distance].gridIndex = select(right.gridIndex, left.gridIndex, cmpMask);
+    relations[index + distance].cellIndex = select(right.cellIndex, left.cellIndex, cmpMask);
+  }
+}
+
+__kernel void setGridRelationIndexRange(
+  __global GridAndCellRelation* relations,
+  __global uint* gridStartIndices,
+  __global uint* gridEndIndices
+) {
+  uint current = get_global_id(0);
+  uint next = current + 1;
+  uint currentGridIndex = relations[current].gridIndex;
+  uint nextGridIndex = relations[next].gridIndex;
+  if (currentGridIndex != nextGridIndex) {
+    gridEndIndices[currentGridIndex] = current;
+    gridStartIndices[nextGridIndex] = next;
+  }
+}

@@ -2,7 +2,7 @@
 
 namespace alcube::physics::samples {
   void BenchmarkSample::runApp(int argc, char **argv) {
-    unsigned int maxCellCount = 16384;
+    unsigned int maxCellCount = 16384; // 2^14
     //unsigned int maxCellCount = 64;
     std::mutex mutex;
     float deltaTime = 1000.0f / 30.0f;
@@ -14,20 +14,19 @@ namespace alcube::physics::samples {
       &mutex,
       maxCellCount,
       8,
-      16,
-      16,
-      16
+      64,
+      64,
+      64
     );
     auto profiler = new utils::Profiler();
     profiler->enabled = true;
     profiler->setShowInterval(0);
     int timerId = profiler->create("update");
-    profiler->update();
     std::random_device rnd;
     std::mt19937 mt(rnd());
     std::uniform_real_distribution<float> randReal(-50, 50);
 
-    for (int i = 0; i < maxCellCount; i++) {
+    for (int i = 0; i < maxCellCount * 2 / 6; i++) {
       auto cell = new Cell();
       cell->currentState.position = glm::vec3(
         randReal(mt),
@@ -45,13 +44,12 @@ namespace alcube::physics::samples {
     }
     resources->release();
 
-    /*
     for (int i = 0; i < maxCellCount; i++) {
-      auto state = simulator->dtos.currentStates[i];
+      //auto state = simulator->dtos.currentStates[i];
       auto relation = simulator->dtos.gridAndCellRelations[i];
-      std::cout << "x: " << state.position.x << ", y: " << state.position.y << ", z: " << state.position.z << ", grid: " << state.gridIndex << std::endl;
+      //std::cout << "x: " << state.position.x << ", y: " << state.position.y << ", z: " << state.position.z << ", grid: " << state.gridIndex << std::endl;
       std::cout << "grid: " << relation.gridIndex << ", cell: " << relation.cellIndex << std::endl;
-    }*/
+    }
     profiler->update();
   }
 }

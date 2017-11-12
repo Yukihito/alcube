@@ -12,6 +12,7 @@
 #include "../utils/opencl/ProgramFactory.h"
 #include "../utils/opencl/Resources.h"
 #include "../utils/opencl/conversions.h"
+#include "../utils/alcubemath.h"
 #include "opencl/dtos.h"
 #include "Cell.h"
 
@@ -31,11 +32,17 @@ namespace alcube::physics {
       utils::opencl::Memory* cells;
       utils::opencl::Memory* currentStates;
       utils::opencl::Memory* gridAndCellRelations;
+      utils::opencl::Memory* gridStartIndices;
+      utils::opencl::Memory* gridEndIndices;
   };
 
   class Kernels {
     public:
       cl_kernel fillGridIndex;
+      cl_kernel merge;
+      cl_kernel bitonic;
+      cl_kernel setGridRelationIndexRange;
+      cl_kernel initGridAndCellRelations;
   };
 
   class Simulator {
@@ -60,6 +67,7 @@ namespace alcube::physics {
       Kernels kernels;
     private:
       unsigned int maxCellCount;
+      unsigned int allGridCount;
       utils::opencl::KernelFactory* kernelFactory;
       utils::opencl::ProgramFactory* programFactory;
       utils::opencl::MemoryManager* memoryManager;

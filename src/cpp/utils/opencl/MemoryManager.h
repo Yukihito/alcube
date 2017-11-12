@@ -4,6 +4,7 @@
 #include "Memory.h"
 #include "Resources.h"
 #include <vector>
+#include <OpenCL/opencl.h>
 
 namespace alcube::utils::opencl {
   class MemoryManager {
@@ -12,8 +13,7 @@ namespace alcube::utils::opencl {
         const std::string& name,
         size_t size,
         void* hostPtr,
-        bool isReadable,
-        bool isWritable
+        cl_mem_flags memFlags
       );
       void allocate();
       void release();
