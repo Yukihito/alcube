@@ -19,7 +19,7 @@ namespace alcube::physics::opencl::dtos {
   class GridAndCellRelation {
     public:
       unsigned int gridIndex;
-      unsigned int cellIndex;
+      unsigned short cellIndex;
   };
 #pragma pack(pop)
 

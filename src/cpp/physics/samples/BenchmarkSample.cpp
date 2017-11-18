@@ -26,7 +26,7 @@ namespace alcube::physics::samples {
     std::mt19937 mt(rnd());
     std::uniform_real_distribution<float> randReal(-50, 50);
 
-    for (int i = 0; i < maxCellCount * 2 / 6; i++) {
+    for (int i = 0; i < maxCellCount; i++) {
       auto cell = new Cell();
       cell->currentState.position = glm::vec3(
         randReal(mt),
@@ -43,13 +43,20 @@ namespace alcube::physics::samples {
       profiler->stop(timerId);
     }
     resources->release();
-
+    int prev = 0;
     for (int i = 0; i < maxCellCount; i++) {
       //auto state = simulator->dtos.currentStates[i];
       auto relation = simulator->dtos.gridAndCellRelations[i];
       //std::cout << "x: " << state.position.x << ", y: " << state.position.y << ", z: " << state.position.z << ", grid: " << state.gridIndex << std::endl;
       std::cout << "grid: " << relation.gridIndex << ", cell: " << relation.cellIndex << std::endl;
+      if (prev > relation.gridIndex) {
+        std::cout << "Invalid order" << std::endl;
+        exit(1);
+      }
+      prev = relation.gridIndex;
     }
     profiler->update();
+    std::cout << "UINT_MAX:" << UINT_MAX << std::endl;
+    std::cout << "USHRT_MAX:" << USHRT_MAX << std::endl;
   }
 }

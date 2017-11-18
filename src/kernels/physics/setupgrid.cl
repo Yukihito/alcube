@@ -8,7 +8,7 @@ typedef struct __attribute__ ((packed)) GridStruct {
 
 typedef struct __attribute__ ((packed)) GridAndCellRelationStruct {
   unsigned int gridIndex;
-  unsigned int cellIndex;
+  unsigned short cellIndex;
 } GridAndCellRelation;
 
 typedef struct __attribute__ ((packed)) RigidBodyStateStruct {
@@ -29,7 +29,7 @@ typedef struct __attribute__ ((packed)) CellStruct {
 __kernel void initGridAndCellRelations(
   __global GridAndCellRelation* relations,
   const uint gridIndex,
-  const uint cellIndex
+  const unsigned short cellIndex
 ) {
   size_t i = get_global_id(0);
   relations[i].gridIndex = gridIndex;
@@ -60,12 +60,20 @@ __kernel void merge(
   if (index % (distance << 1) < distance) {
     GridAndCellRelation left = relations[index];
     GridAndCellRelation right = relations[index + distance];
-    uint cmpMask = left.gridIndex < right.gridIndex ? 1 : 0;
 
-    relations[index].gridIndex = select(left.gridIndex, right.gridIndex, cmpMask);
+    // Original code
+    /*
+    ushort cmpMask = left.gridIndex < right.gridIndex;
+    uint cmpMaskInt = (uint)cmpMask;
+
+    relations[index].gridIndex = select(left.gridIndex, right.gridIndex, cmpMaskInt);
     relations[index].cellIndex = select(left.cellIndex, right.cellIndex, cmpMask);
-    relations[index + distance].gridIndex = select(right.gridIndex, left.gridIndex, cmpMask);
+    relations[index + distance].gridIndex = select(right.gridIndex, left.gridIndex, cmpMaskInt);
     relations[index + distance].cellIndex = select(right.cellIndex, left.cellIndex, cmpMask);
+    */
+    bool b = left.gridIndex < right.gridIndex;
+    relations[index] = b ? left : right;
+    relations[index + distance] = b ? right : left;
   }
 }
 
@@ -79,17 +87,35 @@ __kernel void bitonic(
     uint middleDistance = stageDistance << 1; // * 2
     GridAndCellRelation left = relations[index];
     GridAndCellRelation right = relations[index + distance];
+    /*
+    // Original code
     uint cmpMask = left.gridIndex < right.gridIndex ? 1 : 0;
-
     if (index % (middleDistance << 1) >= middleDistance) {
       cmpMask = left.gridIndex < right.gridIndex ? 1 : 0;
     } else {
       cmpMask = left.gridIndex > right.gridIndex ? 1 : 0;
     }
-    relations[index].gridIndex = select(left.gridIndex, right.gridIndex, cmpMask);
+    relations[index].gridIndex = select(left.gridIndex, right.gridIndex, cmpMaskInt);
     relations[index].cellIndex = select(left.cellIndex, right.cellIndex, cmpMask);
-    relations[index + distance].gridIndex = select(right.gridIndex, left.gridIndex, cmpMask);
+    relations[index + distance].gridIndex = select(right.gridIndex, left.gridIndex, cmpMaskInt);
     relations[index + distance].cellIndex = select(right.cellIndex, left.cellIndex, cmpMask);
+    */
+
+    /*
+    // Improvement 1
+    ushort cmpMask = !(b1 ^ b2);
+    uint cmpMaskInt = (uint)cmpMask;
+    relations[index].gridIndex = select(left.gridIndex, right.gridIndex, cmpMaskInt);
+    relations[index].cellIndex = select(left.cellIndex, right.cellIndex, cmpMask);
+    relations[index + distance].gridIndex = select(right.gridIndex, left.gridIndex, cmpMaskInt);
+    relations[index + distance].cellIndex = select(right.cellIndex, left.cellIndex, cmpMask);
+    */
+    bool b1 = left.gridIndex < right.gridIndex;
+    bool b2 = index % (middleDistance << 1) >= middleDistance;
+    bool b3 = !(b1 ^ b2);
+
+    relations[index] = b3 ? left : right;
+    relations[index + distance] = b3 ? right : left;
   }
 }
 
