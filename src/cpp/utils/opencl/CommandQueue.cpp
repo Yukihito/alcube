@@ -15,6 +15,13 @@ namespace alcube::utils::opencl {
     return arg;
   }
 
+  KernelArg kernelargs::floatArg(float& f) {
+    KernelArg arg = KernelArg();
+    arg.size = sizeof(cl_float);
+    arg.ptr = &f;
+    return arg;
+  }
+
   CommandQueue::CommandQueue(Resources *resources) {
     this->resources = resources;
     this->queue = clCreateCommandQueue(

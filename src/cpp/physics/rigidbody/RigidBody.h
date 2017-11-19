@@ -18,7 +18,7 @@ namespace alcube::physics::rigidbody {
     public:
       RigidBodyState currentState;
       RigidBodyState nextState;
-      float weight;
+      float mass;
       explicit RigidBody();
   };
 }

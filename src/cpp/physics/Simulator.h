@@ -23,7 +23,10 @@ namespace alcube::physics {
       opencl::dtos::Grid* grid;
       opencl::dtos::Cell* cells;
       opencl::dtos::RigidBodyState* currentStates;
+      opencl::dtos::RigidBodyState* nextStates;
       opencl::dtos::GridAndCellRelation* gridAndCellRelations;
+      unsigned int* gridStartIndices;
+      unsigned int* gridEndIndices;
   };
 
   class Memories {
@@ -31,6 +34,7 @@ namespace alcube::physics {
       utils::opencl::Memory* grid;
       utils::opencl::Memory* cells;
       utils::opencl::Memory* currentStates;
+      utils::opencl::Memory* nextStates;
       utils::opencl::Memory* gridAndCellRelations;
       utils::opencl::Memory* gridStartIndices;
       utils::opencl::Memory* gridEndIndices;
@@ -43,6 +47,9 @@ namespace alcube::physics {
       cl_kernel bitonic;
       cl_kernel setGridRelationIndexRange;
       cl_kernel initGridAndCellRelations;
+      cl_kernel collectCollisionAndIntersections;
+      cl_kernel updatePhysicalQuantities;
+      cl_kernel resolveIntersection;
   };
 
   class Simulator {

@@ -38,9 +38,15 @@ namespace alcube::physics::opencl::dtos {
   class Cell {
     public:
       float radius;
-      float weight;
+      float mass;
+      cl_float3 tmpPosition;
       unsigned int springStartIndex;
       unsigned int springEndIndex;
+      bool collisionOccurred;
+      unsigned short collisionCellIndex;
+      float collisionTime;
+      unsigned char neighborCellCount;
+      unsigned short neighborCellIndices[16];
   };
 #pragma pack(pop)
 

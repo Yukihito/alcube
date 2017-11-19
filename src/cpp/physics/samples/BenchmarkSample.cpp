@@ -37,12 +37,15 @@ namespace alcube::physics::samples {
       simulator->dtos.currentStates[i].gridIndex;
     }
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1000; i++) {
       profiler->start(timerId);
       simulator->update(deltaTime);
       profiler->stop(timerId);
     }
+
     resources->release();
+
+    /*
     int prev = 0;
     for (int i = 0; i < maxCellCount; i++) {
       //auto state = simulator->dtos.currentStates[i];
@@ -55,6 +58,25 @@ namespace alcube::physics::samples {
       }
       prev = relation.gridIndex;
     }
+     */
+
+    /*
+    int max = 0;
+    int indexOfMax = 0;
+    int start = 0;
+    int end = 0;
+    for (int i = 0; i < 64 * 64 * 64; i++) {
+      int diff = (simulator->dtos.gridEndIndices[i] - 1) - simulator->dtos.gridStartIndices[i];
+      if (diff > max) {
+        max = diff;
+        indexOfMax = i;
+        start = simulator->dtos.gridStartIndices[i];
+        end = simulator->dtos.gridEndIndices[i];
+      }
+      //std::cout << simulator->dtos.gridStartIndices[i] << ", " << simulator->dtos.gridEndIndices[i] << std::endl;
+    }
+    std::cout << "max: " << max << ", index:" << indexOfMax << ", start: " << start << ", end: " << end << std::endl;
+*/
     profiler->update();
     std::cout << "UINT_MAX:" << UINT_MAX << std::endl;
     std::cout << "USHRT_MAX:" << USHRT_MAX << std::endl;

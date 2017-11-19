@@ -21,12 +21,15 @@ namespace alcube::physics {
     queue = new utils::opencl::CommandQueue(resources);
     cells = {};
 
-    cl_program setupGridProgram = programFactory->create("../src/kernels/physics/setupgrid.cl");
-    kernels.fillGridIndex = kernelFactory->create(setupGridProgram, "fillGridIndex");
-    kernels.merge = kernelFactory->create(setupGridProgram, "merge");
-    kernels.bitonic = kernelFactory->create(setupGridProgram, "bitonic");
-    kernels.setGridRelationIndexRange = kernelFactory->create(setupGridProgram, "setGridRelationIndexRange");
-    kernels.initGridAndCellRelations = kernelFactory->create(setupGridProgram, "initGridAndCellRelations");
+    cl_program program = programFactory->create("../src/kernels/physics/physics.cl");
+    kernels.fillGridIndex = kernelFactory->create(program, "fillGridIndex");
+    kernels.merge = kernelFactory->create(program, "merge");
+    kernels.bitonic = kernelFactory->create(program, "bitonic");
+    kernels.setGridRelationIndexRange = kernelFactory->create(program, "setGridRelationIndexRange");
+    kernels.initGridAndCellRelations = kernelFactory->create(program, "initGridAndCellRelations");
+    kernels.collectCollisionAndIntersections = kernelFactory->create(program, "collectCollisionAndIntersections");
+    kernels.updatePhysicalQuantities = kernelFactory->create(program, "updatePhysicalQuantities");
+    kernels.resolveIntersection = kernelFactory->create(program, "resolveIntersection");
 
     dtos.grid = new opencl::dtos::Grid();
     dtos.grid->edgeLength = gridEdgeLength;
@@ -38,11 +41,15 @@ namespace alcube::physics {
     dtos.grid->origin.s[2] = -(float)((zGridCount * gridEdgeLength) / 2);
     dtos.cells = new opencl::dtos::Cell[maxCellCount];
     dtos.currentStates = new opencl::dtos::RigidBodyState[maxCellCount];
+    dtos.nextStates = new opencl::dtos::RigidBodyState[maxCellCount];
     dtos.gridAndCellRelations = new opencl::dtos::GridAndCellRelation[maxCellCount];
+    dtos.gridStartIndices = new unsigned int[allGridCount];
+    dtos.gridEndIndices = new unsigned int[allGridCount];
 
     memories.grid = memoryManager->define("grid", sizeof(opencl::dtos::Grid), dtos.grid, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
-    memories.cells = memoryManager->define("cells", sizeof(opencl::dtos::Cell), dtos.cells, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
+    memories.cells = memoryManager->define("cells", sizeof(opencl::dtos::Cell), dtos.cells, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR);
     memories.currentStates = memoryManager->define("currentStates", sizeof(opencl::dtos::RigidBodyState), dtos.currentStates, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR);
+    memories.nextStates = memoryManager->define("nextStates", sizeof(opencl::dtos::RigidBodyState), nullptr, CL_MEM_READ_WRITE);
     memories.gridAndCellRelations = memoryManager->define("gridAndCellRelations", sizeof(opencl::dtos::GridAndCellRelation), nullptr, CL_MEM_READ_WRITE);
     memories.gridStartIndices = memoryManager->define("gridStartIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
     memories.gridEndIndices = memoryManager->define("gridEndIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
@@ -56,7 +63,7 @@ namespace alcube::physics {
     for (int i = 0; i < cellCount; i++) {
       Cell* cell = cells[i];
       dtos.cells[i].radius = cell->radius;
-      dtos.cells[i].weight = cell->weight;
+      dtos.cells[i].mass = cell->mass;
       dtos.cells[i].springEndIndex = 0;
       dtos.cells[i].springStartIndex = 0;
       dtos.currentStates[i].gridIndex = 0;
@@ -69,6 +76,7 @@ namespace alcube::physics {
     // Set count of memory, and allocate
     memories.cells->count = cellCount;
     memories.currentStates->count = cellCount;
+    memories.nextStates->count = cellCount;
     memories.gridAndCellRelations->count = cellCountForBitonicSort;
     memories.gridStartIndices->count = allGridCount;
     memories.gridEndIndices->count = allGridCount;
@@ -120,12 +128,41 @@ namespace alcube::physics {
     queue->push(kernels.setGridRelationIndexRange, {cellCount - 1}, {
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),
-      memArg(memories.gridEndIndices)
+      memArg(memories.gridEndIndices),
+      uintArg(cellCount)
     });
+
+
+    // Collect collision and intersections
+    queue->push(kernels.collectCollisionAndIntersections, {cellCount}, {
+      memArg(memories.grid),
+      memArg(memories.cells),
+      memArg(memories.currentStates),
+      memArg(memories.gridAndCellRelations),
+      memArg(memories.gridStartIndices),
+      memArg(memories.gridEndIndices),
+      floatArg(deltaTime)
+    });
+
+    queue->push(kernels.updatePhysicalQuantities, {cellCount}, {
+      memArg(memories.cells),
+      memArg(memories.currentStates),
+      memArg(memories.nextStates),
+      floatArg(deltaTime)
+    });
+
+    queue->push(kernels.resolveIntersection, {cellCount}, {
+      memArg(memories.cells),
+      memArg(memories.nextStates)
+    });
+
 
     // Read
     queue->read(memories.currentStates, dtos.currentStates);
-    queue->read(memories.gridAndCellRelations, dtos.gridAndCellRelations);
+    //queue->read(memories.gridAndCellRelations, dtos.gridAndCellRelations);
+    queue->read(memories.nextStates, dtos.nextStates);
+    //queue->read(memories.gridStartIndices, dtos.gridStartIndices);
+    //queue->read(memories.gridEndIndices, dtos.gridEndIndices);
     // Computing finish
 
     memoryManager->release();
