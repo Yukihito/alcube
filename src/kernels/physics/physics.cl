@@ -52,7 +52,7 @@ __kernel void fillGridIndex(
   float edgeLength = grid->edgeLength;
   float3 position = currentStates[cellIndex].position;
   float3 positionGridSpace = position - grid->origin;
-  unsigned int gridIndex = (int)(positionGridSpace.x / edgeLength) + (int)(positionGridSpace.y / edgeLength) * grid->xCount + (int)(positionGridSpace.z / edgeLength) * grid->xCount * grid->yCount;
+  unsigned int gridIndex = (uint)(positionGridSpace.x / edgeLength) + (uint)(positionGridSpace.y / edgeLength) * grid->xCount + (uint)(positionGridSpace.z / edgeLength) * grid->xCount * grid->yCount;
   currentStates[cellIndex].gridIndex = gridIndex;
   relations[cellIndex].cellIndex = cellIndex;
   relations[cellIndex].gridIndex = gridIndex;
@@ -128,27 +128,32 @@ __kernel void collectCollisionAndIntersections(
   float3 position = currentStates[cellIndex].position;
   float radius = cells[cellIndex].radius;
   float3 velocity = currentStates[cellIndex].linearMomentum / cells[cellIndex].mass;
+  float effectiveRadius = radius + 4.0f;
+  float3 checkStartPositionGridSpace = position - (float3)(effectiveRadius) - grid->origin;
+  checkStartPositionGridSpace.x = clamp(checkStartPositionGridSpace.x, 0.0f, edgeLength * grid->xCount);
+  checkStartPositionGridSpace.y = clamp(checkStartPositionGridSpace.y, 0.0f, edgeLength * grid->yCount);
+  checkStartPositionGridSpace.z = clamp(checkStartPositionGridSpace.z, 0.0f, edgeLength * grid->zCount);
+  float3 checkEndPositionGridSpace = position + (float3)(effectiveRadius) - grid->origin;
+  checkEndPositionGridSpace.x = clamp(checkEndPositionGridSpace.x, 0.0f, edgeLength * grid->xCount);
+  checkEndPositionGridSpace.y = clamp(checkEndPositionGridSpace.y, 0.0f, edgeLength * grid->yCount);
+  checkEndPositionGridSpace.z = clamp(checkEndPositionGridSpace.z, 0.0f, edgeLength * grid->zCount);
 
-  float3 checkStartPosition = position - ((float3)(radius * 4.0f));
-  float3 checkEndPosition = position + ((float3)(radius * 4.0f));
+  uint gridCheckStartX = min((uint)(checkStartPositionGridSpace.x / edgeLength), grid->xCount - 1);
+  uint gridCheckStartY = min((uint)(checkStartPositionGridSpace.y / edgeLength), grid->yCount - 1);
+  uint gridCheckStartZ = min((uint)(checkStartPositionGridSpace.z / edgeLength), grid->zCount - 1);
+  uint gridCheckEndX = min((uint)(checkEndPositionGridSpace.x / edgeLength), grid->xCount - 1);
+  uint gridCheckEndY = min((uint)(checkEndPositionGridSpace.y / edgeLength), grid->yCount - 1);
+  uint gridCheckEndZ = min((uint)(checkEndPositionGridSpace.z / edgeLength), grid->zCount - 1);
 
   ushort collisionCellIndex = 0;
   float collisionTime = deltaTime + 1.0f;
   uchar intersectionCount = 0;
   bool collisionOccurred = false;
   bool isFullOfIntersection = false;
-
-  for (float z = checkStartPosition.z; z <= checkEndPosition.z && !isFullOfIntersection; z += edgeLength) {
-    for (float y = checkStartPosition.y; y <= checkEndPosition.y && !isFullOfIntersection; y += edgeLength) {
-      for (float x = checkStartPosition.x; x <= checkEndPosition.x && !isFullOfIntersection; x += edgeLength) {
-
-	float3 checkPosition = (float3)(x, y, z);
-	float3 checkPositionGridSpace = checkPosition - grid->origin;
-
-	uint gridIndex = (int)(checkPositionGridSpace.x / edgeLength) + (int)(checkPositionGridSpace.y / edgeLength) * grid->xCount + (int)(checkPositionGridSpace.z / edgeLength) * grid->xCount * grid->yCount;
-	if (gridIndex >= allGridCount || gridIndex < 0) {
-	  continue;
-	}
+  for (uint gridZ = gridCheckStartZ; gridZ <= gridCheckEndZ && !isFullOfIntersection; gridZ++) {
+    for (uint gridY = gridCheckStartY; gridY <= gridCheckEndY && !isFullOfIntersection; gridY++) {
+      for (uint gridX = gridCheckStartX; gridX <= gridCheckEndX && !isFullOfIntersection; gridX++) {
+	uint gridIndex = gridX + gridY * grid->xCount + gridZ * grid->xCount * grid->yCount;
 
 	uint checkStartIndex = gridStartIndices[gridIndex];
 	uint checkEndIndex = gridEndIndices[gridIndex];

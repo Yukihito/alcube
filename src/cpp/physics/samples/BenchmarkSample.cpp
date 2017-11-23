@@ -5,7 +5,7 @@ namespace alcube::physics::samples {
     unsigned int maxCellCount = 16384; // 2^14
     //unsigned int maxCellCount = 64;
     std::mutex mutex;
-    float deltaTime = 1000.0f / 30.0f;
+    float deltaTime = 1.0f / 30.0f;
     auto resources = new utils::opencl::Resources();
     auto fileUtil = new utils::FileUtil();
     auto simulator = new Simulator(
@@ -37,7 +37,7 @@ namespace alcube::physics::samples {
       simulator->dtos.currentStates[i].gridIndex;
     }
 
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1000; i++) {
       profiler->start(timerId);
       simulator->update(deltaTime);
       profiler->stop(timerId);

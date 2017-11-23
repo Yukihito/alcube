@@ -72,13 +72,25 @@ namespace alcube::physics {
       Dtos dtos;
       Memories memories;
       Kernels kernels;
+      void setUpComputingSize();
+      void setUpMemories();
+      void tearDownMemories();
+      void input();
+      void output();
+      void computeBroadPhase();
+      void computeNarrowPhase(float deltaTime);
+      void updatePhysicalQuantities(float deltaTime);
+      void resolveIntersection();
+      void read(utils::opencl::Memory* memory, void* hostPtr);
     private:
       unsigned int maxCellCount;
       unsigned int allGridCount;
+      utils::opencl::CommandQueue* queue;
       utils::opencl::KernelFactory* kernelFactory;
       utils::opencl::ProgramFactory* programFactory;
       utils::opencl::MemoryManager* memoryManager;
-      utils::opencl::CommandQueue* queue;
+      unsigned int cellCount;
+      unsigned int cellCountForBitonicSort;
   };
 }
 

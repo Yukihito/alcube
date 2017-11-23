@@ -55,11 +55,12 @@ namespace alcube::physics {
     memories.gridEndIndices = memoryManager->define("gridEndIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
   }
 
-  void Simulator::update(float deltaTime) {
-    auto cellCount = (unsigned int)cells.size();
-    unsigned int cellCountForBitonicSort = utils::math::powerOf2(cellCount);
+  void Simulator::setUpComputingSize() {
+    cellCount = (unsigned int)cells.size();
+    cellCountForBitonicSort = utils::math::powerOf2(cellCount);
+  }
 
-    // Model -> DTO
+  void Simulator::input() {
     for (int i = 0; i < cellCount; i++) {
       Cell* cell = cells[i];
       dtos.cells[i].radius = cell->radius;
@@ -72,8 +73,19 @@ namespace alcube::physics {
       assignClFloat3(dtos.currentStates[i].position, cell->currentState.position);
       assignClFloat4(dtos.currentStates[i].rotation, cell->currentState.rotation);
     }
+  }
 
-    // Set count of memory, and allocate
+  void Simulator::output() {
+    for (int i = 0; i < cellCount; i++) {
+      Cell* cell = cells[i];
+      assignGlmVec3(cell->currentState.linearMomentum, dtos.currentStates[i].linearMomentum);
+      assignGlmVec3(cell->currentState.angularMomentum, dtos.currentStates[i].angularMomentum);
+      assignGlmVec3(cell->currentState.position, dtos.currentStates[i].position);
+      assignGlmQuat(cell->currentState.rotation, dtos.currentStates[i].rotation);
+    }
+  }
+
+  void Simulator::setUpMemories() {
     memories.cells->count = cellCount;
     memories.currentStates->count = cellCount;
     memories.nextStates->count = cellCount;
@@ -81,8 +93,13 @@ namespace alcube::physics {
     memories.gridStartIndices->count = allGridCount;
     memories.gridEndIndices->count = allGridCount;
     memoryManager->allocate();
+  }
 
-    // Computing start
+  void Simulator::tearDownMemories() {
+    memoryManager->release();
+  }
+
+  void Simulator::computeBroadPhase() {
     // Initialize grid and cell relations
     queue->push(kernels.initGridAndCellRelations, {cellCountForBitonicSort}, {
       memArg(memories.gridAndCellRelations),
@@ -131,8 +148,9 @@ namespace alcube::physics {
       memArg(memories.gridEndIndices),
       uintArg(cellCount)
     });
+  }
 
-
+  void Simulator::computeNarrowPhase(float deltaTime) {
     // Collect collision and intersections
     queue->push(kernels.collectCollisionAndIntersections, {cellCount}, {
       memArg(memories.grid),
@@ -143,37 +161,42 @@ namespace alcube::physics {
       memArg(memories.gridEndIndices),
       floatArg(deltaTime)
     });
+  }
 
+  void Simulator::updatePhysicalQuantities(float deltaTime) {
     queue->push(kernels.updatePhysicalQuantities, {cellCount}, {
       memArg(memories.cells),
       memArg(memories.currentStates),
       memArg(memories.nextStates),
       floatArg(deltaTime)
     });
+  }
 
+  void Simulator::resolveIntersection() {
     queue->push(kernels.resolveIntersection, {cellCount}, {
       memArg(memories.cells),
       memArg(memories.nextStates)
     });
+  }
 
+  void Simulator::read(utils::opencl::Memory *memory, void *hostPtr) {
+    queue->read(memory, hostPtr);
+  }
 
-    // Read
-    queue->read(memories.currentStates, dtos.currentStates);
-    //queue->read(memories.gridAndCellRelations, dtos.gridAndCellRelations);
-    queue->read(memories.nextStates, dtos.nextStates);
-    //queue->read(memories.gridStartIndices, dtos.gridStartIndices);
-    //queue->read(memories.gridEndIndices, dtos.gridEndIndices);
-    // Computing finish
+  void Simulator::update(float deltaTime) {
+    setUpComputingSize();
+    input();
+    setUpMemories();
 
-    memoryManager->release();
+    computeBroadPhase();
+    computeNarrowPhase(deltaTime);
+    updatePhysicalQuantities(deltaTime);
+    resolveIntersection();
 
-    // DTO -> Model
-    for (int i = 0; i < cellCount; i++) {
-      Cell* cell = cells[i];
-      assignGlmVec3(cell->currentState.linearMomentum, dtos.currentStates[i].linearMomentum);
-      assignGlmVec3(cell->currentState.angularMomentum, dtos.currentStates[i].angularMomentum);
-      assignGlmVec3(cell->currentState.position, dtos.currentStates[i].position);
-      assignGlmQuat(cell->currentState.rotation, dtos.currentStates[i].rotation);
-    }
+    read(memories.currentStates, dtos.currentStates);
+    read(memories.nextStates, dtos.nextStates);
+
+    tearDownMemories();
+    output();
   }
 }
