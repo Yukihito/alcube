@@ -65,6 +65,7 @@ namespace alcube::physics {
       Cell* cell = cells[i];
       dtos.cells[i].radius = cell->radius;
       dtos.cells[i].mass = cell->mass;
+      dtos.cells[i].elasticity = cell->elasticity;
       dtos.cells[i].springEndIndex = 0;
       dtos.cells[i].springStartIndex = 0;
       dtos.currentStates[i].gridIndex = 0;

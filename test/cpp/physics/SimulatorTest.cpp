@@ -83,6 +83,18 @@ namespace alcube::physics {
         simulator->read(simulator->memories.cells, simulator->dtos.cells);
         simulator->tearDownMemories();
       }
+
+      void simulateAll(float deltaTime) {
+        simulator->setUpComputingSize();
+        simulator->input();
+        simulator->setUpMemories();
+        simulator->computeBroadPhase();
+        simulator->computeNarrowPhase(deltaTime);
+        simulator->updatePhysicalQuantities(deltaTime);
+        simulator->resolveIntersection();
+        simulator->read(simulator->memories.nextStates, simulator->dtos.nextStates);
+        simulator->tearDownMemories();
+      }
   };
 
   TEST_F(SimulatorTest, broadPhase1) { // NOLINT
@@ -202,10 +214,10 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    Cell* cell0 = new Cell();
+    auto cell0 = new Cell();
     cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    Cell* cell1 = new Cell();
+    auto cell1 = new Cell();
     cell1->currentState.position = glm::vec3(2.0f - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -226,10 +238,10 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    Cell* cell0 = new Cell();
+    auto cell0 = new Cell();
     cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    Cell* cell1 = new Cell();
+    auto cell1 = new Cell();
     cell1->currentState.position = glm::vec3(2.0f + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -248,12 +260,12 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    Cell* cell0 = new Cell();
+    auto cell0 = new Cell();
     cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
 
-    Cell* cell1 = new Cell();
+    auto cell1 = new Cell();
     cell1->currentState.position = glm::vec3(2.0f + movingDistance + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -272,12 +284,12 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    Cell* cell0 = new Cell();
+    auto cell0 = new Cell();
     cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
 
-    Cell* cell1 = new Cell();
+    auto cell1 = new Cell();
     cell1->currentState.position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -293,5 +305,155 @@ namespace alcube::physics {
     ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 1);
     ASSERT_EQ(simulator->dtos.cells[1].neighborCellIndices[0], 0);
     ASSERT_EQ(simulator->dtos.cells[1].collisionCellIndex, 0);
+  }
+
+  TEST_F(SimulatorTest, narrowPhase5) { // NOLINT
+    // Cell0 intersects cell1, but steps away during delta time.
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+
+    auto cell0 = new Cell();
+    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->currentState.linearMomentum = glm::vec3(-1.0f, 0.0f, 0.0f);
+    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+
+    auto cell1 = new Cell();
+    cell1->currentState.position = glm::vec3(2.0f + movingDistance + smallDistance, 0.0f, 0.0f);
+
+    addCell(cell0);
+    addCell(cell1);
+    simulateNarrowPhase(deltaTime);
+
+    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cells[0].neighborCellCount, 0);
+
+    ASSERT_FALSE(simulator->dtos.cells[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 0);
+  }
+
+  TEST_F(SimulatorTest, narrowPhase6) { // NOLINT
+    // Cell0 keeps an intersection with cell1 during delta time.
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+
+    auto cell0 = new Cell();
+    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->currentState.linearMomentum = glm::vec3(-1.0f, 0.0f, 0.0f);
+    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+
+    auto cell1 = new Cell();
+    cell1->currentState.position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
+
+    addCell(cell0);
+    addCell(cell1);
+    simulateNarrowPhase(deltaTime);
+
+    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cells[0].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cells[0].neighborCellIndices[0], 1);
+
+    ASSERT_FALSE(simulator->dtos.cells[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cells[1].neighborCellIndices[0], 0);
+  }
+
+  TEST_F(SimulatorTest, narrowPhase7) { // NOLINT
+    // Cell0 intersects cell1 and cell2.
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+
+    auto cell0 = new Cell();
+    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.5f, 0.0f);
+
+    auto cell1 = new Cell();
+    cell1->currentState.position = glm::vec3(2.0f + smallDistance, 0.0f, 0.0f);
+    auto cell2 = new Cell();
+    cell1->currentState.position = glm::vec3(0.0f, 2.0f + smallDistance, 0.0f);
+
+    addCell(cell0);
+    addCell(cell1);
+    addCell(cell2);
+    simulateNarrowPhase(deltaTime);
+
+    ASSERT_TRUE(simulator->dtos.cells[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cells[0].collisionCellIndex, 1);
+    ASSERT_EQ(simulator->dtos.cells[0].neighborCellCount, 2);
+    ASSERT_EQ(simulator->dtos.cells[0].neighborCellIndices[0], 1);
+    ASSERT_EQ(simulator->dtos.cells[0].neighborCellIndices[1], 2);
+
+    ASSERT_TRUE(simulator->dtos.cells[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cells[1].collisionCellIndex, 0);
+    ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cells[1].neighborCellIndices[0], 0);
+
+    ASSERT_FALSE(simulator->dtos.cells[2].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cells[2].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cells[2].neighborCellIndices[0], 0);
+  }
+
+  TEST_F(SimulatorTest, all1) { // NOLINT
+    // Elastic collision.
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+
+    auto cell0 = new Cell();
+    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
+    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+
+    auto cell1 = new Cell();
+    cell1->currentState.position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
+
+    addCell(cell0);
+    addCell(cell1);
+    simulateAll(deltaTime);
+
+    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, 0.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[1].linearMomentum.x, 1.0f);
+  }
+
+  TEST_F(SimulatorTest, all2) { // NOLINT
+    // Inelastic collision.
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+
+    auto cell0 = new Cell();
+    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
+    cell0->elasticity = 0.5f;
+    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+
+    auto cell1 = new Cell();
+    cell1->currentState.position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
+
+    addCell(cell0);
+    addCell(cell1);
+    simulateAll(deltaTime);
+
+    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, 0.25f);
+    ASSERT_EQ(simulator->dtos.nextStates[1].linearMomentum.x, 0.75f);
+  }
+
+  TEST_F(SimulatorTest, all3) { // NOLINT
+    // Perfectly inelastic collision.
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+
+    auto cell0 = new Cell();
+    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
+    cell0->elasticity = 0.0f;
+    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+
+    auto cell1 = new Cell();
+    cell1->currentState.position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
+
+    addCell(cell0);
+    addCell(cell1);
+    simulateAll(deltaTime);
+
+    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, 0.5f);
+    ASSERT_EQ(simulator->dtos.nextStates[1].linearMomentum.x, 0.5f);
   }
 }

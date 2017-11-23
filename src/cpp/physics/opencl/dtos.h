@@ -39,6 +39,7 @@ namespace alcube::physics::opencl::dtos {
     public:
       float radius;
       float mass;
+      float elasticity;
       cl_float3 tmpPosition;
       unsigned int springStartIndex;
       unsigned int springEndIndex;

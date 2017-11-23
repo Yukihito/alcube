@@ -22,6 +22,7 @@ typedef struct __attribute__ ((packed)) RigidBodyStateStruct {
 typedef struct __attribute__ ((packed)) CellStruct {
   float radius;
   float mass;
+  float elasticity;
   float3 tmpPosition;
   unsigned int springStartIndex;
   unsigned int springEndIndex;
@@ -52,7 +53,11 @@ __kernel void fillGridIndex(
   float edgeLength = grid->edgeLength;
   float3 position = currentStates[cellIndex].position;
   float3 positionGridSpace = position - grid->origin;
-  unsigned int gridIndex = (uint)(positionGridSpace.x / edgeLength) + (uint)(positionGridSpace.y / edgeLength) * grid->xCount + (uint)(positionGridSpace.z / edgeLength) * grid->xCount * grid->yCount;
+  uint3 p = convert_uint3(positionGridSpace / edgeLength);
+  uint gridX = clamp(p.x, (uint)0, grid->xCount - 1);
+  uint gridY = clamp(p.y, (uint)0, grid->yCount - 1);
+  uint gridZ = clamp(p.z, (uint)0, grid->zCount - 1);
+  uint gridIndex = (uint)gridX + (uint)gridY * grid->xCount + (uint)gridZ * grid->xCount * grid->yCount;
   currentStates[cellIndex].gridIndex = gridIndex;
   relations[cellIndex].cellIndex = cellIndex;
   relations[cellIndex].gridIndex = gridIndex;
@@ -123,27 +128,23 @@ __kernel void collectCollisionAndIntersections(
 ) {
   size_t cellIndex = get_global_id(0);
   float edgeLength = (float)grid->edgeLength;
-  uint allGridCount = grid->xCount * grid->yCount * grid->zCount;
 
   float3 position = currentStates[cellIndex].position;
   float radius = cells[cellIndex].radius;
   float3 velocity = currentStates[cellIndex].linearMomentum / cells[cellIndex].mass;
   float effectiveRadius = radius + 4.0f;
-  float3 checkStartPositionGridSpace = position - (float3)(effectiveRadius) - grid->origin;
-  checkStartPositionGridSpace.x = clamp(checkStartPositionGridSpace.x, 0.0f, edgeLength * grid->xCount);
-  checkStartPositionGridSpace.y = clamp(checkStartPositionGridSpace.y, 0.0f, edgeLength * grid->yCount);
-  checkStartPositionGridSpace.z = clamp(checkStartPositionGridSpace.z, 0.0f, edgeLength * grid->zCount);
-  float3 checkEndPositionGridSpace = position + (float3)(effectiveRadius) - grid->origin;
-  checkEndPositionGridSpace.x = clamp(checkEndPositionGridSpace.x, 0.0f, edgeLength * grid->xCount);
-  checkEndPositionGridSpace.y = clamp(checkEndPositionGridSpace.y, 0.0f, edgeLength * grid->yCount);
-  checkEndPositionGridSpace.z = clamp(checkEndPositionGridSpace.z, 0.0f, edgeLength * grid->zCount);
 
-  uint gridCheckStartX = min((uint)(checkStartPositionGridSpace.x / edgeLength), grid->xCount - 1);
-  uint gridCheckStartY = min((uint)(checkStartPositionGridSpace.y / edgeLength), grid->yCount - 1);
-  uint gridCheckStartZ = min((uint)(checkStartPositionGridSpace.z / edgeLength), grid->zCount - 1);
-  uint gridCheckEndX = min((uint)(checkEndPositionGridSpace.x / edgeLength), grid->xCount - 1);
-  uint gridCheckEndY = min((uint)(checkEndPositionGridSpace.y / edgeLength), grid->yCount - 1);
-  uint gridCheckEndZ = min((uint)(checkEndPositionGridSpace.z / edgeLength), grid->zCount - 1);
+  float3 checkStartPositionGridSpace = position - (float3)(effectiveRadius) - grid->origin;
+  uint3 checkStartGrid = convert_uint3(checkStartPositionGridSpace / edgeLength);
+  uint gridCheckStartX = clamp(checkStartGrid.x, (uint)0, grid->xCount - 1);
+  uint gridCheckStartY = clamp(checkStartGrid.y, (uint)0, grid->yCount - 1);
+  uint gridCheckStartZ = clamp(checkStartGrid.z, (uint)0, grid->zCount - 1);
+
+  float3 checkEndPositionGridSpace = position + (float3)(effectiveRadius) - grid->origin;
+  uint3 checkEndGrid = convert_uint3(checkEndPositionGridSpace / edgeLength);
+  uint gridCheckEndX = clamp(checkEndGrid.x, (uint)0, grid->xCount - 1);
+  uint gridCheckEndY = clamp(checkEndGrid.y, (uint)0, grid->yCount - 1);
+  uint gridCheckEndZ = clamp(checkEndGrid.z, (uint)0, grid->zCount - 1);
 
   ushort collisionCellIndex = 0;
   float collisionTime = deltaTime + 1.0f;
@@ -236,8 +237,8 @@ __kernel void updatePhysicalQuantities(
   float3 nextLinearMomentum = currentLinearMomentum;
   if (cells[cellIndex].collisionOccurred) {
     ushort otherCellIndex = cells[cellIndex].collisionCellIndex;
-    float elasticity = 1.0f;
-    float otherElasticity = 1.0f;
+    float elasticity = cells[cellIndex].elasticity;
+    float otherElasticity = cells[otherCellIndex].elasticity;
     float otherMass = cells[otherCellIndex].mass;
     float3 relativeOtherCellPosition = currentStates[otherCellIndex].position - nextPosition;
     float3 otherCurrentVelocity = currentStates[otherCellIndex].linearMomentum / otherMass;
