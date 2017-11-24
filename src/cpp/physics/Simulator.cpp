@@ -79,10 +79,10 @@ namespace alcube::physics {
   void Simulator::output() {
     for (int i = 0; i < cellCount; i++) {
       Cell* cell = cells[i];
-      assignGlmVec3(cell->linearMomentum, dtos.currentStates[i].linearMomentum);
-      assignGlmVec3(cell->angularMomentum, dtos.currentStates[i].angularMomentum);
-      assignGlmVec3(cell->position, dtos.currentStates[i].position);
-      assignGlmQuat(cell->rotation, dtos.currentStates[i].rotation);
+      assignGlmVec3(cell->linearMomentum, dtos.nextStates[i].linearMomentum);
+      assignGlmVec3(cell->angularMomentum, dtos.nextStates[i].angularMomentum);
+      assignGlmVec3(cell->position, dtos.nextStates[i].position);
+      assignGlmQuat(cell->rotation, dtos.nextStates[i].rotation);
     }
   }
 
@@ -195,10 +195,11 @@ namespace alcube::physics {
     updatePhysicalQuantities(deltaTime);
     resolveIntersection();
 
-    read(memories.currentStates, dtos.currentStates);
     read(memories.nextStates, dtos.nextStates);
-
     tearDownMemories();
+
+    cellsMutex->lock();
     output();
+    cellsMutex->unlock();
   }
 }

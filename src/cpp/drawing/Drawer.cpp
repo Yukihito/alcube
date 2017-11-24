@@ -28,10 +28,10 @@ namespace alcube::drawing {
 
     glm::mat4 projection =
       glm::perspective(
-        camera->angleOfView, // 視界
-        camera->aspectRatio, // アス比
-        camera->near, // 手前
-        camera->far // 奥
+        camera->angleOfView,
+        camera->aspectRatio,
+        camera->near,
+        camera->far
       );
 
     glm::mat4 view =  glm::inverse(glm::toMat4(camera->rotation)) * glm::translate(-camera->position);
