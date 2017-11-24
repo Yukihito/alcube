@@ -6,10 +6,10 @@ namespace alcube::physics {
   }
 
   glm::vec3 Cell::getPosition() {
-    return currentState.position;
+    return position;
   }
 
   glm::quat Cell::getRotation() {
-    return currentState.rotation;
+    return rotation;
   }
 }

@@ -69,20 +69,20 @@ namespace alcube::physics {
       dtos.cells[i].springEndIndex = 0;
       dtos.cells[i].springStartIndex = 0;
       dtos.currentStates[i].gridIndex = 0;
-      assignClFloat3(dtos.currentStates[i].linearMomentum, cell->currentState.linearMomentum);
-      assignClFloat3(dtos.currentStates[i].angularMomentum, cell->currentState.angularMomentum);
-      assignClFloat3(dtos.currentStates[i].position, cell->currentState.position);
-      assignClFloat4(dtos.currentStates[i].rotation, cell->currentState.rotation);
+      assignClFloat3(dtos.currentStates[i].linearMomentum, cell->linearMomentum);
+      assignClFloat3(dtos.currentStates[i].angularMomentum, cell->angularMomentum);
+      assignClFloat3(dtos.currentStates[i].position, cell->position);
+      assignClFloat4(dtos.currentStates[i].rotation, cell->rotation);
     }
   }
 
   void Simulator::output() {
     for (int i = 0; i < cellCount; i++) {
       Cell* cell = cells[i];
-      assignGlmVec3(cell->currentState.linearMomentum, dtos.currentStates[i].linearMomentum);
-      assignGlmVec3(cell->currentState.angularMomentum, dtos.currentStates[i].angularMomentum);
-      assignGlmVec3(cell->currentState.position, dtos.currentStates[i].position);
-      assignGlmQuat(cell->currentState.rotation, dtos.currentStates[i].rotation);
+      assignGlmVec3(cell->linearMomentum, dtos.currentStates[i].linearMomentum);
+      assignGlmVec3(cell->angularMomentum, dtos.currentStates[i].angularMomentum);
+      assignGlmVec3(cell->position, dtos.currentStates[i].position);
+      assignGlmQuat(cell->rotation, dtos.currentStates[i].rotation);
     }
   }
 

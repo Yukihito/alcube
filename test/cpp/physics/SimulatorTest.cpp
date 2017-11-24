@@ -51,7 +51,7 @@ namespace alcube::physics {
 
         for (int i = 0; i < count; i++) {
           auto cell = new Cell();
-          cell->currentState.position = glm::vec3(
+          cell->position = glm::vec3(
             randReal(mt),
             randReal(mt),
             randReal(mt)
@@ -218,10 +218,10 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
 
     auto cell0 = new Cell();
-    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
 
     auto cell1 = new Cell();
-    cell1->currentState.position = glm::vec3(2.0f - smallDistance, 0.0f, 0.0f);
+    cell1->position = glm::vec3(2.0f - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
@@ -242,10 +242,10 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
 
     auto cell0 = new Cell();
-    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
 
     auto cell1 = new Cell();
-    cell1->currentState.position = glm::vec3(2.0f + smallDistance, 0.0f, 0.0f);
+    cell1->position = glm::vec3(2.0f + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
@@ -264,12 +264,12 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
 
     auto cell0 = new Cell();
-    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
-    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
+    float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
     auto cell1 = new Cell();
-    cell1->currentState.position = glm::vec3(2.0f + movingDistance + smallDistance, 0.0f, 0.0f);
+    cell1->position = glm::vec3(2.0f + movingDistance + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
@@ -288,12 +288,12 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
 
     auto cell0 = new Cell();
-    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
-    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
+    float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
     auto cell1 = new Cell();
-    cell1->currentState.position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
+    cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
@@ -316,12 +316,12 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
 
     auto cell0 = new Cell();
-    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    cell0->currentState.linearMomentum = glm::vec3(-1.0f, 0.0f, 0.0f);
-    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->linearMomentum = glm::vec3(-1.0f, 0.0f, 0.0f);
+    float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
     auto cell1 = new Cell();
-    cell1->currentState.position = glm::vec3(2.0f + movingDistance + smallDistance, 0.0f, 0.0f);
+    cell1->position = glm::vec3(2.0f + movingDistance + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
@@ -340,12 +340,12 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
 
     auto cell0 = new Cell();
-    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    cell0->currentState.linearMomentum = glm::vec3(-1.0f, 0.0f, 0.0f);
-    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->linearMomentum = glm::vec3(-1.0f, 0.0f, 0.0f);
+    float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
     auto cell1 = new Cell();
-    cell1->currentState.position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
+    cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
@@ -366,13 +366,13 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
 
     auto cell0 = new Cell();
-    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.5f, 0.0f);
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->linearMomentum = glm::vec3(1.0f, 0.5f, 0.0f);
 
     auto cell1 = new Cell();
-    cell1->currentState.position = glm::vec3(2.0f + smallDistance, 0.0f, 0.0f);
+    cell1->position = glm::vec3(2.0f + smallDistance, 0.0f, 0.0f);
     auto cell2 = new Cell();
-    cell1->currentState.position = glm::vec3(0.0f, 2.0f + smallDistance, 0.0f);
+    cell1->position = glm::vec3(0.0f, 2.0f + smallDistance, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
@@ -401,12 +401,12 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
 
     auto cell0 = new Cell();
-    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
-    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
+    float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
     auto cell1 = new Cell();
-    cell1->currentState.position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
+    cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
@@ -422,13 +422,13 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
 
     auto cell0 = new Cell();
-    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     cell0->elasticity = 0.5f;
-    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+    float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
     auto cell1 = new Cell();
-    cell1->currentState.position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
+    cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
@@ -444,13 +444,13 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
 
     auto cell0 = new Cell();
-    cell0->currentState.position = glm::vec3(0.0f, 0.0f, 0.0f);
-    cell0->currentState.linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     cell0->elasticity = 0.0f;
-    float movingDistance = (cell0->currentState.linearMomentum.x / cell0->mass) * deltaTime;
+    float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
     auto cell1 = new Cell();
-    cell1->currentState.position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
+    cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
@@ -467,8 +467,8 @@ namespace alcube::physics {
     glm::vec3 corner = -glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
     auto cell = new Cell();
-    cell->currentState.position = glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
-    cell->currentState.linearMomentum = glm::vec3(-0.5f, -1.0f, -0.5f);
+    cell->position = glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
+    cell->linearMomentum = glm::vec3(-0.5f, -1.0f, -0.5f);
     addCell(cell);
     simulateAll(deltaTime);
     ASSERT_TRUE(simulator->dtos.cells[0].collisionOccurred);
@@ -488,7 +488,7 @@ namespace alcube::physics {
     glm::vec3 corner = -glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
     auto cell = new Cell();
-    cell->currentState.position = glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
+    cell->position = glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
     addCell(cell);
     simulateAll(deltaTime);
     ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
@@ -504,8 +504,8 @@ namespace alcube::physics {
     glm::vec3 corner = glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
     auto cell = new Cell();
-    cell->currentState.position = -glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
-    cell->currentState.linearMomentum = glm::vec3(0.5f, 1.0f, 0.5f);
+    cell->position = -glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
+    cell->linearMomentum = glm::vec3(0.5f, 1.0f, 0.5f);
     addCell(cell);
     simulateAll(deltaTime);
     ASSERT_TRUE(simulator->dtos.cells[0].collisionOccurred);
@@ -526,7 +526,7 @@ namespace alcube::physics {
     glm::vec3 corner = glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
     auto cell = new Cell();
-    cell->currentState.position = -glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
+    cell->position = -glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
     addCell(cell);
     simulateAll(deltaTime);
     ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);

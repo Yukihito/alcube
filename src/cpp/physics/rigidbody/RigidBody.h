@@ -6,18 +6,12 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace alcube::physics::rigidbody {
-  class RigidBodyState {
+  class RigidBody {
     public:
       glm::vec3 position;
       glm::quat rotation;
       glm::vec3 linearMomentum;
       glm::vec3 angularMomentum;
-  };
-
-  class RigidBody {
-    public:
-      RigidBodyState currentState;
-      RigidBodyState nextState;
       float mass;
       float elasticity;
       explicit RigidBody();

@@ -28,12 +28,12 @@ namespace alcube::physics::samples {
 
     for (int i = 0; i < maxCellCount; i++) {
       auto cell = new Cell();
-      cell->currentState.position = glm::vec3(
+      cell->position = glm::vec3(
         randReal(mt),
         randReal(mt),
         randReal(mt)
       );
-      cell->currentState.linearMomentum = glm::vec3(
+      cell->linearMomentum = glm::vec3(
         randReal2(mt),
         randReal2(mt),
         randReal2(mt)
