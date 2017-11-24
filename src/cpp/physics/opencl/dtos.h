@@ -48,6 +48,8 @@ namespace alcube::physics::opencl::dtos {
       float collisionTime;
       unsigned char neighborCellCount;
       unsigned short neighborCellIndices[16];
+      unsigned char collisionType;
+      unsigned char collisionWallAxis;
   };
 #pragma pack(pop)
 

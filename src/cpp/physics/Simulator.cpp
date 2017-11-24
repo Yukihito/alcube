@@ -143,7 +143,7 @@ namespace alcube::physics {
     // Setup grid and cell relation ranges
     queue->pushZeroFill(memories.gridStartIndices);
     queue->pushZeroFill(memories.gridEndIndices);
-    queue->push(kernels.setGridRelationIndexRange, {cellCount - 1}, {
+    queue->push(kernels.setGridRelationIndexRange, {cellCount > 1 ? cellCount - 1 : 1}, {
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),
       memArg(memories.gridEndIndices),
@@ -176,7 +176,8 @@ namespace alcube::physics {
   void Simulator::resolveIntersection() {
     queue->push(kernels.resolveIntersection, {cellCount}, {
       memArg(memories.cells),
-      memArg(memories.nextStates)
+      memArg(memories.nextStates),
+      memArg(memories.grid)
     });
   }
 

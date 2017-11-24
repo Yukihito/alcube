@@ -92,6 +92,7 @@ namespace alcube::physics {
         simulator->computeNarrowPhase(deltaTime);
         simulator->updatePhysicalQuantities(deltaTime);
         simulator->resolveIntersection();
+        simulator->read(simulator->memories.cells, simulator->dtos.cells);
         simulator->read(simulator->memories.nextStates, simulator->dtos.nextStates);
         simulator->tearDownMemories();
       }
@@ -455,5 +456,80 @@ namespace alcube::physics {
 
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, 0.5f);
     ASSERT_EQ(simulator->dtos.nextStates[1].linearMomentum.x, 0.5f);
+  }
+
+  TEST_F(SimulatorTest, all4) { // NOLINT
+    // Collision with corner (Grid start position) occurs.
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+    glm::vec3 corner = -glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
+    glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
+    auto cell = new Cell();
+    cell->currentState.position = glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
+    cell->currentState.linearMomentum = glm::vec3(-0.5f, -1.0f, -0.5f);
+    addCell(cell);
+    simulateAll(deltaTime);
+    ASSERT_TRUE(simulator->dtos.cells[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cells[0].collisionWallAxis, 1);
+    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, -0.5f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.y, 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.z, -0.5f);
+    ASSERT_GT(simulator->dtos.nextStates[0].position.x, corner.x + 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y + 1.0f);
+    ASSERT_GT(simulator->dtos.nextStates[0].position.z, corner.z + 1.0f);
+  }
+
+  TEST_F(SimulatorTest, all5) { // NOLINT
+    // Cell intersects corner (Grid start position) occurs.
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+    glm::vec3 corner = -glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
+    glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
+    auto cell = new Cell();
+    cell->currentState.position = glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
+    addCell(cell);
+    simulateAll(deltaTime);
+    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x + 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y + 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z + 1.0f);
+  }
+
+  TEST_F(SimulatorTest, all6) { // NOLINT
+    // Collision with corner (Grid end position) occurs.
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+    glm::vec3 corner = glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
+    glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
+    auto cell = new Cell();
+    cell->currentState.position = -glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
+    cell->currentState.linearMomentum = glm::vec3(0.5f, 1.0f, 0.5f);
+    addCell(cell);
+    simulateAll(deltaTime);
+    ASSERT_TRUE(simulator->dtos.cells[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cells[0].collisionWallAxis, 1);
+    ASSERT_EQ(simulator->dtos.cells[0].collisionType, 0);
+    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, 0.5f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.y, -1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.z, 0.5f);
+    ASSERT_LT(simulator->dtos.nextStates[0].position.x, corner.x - 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y - 1.0f);
+    ASSERT_LT(simulator->dtos.nextStates[0].position.z, corner.z - 1.0f);
+  }
+
+  TEST_F(SimulatorTest, all7) { // NOLINT
+    // Cell intersects corner (Grid end position) occurs.
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+    glm::vec3 corner = glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
+    glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
+    auto cell = new Cell();
+    cell->currentState.position = -glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
+    addCell(cell);
+    simulateAll(deltaTime);
+    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x - 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y - 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z - 1.0f);
   }
 }

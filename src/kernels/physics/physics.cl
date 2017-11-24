@@ -31,6 +31,8 @@ typedef struct __attribute__ ((packed)) CellStruct {
   float collisionTime;
   unsigned char neighborCellCount;
   unsigned short neighborCellIndices[16];
+  unsigned char collisionType;
+  unsigned char collisionWallAxis;
 } Cell;
 
 __kernel void initGridAndCellRelations(
@@ -132,6 +134,37 @@ __kernel void collectCollisionAndIntersections(
   float3 position = currentStates[cellIndex].position;
   float radius = cells[cellIndex].radius;
   float3 velocity = currentStates[cellIndex].linearMomentum / cells[cellIndex].mass;
+
+  float collisionTime = deltaTime + 1.0f;
+  bool collisionOccurred = false;
+  uchar collisionType = 0;
+
+  float3 walls = grid->origin + (float3)(radius);
+  float3 wallDist1 = (walls - position);
+  float3 wallDist2 = (-walls - position);
+  float* wallDistPtrs1 = &wallDist1;
+  float* wallDistPtrs2 = &wallDist2;
+  float* velocityPtr = &velocity;
+  uchar collisionWallAxis;
+  for (uchar i = 0; i < 3; i++) {
+    if (velocity[i] == 0.0f) {
+      continue;
+    }
+    float t1 = wallDist1[i] / velocity[i];
+    float t2 = wallDist2[i] / velocity[i];
+    bool intersects1 = deltaTime >= t1 && t1 > 0;
+    bool intersects2 = deltaTime >= t2 && t2 > 0;
+    float wallCollisionTime = collisionTime;
+    if (intersects1 || intersects2) {
+      wallCollisionTime = intersects1 && wallCollisionTime > t1 ? t1 : wallCollisionTime;
+      wallCollisionTime = intersects2 && wallCollisionTime > t2 ? t2 : wallCollisionTime;
+      collisionWallAxis = wallCollisionTime < collisionTime ? i : collisionWallAxis;
+      collisionTime = wallCollisionTime;
+      collisionOccurred = true;
+      collisionType = 0;
+    }
+  }
+
   float effectiveRadius = radius + 4.0f;
 
   float3 checkStartPositionGridSpace = position - (float3)(effectiveRadius) - grid->origin;
@@ -147,9 +180,7 @@ __kernel void collectCollisionAndIntersections(
   uint gridCheckEndZ = clamp(checkEndGrid.z, (uint)0, grid->zCount - 1);
 
   ushort collisionCellIndex = 0;
-  float collisionTime = deltaTime + 1.0f;
   uchar intersectionCount = 0;
-  bool collisionOccurred = false;
   bool isFullOfIntersection = false;
   for (uint gridZ = gridCheckStartZ; gridZ <= gridCheckEndZ && !isFullOfIntersection; gridZ++) {
     for (uint gridY = gridCheckStartY; gridY <= gridCheckEndY && !isFullOfIntersection; gridY++) {
@@ -202,6 +233,7 @@ __kernel void collectCollisionAndIntersections(
 	      collisionCellIndex = otherCellIndex;
 	      collisionTime = intersectionStartTime;
 	      collisionOccurred = true;
+	      collisionType = 1;
 	    }
 	    cells[cellIndex].neighborCellIndices[intersectionCount] = otherCellIndex;
 	    intersectionCount++;
@@ -218,6 +250,8 @@ __kernel void collectCollisionAndIntersections(
   cells[cellIndex].collisionOccurred = collisionOccurred;
   cells[cellIndex].collisionTime = collisionTime;
   cells[cellIndex].neighborCellCount = intersectionCount;
+  cells[cellIndex].collisionType = collisionType;
+  cells[cellIndex].collisionWallAxis = collisionWallAxis;
 }
 
 __kernel void updatePhysicalQuantities(
@@ -235,7 +269,11 @@ __kernel void updatePhysicalQuantities(
   timeInterval = timeInterval > 0.0f ? timeInterval : 0.0f;
   float3 nextPosition = currentPosition + (currentVelocity * timeInterval);
   float3 nextLinearMomentum = currentLinearMomentum;
-  if (cells[cellIndex].collisionOccurred) {
+  if (cells[cellIndex].collisionOccurred && cells[cellIndex].collisionType == 0) {
+    float* nextLinearMomentumPtr = &nextLinearMomentum;
+    nextLinearMomentumPtr[cells[cellIndex].collisionWallAxis] *= -1.0f;
+  }
+  if (cells[cellIndex].collisionOccurred && cells[cellIndex].collisionType == 1) {
     ushort otherCellIndex = cells[cellIndex].collisionCellIndex;
     float elasticity = cells[cellIndex].elasticity;
     float otherElasticity = cells[otherCellIndex].elasticity;
@@ -257,7 +295,8 @@ __kernel void updatePhysicalQuantities(
 
 __kernel void resolveIntersection(
   __global Cell* cells,
-  __global RigidBodyState* nextStates
+  __global RigidBodyState* nextStates,
+  __global const Grid* grid
 ) {
   size_t cellIndex = get_global_id(0);
   uchar neighborCellCount = cells[cellIndex].neighborCellCount;
@@ -281,5 +320,7 @@ __kernel void resolveIntersection(
   if (intersectionCount > 0) {
     nextPosition = nextPosition + (translation / intersectionCount);
   }
+  float3 corner = grid->origin + (float3)(radius);
+  nextPosition = clamp(nextPosition, corner, -corner);
   nextStates[cellIndex].position = nextPosition;
 }
