@@ -3,7 +3,6 @@
 namespace alcube::physics::samples {
   void BenchmarkSample::runApp(int argc, char **argv) {
     unsigned int maxCellCount = 16384; // 2^14
-    //unsigned int maxCellCount = 64;
     std::mutex mutex;
     float deltaTime = 1.0f / 30.0f;
     auto resources = new utils::opencl::Resources();
@@ -51,7 +50,5 @@ namespace alcube::physics::samples {
 
     resources->release();
     profiler->update();
-    std::cout << "UINT_MAX:" << UINT_MAX << std::endl;
-    std::cout << "USHRT_MAX:" << USHRT_MAX << std::endl;
   }
 }

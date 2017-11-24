@@ -4,6 +4,8 @@
 #include "../../../src/cpp/utils/opencl/Resources.h"
 #include "../../../src/cpp/physics/Simulator.h"
 
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "OCDFAInspection"
 namespace alcube::physics {
   class SimulatorTest : public ::testing::Test { // NOLINT
     protected:
@@ -533,3 +535,4 @@ namespace alcube::physics {
     ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z - 1.0f);
   }
 }
+#pragma clang diagnostic pop
