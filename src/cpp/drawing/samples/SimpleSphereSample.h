@@ -5,6 +5,7 @@
 #include "../Drawer.h"
 #include "../shapes/Shapes.h"
 #include "../shaders/Shaders.h"
+#include "../../utils/app/OpenGLApplication.h"
 
 namespace alcube::drawing::samples {
   class SimpleSphere : public Drawable {
@@ -15,19 +16,17 @@ namespace alcube::drawing::samples {
       glm::vec3 position;
   };
 
-  class SimpleSphereSample {
-    public:
-      void runApp(int argc, char *argv[]);
+  class SimpleSphereSample : public utils::app::OpenGLApplication {
+    protected:
+      void initWindowParams() override;
+      void onInit() override;
+      void onDraw() override;
+      void onUpdate() override;
+      void onClose() override;
     private:
-      static const int WINDOW_WIDTH = 800;
-      static const int WINDOW_HEIGHT = 600;
       Drawer* drawer;
       Camera* camera;
       std::mutex drawablesMutex;
-      void setupWindow(int argc, char* argv[]);
-      void setEventListeners();
-      static void drawEvent();
-      static void keyEvent(unsigned char key, int x, int y);
   };
 
 }
