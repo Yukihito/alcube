@@ -16,17 +16,21 @@ namespace alcube::utils::app {
     public:
       void runApp(int argc, char **argv) override;
     protected:
-      unsigned int windowWidth;
-      unsigned int windowHeight;
-      unsigned int fps;
-      std::string appName;
+      unsigned int windowWidth = 800;
+      unsigned int windowHeight = 600;
+      unsigned int fps = 30;
+      bool isMultiSampleEnabled = false;
+      std::string appName = "";
+
       Keyboard* keyboard = nullptr;
       Mouse* mouse = nullptr;
+
       virtual void initWindowParams();
       virtual void onInit() = 0;
       virtual void onUpdate() = 0;
       virtual void onDraw() = 0;
       virtual void onClose() = 0;
+
       void close();
       void printSystemInfo();
     private:

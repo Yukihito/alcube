@@ -9,6 +9,7 @@ typedef struct __attribute__ ((packed)) GridStruct {
 typedef struct __attribute__ ((packed)) GridAndCellRelationStruct {
   unsigned int gridIndex;
   unsigned short cellIndex;
+  short padding;
 } GridAndCellRelation;
 
 typedef struct __attribute__ ((packed)) RigidBodyStateStruct {
@@ -23,17 +24,19 @@ typedef struct __attribute__ ((packed)) CellStruct {
   float radius;
   float mass;
   float elasticity;
+} Cell;
+
+typedef struct __attribute__ ((packed)) CellVarStruct {
   float3 tmpPosition;
-  unsigned int springStartIndex;
-  unsigned int springEndIndex;
-  bool collisionOccurred;
+  unsigned char collisionOccurred;
   unsigned short collisionCellIndex;
   float collisionTime;
-  unsigned char neighborCellCount;
-  unsigned short neighborCellIndices[16];
   unsigned char collisionType;
   unsigned char collisionWallAxis;
-} Cell;
+  unsigned char neighborCellCount;
+  unsigned short neighborCellIndices[16];
+  char padding[2];
+} CellVar;
 
 __kernel void initGridAndCellRelations(
   __global GridAndCellRelation* relations,
@@ -47,7 +50,7 @@ __kernel void initGridAndCellRelations(
 
 __kernel void fillGridIndex(
   __global const Grid* grid,
-  __global Cell* cells,
+  __global const Cell* cells,
   __global RigidBodyState* currentStates,
   __global GridAndCellRelation* relations
 ) {
@@ -120,7 +123,8 @@ __kernel void setGridRelationIndexRange(
 
 __kernel void collectCollisionAndIntersections(
   __global const Grid* grid,
-  __global Cell* cells,
+  __global const Cell* cells,
+  __global CellVar* cellVars,
   __global RigidBodyState* currentStates,
   __global GridAndCellRelation* relations,
   __global uint* gridStartIndices,
@@ -200,7 +204,7 @@ __kernel void collectCollisionAndIntersections(
 	    // Relative velocity is 0
 	    if (ww < rr) {
 	      // Intersect
-	      cells[cellIndex].neighborCellIndices[intersectionCount] = otherCellIndex;
+	      cellVars[cellIndex].neighborCellIndices[intersectionCount] = otherCellIndex;
 	      intersectionCount++;
 	      isFullOfIntersection = intersectionCount >= 16;
 	    }
@@ -228,7 +232,7 @@ __kernel void collectCollisionAndIntersections(
 	      collisionOccurred = true;
 	      collisionType = 1;
 	    }
-	    cells[cellIndex].neighborCellIndices[intersectionCount] = otherCellIndex;
+	    cellVars[cellIndex].neighborCellIndices[intersectionCount] = otherCellIndex;
 	    intersectionCount++;
 	    isFullOfIntersection = intersectionCount >= 16;
 	    continue;
@@ -239,16 +243,17 @@ __kernel void collectCollisionAndIntersections(
     }
   }
 
-  cells[cellIndex].collisionCellIndex = collisionCellIndex;
-  cells[cellIndex].collisionOccurred = collisionOccurred;
-  cells[cellIndex].collisionTime = collisionTime;
-  cells[cellIndex].neighborCellCount = intersectionCount;
-  cells[cellIndex].collisionType = collisionType;
-  cells[cellIndex].collisionWallAxis = collisionWallAxis;
+  cellVars[cellIndex].collisionCellIndex = collisionCellIndex;
+  cellVars[cellIndex].collisionOccurred = collisionOccurred;
+  cellVars[cellIndex].collisionTime = collisionTime;
+  cellVars[cellIndex].neighborCellCount = intersectionCount;
+  cellVars[cellIndex].collisionType = collisionType;
+  cellVars[cellIndex].collisionWallAxis = collisionWallAxis;
 }
 
 __kernel void updatePhysicalQuantities(
-  __global Cell* cells,
+  __global const Cell* cells,
+  __global CellVar* cellVars,
   __global RigidBodyState* currentStates,
   __global RigidBodyState* nextStates,
   const float deltaTime
@@ -258,16 +263,16 @@ __kernel void updatePhysicalQuantities(
   float3 currentLinearMomentum = currentStates[cellIndex].linearMomentum;
   float3 currentVelocity = currentLinearMomentum / mass;
   float3 currentPosition = currentStates[cellIndex].position;
-  float timeInterval = cells[cellIndex].collisionOccurred ? cells[cellIndex].collisionTime : deltaTime;
+  float timeInterval = cellVars[cellIndex].collisionOccurred ? cellVars[cellIndex].collisionTime : deltaTime;
   timeInterval = timeInterval > 0.0f ? timeInterval : 0.0f;
   float3 nextPosition = currentPosition + (currentVelocity * timeInterval);
   float3 nextLinearMomentum = currentLinearMomentum;
-  if (cells[cellIndex].collisionOccurred && cells[cellIndex].collisionType == 0) {
+  if (cellVars[cellIndex].collisionOccurred && cellVars[cellIndex].collisionType == 0) {
     float* nextLinearMomentumPtr = &nextLinearMomentum;
-    nextLinearMomentumPtr[cells[cellIndex].collisionWallAxis] *= -1.0f;
+    nextLinearMomentumPtr[cellVars[cellIndex].collisionWallAxis] *= -1.0f;
   }
-  if (cells[cellIndex].collisionOccurred && cells[cellIndex].collisionType == 1) {
-    ushort otherCellIndex = cells[cellIndex].collisionCellIndex;
+  if (cellVars[cellIndex].collisionOccurred && cellVars[cellIndex].collisionType == 1) {
+    ushort otherCellIndex = cellVars[cellIndex].collisionCellIndex;
     float elasticity = cells[cellIndex].elasticity;
     float otherElasticity = cells[otherCellIndex].elasticity;
     float otherMass = cells[otherCellIndex].mass;
@@ -280,27 +285,30 @@ __kernel void updatePhysicalQuantities(
     float3 acceleration = effectiveVelocity * (1.0f + (elasticity * otherElasticity)) / (1.0f + (mass / otherMass));
     nextLinearMomentum = currentLinearMomentum + (acceleration / mass);
   }
-  cells[cellIndex].tmpPosition = nextPosition;
+
+  cellVars[cellIndex].tmpPosition = nextPosition;
   nextStates[cellIndex].linearMomentum = nextLinearMomentum;
   nextStates[cellIndex].rotation = currentStates[cellIndex].rotation;
   nextStates[cellIndex].angularMomentum = currentStates[cellIndex].angularMomentum;
 }
 
 __kernel void resolveIntersection(
-  __global Cell* cells,
+  __global const Cell* cells,
+  __global CellVar* cellVars,
   __global RigidBodyState* nextStates,
   __global const Grid* grid
 ) {
   size_t cellIndex = get_global_id(0);
-  uchar neighborCellCount = cells[cellIndex].neighborCellCount;
+  uchar neighborCellCount = cellVars[cellIndex].neighborCellCount;
   float radius = cells[cellIndex].radius;
-  float3 position = cells[cellIndex].tmpPosition;
+  float3 position = cellVars[cellIndex].tmpPosition;
   float3 translation = (float3)(0.0f);
   float3 nextPosition = position;
   uchar intersectionCount = 0;
+
   for (uchar i = 0; i < neighborCellCount; i++) {
-    ushort neighborCellIndex = cells[cellIndex].neighborCellIndices[i];
-    float3 otherPosition = cells[neighborCellIndex].tmpPosition;
+    ushort neighborCellIndex = cellVars[cellIndex].neighborCellIndices[i];
+    float3 otherPosition = cellVars[neighborCellIndex].tmpPosition;
     float r = radius + cells[neighborCellIndex].radius;
     float3 relativePosition = otherPosition - position;
     float dist = length(relativePosition);
@@ -313,6 +321,7 @@ __kernel void resolveIntersection(
   if (intersectionCount > 0) {
     nextPosition = nextPosition + (translation / intersectionCount);
   }
+
   float3 corner = grid->origin + (float3)(radius);
   nextPosition = clamp(nextPosition, corner, -corner);
   nextStates[cellIndex].position = nextPosition;

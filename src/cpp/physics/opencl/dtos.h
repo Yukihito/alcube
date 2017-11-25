@@ -20,6 +20,7 @@ namespace alcube::physics::opencl::dtos {
     public:
       unsigned int gridIndex;
       unsigned short cellIndex;
+      short padding;
   };
 #pragma pack(pop)
 
@@ -40,16 +41,21 @@ namespace alcube::physics::opencl::dtos {
       float radius;
       float mass;
       float elasticity;
+  };
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+  class CellVar {
+    public:
       cl_float3 tmpPosition;
-      unsigned int springStartIndex;
-      unsigned int springEndIndex;
-      bool collisionOccurred;
-      unsigned short collisionCellIndex;
-      float collisionTime;
-      unsigned char neighborCellCount;
-      unsigned short neighborCellIndices[16];
-      unsigned char collisionType;
-      unsigned char collisionWallAxis;
+      unsigned char collisionOccurred; // 1
+      unsigned short collisionCellIndex; // 2
+      float collisionTime; // 4
+      unsigned char collisionType; // 1
+      unsigned char collisionWallAxis; // 1
+      unsigned char neighborCellCount; // 1
+      unsigned short neighborCellIndices[16]; // 16 * 2
+      char padding[2];
   };
 #pragma pack(pop)
 
@@ -63,6 +69,5 @@ namespace alcube::physics::opencl::dtos {
       cl_float4 endCellRotation;
   };
 #pragma pack(pop)
-
 }
 #endif //ALCUBE_DTOS_H

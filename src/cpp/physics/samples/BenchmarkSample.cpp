@@ -38,7 +38,7 @@ namespace alcube::physics::samples {
         randReal2(mt),
         randReal2(mt)
       );
-      simulator->cells.push_back(cell);
+      simulator->add(cell);
       simulator->dtos.currentStates[i].gridIndex;
     }
 

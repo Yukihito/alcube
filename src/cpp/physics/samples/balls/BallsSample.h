@@ -8,13 +8,22 @@
 #include "../../../drawing/shapes/Shapes.h"
 #include "../../../drawing/shaders/Shaders.h"
 #include "../../../utils/app/OpenGLApplication.h"
+#include "../../../utils/Profiler.h"
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtx/transform.hpp>
 
 namespace alcube::physics::samples::balls {
   class Ball : public drawing::Drawable, public Cell {
+    public:
       Ball(drawing::shapes::Shapes* shapes, drawing::shaders::Shaders* shaders);
+    protected:
       glm::mat4 getModelMat() override;
+  };
+
+  class Profilers {
+    public:
+      int update;
+      int all;
   };
 
   class BallsSample : public utils::app::OpenGLApplication {
@@ -27,10 +36,18 @@ namespace alcube::physics::samples::balls {
     private:
       drawing::Drawer* drawer;
       drawing::Camera* camera;
-      Simulator physicsSimulator;
+      drawing::shaders::Shaders* shaders;
+      drawing::shapes::Shapes* shapes;
+      utils::opencl::Resources* resources;
+      utils::FileUtil* fileUtil;
+      utils::Profiler* profiler;
+      Simulator* physicsSimulator;
       std::mutex mutex;
+      Profilers profilers;
+      unsigned int maxCellCount;
+      float deltaTime;
+      void add(Ball* ball);
   };
 }
-
 
 #endif //ALCUBE_BALLSSAMPLE_H

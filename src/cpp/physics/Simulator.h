@@ -22,6 +22,7 @@ namespace alcube::physics {
     public:
       opencl::dtos::Grid* grid;
       opencl::dtos::Cell* cells;
+      opencl::dtos::CellVar* cellVars;
       opencl::dtos::RigidBodyState* currentStates;
       opencl::dtos::RigidBodyState* nextStates;
       opencl::dtos::GridAndCellRelation* gridAndCellRelations;
@@ -33,6 +34,7 @@ namespace alcube::physics {
     public:
       utils::opencl::Memory* grid;
       utils::opencl::Memory* cells;
+      utils::opencl::Memory* cellVars;
       utils::opencl::Memory* currentStates;
       utils::opencl::Memory* nextStates;
       utils::opencl::Memory* gridAndCellRelations;
@@ -65,9 +67,8 @@ namespace alcube::physics {
         unsigned int zGridCount
       );
 
-      std::vector<Cell*> cells;
+      void add(Cell* cell);
       void update(float deltaTime);
-      std::mutex* cellsMutex;
 
       Dtos dtos;
       Memories memories;
@@ -83,6 +84,8 @@ namespace alcube::physics {
       void resolveIntersection();
       void read(utils::opencl::Memory* memory, void* hostPtr);
     private:
+      std::mutex* cellsMutex;
+      std::vector<Cell*> cells;
       unsigned int maxCellCount;
       unsigned int allGridCount;
       utils::opencl::CommandQueue* queue;

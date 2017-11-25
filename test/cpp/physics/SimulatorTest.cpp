@@ -61,7 +61,7 @@ namespace alcube::physics {
       }
 
       void addCell(Cell* cell) {
-        simulator->cells.push_back(cell);
+        simulator->add(cell);
         cells.push_back(cell);
       }
 
@@ -82,7 +82,7 @@ namespace alcube::physics {
         simulator->setUpMemories();
         simulator->computeBroadPhase();
         simulator->computeNarrowPhase(deltaTime);
-        simulator->read(simulator->memories.cells, simulator->dtos.cells);
+        simulator->read(simulator->memories.cellVars, simulator->dtos.cellVars);
         simulator->tearDownMemories();
       }
 
@@ -94,7 +94,7 @@ namespace alcube::physics {
         simulator->computeNarrowPhase(deltaTime);
         simulator->updatePhysicalQuantities(deltaTime);
         simulator->resolveIntersection();
-        simulator->read(simulator->memories.cells, simulator->dtos.cells);
+        simulator->read(simulator->memories.cellVars, simulator->dtos.cellVars);
         simulator->read(simulator->memories.nextStates, simulator->dtos.nextStates);
         simulator->tearDownMemories();
       }
@@ -227,13 +227,13 @@ namespace alcube::physics {
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellIndices[0], 1);
+    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellIndices[0], 1);
 
-    ASSERT_FALSE(simulator->dtos.cells[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellIndices[0], 0);
+    ASSERT_FALSE(simulator->dtos.cellVars[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellIndices[0], 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase2) { // NOLINT
@@ -251,11 +251,11 @@ namespace alcube::physics {
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 0);
 
-    ASSERT_FALSE(simulator->dtos.cells[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.cellVars[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase3) { // NOLINT
@@ -275,11 +275,11 @@ namespace alcube::physics {
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 0);
 
-    ASSERT_FALSE(simulator->dtos.cells[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.cellVars[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase4) { // NOLINT
@@ -299,15 +299,15 @@ namespace alcube::physics {
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_TRUE(simulator->dtos.cells[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellIndices[0], 1);
-    ASSERT_EQ(simulator->dtos.cells[0].collisionCellIndex, 1);
+    ASSERT_TRUE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellIndices[0], 1);
+    ASSERT_EQ(simulator->dtos.cellVars[0].collisionCellIndex, 1);
 
-    ASSERT_TRUE(simulator->dtos.cells[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellIndices[0], 0);
-    ASSERT_EQ(simulator->dtos.cells[1].collisionCellIndex, 0);
+    ASSERT_TRUE(simulator->dtos.cellVars[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellIndices[0], 0);
+    ASSERT_EQ(simulator->dtos.cellVars[1].collisionCellIndex, 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase5) { // NOLINT
@@ -327,11 +327,11 @@ namespace alcube::physics {
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 0);
 
-    ASSERT_FALSE(simulator->dtos.cells[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.cellVars[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase6) { // NOLINT
@@ -351,13 +351,13 @@ namespace alcube::physics {
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellIndices[0], 1);
+    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellIndices[0], 1);
 
-    ASSERT_FALSE(simulator->dtos.cells[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellIndices[0], 0);
+    ASSERT_FALSE(simulator->dtos.cellVars[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellIndices[0], 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase7) { // NOLINT
@@ -379,20 +379,20 @@ namespace alcube::physics {
     addCell(cell2);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_TRUE(simulator->dtos.cells[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[0].collisionCellIndex, 1);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellCount, 2);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellIndices[0], 1);
-    ASSERT_EQ(simulator->dtos.cells[0].neighborCellIndices[1], 2);
+    ASSERT_TRUE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[0].collisionCellIndex, 1);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 2);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellIndices[0], 1);
+    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellIndices[1], 2);
 
-    ASSERT_TRUE(simulator->dtos.cells[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[1].collisionCellIndex, 0);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cells[1].neighborCellIndices[0], 0);
+    ASSERT_TRUE(simulator->dtos.cellVars[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[1].collisionCellIndex, 0);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellIndices[0], 0);
 
-    ASSERT_FALSE(simulator->dtos.cells[2].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[2].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cells[2].neighborCellIndices[0], 0);
+    ASSERT_FALSE(simulator->dtos.cellVars[2].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[2].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.cellVars[2].neighborCellIndices[0], 0);
   }
 
   TEST_F(SimulatorTest, all1) { // NOLINT
@@ -471,8 +471,8 @@ namespace alcube::physics {
     cell->linearMomentum = glm::vec3(-0.5f, -1.0f, -0.5f);
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_TRUE(simulator->dtos.cells[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[0].collisionWallAxis, 1);
+    ASSERT_TRUE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[0].collisionWallAxis, 1);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, -0.5f);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.y, 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.z, -0.5f);
@@ -491,7 +491,7 @@ namespace alcube::physics {
     cell->position = glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
+    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x + 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y + 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z + 1.0f);
@@ -508,9 +508,9 @@ namespace alcube::physics {
     cell->linearMomentum = glm::vec3(0.5f, 1.0f, 0.5f);
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_TRUE(simulator->dtos.cells[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cells[0].collisionWallAxis, 1);
-    ASSERT_EQ(simulator->dtos.cells[0].collisionType, 0);
+    ASSERT_TRUE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.cellVars[0].collisionWallAxis, 1);
+    ASSERT_EQ(simulator->dtos.cellVars[0].collisionType, 0);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, 0.5f);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.y, -1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.z, 0.5f);
@@ -529,7 +529,7 @@ namespace alcube::physics {
     cell->position = -glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_FALSE(simulator->dtos.cells[0].collisionOccurred);
+    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x - 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y - 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z - 1.0f);

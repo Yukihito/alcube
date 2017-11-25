@@ -40,6 +40,7 @@ namespace alcube::physics {
     dtos.grid->origin.s[1] = -(float)((yGridCount * gridEdgeLength) / 2);
     dtos.grid->origin.s[2] = -(float)((zGridCount * gridEdgeLength) / 2);
     dtos.cells = new opencl::dtos::Cell[maxCellCount];
+    dtos.cellVars = new opencl::dtos::CellVar[maxCellCount];
     dtos.currentStates = new opencl::dtos::RigidBodyState[maxCellCount];
     dtos.nextStates = new opencl::dtos::RigidBodyState[maxCellCount];
     dtos.gridAndCellRelations = new opencl::dtos::GridAndCellRelation[maxCellCount];
@@ -47,8 +48,9 @@ namespace alcube::physics {
     dtos.gridEndIndices = new unsigned int[allGridCount];
 
     memories.grid = memoryManager->define("grid", sizeof(opencl::dtos::Grid), dtos.grid, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
-    memories.cells = memoryManager->define("cells", sizeof(opencl::dtos::Cell), dtos.cells, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR);
+    memories.cells = memoryManager->define("cells", sizeof(opencl::dtos::Cell), dtos.cells, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
     memories.currentStates = memoryManager->define("currentStates", sizeof(opencl::dtos::RigidBodyState), dtos.currentStates, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR);
+    memories.cellVars = memoryManager->define("cellVars", sizeof(opencl::dtos::CellVar), nullptr, CL_MEM_READ_WRITE);
     memories.nextStates = memoryManager->define("nextStates", sizeof(opencl::dtos::RigidBodyState), nullptr, CL_MEM_READ_WRITE);
     memories.gridAndCellRelations = memoryManager->define("gridAndCellRelations", sizeof(opencl::dtos::GridAndCellRelation), nullptr, CL_MEM_READ_WRITE);
     memories.gridStartIndices = memoryManager->define("gridStartIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
@@ -66,8 +68,6 @@ namespace alcube::physics {
       dtos.cells[i].radius = cell->radius;
       dtos.cells[i].mass = cell->mass;
       dtos.cells[i].elasticity = cell->elasticity;
-      dtos.cells[i].springEndIndex = 0;
-      dtos.cells[i].springStartIndex = 0;
       dtos.currentStates[i].gridIndex = 0;
       assignClFloat3(dtos.currentStates[i].linearMomentum, cell->linearMomentum);
       assignClFloat3(dtos.currentStates[i].angularMomentum, cell->angularMomentum);
@@ -88,6 +88,7 @@ namespace alcube::physics {
 
   void Simulator::setUpMemories() {
     memories.cells->count = cellCount;
+    memories.cellVars->count = cellCount;
     memories.currentStates->count = cellCount;
     memories.nextStates->count = cellCount;
     memories.gridAndCellRelations->count = cellCountForBitonicSort;
@@ -156,6 +157,7 @@ namespace alcube::physics {
     queue->push(kernels.collectCollisionAndIntersections, {cellCount}, {
       memArg(memories.grid),
       memArg(memories.cells),
+      memArg(memories.cellVars),
       memArg(memories.currentStates),
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),
@@ -167,6 +169,7 @@ namespace alcube::physics {
   void Simulator::updatePhysicalQuantities(float deltaTime) {
     queue->push(kernels.updatePhysicalQuantities, {cellCount}, {
       memArg(memories.cells),
+      memArg(memories.cellVars),
       memArg(memories.currentStates),
       memArg(memories.nextStates),
       floatArg(deltaTime)
@@ -176,6 +179,7 @@ namespace alcube::physics {
   void Simulator::resolveIntersection() {
     queue->push(kernels.resolveIntersection, {cellCount}, {
       memArg(memories.cells),
+      memArg(memories.cellVars),
       memArg(memories.nextStates),
       memArg(memories.grid)
     });
@@ -194,12 +198,14 @@ namespace alcube::physics {
     computeNarrowPhase(deltaTime);
     updatePhysicalQuantities(deltaTime);
     resolveIntersection();
-
     read(memories.nextStates, dtos.nextStates);
     tearDownMemories();
-
     cellsMutex->lock();
     output();
     cellsMutex->unlock();
+  }
+
+  void Simulator::add(Cell *cell) {
+    cells.push_back(cell);
   }
 }

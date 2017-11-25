@@ -32,6 +32,7 @@ namespace alcube::utils::app {
 
   void OpenGLApplication::updateLoop() {
     while (true) {
+      std::chrono::system_clock::time_point updateStartTime = std::chrono::system_clock::now();
       appInst->endStatusMutex.lock();
       if (appInst->endStatus == 1) {
         appInst->endStatusMutex.unlock();
@@ -40,9 +41,14 @@ namespace alcube::utils::app {
       appInst->endStatusMutex.unlock();
 
       appInst->onUpdate();
-      int nextFlameInterval = 1000 / appInst->fps;
-      std::chrono::milliseconds intervalMs(nextFlameInterval);
-      std::this_thread::sleep_for(intervalMs);
+      std::chrono::system_clock::time_point updateEndTime = std::chrono::system_clock::now();
+      int elapsedTime = (int) std::chrono::duration_cast<std::chrono::milliseconds>(updateEndTime - updateStartTime).count();
+      int nextFlameInterval = (1000 / appInst->fps) - elapsedTime;
+
+      if (nextFlameInterval > 0) {
+        std::chrono::milliseconds intervalMs(nextFlameInterval);
+        std::this_thread::sleep_for(intervalMs);
+      }
     }
 
     appInst->endStatusMutex.lock();
@@ -54,6 +60,7 @@ namespace alcube::utils::app {
     windowWidth = 800;
     windowHeight = 600;
     fps = 30;
+    isMultiSampleEnabled = false;
     appName = "";
   }
 
@@ -91,7 +98,11 @@ namespace alcube::utils::app {
   void OpenGLApplication::setupWindow(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitWindowSize(windowWidth, windowHeight);
-    glutInitDisplayMode(GLUT_3_2_CORE_PROFILE | GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH | GLUT_MULTISAMPLE);
+    unsigned int displayMode = GLUT_3_2_CORE_PROFILE | GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH;
+    if (isMultiSampleEnabled) {
+      displayMode = displayMode | GLUT_MULTISAMPLE;
+    }
+    glutInitDisplayMode(displayMode);
     glutCreateWindow(appName.c_str());
   }
 
