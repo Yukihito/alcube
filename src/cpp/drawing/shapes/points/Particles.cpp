@@ -8,7 +8,7 @@ namespace alcube::drawing::shapes::points {
   }
 
   void Particles::draw() {
-    glDrawArrays(GL_POINTS, 0, particleCount * 3);
+    glDrawArrays(GL_POINTS, 0, particleCount);
   }
 
   Buffer* Particles::createBuffer() {

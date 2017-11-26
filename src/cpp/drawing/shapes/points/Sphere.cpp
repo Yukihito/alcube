@@ -2,7 +2,7 @@
 
 namespace alcube::drawing::shapes::points {
   void Sphere::draw() {
-    glDrawArrays(GL_POINTS, 0, (int)splitCount * (int)splitCount * 3);
+    glDrawArrays(GL_POINTS, 0, (int)splitCount * (int)splitCount);
   };
 
   Buffer* Sphere::createBuffer() {
