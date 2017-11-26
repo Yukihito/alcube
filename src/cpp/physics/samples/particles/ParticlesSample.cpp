@@ -32,9 +32,9 @@ namespace alcube::physics::samples::particles {
       positions[j + 1] = cells[i]->position.y;
       positions[j + 2] = cells[i]->position.z;
 
-      colors[j + 0] = (float)fabs(cells[i]->linearMomentum.x) / 30.0f;
-      colors[j + 1] = (float)fabs(cells[i]->linearMomentum.y) / 30.0f;
-      colors[j + 2] = (float)fabs(cells[i]->linearMomentum.z) / 30.0f;
+      //colors[j + 0] = (float)fabs(cells[i]->linearMomentum.x) / 30.0f;
+      //colors[j + 1] = (float)fabs(cells[i]->linearMomentum.y) / 30.0f;
+      //colors[j + 2] = (float)fabs(cells[i]->linearMomentum.z) / 30.0f;
     }
 
     shape->buffer->verticesSize = cells.size() * sizeof(GLfloat) * 3;
@@ -48,24 +48,24 @@ namespace alcube::physics::samples::particles {
   void ParticlesSample::initWindowParams() {
     windowWidth = 800;
     windowHeight = 600;
-    fps = 60;
+    fps = 30;
     appName = "ParticlesSample";
     isMultiSampleEnabled = false;
   }
 
   void ParticlesSample::onInit() {
-    maxCellCount = 16384; // 2^14
+    maxCellCount = 65536;
     deltaTime = 1.0f / 30.0f;
     unsigned int gridEdgeLength = 8;
     unsigned int xGridCount = 64;
     unsigned int yGridCount = 64;
     unsigned int zGridCount = 64;
     float near = 0.1f;
-    float far = gridEdgeLength * xGridCount * 2.0f;
+    float far = gridEdgeLength * xGridCount * 4.0f;
     shaders = new drawing::shaders::Shaders(new utils::FileUtil());
     shapes = new drawing::shapes::Shapes();
     camera = new drawing::Camera(
-      glm::vec3(0.0f, 0.0f, far),
+      glm::vec3(0.0f, 0.0f, far / 2),
       glm::quat(),
       glm::radians(45.0f),
       (float)windowWidth,
@@ -87,9 +87,11 @@ namespace alcube::physics::samples::particles {
       zGridCount
     );
 
+    particles = new Particles(shapes, shaders, maxCellCount);
+
     std::random_device rnd;
     std::mt19937 mt(rnd());
-    std::uniform_real_distribution<float> randReal(-50, 50);
+    std::uniform_real_distribution<float> randReal(0, 256);
     std::uniform_real_distribution<float> randReal2(-30, 30);
 
     for (int i = 0; i < maxCellCount; i++) {
@@ -106,9 +108,15 @@ namespace alcube::physics::samples::particles {
       );
       physicsSimulator->add(cell);
       cells.push_back(cell);
+      int j = i * 3;
+      particles->colors[j + 0] = (float)(fabs(cell->position.x) + 256.0f) / 512.0f;
+      particles->colors[j + 1] = (float)(fabs(cell->position.y) + 256.0f) / 512.0f;
+      particles->colors[j + 2] = (float)(fabs(cell->position.z) + 256.0f) / 512.0f;
+      //particles->colors[j + 0] = (float)(fabs(cell->linearMomentum.x) + 30.0f) / 60.0f;
+      //particles->colors[j + 1] = (float)(fabs(cell->linearMomentum.y) + 30.0f) / 60.0f;
+      //particles->colors[j + 2] = (float)(fabs(cell->linearMomentum.z) + 30.0f) / 60.0f;
     }
 
-    particles = new Particles(shapes, shaders, maxCellCount);
     particles->update(cells);
     drawer->add(particles);
     profiler = new utils::Profiler();

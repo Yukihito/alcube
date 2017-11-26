@@ -285,8 +285,11 @@ __kernel void updatePhysicalQuantities(
     float effect = dot(relativeVelocity, direction);
     float3 effectiveVelocity = direction * effect;
     float3 acceleration = effectiveVelocity * (1.0f + (elasticity * otherElasticity)) / (1.0f + (mass / otherMass));
-    nextLinearMomentum = currentLinearMomentum + (acceleration / mass);
+    nextLinearMomentum = currentLinearMomentum + (acceleration * mass);
   }
+
+  float3 maxLinearMomentum = (float3)((2.0f * (1.0f / deltaTime)) * mass);
+  nextLinearMomentum = clamp(nextLinearMomentum, -maxLinearMomentum, maxLinearMomentum);
 
   cellVars[cellIndex].tmpPosition = nextPosition;
   nextStates[cellIndex].linearMomentum = nextLinearMomentum;
