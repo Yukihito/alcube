@@ -1,36 +1,51 @@
 #include "Buffer.h"
 
 namespace alcube::drawing {
-  Buffer::Buffer(size_t verticesSize, size_t indicesSize, size_t normalsSize) {
+  Buffer::Buffer(size_t verticesAllocationSize, size_t indicesAllocationSize, size_t normalsAllocationSize, size_t colorsAllocationSize) {
+    this->arrayId = 0;
     this->vertexBufferId = 0;
     this->indexBufferId = 0;
     this->normalBufferId = 0;
-    this->arrayId = 0;
+    this->colorBufferId = 0;
+
     this->vertices = nullptr;
     this->indices = nullptr;
     this->normals = nullptr;
+    this->colors = nullptr;
 
-    this->verticesSize = verticesSize;
-    this->indicesSize = indicesSize;
-    this->normalsSize = normalsSize;
+    this->verticesSize = verticesAllocationSize;
+    this->indicesSize = indicesAllocationSize;
+    this->normalsSize = normalsAllocationSize;
+    this->colorsSize = colorsAllocationSize;
+
+    this->verticesAllocationSize = verticesAllocationSize;
+    this->indicesAllocationSize = indicesAllocationSize;
+    this->normalsAllocationSize = normalsAllocationSize;
+    this->colorsAllocationSize = colorsAllocationSize;
 
     glGenVertexArrays(1, &this->arrayId);
     glBindVertexArray(this->arrayId);
 
     glGenBuffers(1, &this->vertexBufferId);
     glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
-    glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)verticesSize, nullptr, GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)verticesAllocationSize, nullptr, GL_DYNAMIC_DRAW);
 
-    if (indicesSize > 0) {
+    if (indicesAllocationSize > 0) {
       glGenBuffers(1, &this->indexBufferId);
       glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBufferId);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)indicesSize, nullptr, GL_DYNAMIC_DRAW);
+      glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)indicesAllocationSize, nullptr, GL_DYNAMIC_DRAW);
     }
 
-    if (normalsSize > 0) {
+    if (normalsAllocationSize > 0) {
       glGenBuffers(1, &this->normalBufferId);
       glBindBuffer(GL_ARRAY_BUFFER, this->normalBufferId);
-      glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)normalsSize, nullptr, GL_DYNAMIC_DRAW);
+      glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)normalsAllocationSize, nullptr, GL_DYNAMIC_DRAW);
+    }
+
+    if (colorsAllocationSize > 0) {
+      glGenBuffers(1, &this->colorBufferId);
+      glBindBuffer(GL_ARRAY_BUFFER, this->colorBufferId);
+      glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)colorsAllocationSize, nullptr, GL_DYNAMIC_DRAW);
     }
 
     glBindVertexArray(0);
@@ -39,5 +54,7 @@ namespace alcube::drawing {
   Buffer::~Buffer() {
     delete this->vertices;
     delete this->indices;
+    delete this->normals;
+    delete this->colors;
   }
 }

@@ -534,5 +534,34 @@ namespace alcube::physics {
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y - 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z - 1.0f);
   }
+
+  TEST_F(SimulatorTest, all8) {
+    //  momentum conservation law
+    float deltaTime = 1.0f / 30.0f;
+    float smallDistance = 0.001f;
+
+    auto cell0 = new Cell();
+    cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
+    cell0->linearMomentum = glm::vec3(1.0f, 0.5f, 0.0f);
+    float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
+
+    auto cell1 = new Cell();
+    cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
+    cell1->linearMomentum = glm::vec3(-1.0f, -0.5f, 0.0f);
+
+    float momentumSum = sqrtf(1.0f * 1.0f + 0.5f * 0.5f) * 2.0f;
+
+    addCell(cell0);
+    addCell(cell1);
+    simulateAll(deltaTime);
+    ASSERT_TRUE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_TRUE(simulator->dtos.cellVars[1].collisionOccurred);
+    cl_float3 m0 = simulator->dtos.nextStates[0].linearMomentum;
+    cl_float3 m1 = simulator->dtos.nextStates[1].linearMomentum;
+
+    float momentumSum2 = sqrtf(m0.x * m0.x + m0.y * m0.y + m0.z * m0.z) + sqrtf(m1.x * m1.x + m1.y * m1.y + m1.z * m1.z);
+
+    ASSERT_EQ(momentumSum, momentumSum2);
+  }
 }
 #pragma clang diagnostic pop

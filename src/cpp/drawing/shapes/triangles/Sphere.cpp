@@ -42,11 +42,13 @@ namespace alcube::drawing::shapes::triangles {
     auto buffer = new Buffer(
       verticesLength * sizeof(GLfloat),
       indicesLength * sizeof(GLuint),
-      verticesLength * sizeof(GLfloat)
+      verticesLength * sizeof(GLfloat),
+      0
     );
     buffer->vertices = vertices;
     buffer->indices = indices;
     buffer->normals = normals;
+    buffer->colors = nullptr;
     return buffer;
   }
 

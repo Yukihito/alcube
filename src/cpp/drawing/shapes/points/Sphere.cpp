@@ -25,10 +25,11 @@ namespace alcube::drawing::shapes::points {
       }
     }
 
-    auto buffer = new Buffer(verticesLength * sizeof(GLfloat), 0, 0);
+    auto buffer = new Buffer(verticesLength * sizeof(GLfloat), 0, 0, 0);
     buffer->vertices = vertices;
     buffer->indices = nullptr;
     buffer->normals = nullptr;
+    buffer->colors = nullptr;
     return buffer;
   }
 

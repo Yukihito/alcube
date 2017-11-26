@@ -1,0 +1,144 @@
+#include "ParticlesSample.h"
+
+namespace alcube::physics::samples::particles {
+  Particles::Particles(
+    drawing::shapes::Shapes *shapes,
+    drawing::shaders::Shaders *shaders,
+    unsigned int maxParticleCount
+  ) {
+    particlesShape = shapes->points.createParticles(maxParticleCount);
+    shape = particlesShape;
+    shader = &shaders->particle;
+    positions = new GLfloat[maxParticleCount * 3]();
+    colors = new GLfloat[maxParticleCount * 3]();
+    shape->buffer->verticesSize = 0;
+    shape->buffer->indicesSize = 0;
+    shape->buffer->normalsSize = 0;
+    shape->buffer->colorsSize = 0;
+    shape->buffer->vertices = positions;
+    shape->buffer->colors = colors;
+  }
+
+  glm::mat4 Particles::getModelMat() {
+    static float t = 0.0f;
+    t += 0.01f;
+    return glm::rotate(t, glm::vec3(0.0f, 1.0f, 0.0f));
+  }
+
+  void Particles::update(std::vector<Cell *> &cells) {
+    for (int i = 0; i < cells.size(); i++) {
+      int j = i * 3;
+      positions[j + 0] = cells[i]->position.x;
+      positions[j + 1] = cells[i]->position.y;
+      positions[j + 2] = cells[i]->position.z;
+
+      colors[j + 0] = (float)fabs(cells[i]->linearMomentum.x) / 30.0f;
+      colors[j + 1] = (float)fabs(cells[i]->linearMomentum.y) / 30.0f;
+      colors[j + 2] = (float)fabs(cells[i]->linearMomentum.z) / 30.0f;
+    }
+
+    shape->buffer->verticesSize = cells.size() * sizeof(GLfloat) * 3;
+    shape->buffer->indicesSize = 0;
+    shape->buffer->normalsSize = 0;
+    shape->buffer->colorsSize = cells.size() * sizeof(GLfloat) * 3;
+
+    particlesShape->particleCount = (unsigned int)cells.size();
+  }
+
+  void ParticlesSample::initWindowParams() {
+    windowWidth = 800;
+    windowHeight = 600;
+    fps = 60;
+    appName = "ParticlesSample";
+    isMultiSampleEnabled = false;
+  }
+
+  void ParticlesSample::onInit() {
+    maxCellCount = 16384; // 2^14
+    deltaTime = 1.0f / 30.0f;
+    unsigned int gridEdgeLength = 8;
+    unsigned int xGridCount = 64;
+    unsigned int yGridCount = 64;
+    unsigned int zGridCount = 64;
+    float near = 0.1f;
+    float far = gridEdgeLength * xGridCount * 2.0f;
+    shaders = new drawing::shaders::Shaders(new utils::FileUtil());
+    shapes = new drawing::shapes::Shapes();
+    camera = new drawing::Camera(
+      glm::vec3(0.0f, 0.0f, far),
+      glm::quat(),
+      glm::radians(45.0f),
+      (float)windowWidth,
+      (float)windowHeight,
+      near,
+      far
+    );
+    drawer = new drawing::Drawer(camera, &mutex);
+    resources = new utils::opencl::Resources();
+    fileUtil = new utils::FileUtil();
+    physicsSimulator = new Simulator(
+      resources,
+      fileUtil,
+      &mutex,
+      maxCellCount,
+      gridEdgeLength,
+      xGridCount,
+      yGridCount,
+      zGridCount
+    );
+
+    std::random_device rnd;
+    std::mt19937 mt(rnd());
+    std::uniform_real_distribution<float> randReal(-50, 50);
+    std::uniform_real_distribution<float> randReal2(-30, 30);
+
+    for (int i = 0; i < maxCellCount; i++) {
+      auto cell = new Cell();
+      cell->position = glm::vec3(
+        randReal(mt),
+        randReal(mt),
+        randReal(mt)
+      );
+      cell->linearMomentum = glm::vec3(
+        randReal2(mt),
+        randReal2(mt),
+        randReal2(mt)
+      );
+      physicsSimulator->add(cell);
+      cells.push_back(cell);
+    }
+
+    particles = new Particles(shapes, shaders, maxCellCount);
+    particles->update(cells);
+    drawer->add(particles);
+    profiler = new utils::Profiler();
+    profiler->setShowInterval(1000);
+    profiler->enabled = true;
+    profilers.update = profiler->create("update");
+    profilers.all = profiler->create("all");
+
+    profiler->start(profilers.all);
+  }
+
+  void ParticlesSample::onDraw() {
+    drawer->draw();
+  }
+
+  void ParticlesSample::onUpdate() {
+    profiler->start(profilers.update);
+    physicsSimulator->update(deltaTime);
+
+    mutex.lock();
+    particles->update(cells);
+    mutex.unlock();
+    profiler->stop(profilers.update);
+
+    profiler->stop(profilers.all);
+    profiler->update();
+    profiler->start(profilers.all);
+  }
+
+  void ParticlesSample::onClose() {
+    resources->release();
+  }
+}

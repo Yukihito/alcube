@@ -267,10 +267,12 @@ __kernel void updatePhysicalQuantities(
   timeInterval = timeInterval > 0.0f ? timeInterval : 0.0f;
   float3 nextPosition = currentPosition + (currentVelocity * timeInterval);
   float3 nextLinearMomentum = currentLinearMomentum;
+
   if (cellVars[cellIndex].collisionOccurred && cellVars[cellIndex].collisionType == 0) {
     float* nextLinearMomentumPtr = &nextLinearMomentum;
     nextLinearMomentumPtr[cellVars[cellIndex].collisionWallAxis] *= -1.0f;
   }
+
   if (cellVars[cellIndex].collisionOccurred && cellVars[cellIndex].collisionType == 1) {
     ushort otherCellIndex = cellVars[cellIndex].collisionCellIndex;
     float elasticity = cells[cellIndex].elasticity;
