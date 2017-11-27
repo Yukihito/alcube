@@ -1,60 +1,53 @@
 #include "Buffer.h"
 
 namespace alcube::drawing {
-  Buffer::Buffer(size_t verticesAllocationSize, size_t indicesAllocationSize, size_t normalsAllocationSize, size_t colorsAllocationSize) {
-    this->arrayId = 0;
-    this->vertexBufferId = 0;
-    this->indexBufferId = 0;
-    this->normalBufferId = 0;
-    this->colorBufferId = 0;
+  VBO::VBO(GLsizeiptr allocationSize, GLenum target) {
+    this->target = target;
+    this->allocationSize = allocationSize;
+    this->size = allocationSize;
+    data = nullptr;
+    glGenBuffers(1, &this->bufferId);
+    glBindBuffer(target, this->bufferId);
+    glBufferData(target, allocationSize, nullptr, GL_DYNAMIC_DRAW);
+  }
 
-    this->vertices = nullptr;
-    this->indices = nullptr;
-    this->normals = nullptr;
-    this->colors = nullptr;
-
-    this->verticesSize = verticesAllocationSize;
-    this->indicesSize = indicesAllocationSize;
-    this->normalsSize = normalsAllocationSize;
-    this->colorsSize = colorsAllocationSize;
-
-    this->verticesAllocationSize = verticesAllocationSize;
-    this->indicesAllocationSize = indicesAllocationSize;
-    this->normalsAllocationSize = normalsAllocationSize;
-    this->colorsAllocationSize = colorsAllocationSize;
+  Buffer::Buffer(
+    GLsizeiptr verticesAllocationSize,
+    GLsizeiptr indicesAllocationSize,
+    GLsizeiptr normalsAllocationSize,
+    GLsizeiptr colorsAllocationSize
+  ) {
+    vbos.vertices = nullptr;
+    vbos.indices = nullptr;
+    vbos.normals = nullptr;
+    vbos.colors = nullptr;
 
     glGenVertexArrays(1, &this->arrayId);
     glBindVertexArray(this->arrayId);
 
-    glGenBuffers(1, &this->vertexBufferId);
-    glBindBuffer(GL_ARRAY_BUFFER, this->vertexBufferId);
-    glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)verticesAllocationSize, nullptr, GL_DYNAMIC_DRAW);
+    if (verticesAllocationSize > 0) {
+      vbos.vertices = new VBO(verticesAllocationSize, GL_ARRAY_BUFFER);
+    }
 
     if (indicesAllocationSize > 0) {
-      glGenBuffers(1, &this->indexBufferId);
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->indexBufferId);
-      glBufferData(GL_ELEMENT_ARRAY_BUFFER, (GLsizeiptr)indicesAllocationSize, nullptr, GL_DYNAMIC_DRAW);
+      vbos.indices = new VBO(indicesAllocationSize, GL_ELEMENT_ARRAY_BUFFER);
     }
 
     if (normalsAllocationSize > 0) {
-      glGenBuffers(1, &this->normalBufferId);
-      glBindBuffer(GL_ARRAY_BUFFER, this->normalBufferId);
-      glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)normalsAllocationSize, nullptr, GL_DYNAMIC_DRAW);
+      vbos.normals = new VBO(normalsAllocationSize, GL_ARRAY_BUFFER);
     }
 
     if (colorsAllocationSize > 0) {
-      glGenBuffers(1, &this->colorBufferId);
-      glBindBuffer(GL_ARRAY_BUFFER, this->colorBufferId);
-      glBufferData(GL_ARRAY_BUFFER, (GLsizeiptr)colorsAllocationSize, nullptr, GL_DYNAMIC_DRAW);
+      vbos.colors = new VBO(colorsAllocationSize, GL_ARRAY_BUFFER);
     }
 
     glBindVertexArray(0);
   }
 
   Buffer::~Buffer() {
-    delete this->vertices;
-    delete this->indices;
-    delete this->normals;
-    delete this->colors;
+    delete vbos.vertices;
+    delete vbos.indices;
+    delete vbos.normals;
+    delete vbos.colors;
   }
 }

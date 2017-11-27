@@ -45,10 +45,9 @@ namespace alcube::drawing::shapes::triangles {
       verticesLength * sizeof(GLfloat),
       0
     );
-    buffer->vertices = vertices;
-    buffer->indices = indices;
-    buffer->normals = normals;
-    buffer->colors = nullptr;
+    buffer->vbos.vertices->data = vertices;
+    buffer->vbos.indices->data = indices;
+    buffer->vbos.normals->data = normals;
     return buffer;
   }
 

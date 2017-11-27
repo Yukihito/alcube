@@ -22,6 +22,9 @@ namespace alcube::drawing {
         const char **uniformNames,
         unsigned int uniformsCount
       );
+
+      void setIndexBuffer(VBO* vbo);
+      void setVertexBuffer(VBO* vbo, GLuint location);
   };
 }
 

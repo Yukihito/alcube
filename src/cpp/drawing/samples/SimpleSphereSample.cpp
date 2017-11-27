@@ -3,8 +3,8 @@
 
 namespace alcube::drawing::samples {
   SimpleSphere::SimpleSphere(glm::vec3& position, shapes::Shapes* shapes, shaders::Shaders* shaders) {
-    shape = &shapes->points.sphere;
-    shader = &shaders->simple;
+    shape = &shapes->triangles.sphere;
+    shader = &shaders->standard;
     this->position = position;
   }
 

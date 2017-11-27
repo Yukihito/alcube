@@ -18,10 +18,6 @@ namespace alcube::drawing::shapes::points {
       0,
       maxParticleCount * sizeof(GLfloat) * 3
     );
-    buffer->vertices = nullptr;
-    buffer->indices = nullptr;
-    buffer->normals = nullptr;
-    buffer->colors = nullptr;
     return buffer;
   }
 }

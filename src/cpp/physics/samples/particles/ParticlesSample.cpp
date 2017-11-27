@@ -11,12 +11,10 @@ namespace alcube::physics::samples::particles {
     shader = &shaders->particle;
     positions = new GLfloat[maxParticleCount * 3]();
     colors = new GLfloat[maxParticleCount * 3]();
-    shape->buffer->verticesSize = 0;
-    shape->buffer->indicesSize = 0;
-    shape->buffer->normalsSize = 0;
-    shape->buffer->colorsSize = 0;
-    shape->buffer->vertices = positions;
-    shape->buffer->colors = colors;
+    shape->buffer->vbos.vertices->size = 0;
+    shape->buffer->vbos.colors->size = 0;
+    shape->buffer->vbos.vertices->data = positions;
+    shape->buffer->vbos.colors->data = colors;
   }
 
   glm::mat4 Particles::getModelMat() {
@@ -37,10 +35,8 @@ namespace alcube::physics::samples::particles {
       //colors[j + 2] = (float)fabs(cells[i]->linearMomentum.z) / 30.0f;
     }
 
-    shape->buffer->verticesSize = cells.size() * sizeof(GLfloat) * 3;
-    shape->buffer->indicesSize = 0;
-    shape->buffer->normalsSize = 0;
-    shape->buffer->colorsSize = cells.size() * sizeof(GLfloat) * 3;
+    shape->buffer->vbos.vertices->size = cells.size() * sizeof(GLfloat) * 3;
+    shape->buffer->vbos.colors->size = cells.size() * sizeof(GLfloat) * 3;
 
     particlesShape->particleCount = (unsigned int)cells.size();
   }

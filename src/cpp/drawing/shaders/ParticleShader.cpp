@@ -15,34 +15,8 @@ namespace alcube::drawing::shaders {
   }
 
   void ParticleShader::setupBuffer(Buffer *buffer) {
-    glBindBuffer(GL_ARRAY_BUFFER, buffer->vertexBufferId);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, (GLsizeiptr)buffer->verticesSize, buffer->vertices);
-    if (buffer->indices != nullptr) {
-      glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, buffer->indexBufferId);
-      glBufferSubData(GL_ELEMENT_ARRAY_BUFFER, 0, (GLsizeiptr)buffer->indicesSize, buffer->indices);
-    }
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(
-      0,        // 属性0：シェーダ内のlayoutと合わせる必要がある
-      3,        // 頂点1つのサイズ。vec3のため3を指定
-      GL_FLOAT, // 頂点の要素の型
-      GL_FALSE, // 正規化
-      0,        // ストライド
-      nullptr   // 配列バッファオフセット
-    );
-
-    if (buffer->colors != nullptr) {
-      glEnableVertexAttribArray(1);
-      glBindBuffer(GL_ARRAY_BUFFER, buffer->colorBufferId);
-      glBufferSubData(GL_ARRAY_BUFFER, 0, (GLsizeiptr)buffer->colorsSize, buffer->colors);
-      glVertexAttribPointer(
-        1,                                // 属性
-        3,                                // サイズ
-        GL_FLOAT,                         // タイプ
-        GL_FALSE,                         // 正規化？
-        0,                                // ストライド
-        nullptr                          // 配列バッファオフセット
-      );
-    }
+    setVertexBuffer(buffer->vbos.vertices, 0);
+    setIndexBuffer(buffer->vbos.indices);
+    setVertexBuffer(buffer->vbos.colors, 1);
   }
 }
