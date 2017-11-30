@@ -2,6 +2,7 @@
 #define ALCUBE_CONTEXT_H
 
 #include <glm/mat4x4.hpp>
+#include "Material.h"
 
 namespace alcube::drawing {
   class Context {
@@ -10,6 +11,7 @@ namespace alcube::drawing {
       glm::mat4 vp;
       glm::mat4 v;
       glm::mat4 m;
+      Material* material;
   };
 }
 

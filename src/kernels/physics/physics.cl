@@ -29,13 +29,14 @@ typedef struct __attribute__ ((packed)) CellStruct {
 typedef struct __attribute__ ((packed)) CellVarStruct {
   float3 tmpPosition;
   unsigned char collisionOccurred;
+  unsigned char wallCollisionOccurred;
   unsigned short collisionCellIndex;
   float collisionTime;
   unsigned char collisionType;
   unsigned char collisionWallAxis;
   unsigned char neighborCellCount;
+  char collisionWallNormalSign;
   unsigned short neighborCellIndices[16];
-  char padding[2];
 } CellVar;
 
 __kernel void initGridAndCellRelations(
@@ -140,31 +141,35 @@ __kernel void collectCollisionAndIntersections(
 
   float collisionTime = deltaTime + 1.0f;
   bool collisionOccurred = false;
-  uchar collisionType = 0;
+  bool wallCollisionOccurred = false;
 
   float3 walls = grid->origin + (float3)(radius);
   float3 wallDist1 = (walls - position);
   float3 wallDist2 = (-walls - position);
-  float* wallDistPtrs1 = &wallDist1;
-  float* wallDistPtrs2 = &wallDist2;
+  float* wallDistPtr1 = &wallDist1;
+  float* wallDistPtr2 = &wallDist2;
   float* velocityPtr = &velocity;
   uchar collisionWallAxis;
+  float minWallCollisionTime = deltaTime + 1.0f;
+  char collisionWallNormalSign;
   for (uchar i = 0; i < 3; i++) {
-    if (velocity[i] == 0.0f) {
+    if (velocityPtr[i] == 0.0f) {
       continue;
     }
-    float t1 = wallDist1[i] / velocity[i];
-    float t2 = wallDist2[i] / velocity[i];
-    bool intersects1 = deltaTime >= t1 && t1 > 0;
-    bool intersects2 = deltaTime >= t2 && t2 > 0;
-    float wallCollisionTime = collisionTime;
+    float t1 = wallDistPtr1[i] / velocityPtr[i];
+    float t2 = wallDistPtr2[i] / velocityPtr[i];
+    bool intersects1 = deltaTime >= t1 && t1 >= 0;
+    bool intersects2 = deltaTime >= t2 && t2 >= 0;
+    float wallCollisionTime = minWallCollisionTime;
     if (intersects1 || intersects2) {
       wallCollisionTime = intersects1 && wallCollisionTime > t1 ? t1 : wallCollisionTime;
       wallCollisionTime = intersects2 && wallCollisionTime > t2 ? t2 : wallCollisionTime;
-      collisionWallAxis = wallCollisionTime < collisionTime ? i : collisionWallAxis;
-      collisionTime = wallCollisionTime;
-      collisionOccurred = true;
-      collisionType = 0;
+      bool isNearestIntersection = wallCollisionTime < minWallCollisionTime;
+      collisionWallAxis = isNearestIntersection ? i : collisionWallAxis;
+      char sign = intersects1 ? 1.0f : -1.0f;
+      collisionWallNormalSign = isNearestIntersection ? sign : collisionWallNormalSign;
+      minWallCollisionTime = wallCollisionTime;
+      wallCollisionOccurred = true;
     }
   }
 
@@ -230,7 +235,6 @@ __kernel void collectCollisionAndIntersections(
 	      collisionCellIndex = otherCellIndex;
 	      collisionTime = intersectionStartTime;
 	      collisionOccurred = true;
-	      collisionType = 1;
 	    }
 	    cellVars[cellIndex].neighborCellIndices[intersectionCount] = otherCellIndex;
 	    intersectionCount++;
@@ -245,10 +249,11 @@ __kernel void collectCollisionAndIntersections(
 
   cellVars[cellIndex].collisionCellIndex = collisionCellIndex;
   cellVars[cellIndex].collisionOccurred = collisionOccurred;
+  cellVars[cellIndex].wallCollisionOccurred = wallCollisionOccurred;
   cellVars[cellIndex].collisionTime = collisionTime;
   cellVars[cellIndex].neighborCellCount = intersectionCount;
-  cellVars[cellIndex].collisionType = collisionType;
   cellVars[cellIndex].collisionWallAxis = collisionWallAxis;
+  cellVars[cellIndex].collisionWallNormalSign = collisionWallNormalSign;
 }
 
 __kernel void updatePhysicalQuantities(
@@ -268,24 +273,29 @@ __kernel void updatePhysicalQuantities(
   float3 nextPosition = currentPosition + (currentVelocity * timeInterval);
   float3 nextLinearMomentum = currentLinearMomentum;
 
-  if (cellVars[cellIndex].collisionOccurred && cellVars[cellIndex].collisionType == 0) {
-    float* nextLinearMomentumPtr = &nextLinearMomentum;
-    nextLinearMomentumPtr[cellVars[cellIndex].collisionWallAxis] *= -1.0f;
+  if (cellVars[cellIndex].collisionOccurred) {
+    ushort otherCellIndex = cellVars[cellIndex].collisionCellIndex;
+    if (cellVars[otherCellIndex].collisionOccurred && cellVars[otherCellIndex].collisionCellIndex == cellIndex) {
+      float elasticity = cells[cellIndex].elasticity;
+      float otherElasticity = cells[otherCellIndex].elasticity;
+      float otherMass = cells[otherCellIndex].mass;
+      float3 relativeOtherCellPosition = currentStates[otherCellIndex].position - currentPosition;
+      float3 otherCurrentVelocity = currentStates[otherCellIndex].linearMomentum / otherMass;
+      float3 relativeVelocity = otherCurrentVelocity - currentVelocity;
+      float3 direction = normalize(relativeOtherCellPosition);
+      float effect = dot(relativeVelocity, direction);
+      float3 effectiveVelocity = direction * effect;
+      float3 acceleration = effectiveVelocity * (1.0f + (elasticity * otherElasticity)) / (1.0f + (mass / otherMass));
+      nextLinearMomentum = currentLinearMomentum + (acceleration * mass);
+    }
   }
 
-  if (cellVars[cellIndex].collisionOccurred && cellVars[cellIndex].collisionType == 1) {
-    ushort otherCellIndex = cellVars[cellIndex].collisionCellIndex;
-    float elasticity = cells[cellIndex].elasticity;
-    float otherElasticity = cells[otherCellIndex].elasticity;
-    float otherMass = cells[otherCellIndex].mass;
-    float3 relativeOtherCellPosition = currentStates[otherCellIndex].position - nextPosition;
-    float3 otherCurrentVelocity = currentStates[otherCellIndex].linearMomentum / otherMass;
-    float3 relativeVelocity = otherCurrentVelocity - currentVelocity;
-    float3 direction = normalize(relativeOtherCellPosition);
-    float effect = dot(relativeVelocity, direction);
-    float3 effectiveVelocity = direction * effect;
-    float3 acceleration = effectiveVelocity * (1.0f + (elasticity * otherElasticity)) / (1.0f + (mass / otherMass));
-    nextLinearMomentum = currentLinearMomentum + (acceleration * mass);
+  if (cellVars[cellIndex].wallCollisionOccurred) {
+    char collisionWallNormalSign = cellVars[cellIndex].collisionWallNormalSign;
+    float* nextLinearMomentumPtr = &nextLinearMomentum;
+    if (nextLinearMomentumPtr[cellVars[cellIndex].collisionWallAxis] * collisionWallNormalSign < 0) {
+      nextLinearMomentumPtr[cellVars[cellIndex].collisionWallAxis] *= -1.0f;
+    }
   }
 
   float3 maxLinearMomentum = (float3)((2.0f * (1.0f / deltaTime)) * mass);
