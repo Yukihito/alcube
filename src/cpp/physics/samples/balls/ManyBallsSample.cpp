@@ -19,7 +19,7 @@ namespace alcube::physics::samples::balls {
   }
 
   drawing::Material* ColorBall::getMaterial() {
-    /*
+
     glm::vec3 diffuse = glm::vec3(
       sqrtf(linearMomentum.x * linearMomentum.x) / 15.0f,
       sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f,
@@ -27,7 +27,7 @@ namespace alcube::physics::samples::balls {
 
     material->diffuse = diffuse;
     material->ambient = diffuse / 2.0f;
-     */
+
     return this->material;
   }
 
@@ -46,7 +46,7 @@ namespace alcube::physics::samples::balls {
 
   void ManyBallsSample::onInit() {
     maxCellCount = 16384; // 2^14
-    int ballCount = 64;
+    int ballCount = 32;
     deltaTime = 1.0f / 30.0f;
     unsigned int gridEdgeLength = 8;
     unsigned int xGridCount = 2;
@@ -107,7 +107,7 @@ namespace alcube::physics::samples::balls {
         randReal2(mt),
         randReal2(mt)
       );
-      //ball->elasticity = 0.8f;
+      ball->elasticity = 0.8f;
       add(ball);
     }
 

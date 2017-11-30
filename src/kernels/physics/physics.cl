@@ -291,12 +291,14 @@ __kernel void updatePhysicalQuantities(
   }
 
   if (cellVars[cellIndex].wallCollisionOccurred) {
+    float elasticity = cells[cellIndex].elasticity;
     char collisionWallNormalSign = cellVars[cellIndex].collisionWallNormalSign;
     float* nextLinearMomentumPtr = &nextLinearMomentum;
     if (nextLinearMomentumPtr[cellVars[cellIndex].collisionWallAxis] * collisionWallNormalSign < 0) {
-      nextLinearMomentumPtr[cellVars[cellIndex].collisionWallAxis] *= -1.0f;
+      nextLinearMomentumPtr[cellVars[cellIndex].collisionWallAxis] *= -elasticity;
     }
   }
+  nextLinearMomentum.y -= 9.8f * deltaTime;
 
   float3 maxLinearMomentum = (float3)((2.0f * (1.0f / deltaTime)) * mass);
   nextLinearMomentum = clamp(nextLinearMomentum, -maxLinearMomentum, maxLinearMomentum);
@@ -333,11 +335,15 @@ __kernel void resolveIntersection(
       intersectionCount++;
     }
   }
+
   if (intersectionCount > 0) {
-    nextPosition = nextPosition + (translation / intersectionCount);
+    translation /= intersectionCount;
+    nextPosition += translation;
   }
 
   float3 corner = grid->origin + (float3)(radius);
   nextPosition = clamp(nextPosition, corner, -corner);
+  float3 reaction = (nextPosition - position) * cells[cellIndex].mass;
+  nextStates[cellIndex].linearMomentum += reaction;
   nextStates[cellIndex].position = nextPosition;
 }
