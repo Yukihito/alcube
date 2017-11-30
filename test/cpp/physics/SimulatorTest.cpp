@@ -471,14 +471,14 @@ namespace alcube::physics {
     cell->linearMomentum = glm::vec3(-0.5f, -1.0f, -0.5f);
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_TRUE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_TRUE(simulator->dtos.cellVars[0].wallCollisionOccurred);
     ASSERT_EQ(simulator->dtos.cellVars[0].collisionWallAxis, 1);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, -0.5f);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.y, 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.z, -0.5f);
-    ASSERT_GT(simulator->dtos.nextStates[0].position.x, corner.x + 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x + 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y + 1.0f);
-    ASSERT_GT(simulator->dtos.nextStates[0].position.z, corner.z + 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z + 1.0f);
   }
 
   TEST_F(SimulatorTest, all5) { // NOLINT
@@ -491,7 +491,7 @@ namespace alcube::physics {
     cell->position = glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_FALSE(simulator->dtos.cellVars[0].wallCollisionOccurred);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x + 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y + 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z + 1.0f);
@@ -508,15 +508,15 @@ namespace alcube::physics {
     cell->linearMomentum = glm::vec3(0.5f, 1.0f, 0.5f);
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_TRUE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_TRUE(simulator->dtos.cellVars[0].wallCollisionOccurred);
     ASSERT_EQ(simulator->dtos.cellVars[0].collisionWallAxis, 1);
     ASSERT_EQ(simulator->dtos.cellVars[0].collisionType, 0);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, 0.5f);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.y, -1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.z, 0.5f);
-    ASSERT_LT(simulator->dtos.nextStates[0].position.x, corner.x - 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x - 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y - 1.0f);
-    ASSERT_LT(simulator->dtos.nextStates[0].position.z, corner.z - 1.0f);
+    ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z - 1.0f);
   }
 
   TEST_F(SimulatorTest, all7) { // NOLINT
@@ -529,7 +529,7 @@ namespace alcube::physics {
     cell->position = -glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
+    ASSERT_FALSE(simulator->dtos.cellVars[0].wallCollisionOccurred);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x - 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y - 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z - 1.0f);
