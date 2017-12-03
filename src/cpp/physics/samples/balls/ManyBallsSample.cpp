@@ -7,7 +7,7 @@ namespace alcube::physics::samples::balls {
     glm::vec3 diffuse
   ) {
     shape = &shapes->triangles.sphere;
-    shader = &shaders->standard;
+    shader = &shaders->tile;
     material = new drawing::Material();
     material->diffuse = diffuse;
     material->ambient = diffuse / 2.0f;

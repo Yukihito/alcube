@@ -8,15 +8,17 @@ namespace alcube::drawing::shapes::triangles {
   Buffer* Sphere::createBuffer() {
     auto iSplitCount = (int)splitCount;
     size_t verticesLength = splitCount * splitCount * 3;
+    size_t uvsLength = splitCount * splitCount * 2;
     auto vertices = new GLfloat[verticesLength]();
     auto normals = new GLfloat[verticesLength]();
+    auto uvs = new GLfloat[uvsLength];
     float pi = 3.1415f;
-    for (int i = 0; i < splitCount * 3; i+=3) {
-      float y = (float)i / (float)(splitCount * 3);
+    for (int i = 0; i < splitCount; i++) {
+      float y = (float)i / (float)splitCount;
       float r = std::sin(y * pi);
-      for (int j = 0; j < splitCount * 3; j+=3) {
-        float x = (float)j / (float)(splitCount * 3);
-        size_t k = i * splitCount + j;
+      for (int j = 0; j < splitCount; j++) {
+        float x = (float)j / (float)splitCount;
+        size_t k = (i * splitCount + j) * 3;
         vertices[k + 0] = std::cos(x * pi * 2) * r;
         vertices[k + 1] = std::cos(y * pi);
         vertices[k + 2] = std::sin(x * pi * 2) * r;
@@ -37,17 +39,22 @@ namespace alcube::drawing::shapes::triangles {
         indices[indicesIndex + 5] = (uint)((i + 1) * iSplitCount + j);
         indices[indicesIndex + 4] = (uint)((i + 1) * iSplitCount + j + 1);
         indicesIndex += 6;
+        size_t l = (i * splitCount + j) * 2;
+        uvs[l + 0] = (float)i / (float)(splitCount - 1);
+        uvs[l + 1] = (float)j / (float)(splitCount - 1);
       }
     }
     auto buffer = new Buffer(
       verticesLength * sizeof(GLfloat),
       indicesLength * sizeof(GLuint),
       verticesLength * sizeof(GLfloat),
-      0
+      0,
+      uvsLength * sizeof(GLfloat)
     );
     buffer->vbos.vertices->data = vertices;
     buffer->vbos.indices->data = indices;
     buffer->vbos.normals->data = normals;
+    buffer->vbos.uvs->data = uvs;
     return buffer;
   }
 

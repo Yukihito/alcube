@@ -16,7 +16,8 @@ namespace alcube::drawing::shapes::points {
       maxParticleCount * sizeof(GLfloat) * 3,
       0,
       0,
-      maxParticleCount * sizeof(GLfloat) * 3
+      maxParticleCount * sizeof(GLfloat) * 3,
+      0
     );
     return buffer;
   }
