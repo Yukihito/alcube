@@ -47,15 +47,11 @@ namespace alcube::physics::opencl::dtos {
 #pragma pack(push, 1)
   class CellVar {
     public:
-      cl_float3 tmpPosition; // 12
-      unsigned char collisionOccurred; // 1
-      unsigned char wallCollisionOccurred; // 1
-      unsigned short collisionCellIndex; // 2
+      cl_float3 positionAfterMotion; // 12
       float collisionTime; // 4
-      unsigned char collisionType; // 1
-      unsigned char collisionWallAxis; // 1
+      unsigned short collisionCellIndex; // 2
+      unsigned char collisionOccurred; // 1
       unsigned char neighborCellCount; // 1
-      char collisionWallNormalSign; // 1
       unsigned short neighborCellIndices[16]; // 16 * 2
   };
 #pragma pack(pop)

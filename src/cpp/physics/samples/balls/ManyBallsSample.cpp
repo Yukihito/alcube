@@ -19,15 +19,16 @@ namespace alcube::physics::samples::balls {
   }
 
   drawing::Material* ColorBall::getMaterial() {
+    bool showLinearMomentum = false;
+    if(showLinearMomentum) {
+      glm::vec3 diffuse = glm::vec3(
+        sqrtf(linearMomentum.x * linearMomentum.x) / 15.0f,
+        sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f,
+        sqrtf(linearMomentum.z * linearMomentum.z) / 15.0f);
 
-    glm::vec3 diffuse = glm::vec3(
-      sqrtf(linearMomentum.x * linearMomentum.x) / 15.0f,
-      sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f,
-      sqrtf(linearMomentum.z * linearMomentum.z) / 15.0f);
-
-    material->diffuse = diffuse;
-    material->ambient = diffuse / 2.0f;
-
+      material->diffuse = diffuse;
+      material->ambient = diffuse / 2.0f;
+    }
     return this->material;
   }
 
@@ -36,7 +37,7 @@ namespace alcube::physics::samples::balls {
     windowHeight = 600;
     fps = 30;
     appName = "BallsSample";
-    isMultiSampleEnabled = false;
+    isMultiSampleEnabled = true;
   }
 
   void ManyBallsSample::add(ColorBall *ball) {
@@ -48,6 +49,7 @@ namespace alcube::physics::samples::balls {
     maxCellCount = 16384; // 2^14
     int ballCount = 32;
     deltaTime = 1.0f / 30.0f;
+    float gravity = 9.8f;
     unsigned int gridEdgeLength = 8;
     unsigned int xGridCount = 2;
     unsigned int yGridCount = 2;
@@ -78,6 +80,7 @@ namespace alcube::physics::samples::balls {
       yGridCount,
       zGridCount
     );
+    physicsSimulator->gravity = gravity;
     profiler = new utils::Profiler();
     profiler->setShowInterval(1000);
     profiler->enabled = true;

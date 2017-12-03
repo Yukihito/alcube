@@ -50,7 +50,7 @@ namespace alcube::physics {
       cl_kernel setGridRelationIndexRange;
       cl_kernel initGridAndCellRelations;
       cl_kernel collectCollisionAndIntersections;
-      cl_kernel updatePhysicalQuantities;
+      cl_kernel motion;
       cl_kernel resolveIntersection;
   };
 
@@ -69,7 +69,7 @@ namespace alcube::physics {
 
       void add(Cell* cell);
       void update(float deltaTime);
-
+      float gravity;
       Dtos dtos;
       Memories memories;
       Kernels kernels;
@@ -80,8 +80,8 @@ namespace alcube::physics {
       void output();
       void computeBroadPhase();
       void computeNarrowPhase(float deltaTime);
-      void updatePhysicalQuantities(float deltaTime);
-      void resolveIntersection();
+      void motion(float deltaTime);
+      void resolveIntersection(float deltaTime);
       void read(utils::opencl::Memory* memory, void* hostPtr);
     private:
       std::mutex* cellsMutex;

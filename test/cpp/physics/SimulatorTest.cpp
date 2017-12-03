@@ -92,7 +92,7 @@ namespace alcube::physics {
         simulator->setUpMemories();
         simulator->computeBroadPhase();
         simulator->computeNarrowPhase(deltaTime);
-        simulator->updatePhysicalQuantities(deltaTime);
+        simulator->motion(deltaTime);
         simulator->resolveIntersection();
         simulator->read(simulator->memories.cellVars, simulator->dtos.cellVars);
         simulator->read(simulator->memories.nextStates, simulator->dtos.nextStates);
@@ -473,9 +473,9 @@ namespace alcube::physics {
     simulateAll(deltaTime);
     ASSERT_TRUE(simulator->dtos.cellVars[0].wallCollisionOccurred);
     ASSERT_EQ(simulator->dtos.cellVars[0].collisionWallAxis, 1);
-    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, -0.5f);
-    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.y, 1.0f);
-    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.z, -0.5f);
+    ASSERT_GT(simulator->dtos.nextStates[0].linearMomentum.x, -0.5f);
+    ASSERT_GT(simulator->dtos.nextStates[0].linearMomentum.y, 1.0f);
+    ASSERT_GT(simulator->dtos.nextStates[0].linearMomentum.z, -0.5f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x + 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y + 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z + 1.0f);
@@ -511,9 +511,9 @@ namespace alcube::physics {
     ASSERT_TRUE(simulator->dtos.cellVars[0].wallCollisionOccurred);
     ASSERT_EQ(simulator->dtos.cellVars[0].collisionWallAxis, 1);
     ASSERT_EQ(simulator->dtos.cellVars[0].collisionType, 0);
-    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.x, 0.5f);
-    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.y, -1.0f);
-    ASSERT_EQ(simulator->dtos.nextStates[0].linearMomentum.z, 0.5f);
+    ASSERT_LT(simulator->dtos.nextStates[0].linearMomentum.x, 0.5f);
+    ASSERT_LT(simulator->dtos.nextStates[0].linearMomentum.y, -1.0f);
+    ASSERT_LT(simulator->dtos.nextStates[0].linearMomentum.z, 0.5f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x - 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y - 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z - 1.0f);

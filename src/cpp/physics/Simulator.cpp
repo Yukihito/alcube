@@ -20,6 +20,7 @@ namespace alcube::physics {
     memoryManager = new utils::opencl::MemoryManager(resources);
     queue = new utils::opencl::CommandQueue(resources);
     cells = {};
+    gravity = 0.0f;
 
     cl_program program = programFactory->create("../src/kernels/physics/physics.cl");
     kernels.fillGridIndex = kernelFactory->create(program, "fillGridIndex");
@@ -28,7 +29,7 @@ namespace alcube::physics {
     kernels.setGridRelationIndexRange = kernelFactory->create(program, "setGridRelationIndexRange");
     kernels.initGridAndCellRelations = kernelFactory->create(program, "initGridAndCellRelations");
     kernels.collectCollisionAndIntersections = kernelFactory->create(program, "collectCollisionAndIntersections");
-    kernels.updatePhysicalQuantities = kernelFactory->create(program, "updatePhysicalQuantities");
+    kernels.motion = kernelFactory->create(program, "motion");
     kernels.resolveIntersection = kernelFactory->create(program, "resolveIntersection");
 
     dtos.grid = new opencl::dtos::Grid();
@@ -166,8 +167,8 @@ namespace alcube::physics {
     });
   }
 
-  void Simulator::updatePhysicalQuantities(float deltaTime) {
-    queue->push(kernels.updatePhysicalQuantities, {cellCount}, {
+  void Simulator::motion(float deltaTime) {
+    queue->push(kernels.motion, {cellCount}, {
       memArg(memories.cells),
       memArg(memories.cellVars),
       memArg(memories.currentStates),
@@ -176,12 +177,15 @@ namespace alcube::physics {
     });
   }
 
-  void Simulator::resolveIntersection() {
+  void Simulator::resolveIntersection(float deltaTime) {
     queue->push(kernels.resolveIntersection, {cellCount}, {
       memArg(memories.cells),
       memArg(memories.cellVars),
+      memArg(memories.currentStates),
       memArg(memories.nextStates),
-      memArg(memories.grid)
+      memArg(memories.grid),
+      floatArg(deltaTime),
+      floatArg(gravity)
     });
   }
 
@@ -196,8 +200,8 @@ namespace alcube::physics {
 
     computeBroadPhase();
     computeNarrowPhase(deltaTime);
-    updatePhysicalQuantities(deltaTime);
-    resolveIntersection();
+    motion(deltaTime);
+    resolveIntersection(deltaTime);
     read(memories.nextStates, dtos.nextStates);
     tearDownMemories();
     cellsMutex->lock();
