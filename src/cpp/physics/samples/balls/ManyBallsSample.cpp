@@ -15,7 +15,7 @@ namespace alcube::physics::samples::balls {
   }
 
   glm::mat4 ColorBall::getModelMat() {
-    return glm::translate(position);
+    return glm::translate(position) * glm::toMat4(rotation) * glm::scale(glm::vec3(radius, radius, radius));
   }
 
   drawing::Material* ColorBall::getMaterial() {
@@ -47,7 +47,7 @@ namespace alcube::physics::samples::balls {
 
   void ManyBallsSample::onInit() {
     maxCellCount = 16384; // 2^14
-    int ballCount = 32;
+    int ballCount = 2;
     deltaTime = 1.0f / 30.0f;
     float gravity = 9.8f;
     unsigned int gridEdgeLength = 8;
@@ -111,6 +111,7 @@ namespace alcube::physics::samples::balls {
         randReal2(mt)
       );
       ball->elasticity = 0.8f;
+      ball->frictionFactor = 0.8f;
       add(ball);
     }
 

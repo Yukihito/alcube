@@ -24,16 +24,40 @@ typedef struct __attribute__ ((packed)) CellStruct {
   float radius;
   float mass;
   float elasticity;
+  float frictionFactor;
 } Cell;
 
 typedef struct __attribute__ ((packed)) CellVarStruct {
   float3 positionAfterMotion;
+  float4 rotationAfterMotion;
   float collisionTime;
   unsigned short collisionCellIndex;
   unsigned char collisionOccurred;
   unsigned char neighborCellCount;
   unsigned short neighborCellIndices[16];
 } CellVar;
+
+float4 mulQuat(
+  float4* q,
+  float4* r
+) {
+  float3 u = (float3)(q->x, q->y, q->z);
+  float3 v = (float3)(r->x, r->y, r->z);
+  float3 ipart = v * q->w + u * r->w + cross(u, v);
+  float tpart = q->w * r->w - dot(u, v);
+  return (float4)(ipart.x, ipart.y, ipart.z, tpart);
+}
+
+float3 rotateByQuat(
+  float3* v,
+  float4* q
+) {
+  float4 p = (float4)(v->x, v->y, v->z, 0.0f);
+  float4 r = (float4)(-q->x, -q->y, -q->z, q->w);
+  float4 qp = mulQuat(q, &p);
+  float4 qpr = mulQuat(&qp, &r);
+  return (float3)(qpr.x, qpr.y, qpr.z);
+}
 
 __kernel void initGridAndCellRelations(
   __global GridAndCellRelation* relations,
@@ -226,14 +250,31 @@ __kernel void motion(
   const float deltaTime
 ) {
   size_t cellIndex = get_global_id(0);
+  float timeInterval = cellVars[cellIndex].collisionOccurred ? cellVars[cellIndex].collisionTime : deltaTime;
+  timeInterval = timeInterval > 0.0f ? timeInterval : 0.0f;
+
   float mass = cells[cellIndex].mass;
+  float radius = cells[cellIndex].radius;
   float3 currentLinearMomentum = currentStates[cellIndex].linearMomentum;
   float3 currentVelocity = currentLinearMomentum / mass;
   float3 currentPosition = currentStates[cellIndex].position;
-  float timeInterval = cellVars[cellIndex].collisionOccurred ? cellVars[cellIndex].collisionTime : deltaTime;
-  timeInterval = timeInterval > 0.0f ? timeInterval : 0.0f;
-  cellVars[cellIndex].positionAfterMotion = currentPosition + (currentVelocity * timeInterval);
-  nextStates[cellIndex].rotation = currentStates[cellIndex].rotation;
+  float3 positionDiff = currentVelocity * timeInterval;
+
+  float3 currentAngularMomentum = currentStates[cellIndex].angularMomentum;
+  float momentOfInertia = (2.0f / 5.0f) * mass * radius * radius;
+  float3 currentAngularVelocity = currentAngularMomentum / momentOfInertia;
+  float4 currentRotation = currentStates[cellIndex].rotation;
+  float3 rotationDiff = currentAngularVelocity * timeInterval;
+  float4 rotationDiffQuat = (float4)(0.0f, 0.0f, 0.0f, 1.0f);
+  if (dot(rotationDiff, rotationDiff) > 0.0f) {
+    float3 rotationAxis = normalize(rotationDiff);
+    float rotationScalar = length(rotationDiff);
+    float halfRotationScalar = rotationScalar / 2.0f;
+    rotationDiffQuat.w = cos(halfRotationScalar);
+    rotationDiffQuat.xyz = rotationAxis * sin(halfRotationScalar);
+  }
+  cellVars[cellIndex].positionAfterMotion = currentPosition + positionDiff;
+  cellVars[cellIndex].rotationAfterMotion = mulQuat(&rotationDiffQuat, &currentRotation);
 }
 
 __kernel void resolveIntersection(
@@ -253,6 +294,8 @@ __kernel void resolveIntersection(
   float radius = cells[cellIndex].radius;
   float mass = cells[cellIndex].mass;
   float3 positionAfterMotion = cellVars[cellIndex].positionAfterMotion;
+  float4 rotationAfterMotion = cellVars[cellIndex].rotationAfterMotion;
+  float4 nextRotation = rotationAfterMotion;
 
   // Resolve intersection.
   float3 translation = (float3)(0.0f);
@@ -272,6 +315,12 @@ __kernel void resolveIntersection(
 
   // Calc reaction.
   // Calc reaction of collision with walls.
+  float3 currentAngularMomentum = currentStates[cellIndex].angularMomentum;
+  float momentOfInertia = (2.0f / 5.0f) * mass * radius * radius;
+  float3 currentAngularVelocity = currentAngularMomentum / momentOfInertia;
+  float3 currentVelocity = currentLinearMomentum / mass;
+  float3 angularAcceleration = (float3)(0.0f);
+  float3 acceleration = (float3)(0.0f);
   float3 reaction = (float3)(0.0f, 0.0f, 0.0f);
   float3 corner = grid->origin + (float3)(radius);
   float3 nextPositionBeforeClamp = nextPosition;
@@ -279,11 +328,22 @@ __kernel void resolveIntersection(
   float3 translationByWalls = nextPosition - nextPositionBeforeClamp;
   float* translationByWallsPtr = &translationByWalls;
   float* reactionPtr = &reaction;
+  float* linearMomentumPtr = &currentLinearMomentum;
+  float elasticity = cells[cellIndex].elasticity;
   for (uchar i = 0; i < 3; i++) {
-    float elasticity = cells[cellIndex].elasticity;
-    float* linearMomentumPtr = &currentLinearMomentum;
-    if (translationByWallsPtr[i] * linearMomentumPtr[i] < 0.0f) {
-      reactionPtr[i] = -2.0f * linearMomentumPtr[i] * elasticity;
+    float translationByWallScalar = translationByWallsPtr[i];
+    if (translationByWallScalar * linearMomentumPtr[i] < 0.0f) {
+      reactionPtr[i] -= linearMomentumPtr[i] * 2.0f * elasticity;
+      float3 wallNormal = (float3)(0.0f);
+      float3* wallNormalPtr = &wallNormal;
+      wallNormalPtr[i] = translationByWallsPtr[i] > 0.0f ? 1.0f : -1.0f;
+      float3 workingPoint = (float3)(0.0f);
+      float* workingPointPtr = &workingPoint;
+      workingPointPtr[i] = translationByWallsPtr[i] > 0.0f ? -radius : radius;
+      float3 currentVelocityOnWall = currentVelocity - wallNormal * dot(wallNormal, currentVelocity);
+      float3 impulse = -(2.0f / 7.0f) * mass * (currentVelocity + cross(-workingPoint, currentAngularVelocity));
+      angularAcceleration += cross(workingPoint, impulse / momentOfInertia);
+      acceleration += impulse / mass;
     }
   }
   // Calc reaction of intersected cells.
@@ -294,10 +354,11 @@ __kernel void resolveIntersection(
   }
   // Finish to calc reaction.
 
+
+
   // Calc acceleration.
   // Calc acceleration of collision with other cell.
-  float3 currentVelocity = currentLinearMomentum / mass;
-  float3 acceleration = (float3)(0.0f);
+
   if (cellVars[cellIndex].collisionOccurred) {
     ushort otherCellIndex = cellVars[cellIndex].collisionCellIndex;
     if (cellVars[otherCellIndex].collisionOccurred && cellVars[otherCellIndex].collisionCellIndex == cellIndex) {
@@ -325,6 +386,7 @@ __kernel void resolveIntersection(
   nextLinearMomentum = clamp(nextLinearMomentum, -maxLinearMomentum, maxLinearMomentum);
 
   nextStates[cellIndex].linearMomentum = nextLinearMomentum;
-  nextStates[cellIndex].angularMomentum = currentStates[cellIndex].angularMomentum;
+  nextStates[cellIndex].angularMomentum = currentStates[cellIndex].angularMomentum + angularAcceleration * momentOfInertia;
   nextStates[cellIndex].position = nextPosition;
+  nextStates[cellIndex].rotation = nextRotation;
 }

@@ -41,6 +41,7 @@ namespace alcube::physics::opencl::dtos {
       float radius;
       float mass;
       float elasticity;
+      float frictionFactor;
   };
 #pragma pack(pop)
 
@@ -48,6 +49,7 @@ namespace alcube::physics::opencl::dtos {
   class CellVar {
     public:
       cl_float3 positionAfterMotion; // 12
+      cl_float4 rotationAfterMotion; // 16
       float collisionTime; // 4
       unsigned short collisionCellIndex; // 2
       unsigned char collisionOccurred; // 1
