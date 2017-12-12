@@ -14,7 +14,8 @@ namespace alcube::physics::rigidbody {
       glm::vec3 angularMomentum;
       float mass;
       float elasticity;
-      float frictionFactor;
+      float dynamicFrictionCoefficient;
+      float staticFrictionCoefficient;
       explicit RigidBody();
   };
 }

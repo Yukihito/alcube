@@ -41,7 +41,8 @@ namespace alcube::physics::opencl::dtos {
       float radius;
       float mass;
       float elasticity;
-      float frictionFactor;
+      float dynamicFrictionCoefficient;
+      float staticFrictionCoefficient;
   };
 #pragma pack(pop)
 

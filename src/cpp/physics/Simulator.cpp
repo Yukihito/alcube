@@ -69,7 +69,8 @@ namespace alcube::physics {
       dtos.cells[i].radius = cell->radius;
       dtos.cells[i].mass = cell->mass;
       dtos.cells[i].elasticity = cell->elasticity;
-      dtos.cells[i].frictionFactor = cell->frictionFactor;
+      dtos.cells[i].staticFrictionCoefficient = cell->staticFrictionCoefficient;
+      dtos.cells[i].dynamicFrictionCoefficient = cell->dynamicFrictionCoefficient;
       dtos.currentStates[i].gridIndex = 0;
       assignClFloat3(dtos.currentStates[i].linearMomentum, cell->linearMomentum);
       assignClFloat3(dtos.currentStates[i].angularMomentum, cell->angularMomentum);

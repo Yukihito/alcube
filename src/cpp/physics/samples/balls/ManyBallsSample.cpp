@@ -19,8 +19,21 @@ namespace alcube::physics::samples::balls {
   }
 
   drawing::Material* ColorBall::getMaterial() {
-    bool showLinearMomentum = false;
+    bool showLinearMomentum = true;
     if(showLinearMomentum) {
+      /*
+      glm::vec3 diffuse = glm::vec3(
+        sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f,
+        0.0f,
+        0.0f);
+      if (linearMomentum.y > 0.0f) {
+        diffuse = glm::vec3(
+          0.0f,
+          sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f,
+          0.0f);
+      }
+       */
+
       glm::vec3 diffuse = glm::vec3(
         sqrtf(linearMomentum.x * linearMomentum.x) / 15.0f,
         sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f,
@@ -47,7 +60,7 @@ namespace alcube::physics::samples::balls {
 
   void ManyBallsSample::onInit() {
     maxCellCount = 16384; // 2^14
-    int ballCount = 2;
+    int ballCount = 128;
     deltaTime = 1.0f / 30.0f;
     float gravity = 9.8f;
     unsigned int gridEdgeLength = 8;
@@ -111,7 +124,8 @@ namespace alcube::physics::samples::balls {
         randReal2(mt)
       );
       ball->elasticity = 0.8f;
-      ball->frictionFactor = 0.8f;
+      ball->staticFrictionCoefficient = 0.8f;
+      ball->dynamicFrictionCoefficient = 0.6f;
       add(ball);
     }
 
