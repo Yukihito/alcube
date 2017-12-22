@@ -28,9 +28,14 @@ namespace alcube::physics {
     kernels.bitonic = kernelFactory->create(program, "bitonic");
     kernels.setGridRelationIndexRange = kernelFactory->create(program, "setGridRelationIndexRange");
     kernels.initGridAndCellRelations = kernelFactory->create(program, "initGridAndCellRelations");
-    kernels.collectCollisionAndIntersections = kernelFactory->create(program, "collectCollisionAndIntersections");
+    kernels.collectIntersections = kernelFactory->create(program, "collectIntersections");
+    kernels.applyPenalty = kernelFactory->create(program, "applyPenalty");
+    kernels.collectFrictionalCollisions = kernelFactory->create(program, "collectFrictionalCollisions");
+    kernels.updateVelocityByFriction = kernelFactory->create(program, "updateVelocityByFriction");
+    kernels.collectCollisions = kernelFactory->create(program, "collectCollisions");
+    kernels.updateVelocity = kernelFactory->create(program, "updateVelocity");
     kernels.motion = kernelFactory->create(program, "motion");
-    kernels.resolveIntersection = kernelFactory->create(program, "resolveIntersection");
+    kernels.postProcessing = kernelFactory->create(program, "postProcessing");
 
     dtos.grid = new opencl::dtos::Grid();
     dtos.grid->edgeLength = gridEdgeLength;
@@ -40,6 +45,18 @@ namespace alcube::physics {
     dtos.grid->origin.s[0] = -(float)((xGridCount * gridEdgeLength) / 2);
     dtos.grid->origin.s[1] = -(float)((yGridCount * gridEdgeLength) / 2);
     dtos.grid->origin.s[2] = -(float)((zGridCount * gridEdgeLength) / 2);
+    for (int i = 0; i < 3; i++) {
+      dtos.grid->normals[i].s[0] = 0.0f;
+      dtos.grid->normals[i].s[0] = 0.0f;
+      dtos.grid->normals[i].s[0] = 0.0f;
+      dtos.grid->normals[i].s[i] = 1.0f;
+    }
+    for (int i = 3; i < 6; i++) {
+      dtos.grid->normals[i].s[0] = 0.0f;
+      dtos.grid->normals[i].s[0] = 0.0f;
+      dtos.grid->normals[i].s[0] = 0.0f;
+      dtos.grid->normals[i].s[i - 3] = -1.0f;
+    }
     dtos.cells = new opencl::dtos::Cell[maxCellCount];
     dtos.cellVars = new opencl::dtos::CellVar[maxCellCount];
     dtos.currentStates = new opencl::dtos::RigidBodyState[maxCellCount];
@@ -156,17 +173,47 @@ namespace alcube::physics {
   }
 
   void Simulator::computeNarrowPhase(float deltaTime) {
-    // Collect collision and intersections
-    queue->push(kernels.collectCollisionAndIntersections, {cellCount}, {
+    queue->push(kernels.collectIntersections, {cellCount}, {
       memArg(memories.grid),
       memArg(memories.cells),
       memArg(memories.cellVars),
       memArg(memories.currentStates),
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),
-      memArg(memories.gridEndIndices),
+      memArg(memories.gridEndIndices)
+    });
+  }
+
+  void Simulator::resolveConstraints(float deltaTime) {
+    queue->push(kernels.applyPenalty, {cellCount}, {
+      memArg(memories.grid),
+      memArg(memories.cells),
+      memArg(memories.cellVars),
+      memArg(memories.currentStates),
       floatArg(deltaTime)
     });
+    queue->push(kernels.collectFrictionalCollisions, {cellCount}, {
+      memArg(memories.grid),
+      memArg(memories.cells),
+      memArg(memories.cellVars)
+    });
+    queue->push(kernels.updateVelocityByFriction, {cellCount}, {
+      memArg(memories.grid),
+      memArg(memories.cells),
+      memArg(memories.cellVars)
+    });
+    for (int i = 0; i < 16; i++) {
+      queue->push(kernels.collectCollisions, {cellCount}, {
+        memArg(memories.grid),
+        memArg(memories.cells),
+        memArg(memories.cellVars)
+      });
+      queue->push(kernels.updateVelocity, {cellCount}, {
+        memArg(memories.grid),
+        memArg(memories.cells),
+        memArg(memories.cellVars)
+      });
+    }
   }
 
   void Simulator::motion(float deltaTime) {
@@ -177,17 +224,12 @@ namespace alcube::physics {
       memArg(memories.nextStates),
       floatArg(deltaTime)
     });
-  }
 
-  void Simulator::resolveIntersection(float deltaTime) {
-    queue->push(kernels.resolveIntersection, {cellCount}, {
+    queue->push(kernels.postProcessing, {cellCount}, {
+      memArg(memories.grid),
       memArg(memories.cells),
       memArg(memories.cellVars),
-      memArg(memories.currentStates),
-      memArg(memories.nextStates),
-      memArg(memories.grid),
-      floatArg(deltaTime),
-      floatArg(gravity)
+      memArg(memories.nextStates)
     });
   }
 
@@ -202,8 +244,8 @@ namespace alcube::physics {
 
     computeBroadPhase();
     computeNarrowPhase(deltaTime);
+    resolveConstraints(deltaTime);
     motion(deltaTime);
-    resolveIntersection(deltaTime);
     read(memories.nextStates, dtos.nextStates);
     tearDownMemories();
     cellsMutex->lock();

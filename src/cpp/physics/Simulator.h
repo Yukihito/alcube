@@ -49,9 +49,14 @@ namespace alcube::physics {
       cl_kernel bitonic;
       cl_kernel setGridRelationIndexRange;
       cl_kernel initGridAndCellRelations;
-      cl_kernel collectCollisionAndIntersections;
+      cl_kernel collectIntersections;
+      cl_kernel applyPenalty;
+      cl_kernel collectFrictionalCollisions;
+      cl_kernel updateVelocityByFriction;
+      cl_kernel collectCollisions;
+      cl_kernel updateVelocity;
       cl_kernel motion;
-      cl_kernel resolveIntersection;
+      cl_kernel postProcessing;
   };
 
   class Simulator {
@@ -80,8 +85,8 @@ namespace alcube::physics {
       void output();
       void computeBroadPhase();
       void computeNarrowPhase(float deltaTime);
+      void resolveConstraints(float deltaTime);
       void motion(float deltaTime);
-      void resolveIntersection(float deltaTime);
       void read(utils::opencl::Memory* memory, void* hostPtr);
     private:
       std::mutex* cellsMutex;

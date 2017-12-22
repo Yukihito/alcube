@@ -7,7 +7,7 @@ namespace alcube::physics::samples::balls {
     glm::vec3 diffuse
   ) {
     shape = &shapes->triangles.sphere;
-    shader = &shaders->tile;
+    shader = &shaders->standard;
     material = new drawing::Material();
     material->diffuse = diffuse;
     material->ambient = diffuse / 2.0f;
@@ -19,7 +19,7 @@ namespace alcube::physics::samples::balls {
   }
 
   drawing::Material* ColorBall::getMaterial() {
-    bool showLinearMomentum = true;
+    bool showLinearMomentum = false;
     if(showLinearMomentum) {
       /*
       glm::vec3 diffuse = glm::vec3(
@@ -60,7 +60,7 @@ namespace alcube::physics::samples::balls {
 
   void ManyBallsSample::onInit() {
     maxCellCount = 16384; // 2^14
-    int ballCount = 128;
+    int ballCount = 256;
     deltaTime = 1.0f / 30.0f;
     float gravity = 9.8f;
     unsigned int gridEdgeLength = 8;
@@ -124,8 +124,8 @@ namespace alcube::physics::samples::balls {
         randReal2(mt)
       );
       ball->elasticity = 0.8f;
-      ball->staticFrictionCoefficient = 0.8f;
-      ball->dynamicFrictionCoefficient = 0.6f;
+      //ball->staticFrictionCoefficient = 0.8f;
+      //ball->dynamicFrictionCoefficient = 0.6f;
       add(ball);
     }
 

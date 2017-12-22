@@ -12,6 +12,7 @@ namespace alcube::physics::opencl::dtos {
       unsigned int zCount;
       unsigned int edgeLength;
       cl_float3 origin;
+      cl_float3 normals[6];
   };
 #pragma pack(pop)
 
@@ -49,13 +50,29 @@ namespace alcube::physics::opencl::dtos {
 #pragma pack(push, 1)
   class CellVar {
     public:
-      cl_float3 positionAfterMotion; // 12
-      cl_float4 rotationAfterMotion; // 16
-      float collisionTime; // 4
-      unsigned short collisionCellIndex; // 2
-      unsigned char collisionOccurred; // 1
-      unsigned char neighborCellCount; // 1
-      unsigned short neighborCellIndices[16]; // 16 * 2
+      // 32
+      cl_float3 linearVelocity; // 4 * 3 = 12
+      cl_float3 angularVelocity; // 4 * 3 = 12
+      float momentOfInertia; // 4
+      float splitMass; // 4
+
+      // 4
+      unsigned char cellIntersectionCount; // 1
+      unsigned char cellCollisionCount; // 1
+      unsigned char planeIntersectionCount; // 1
+      unsigned char planeCollisionCount; // 1
+
+      // 320
+      unsigned short intersectedCellIndices[16]; // 2 * 16 = 32
+      unsigned short collisionCellIndices[16]; // 2 * 16 = 32
+      float  cellCollisionSpeeds[16]; // 4 * 16 = 64
+      cl_float3 cellIntersectionNormals[16]; // 4 * 3 * 16 = 192
+
+      // 32
+      unsigned short intersectedPlaneIndices[4]; // 2 * 4 = 8
+      unsigned short collisionPlaneIndices[4]; // 2 * 4 = 8
+      float  planeCollisionSpeeds[4]; // 4 * 4 = 16
+      int isFloating;
   };
 #pragma pack(pop)
 
