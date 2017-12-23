@@ -51,8 +51,7 @@ namespace alcube::physics {
       cl_kernel initGridAndCellRelations;
       cl_kernel collectIntersections;
       cl_kernel applyPenalty;
-      cl_kernel collectFrictionalCollisions;
-      cl_kernel updateVelocityByFriction;
+      cl_kernel applyFriction;
       cl_kernel collectCollisions;
       cl_kernel updateVelocity;
       cl_kernel motion;

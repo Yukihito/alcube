@@ -30,8 +30,7 @@ namespace alcube::physics {
     kernels.initGridAndCellRelations = kernelFactory->create(program, "initGridAndCellRelations");
     kernels.collectIntersections = kernelFactory->create(program, "collectIntersections");
     kernels.applyPenalty = kernelFactory->create(program, "applyPenalty");
-    kernels.collectFrictionalCollisions = kernelFactory->create(program, "collectFrictionalCollisions");
-    kernels.updateVelocityByFriction = kernelFactory->create(program, "updateVelocityByFriction");
+    kernels.applyFriction = kernelFactory->create(program, "applyFriction");
     kernels.collectCollisions = kernelFactory->create(program, "collectCollisions");
     kernels.updateVelocity = kernelFactory->create(program, "updateVelocity");
     kernels.motion = kernelFactory->create(program, "motion");
@@ -180,7 +179,9 @@ namespace alcube::physics {
       memArg(memories.currentStates),
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),
-      memArg(memories.gridEndIndices)
+      memArg(memories.gridEndIndices),
+      floatArg(deltaTime),
+      floatArg(gravity)
     });
   }
 
@@ -191,16 +192,6 @@ namespace alcube::physics {
       memArg(memories.cellVars),
       memArg(memories.currentStates),
       floatArg(deltaTime)
-    });
-    queue->push(kernels.collectFrictionalCollisions, {cellCount}, {
-      memArg(memories.grid),
-      memArg(memories.cells),
-      memArg(memories.cellVars)
-    });
-    queue->push(kernels.updateVelocityByFriction, {cellCount}, {
-      memArg(memories.grid),
-      memArg(memories.cells),
-      memArg(memories.cellVars)
     });
     for (int i = 0; i < 16; i++) {
       queue->push(kernels.collectCollisions, {cellCount}, {
@@ -214,6 +205,11 @@ namespace alcube::physics {
         memArg(memories.cellVars)
       });
     }
+    queue->push(kernels.applyFriction, {cellCount}, {
+      memArg(memories.grid),
+      memArg(memories.cells),
+      memArg(memories.cellVars)
+    });
   }
 
   void Simulator::motion(float deltaTime) {
