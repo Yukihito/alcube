@@ -95,7 +95,7 @@ namespace alcube::utils::opencl {
     status = clEnqueueReadBuffer(
       queue,
       memory->mem,
-      CL_FALSE,
+      CL_TRUE,
       memory->size * index,
       memory->size,
       hostPtr,

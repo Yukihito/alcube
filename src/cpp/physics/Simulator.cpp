@@ -214,7 +214,7 @@ namespace alcube::physics {
     });
 
     queue->readAt(memories.blocks, dtos.lastBlock, cellCount - 1);
-    std::cout << "intersectionCount: " << dtos.lastBlock->cumulativeIntersectionCount << std::endl;
+    //std::cout << "intersectionCount: " << dtos.lastBlock->cumulativeIntersectionCount << std::endl;
     if (dtos.lastBlock->cumulativeIntersectionCount == 0) {
       return;
     }

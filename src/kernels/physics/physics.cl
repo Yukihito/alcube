@@ -440,7 +440,7 @@ __kernel void calcConstraintImpulse(
   __global CellVar* cellVar = &cellVars[cellIndex];
   float mass = cellVar->massForCollision;
   float elasticity = intersectionType == 0 ? cells[cellIndex].elasticity * cells[otherIndex].elasticity : cells[cellIndex].elasticity;
-  float massRatio = intersectionType == 0 ? mass / cellVars[otherIndex].massForCollision : mass;
+  float massRatio = intersectionType == 0 ? mass / cellVars[otherIndex].massForCollision : 0.0f;
   float3 intersectionNormal = intersection->normal;
   float speedOnIntersectionNormal = dot(cellVar->linearVelocity, intersectionNormal);
   float affectedSpeed = (intersection->intersectionSpeed * (1.0f + elasticity) / (1.0f + massRatio)) + speedOnIntersectionNormal;
