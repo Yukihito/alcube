@@ -14,7 +14,7 @@ namespace alcube::utils::opencl {
     std::cout << "status clBuildProgram: " << status << std::endl;
     if (status != CL_SUCCESS) {
       size_t length;
-      char buffer[2048];
+      char buffer[65536];
       clGetProgramBuildInfo(program, this->resources->deviceId, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &length);
       std::cout << "--- Build log ---\n " << buffer << std::endl;
     }

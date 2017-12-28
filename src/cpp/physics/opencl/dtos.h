@@ -50,29 +50,47 @@ namespace alcube::physics::opencl::dtos {
 #pragma pack(push, 1)
   class CellVar {
     public:
-      // 32
-      cl_float3 linearVelocity; // 4 * 3 = 12
-      cl_float3 angularVelocity; // 4 * 3 = 12
-      float momentOfInertia; // 4
-      float splitMass; // 4
-
-      // 4
-      unsigned char cellIntersectionCount; // 1
-      unsigned char cellCollisionCount; // 1
-      unsigned char planeIntersectionCount; // 1
-      unsigned char planeCollisionCount; // 1
-
-      // 320
-      unsigned short intersectedCellIndices[16]; // 2 * 16 = 32
-      unsigned short collisionCellIndices[16]; // 2 * 16 = 32
-      float  cellCollisionSpeeds[16]; // 4 * 16 = 64
-      cl_float3 cellIntersectionNormals[16]; // 4 * 3 * 16 = 192
-
-      // 32
-      unsigned short intersectedPlaneIndices[4]; // 2 * 4 = 8
-      unsigned short collisionPlaneIndices[4]; // 2 * 4 = 8
-      float  planeCollisionSpeeds[4]; // 4 * 4 = 16
+      cl_float3 linearVelocity;
+      cl_float3 angularVelocity;
+      float momentOfInertia;
+      float massForIntersection;
+      float massForCollision;
       int isFloating;
+  };
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+  class Intersection {
+    public:
+      unsigned int type;
+      unsigned short index;
+      unsigned short otherIndex;
+      float intersectionLength;
+      float intersectionSpeed;
+      cl_float3 constraintImpulse;
+      cl_float3 frictionalImpulse;
+      cl_float3 angularFrictionalImpulse;
+      cl_float3 penaltyImpulse;
+      cl_float3 normal;
+  };
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+  class IntersectionBlock {
+    public:
+      unsigned int cumulativeIntersectionCount;
+      unsigned short intersectionCount;
+      unsigned short collisionCount;
+      unsigned char collisionIndices[16];
+      Intersection intersections[16];
+  };
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+  class IntersectionRef {
+    public:
+      unsigned short blockIndex;
+      unsigned short intersectionIndex;
   };
 #pragma pack(pop)
 

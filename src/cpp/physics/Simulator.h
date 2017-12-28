@@ -28,6 +28,7 @@ namespace alcube::physics {
       opencl::dtos::GridAndCellRelation* gridAndCellRelations;
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
+      opencl::dtos::IntersectionBlock* lastBlock;
   };
 
   class Memories {
@@ -35,6 +36,9 @@ namespace alcube::physics {
       utils::opencl::Memory* grid;
       utils::opencl::Memory* cells;
       utils::opencl::Memory* cellVars;
+      utils::opencl::Memory* intersections;
+      utils::opencl::Memory* blocks;
+      utils::opencl::Memory* intersectionRefs;
       utils::opencl::Memory* currentStates;
       utils::opencl::Memory* nextStates;
       utils::opencl::Memory* gridAndCellRelations;
@@ -50,10 +54,15 @@ namespace alcube::physics {
       cl_kernel setGridRelationIndexRange;
       cl_kernel initGridAndCellRelations;
       cl_kernel collectIntersections;
-      cl_kernel applyPenalty;
-      cl_kernel applyFriction;
+      cl_kernel countIntersections;
+      cl_kernel setUpIntersectionRefs;
+      cl_kernel calcPenaltyImpulse;
+      cl_kernel updateByPenaltyImpulse;
+      cl_kernel calcFrictionalImpulse;
+      cl_kernel updateByFrictionalImpulse;
       cl_kernel collectCollisions;
-      cl_kernel updateVelocity;
+      cl_kernel calcConstraintImpulse;
+      cl_kernel updateByConstraintImpulse;
       cl_kernel motion;
       cl_kernel postProcessing;
   };

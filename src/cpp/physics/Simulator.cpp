@@ -29,10 +29,15 @@ namespace alcube::physics {
     kernels.setGridRelationIndexRange = kernelFactory->create(program, "setGridRelationIndexRange");
     kernels.initGridAndCellRelations = kernelFactory->create(program, "initGridAndCellRelations");
     kernels.collectIntersections = kernelFactory->create(program, "collectIntersections");
-    kernels.applyPenalty = kernelFactory->create(program, "applyPenalty");
-    kernels.applyFriction = kernelFactory->create(program, "applyFriction");
+    kernels.countIntersections = kernelFactory->create(program, "countIntersections");
+    kernels.setUpIntersectionRefs = kernelFactory->create(program, "setUpIntersectionRefs");
+    kernels.calcPenaltyImpulse = kernelFactory->create(program, "calcPenaltyImpulse");
+    kernels.updateByPenaltyImpulse = kernelFactory->create(program, "updateByPenaltyImpulse");
+    kernels.calcFrictionalImpulse = kernelFactory->create(program, "calcFrictionalImpulse");
+    kernels.updateByFrictionalImpulse = kernelFactory->create(program, "updateByFrictionalImpulse");
     kernels.collectCollisions = kernelFactory->create(program, "collectCollisions");
-    kernels.updateVelocity = kernelFactory->create(program, "updateVelocity");
+    kernels.calcConstraintImpulse = kernelFactory->create(program, "calcConstraintImpulse");
+    kernels.updateByConstraintImpulse = kernelFactory->create(program, "updateByConstraintImpulse");
     kernels.motion = kernelFactory->create(program, "motion");
     kernels.postProcessing = kernelFactory->create(program, "postProcessing");
 
@@ -63,11 +68,15 @@ namespace alcube::physics {
     dtos.gridAndCellRelations = new opencl::dtos::GridAndCellRelation[maxCellCount];
     dtos.gridStartIndices = new unsigned int[allGridCount];
     dtos.gridEndIndices = new unsigned int[allGridCount];
+    dtos.lastBlock = new opencl::dtos::IntersectionBlock[1];
 
     memories.grid = memoryManager->define("grid", sizeof(opencl::dtos::Grid), dtos.grid, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
     memories.cells = memoryManager->define("cells", sizeof(opencl::dtos::Cell), dtos.cells, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
     memories.currentStates = memoryManager->define("currentStates", sizeof(opencl::dtos::RigidBodyState), dtos.currentStates, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR);
     memories.cellVars = memoryManager->define("cellVars", sizeof(opencl::dtos::CellVar), nullptr, CL_MEM_READ_WRITE);
+    memories.intersections = memoryManager->define("intersections", sizeof(opencl::dtos::Intersection), nullptr, CL_MEM_READ_WRITE);
+    memories.blocks = memoryManager->define("blocks", sizeof(opencl::dtos::IntersectionBlock), nullptr, CL_MEM_READ_WRITE);
+    memories.intersectionRefs = memoryManager->define("intersectionRefs", sizeof(opencl::dtos::IntersectionRef), nullptr, CL_MEM_READ_WRITE);
     memories.nextStates = memoryManager->define("nextStates", sizeof(opencl::dtos::RigidBodyState), nullptr, CL_MEM_READ_WRITE);
     memories.gridAndCellRelations = memoryManager->define("gridAndCellRelations", sizeof(opencl::dtos::GridAndCellRelation), nullptr, CL_MEM_READ_WRITE);
     memories.gridStartIndices = memoryManager->define("gridStartIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
@@ -113,6 +122,9 @@ namespace alcube::physics {
     memories.gridAndCellRelations->count = cellCountForBitonicSort;
     memories.gridStartIndices->count = allGridCount;
     memories.gridEndIndices->count = allGridCount;
+    memories.blocks->count = cellCount;
+    memories.intersections->count = cellCount * 16;
+    memories.intersectionRefs->count = cellCount * 16;
     memoryManager->allocate();
   }
 
@@ -180,35 +192,72 @@ namespace alcube::physics {
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),
       memArg(memories.gridEndIndices),
+      memArg(memories.blocks),
       floatArg(deltaTime),
       floatArg(gravity)
     });
   }
 
   void Simulator::resolveConstraints(float deltaTime) {
-    queue->push(kernels.applyPenalty, {cellCount}, {
-      memArg(memories.grid),
-      memArg(memories.cells),
-      memArg(memories.cellVars),
-      memArg(memories.currentStates),
-      floatArg(deltaTime)
-    });
-    for (int i = 0; i < 16; i++) {
-      queue->push(kernels.collectCollisions, {cellCount}, {
-        memArg(memories.grid),
-        memArg(memories.cells),
-        memArg(memories.cellVars)
-      });
-      queue->push(kernels.updateVelocity, {cellCount}, {
-        memArg(memories.grid),
-        memArg(memories.cells),
-        memArg(memories.cellVars)
+    for (unsigned int dist = 2; dist <= cellCount; dist *= 2) {
+      unsigned int halfDist = dist / 2;
+      queue->push(kernels.countIntersections, {cellCount}, {
+        memArg(memories.blocks),
+        uintArg(dist),
+        uintArg(halfDist)
       });
     }
-    queue->push(kernels.applyFriction, {cellCount}, {
-      memArg(memories.grid),
+
+    queue->push(kernels.setUpIntersectionRefs, {cellCount}, {
+      memArg(memories.blocks),
+      memArg(memories.intersectionRefs)
+    });
+
+    queue->readAt(memories.blocks, dtos.lastBlock, cellCount - 1);
+    std::cout << "intersectionCount: " << dtos.lastBlock->cumulativeIntersectionCount << std::endl;
+    if (dtos.lastBlock->cumulativeIntersectionCount == 0) {
+      return;
+    }
+    queue->push(kernels.calcPenaltyImpulse, {dtos.lastBlock->cumulativeIntersectionCount}, {
+      memArg(memories.intersectionRefs),
+      memArg(memories.blocks),
+      floatArg(deltaTime)
+    });
+    queue->push(kernels.updateByPenaltyImpulse, {cellCount}, {
       memArg(memories.cells),
-      memArg(memories.cellVars)
+      memArg(memories.cellVars),
+      memArg(memories.blocks)
+    });
+
+    for (int i = 0; i < 16; i++) {
+      queue->push(kernels.collectCollisions, {cellCount}, {
+        memArg(memories.cells),
+        memArg(memories.cellVars),
+        memArg(memories.blocks)
+      });
+      queue->push(kernels.calcConstraintImpulse, {dtos.lastBlock->cumulativeIntersectionCount}, {
+        memArg(memories.cells),
+        memArg(memories.cellVars),
+        memArg(memories.intersectionRefs),
+        memArg(memories.blocks)
+      });
+      queue->push(kernels.updateByConstraintImpulse, {cellCount}, {
+        memArg(memories.cells),
+        memArg(memories.cellVars),
+        memArg(memories.blocks)
+      });
+    }
+
+    queue->push(kernels.calcFrictionalImpulse, {dtos.lastBlock->cumulativeIntersectionCount}, {
+      memArg(memories.cells),
+      memArg(memories.cellVars),
+      memArg(memories.intersectionRefs),
+      memArg(memories.blocks)
+    });
+    queue->push(kernels.updateByFrictionalImpulse, {cellCount}, {
+      memArg(memories.cells),
+      memArg(memories.cellVars),
+      memArg(memories.blocks)
     });
   }
 

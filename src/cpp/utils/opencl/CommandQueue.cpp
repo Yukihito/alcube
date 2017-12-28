@@ -89,4 +89,22 @@ namespace alcube::utils::opencl {
       std::cout << memory->name << " clEnqueueReadBuffer failure: " << status << std::endl;
     }
   }
+
+  void CommandQueue::readAt(Memory *memory, void *hostPtr, unsigned int index) {
+    cl_int status;
+    status = clEnqueueReadBuffer(
+      queue,
+      memory->mem,
+      CL_FALSE,
+      memory->size * index,
+      memory->size,
+      hostPtr,
+      0,
+      nullptr,
+      nullptr
+    );
+    if (status != CL_SUCCESS) {
+      std::cout << memory->name << " clEnqueueReadBuffer failure: " << status << std::endl;
+    }
+  }
 }
