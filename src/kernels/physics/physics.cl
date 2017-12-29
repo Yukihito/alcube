@@ -30,26 +30,53 @@ typedef struct __attribute__ ((packed)) CellStruct {
 } Cell;
 
 typedef struct __attribute__ ((packed)) IntersectionStruct {
-  unsigned int type;
-  unsigned short index;
+  unsigned short type;
   unsigned short otherIndex;
-  float intersectionLength;
-  float intersectionSpeed;
+  float length;
+  float speed;
   float3 normal;
 } Intersection;
 
 typedef struct __attribute__ ((packed)) CellVarStruct {
-  float3 linearVelocity; // 4 * 3 = 12
-  float3 angularVelocity; // 4 * 3 = 12
-  float momentOfInertia; // 4
-  float massForIntersection; // 4
-  float massForCollision; // 4
-  int isFloating; // 4
+  float3 linearVelocity;
+  float3 angularVelocity;
+  float momentOfInertia;
+  float massForIntersection;
+  float massForCollision;
+  int isFloating;
   unsigned short intersectionCount;
   unsigned short collisionCount;
   unsigned char collisionIndices[16];
   Intersection intersections[16];
 } CellVar;
+
+float4 mulQuat(float4* q, float4* r);
+float3 rotateByQuat(float3* v, float4* q);
+
+void accumulatePenaltyImpulse(
+  __global Intersection* intersection,
+  const float deltaTime,
+  float3* acc
+);
+
+void accumulateFrictionalImpulse(
+  __global const Cell* cell,
+  __global CellVar* cellVar,
+  __global const Cell* cells,
+  __global CellVar* cellVars,
+  __global Intersection* intersection,
+  float3* linearMomentumAcc,
+  float3* angularMomentumAcc
+);
+
+void accumulateConstraintImpulse(
+  __global const Cell* cell,
+  __global CellVar* cellVar,
+  __global const Cell* cells,
+  __global CellVar* cellVars,
+  __global Intersection* intersection,
+  float3* acc
+);
 
 float4 mulQuat(
   float4* q,
@@ -173,7 +200,7 @@ __kernel void collectIntersections(
   __global CellVar* cellVar = &cellVars[cellIndex];
   __global const Cell* cell = &cells[cellIndex];
   float3 position = currentState->position;
-  float* positionPtr = &position;
+  float* positionPtr = (float*)&position;
   float radius = cell->radius;
   float mass = cell->mass;
   float smallValue = 0.0001f;
@@ -205,11 +232,10 @@ __kernel void collectIntersections(
 	  if (ww > 0.0f && ww <= rr + smallValue) {
 	    __global Intersection* intersection = &cellVar->intersections[intersectionCount];
 	    intersection->type = 0;
-	    intersection->index = cellIndex;
 	    intersection->otherIndex = otherCellIndex;
 	    intersection->normal = normalize(w);
-	    intersection->intersectionLength = r - length(w);
-	    intersection->intersectionSpeed = 0.0f;
+	    intersection->length = r - length(w);
+	    intersection->speed = 0.0f;
 	    intersectionCount++;
 	    isFullOfIntersection = intersectionCount >= 16;
 	  }
@@ -219,16 +245,15 @@ __kernel void collectIntersections(
   }
 
   float3 corner = grid->origin + (float3)(radius + smallValue);
-  float* cornerPtr = &corner;
+  float* cornerPtr = (float*)&corner;
   for (uint i = 0; i < 3 && !isFullOfIntersection; i++) {
     if (positionPtr[i] <= cornerPtr[i]) {
       __global Intersection* intersection = &cellVar->intersections[intersectionCount];
       intersection->type = 1;
-      intersection->index = cellIndex;
       intersection->otherIndex = i;
       intersection->normal = -grid->normals[i];
-      intersection->intersectionLength = cornerPtr[i] - positionPtr[i];
-      intersection->intersectionSpeed = 0.0f;
+      intersection->length = cornerPtr[i] - positionPtr[i];
+      intersection->speed = 0.0f;
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= 16;
       if (i == 1) {
@@ -240,11 +265,10 @@ __kernel void collectIntersections(
     if (positionPtr[i - 3] >= -cornerPtr[i - 3]) {
       __global Intersection* intersection = &cellVar->intersections[intersectionCount];
       intersection->type = 1;
-      intersection->index = cellIndex;
       intersection->otherIndex = i;
       intersection->normal = -grid->normals[i];
-      intersection->intersectionLength = positionPtr[i - 3] + cornerPtr[i - 3];
-      intersection->intersectionSpeed = 0.0f;
+      intersection->length = positionPtr[i - 3] + cornerPtr[i - 3];
+      intersection->speed = 0.0f;
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= 16;
     }
@@ -274,7 +298,7 @@ void accumulatePenaltyImpulse(
   const float deltaTime,
   float3* acc
 ) {
-  *acc += (-64.0f * log2(intersection->intersectionLength + 1.0f) * deltaTime) * intersection->normal;
+  *acc += (-64.0f * log2(intersection->length + 1.0f) * deltaTime) * intersection->normal;
 }
 
 __kernel void updateByPenaltyImpulse(
@@ -358,8 +382,8 @@ __kernel void collectCollisions(
   uchar collisionCount = 0;
   for (uchar i = 0; i < count; i++) {
     float3 relativeSpeed = intersections[i].type == 0 ? cellVars[intersections[i].otherIndex].linearVelocity - cellVar->linearVelocity : - cellVar->linearVelocity;
-    intersections[i].intersectionSpeed = dot(intersections[i].normal, relativeSpeed);
-    if (intersections[i].intersectionSpeed < 0.0f) {
+    intersections[i].speed = dot(intersections[i].normal, relativeSpeed);
+    if (intersections[i].speed < 0.0f) {
       cellVar->collisionIndices[collisionCount] = i;
       collisionCount++;
     }
@@ -376,7 +400,7 @@ void accumulateConstraintImpulse(
   __global Intersection* intersection,
   float3* acc
 ) {
-  if (intersection->intersectionSpeed >= 0.0f) {
+  if (intersection->speed >= 0.0f) {
     return;
   }
   unsigned int intersectionType = intersection->type;
@@ -386,7 +410,7 @@ void accumulateConstraintImpulse(
   float massRatio = intersectionType == 0 ? mass / cellVars[otherIndex].massForCollision : 0.0f;
   float3 intersectionNormal = intersection->normal;
   float speedOnIntersectionNormal = dot(cellVar->linearVelocity, intersectionNormal);
-  float affectedSpeed = (intersection->intersectionSpeed * (1.0f + elasticity) / (1.0f + massRatio)) + speedOnIntersectionNormal;
+  float affectedSpeed = (intersection->speed * (1.0f + elasticity) / (1.0f + massRatio)) + speedOnIntersectionNormal;
   *acc += (cellVar->linearVelocity + (affectedSpeed - speedOnIntersectionNormal) * intersectionNormal) * mass;
 }
 

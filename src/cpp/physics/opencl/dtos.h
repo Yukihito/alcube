@@ -50,11 +50,10 @@ namespace alcube::physics::opencl::dtos {
 #pragma pack(push, 1)
   class Intersection {
     public:
-      unsigned int type;
-      unsigned short index;
+      unsigned short type;
       unsigned short otherIndex;
-      float intersectionLength;
-      float intersectionSpeed;
+      float length;
+      float speed;
       cl_float3 normal;
   };
 #pragma pack(pop)
