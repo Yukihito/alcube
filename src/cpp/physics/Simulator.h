@@ -54,14 +54,9 @@ namespace alcube::physics {
       cl_kernel setGridRelationIndexRange;
       cl_kernel initGridAndCellRelations;
       cl_kernel collectIntersections;
-      cl_kernel countIntersections;
-      cl_kernel setUpIntersectionRefs;
-      cl_kernel calcPenaltyImpulse;
       cl_kernel updateByPenaltyImpulse;
-      cl_kernel calcFrictionalImpulse;
       cl_kernel updateByFrictionalImpulse;
       cl_kernel collectCollisions;
-      cl_kernel calcConstraintImpulse;
       cl_kernel updateByConstraintImpulse;
       cl_kernel motion;
       cl_kernel postProcessing;

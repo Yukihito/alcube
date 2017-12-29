@@ -67,10 +67,6 @@ namespace alcube::physics::opencl::dtos {
       unsigned short otherIndex;
       float intersectionLength;
       float intersectionSpeed;
-      cl_float3 constraintImpulse;
-      cl_float3 frictionalImpulse;
-      cl_float3 angularFrictionalImpulse;
-      cl_float3 penaltyImpulse;
       cl_float3 normal;
   };
 #pragma pack(pop)

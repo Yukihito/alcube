@@ -29,14 +29,9 @@ namespace alcube::physics {
     kernels.setGridRelationIndexRange = kernelFactory->create(program, "setGridRelationIndexRange");
     kernels.initGridAndCellRelations = kernelFactory->create(program, "initGridAndCellRelations");
     kernels.collectIntersections = kernelFactory->create(program, "collectIntersections");
-    kernels.countIntersections = kernelFactory->create(program, "countIntersections");
-    kernels.setUpIntersectionRefs = kernelFactory->create(program, "setUpIntersectionRefs");
-    kernels.calcPenaltyImpulse = kernelFactory->create(program, "calcPenaltyImpulse");
     kernels.updateByPenaltyImpulse = kernelFactory->create(program, "updateByPenaltyImpulse");
-    kernels.calcFrictionalImpulse = kernelFactory->create(program, "calcFrictionalImpulse");
     kernels.updateByFrictionalImpulse = kernelFactory->create(program, "updateByFrictionalImpulse");
     kernels.collectCollisions = kernelFactory->create(program, "collectCollisions");
-    kernels.calcConstraintImpulse = kernelFactory->create(program, "calcConstraintImpulse");
     kernels.updateByConstraintImpulse = kernelFactory->create(program, "updateByConstraintImpulse");
     kernels.motion = kernelFactory->create(program, "motion");
     kernels.postProcessing = kernelFactory->create(program, "postProcessing");
@@ -199,34 +194,11 @@ namespace alcube::physics {
   }
 
   void Simulator::resolveConstraints(float deltaTime) {
-    for (unsigned int dist = 2; dist <= cellCount; dist *= 2) {
-      unsigned int halfDist = dist / 2;
-      queue->push(kernels.countIntersections, {cellCount}, {
-        memArg(memories.blocks),
-        uintArg(dist),
-        uintArg(halfDist)
-      });
-    }
-
-    queue->push(kernels.setUpIntersectionRefs, {cellCount}, {
-      memArg(memories.blocks),
-      memArg(memories.intersectionRefs)
-    });
-
-    queue->readAt(memories.blocks, dtos.lastBlock, cellCount - 1);
-    //std::cout << "intersectionCount: " << dtos.lastBlock->cumulativeIntersectionCount << std::endl;
-    if (dtos.lastBlock->cumulativeIntersectionCount == 0) {
-      return;
-    }
-    queue->push(kernels.calcPenaltyImpulse, {dtos.lastBlock->cumulativeIntersectionCount}, {
-      memArg(memories.intersectionRefs),
-      memArg(memories.blocks),
-      floatArg(deltaTime)
-    });
     queue->push(kernels.updateByPenaltyImpulse, {cellCount}, {
       memArg(memories.cells),
       memArg(memories.cellVars),
-      memArg(memories.blocks)
+      memArg(memories.blocks),
+      floatArg(deltaTime)
     });
 
     for (int i = 0; i < 16; i++) {
@@ -235,25 +207,12 @@ namespace alcube::physics {
         memArg(memories.cellVars),
         memArg(memories.blocks)
       });
-      queue->push(kernels.calcConstraintImpulse, {dtos.lastBlock->cumulativeIntersectionCount}, {
-        memArg(memories.cells),
-        memArg(memories.cellVars),
-        memArg(memories.intersectionRefs),
-        memArg(memories.blocks)
-      });
       queue->push(kernels.updateByConstraintImpulse, {cellCount}, {
         memArg(memories.cells),
         memArg(memories.cellVars),
         memArg(memories.blocks)
       });
     }
-
-    queue->push(kernels.calcFrictionalImpulse, {dtos.lastBlock->cumulativeIntersectionCount}, {
-      memArg(memories.cells),
-      memArg(memories.cellVars),
-      memArg(memories.intersectionRefs),
-      memArg(memories.blocks)
-    });
     queue->push(kernels.updateByFrictionalImpulse, {cellCount}, {
       memArg(memories.cells),
       memArg(memories.cellVars),

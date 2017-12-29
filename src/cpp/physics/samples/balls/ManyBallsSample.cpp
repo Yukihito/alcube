@@ -60,7 +60,7 @@ namespace alcube::physics::samples::balls {
 
   void ManyBallsSample::onInit() {
     maxCellCount = 16384; // 2^14
-    int ballCount = 128;
+    int ballCount = 32;
     deltaTime = 1.0f / 30.0f;
     float gravity = 9.8f;
     unsigned int gridEdgeLength = 8;
