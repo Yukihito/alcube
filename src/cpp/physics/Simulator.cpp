@@ -23,7 +23,13 @@ namespace alcube::physics {
     cells = {};
     gravity = 0.0f;
 
-    cl_program program = programFactory->create("../src/kernels/physics/physics.cl");
+    cl_program program = programFactory->create({
+      "../src/kernels/physics/common.cl",
+      "../src/kernels/physics/broadphase.cl",
+      "../src/kernels/physics/narrowphase.cl",
+      "../src/kernels/physics/constraintresolving.cl",
+      "../src/kernels/physics/motion.cl"
+    });
     kernels.fillGridIndex = kernelFactory->create(program, "fillGridIndex");
     kernels.merge = kernelFactory->create(program, "merge");
     kernels.bitonic = kernelFactory->create(program, "bitonic");
