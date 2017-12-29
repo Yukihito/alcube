@@ -48,18 +48,6 @@ namespace alcube::physics::opencl::dtos {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-  class CellVar {
-    public:
-      cl_float3 linearVelocity;
-      cl_float3 angularVelocity;
-      float momentOfInertia;
-      float massForIntersection;
-      float massForCollision;
-      int isFloating;
-  };
-#pragma pack(pop)
-
-#pragma pack(push, 1)
   class Intersection {
     public:
       unsigned int type;
@@ -72,21 +60,18 @@ namespace alcube::physics::opencl::dtos {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-  class IntersectionBlock {
+  class CellVar {
     public:
-      unsigned int cumulativeIntersectionCount;
+      cl_float3 linearVelocity;
+      cl_float3 angularVelocity;
+      float momentOfInertia;
+      float massForIntersection;
+      float massForCollision;
+      int isFloating;
       unsigned short intersectionCount;
       unsigned short collisionCount;
       unsigned char collisionIndices[16];
       Intersection intersections[16];
-  };
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-  class IntersectionRef {
-    public:
-      unsigned short blockIndex;
-      unsigned short intersectionIndex;
   };
 #pragma pack(pop)
 

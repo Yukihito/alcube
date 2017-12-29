@@ -24,6 +24,7 @@ namespace alcube::utils::opencl {
       void push(cl_kernel op, std::vector<size_t> ranges, std::initializer_list<KernelArg> args);
       void pushZeroFill(Memory* mem);
       void read(Memory* memory, void* hostPtr);
+      void write(Memory* memory);
       void readAt(Memory* memory, void* hostPtr, unsigned int index);
     private:
       cl_command_queue queue;

@@ -13,6 +13,7 @@ namespace alcube::utils::opencl {
       size_t size;
       size_t count;
       cl_context context;
+      void* hostPtr;
       void allocate();
       void release();
       explicit Memory(
@@ -23,7 +24,6 @@ namespace alcube::utils::opencl {
         cl_mem_flags memFlags
       );
     private:
-      void* hostPtr;
       cl_mem_flags memFlags;
   };
 }

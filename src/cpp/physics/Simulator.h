@@ -28,7 +28,6 @@ namespace alcube::physics {
       opencl::dtos::GridAndCellRelation* gridAndCellRelations;
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
-      opencl::dtos::IntersectionBlock* lastBlock;
   };
 
   class Memories {
@@ -36,9 +35,6 @@ namespace alcube::physics {
       utils::opencl::Memory* grid;
       utils::opencl::Memory* cells;
       utils::opencl::Memory* cellVars;
-      utils::opencl::Memory* intersections;
-      utils::opencl::Memory* blocks;
-      utils::opencl::Memory* intersectionRefs;
       utils::opencl::Memory* currentStates;
       utils::opencl::Memory* nextStates;
       utils::opencl::Memory* gridAndCellRelations;
@@ -81,6 +77,7 @@ namespace alcube::physics {
       Dtos dtos;
       Memories memories;
       Kernels kernels;
+      bool allocated;
       void setUpComputingSize();
       void setUpMemories();
       void tearDownMemories();

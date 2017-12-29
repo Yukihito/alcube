@@ -147,6 +147,7 @@ namespace alcube::physics::samples::balls {
   }
 
   void ManyBallsSample::onClose() {
+    physicsSimulator->tearDownMemories();
     resources->release();
   }
 }

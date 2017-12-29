@@ -12,6 +12,7 @@ namespace alcube::physics {
     unsigned int yGridCount,
     unsigned int zGridCount
   ) {
+    this->allocated = false;
     this->cellsMutex = cellsMutex;
     this->maxCellCount = maxCellCount;
     this->allGridCount = xGridCount * yGridCount * zGridCount;
@@ -63,15 +64,11 @@ namespace alcube::physics {
     dtos.gridAndCellRelations = new opencl::dtos::GridAndCellRelation[maxCellCount];
     dtos.gridStartIndices = new unsigned int[allGridCount];
     dtos.gridEndIndices = new unsigned int[allGridCount];
-    dtos.lastBlock = new opencl::dtos::IntersectionBlock[1];
 
     memories.grid = memoryManager->define("grid", sizeof(opencl::dtos::Grid), dtos.grid, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
     memories.cells = memoryManager->define("cells", sizeof(opencl::dtos::Cell), dtos.cells, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
     memories.currentStates = memoryManager->define("currentStates", sizeof(opencl::dtos::RigidBodyState), dtos.currentStates, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR);
     memories.cellVars = memoryManager->define("cellVars", sizeof(opencl::dtos::CellVar), nullptr, CL_MEM_READ_WRITE);
-    memories.intersections = memoryManager->define("intersections", sizeof(opencl::dtos::Intersection), nullptr, CL_MEM_READ_WRITE);
-    memories.blocks = memoryManager->define("blocks", sizeof(opencl::dtos::IntersectionBlock), nullptr, CL_MEM_READ_WRITE);
-    memories.intersectionRefs = memoryManager->define("intersectionRefs", sizeof(opencl::dtos::IntersectionRef), nullptr, CL_MEM_READ_WRITE);
     memories.nextStates = memoryManager->define("nextStates", sizeof(opencl::dtos::RigidBodyState), nullptr, CL_MEM_READ_WRITE);
     memories.gridAndCellRelations = memoryManager->define("gridAndCellRelations", sizeof(opencl::dtos::GridAndCellRelation), nullptr, CL_MEM_READ_WRITE);
     memories.gridStartIndices = memoryManager->define("gridStartIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
@@ -117,10 +114,13 @@ namespace alcube::physics {
     memories.gridAndCellRelations->count = cellCountForBitonicSort;
     memories.gridStartIndices->count = allGridCount;
     memories.gridEndIndices->count = allGridCount;
-    memories.blocks->count = cellCount;
-    memories.intersections->count = cellCount * 16;
-    memories.intersectionRefs->count = cellCount * 16;
-    memoryManager->allocate();
+    if (!allocated) {
+      memoryManager->allocate();
+      allocated = true;
+    } else {
+      queue->write(memories.cells);
+      queue->write(memories.currentStates);
+    }
   }
 
   void Simulator::tearDownMemories() {
@@ -187,7 +187,6 @@ namespace alcube::physics {
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),
       memArg(memories.gridEndIndices),
-      memArg(memories.blocks),
       floatArg(deltaTime),
       floatArg(gravity)
     });
@@ -197,26 +196,22 @@ namespace alcube::physics {
     queue->push(kernels.updateByPenaltyImpulse, {cellCount}, {
       memArg(memories.cells),
       memArg(memories.cellVars),
-      memArg(memories.blocks),
       floatArg(deltaTime)
     });
 
     for (int i = 0; i < 16; i++) {
       queue->push(kernels.collectCollisions, {cellCount}, {
         memArg(memories.cells),
-        memArg(memories.cellVars),
-        memArg(memories.blocks)
+        memArg(memories.cellVars)
       });
       queue->push(kernels.updateByConstraintImpulse, {cellCount}, {
         memArg(memories.cells),
-        memArg(memories.cellVars),
-        memArg(memories.blocks)
+        memArg(memories.cellVars)
       });
     }
     queue->push(kernels.updateByFrictionalImpulse, {cellCount}, {
       memArg(memories.cells),
-      memArg(memories.cellVars),
-      memArg(memories.blocks)
+      memArg(memories.cellVars)
     });
   }
 
@@ -251,7 +246,6 @@ namespace alcube::physics {
     resolveConstraints(deltaTime);
     motion(deltaTime);
     read(memories.nextStates, dtos.nextStates);
-    tearDownMemories();
     cellsMutex->lock();
     output();
     cellsMutex->unlock();

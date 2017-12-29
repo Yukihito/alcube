@@ -143,6 +143,7 @@ namespace alcube::physics::samples::particles {
   }
 
   void ParticlesSample::onClose() {
+    physicsSimulator->tearDownMemories();
     resources->release();
   }
 }
