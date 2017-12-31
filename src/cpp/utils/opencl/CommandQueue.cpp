@@ -91,6 +91,9 @@ namespace alcube::utils::opencl {
   }
 
   void CommandQueue::write(Memory *memory) {
+    if (memory->count == 0) {
+      return;
+    }
     cl_int status;
     status = clEnqueueWriteBuffer(
       queue,

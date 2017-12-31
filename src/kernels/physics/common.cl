@@ -27,6 +27,8 @@ typedef struct __attribute__ ((packed)) CellStruct {
   float elasticity;
   float dynamicFrictionCoefficient;
   float staticFrictionCoefficient;
+  uint springIndices[16];
+  uint springCount;
 } Cell;
 
 typedef struct __attribute__ ((packed)) IntersectionStruct {
@@ -43,40 +45,27 @@ typedef struct __attribute__ ((packed)) CellVarStruct {
   float momentOfInertia;
   float massForIntersection;
   float massForCollision;
+  ushort intersectionCount;
+  ushort collisionCount;
   int isFloating;
-  unsigned short intersectionCount;
-  unsigned short collisionCount;
   unsigned char collisionIndices[16];
   Intersection intersections[16];
 } CellVar;
 
+typedef struct __attribute__ ((packed)) SpringStruct {
+  float k;
+  float3 nodePositionsModelSpace[2];
+  ushort cellIndices[2];
+} Spring;
+
+typedef struct __attribute__ ((packed)) SpringVarStruct {
+  float3 linearImpulses[2];
+  float3 angularImpulses[2];
+} SpringVar;
+
 float4 mulQuat(float4* q, float4* r);
 float3 rotateByQuat(float3* v, float4* q);
-
-void accumulatePenaltyImpulse(
-  __global Intersection* intersection,
-  const float deltaTime,
-  float3* acc
-);
-
-void accumulateFrictionalImpulse(
-  __global const Cell* cell,
-  __global CellVar* cellVar,
-  __global const Cell* cells,
-  __global CellVar* cellVars,
-  __global Intersection* intersection,
-  float3* linearMomentumAcc,
-  float3* angularMomentumAcc
-);
-
-void accumulateConstraintImpulse(
-  __global const Cell* cell,
-  __global CellVar* cellVar,
-  __global const Cell* cells,
-  __global CellVar* cellVars,
-  __global Intersection* intersection,
-  float3* acc
-);
+float4 createQuatFromDisplacement(float3* angularDisplacement);
 
 float4 mulQuat(
   float4* q,
@@ -98,4 +87,14 @@ float3 rotateByQuat(
   float4 qp = mulQuat(q, &p);
   float4 qpr = mulQuat(&qp, &r);
   return (float3)(qpr.x, qpr.y, qpr.z);
+}
+
+float4 createQuatFromDisplacement(
+  float3* angularDisplacement
+) {
+  float4 q = (float4)(0.0f);
+  float halfRotationScalar = length(*angularDisplacement) / 2.0f;
+  q.w = cos(halfRotationScalar);
+  q.xyz = normalize(*angularDisplacement) * sin(halfRotationScalar);
+  return q;
 }

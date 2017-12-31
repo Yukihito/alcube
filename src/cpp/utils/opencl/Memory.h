@@ -12,6 +12,7 @@ namespace alcube::utils::opencl {
       std::string name;
       size_t size;
       size_t count;
+      size_t allocationCount;
       cl_context context;
       void* hostPtr;
       void allocate();

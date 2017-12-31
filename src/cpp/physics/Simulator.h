@@ -15,6 +15,7 @@
 #include "../utils/alcubemath.h"
 #include "opencl/dtos.h"
 #include "Cell.h"
+#include "Spring.h"
 
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
@@ -28,6 +29,7 @@ namespace alcube::physics {
       opencl::dtos::GridAndCellRelation* gridAndCellRelations;
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
+      opencl::dtos::Spring* springs;
   };
 
   class Memories {
@@ -40,6 +42,8 @@ namespace alcube::physics {
       utils::opencl::Memory* gridAndCellRelations;
       utils::opencl::Memory* gridStartIndices;
       utils::opencl::Memory* gridEndIndices;
+      utils::opencl::Memory* springs;
+      utils::opencl::Memory* springVars;
   };
 
   class Kernels {
@@ -88,17 +92,22 @@ namespace alcube::physics {
       void resolveConstraints(float deltaTime);
       void motion(float deltaTime);
       void read(utils::opencl::Memory* memory, void* hostPtr);
+      void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);
     private:
       std::mutex* cellsMutex;
       std::vector<Cell*> cells;
-      unsigned int maxCellCount;
+      std::vector<Spring*> springs;
       unsigned int allGridCount;
+      unsigned int cellCount;
+      unsigned int maxCellCount;
+      unsigned int cellCountForBitonicSort;
+      unsigned int maxCellCountForBitonicSort;
+      unsigned int springCount;
+      unsigned int maxSpringCount;
       utils::opencl::CommandQueue* queue;
       utils::opencl::KernelFactory* kernelFactory;
       utils::opencl::ProgramFactory* programFactory;
       utils::opencl::MemoryManager* memoryManager;
-      unsigned int cellCount;
-      unsigned int cellCountForBitonicSort;
   };
 }
 

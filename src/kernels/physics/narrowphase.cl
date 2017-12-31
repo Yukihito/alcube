@@ -1,3 +1,27 @@
+void setIntersection(
+  __global Intersection* intersection,
+  ushort type,
+  ushort otherIndex,
+  float length,
+  float speed,
+  float3 normal
+);
+
+void setIntersection(
+  __global Intersection* intersection,
+  ushort type,
+  ushort otherIndex,
+  float length,
+  float speed,
+  float3 normal
+) {
+  intersection->type = type;
+  intersection->otherIndex = otherIndex;
+  intersection->length = length;
+  intersection->speed = speed;
+  intersection->normal = normal;
+}
+
 __kernel void collectIntersections(
   __global const Grid* grid,
   __global const Cell* cells,
@@ -20,18 +44,16 @@ __kernel void collectIntersections(
   float mass = cell->mass;
   float smallValue = 0.0001f;
   bool isFullOfIntersection = false;
+  bool isFloating = true;
   float effectiveRadius = radius + 3.0f;
-  float3 checkStartPositionGridSpace = position - (float3)(effectiveRadius) - grid->origin;
-  float3 checkEndPositionGridSpace = position + (float3)(effectiveRadius) - grid->origin;
   uint3 gridCorner0 = (uint3)(0);
   uint3 gridCorner1 = (uint3)(grid->xCount - 1, grid->yCount - 1, grid->zCount - 1);
-  bool isFloating = true;
-  uint3 checkStartGrid = clamp(convert_uint3(checkStartPositionGridSpace / edgeLength), gridCorner0, gridCorner1);
-  uint3 checkEndGrid = clamp(convert_uint3(checkEndPositionGridSpace / edgeLength), gridCorner0, gridCorner1);
+  uint3 checkStartGrid = clamp(convert_uint3((position - (float3)(effectiveRadius) - grid->origin) / edgeLength), gridCorner0, gridCorner1);
+  uint3 checkEndGrid   = clamp(convert_uint3((position + (float3)(effectiveRadius) - grid->origin) / edgeLength), gridCorner0, gridCorner1);
   uchar intersectionCount = 0;
   for (uint gridZ = checkStartGrid.z; gridZ <= checkEndGrid.z && !isFullOfIntersection; gridZ++) {
     for (uint gridY = checkStartGrid.y; gridY <= checkEndGrid.y && !isFullOfIntersection; gridY++) {
-      for (uint gridX = checkStartGrid.x; gridX <=checkEndGrid.x && !isFullOfIntersection; gridX++) {
+      for (uint gridX = checkStartGrid.x; gridX <= checkEndGrid.x && !isFullOfIntersection; gridX++) {
 	uint gridIndex = gridX + gridY * grid->xCount + gridZ * grid->xCount * grid->yCount;
 	uint checkStartIndex = gridStartIndices[gridIndex];
 	uint checkEndIndex = gridEndIndices[gridIndex];
@@ -45,12 +67,8 @@ __kernel void collectIntersections(
 	  float rr = r * r;
 	  float ww = dot(w, w);
 	  if (ww > 0.0f && ww <= rr + smallValue) {
-	    __global Intersection* intersection = &cellVar->intersections[intersectionCount];
-	    intersection->type = 0;
-	    intersection->otherIndex = otherCellIndex;
-	    intersection->normal = normalize(w);
-	    intersection->length = r - length(w);
-	    intersection->speed = 0.0f;
+	    setIntersection(
+              &cellVar->intersections[intersectionCount], 0, otherCellIndex, r - length(w), 0.0f, normalize(w));
 	    intersectionCount++;
 	    isFullOfIntersection = intersectionCount >= 16;
 	  }
@@ -63,12 +81,8 @@ __kernel void collectIntersections(
   float* cornerPtr = (float*)&corner;
   for (uint i = 0; i < 3 && !isFullOfIntersection; i++) {
     if (positionPtr[i] <= cornerPtr[i]) {
-      __global Intersection* intersection = &cellVar->intersections[intersectionCount];
-      intersection->type = 1;
-      intersection->otherIndex = i;
-      intersection->normal = -grid->normals[i];
-      intersection->length = cornerPtr[i] - positionPtr[i];
-      intersection->speed = 0.0f;
+      setIntersection(
+        &cellVar->intersections[intersectionCount], 1, i, cornerPtr[i] - positionPtr[i], 0.0f, -grid->normals[i]);
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= 16;
       if (i == 1) {
@@ -76,14 +90,12 @@ __kernel void collectIntersections(
       }
     }
   }
+
   for (uint i = 3; i < 6 && !isFullOfIntersection; i++) {
-    if (positionPtr[i - 3] >= -cornerPtr[i - 3]) {
-      __global Intersection* intersection = &cellVar->intersections[intersectionCount];
-      intersection->type = 1;
-      intersection->otherIndex = i;
-      intersection->normal = -grid->normals[i];
-      intersection->length = positionPtr[i - 3] + cornerPtr[i - 3];
-      intersection->speed = 0.0f;
+    uint pi = i - 3;
+    if (positionPtr[pi] >= -cornerPtr[pi]) {
+      setIntersection(
+        &cellVar->intersections[intersectionCount], 1, i, positionPtr[pi] + cornerPtr[pi], 0.0f, -grid->normals[i]);
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= 16;
     }

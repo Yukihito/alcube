@@ -19,14 +19,7 @@ __kernel void motion(
   float3 angularMomentum = angularVelocity * momentOfInertia;
   float4 currentRotation = currentStates[cellIndex].rotation;
   float3 rotationDiff = angularVelocity * deltaTime;
-  float4 rotationDiffQuat = (float4)(0.0f, 0.0f, 0.0f, 1.0f);
-  if (dot(rotationDiff, rotationDiff) > 0.0f) {
-    float3 rotationAxis = normalize(rotationDiff);
-    float rotationScalar = length(rotationDiff);
-    float halfRotationScalar = rotationScalar / 2.0f;
-    rotationDiffQuat.w = cos(halfRotationScalar);
-    rotationDiffQuat.xyz = rotationAxis * sin(halfRotationScalar);
-  }
+  float4 rotationDiffQuat = createQuatFromDisplacement(&rotationDiff);
 
   float3 nextPosition = currentPosition + positionDiff;
   float4 nextRotation = mulQuat(&rotationDiffQuat, &currentRotation);

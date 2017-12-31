@@ -2,14 +2,12 @@
 #define ALCUBE_PHYSICS_CELL_H
 
 #include "rigidbody/Sphere.h"
-#include "rigidbody/Spring.h"
 
 namespace alcube::physics {
-  class Cell : public rigidbody::Sphere, rigidbody::SpringsHolder {
+  class Cell : public rigidbody::Sphere {
     public:
       explicit Cell();
-      glm::vec3 getPosition() override;
-      glm::quat getRotation() override;
+      unsigned short index;
   };
 }
 

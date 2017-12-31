@@ -15,6 +15,7 @@ namespace alcube::physics {
     this->allocated = false;
     this->cellsMutex = cellsMutex;
     this->maxCellCount = maxCellCount;
+    this->maxSpringCount = maxCellCount * 16;
     this->allGridCount = xGridCount * yGridCount * zGridCount;
     kernelFactory = new utils::opencl::KernelFactory(resources, fileUtil);
     programFactory = new utils::opencl::ProgramFactory(resources, fileUtil);
@@ -70,6 +71,7 @@ namespace alcube::physics {
     dtos.gridAndCellRelations = new opencl::dtos::GridAndCellRelation[maxCellCount];
     dtos.gridStartIndices = new unsigned int[allGridCount];
     dtos.gridEndIndices = new unsigned int[allGridCount];
+    dtos.springs = new opencl::dtos::Spring[maxSpringCount];
 
     memories.grid = memoryManager->define("grid", sizeof(opencl::dtos::Grid), dtos.grid, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
     memories.cells = memoryManager->define("cells", sizeof(opencl::dtos::Cell), dtos.cells, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
@@ -79,14 +81,37 @@ namespace alcube::physics {
     memories.gridAndCellRelations = memoryManager->define("gridAndCellRelations", sizeof(opencl::dtos::GridAndCellRelation), nullptr, CL_MEM_READ_WRITE);
     memories.gridStartIndices = memoryManager->define("gridStartIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
     memories.gridEndIndices = memoryManager->define("gridEndIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
+    memories.springs = memoryManager->define("springs", sizeof(opencl::dtos::Spring), dtos.springs, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
+    memories.springVars = memoryManager->define("springVars", sizeof(opencl::dtos::SpringVar), nullptr, CL_MEM_READ_WRITE);
   }
 
   void Simulator::setUpComputingSize() {
     cellCount = (unsigned int)cells.size();
+    springCount = (unsigned int)springs.size();
     cellCountForBitonicSort = utils::math::powerOf2(cellCount);
+    maxCellCountForBitonicSort = utils::math::powerOf2(maxCellCount);
+  }
+
+  void Simulator::setUpSpring(unsigned int springIndex, unsigned char nodeIndex) {
+    dtos.springs[springIndex].cellIndices[nodeIndex] = springs[springIndex]->nodes[nodeIndex].cell->index;
+    assignClFloat3(dtos.springs[springIndex].nodePositionsModelSpace[nodeIndex], springs[springIndex]->nodes[nodeIndex].position);
+    opencl::dtos::Cell* cell = &dtos.cells[springs[springIndex]->nodes[nodeIndex].cell->index];
+    cell->springIndices[cell->springCount] = springIndex;
+    cell->springCount++;
   }
 
   void Simulator::input() {
+    for (unsigned int i = 0; i < cellCount; i++) {
+      cells[i]->index = (unsigned short)i;
+      dtos.cells[i].springCount = 0;
+    }
+
+    for (unsigned int i = 0; i < springCount; i++) {
+      dtos.springs[i].k = springs[i]->k;
+      setUpSpring(i, 0);
+      setUpSpring(i, 1);
+    }
+
     for (int i = 0; i < cellCount; i++) {
       Cell* cell = cells[i];
       dtos.cells[i].radius = cell->radius;
@@ -120,12 +145,24 @@ namespace alcube::physics {
     memories.gridAndCellRelations->count = cellCountForBitonicSort;
     memories.gridStartIndices->count = allGridCount;
     memories.gridEndIndices->count = allGridCount;
+    memories.springs->count = springCount;
+    memories.springVars->count = springCount;
     if (!allocated) {
+      memories.cells->allocationCount = maxCellCount;
+      memories.cellVars->allocationCount = maxCellCount;
+      memories.currentStates->allocationCount = maxCellCount;
+      memories.nextStates->allocationCount = maxCellCount;
+      memories.gridAndCellRelations->allocationCount = maxCellCountForBitonicSort;
+      memories.gridStartIndices->allocationCount = allGridCount;
+      memories.gridEndIndices->allocationCount = allGridCount;
+      memories.springs->allocationCount = maxSpringCount;
+      memories.springVars->allocationCount = maxSpringCount;
       memoryManager->allocate();
       allocated = true;
     } else {
       queue->write(memories.cells);
       queue->write(memories.currentStates);
+      queue->write(memories.springs);
     }
   }
 

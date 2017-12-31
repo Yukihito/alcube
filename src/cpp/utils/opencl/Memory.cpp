@@ -15,13 +15,13 @@ namespace alcube::utils::opencl {
     this->context = context;
     this->count = 1;
     this->memFlags = memFlags;
+    this->allocationCount = 1;
   }
 
   void Memory::allocate() {
     cl_int status;
-    size_t allocationCount = count;
     if (allocationCount == 0) {
-      allocationCount = 1;
+      return;
     }
     mem = clCreateBuffer(
       context,
@@ -36,6 +36,8 @@ namespace alcube::utils::opencl {
   }
 
   void Memory::release() {
-    clReleaseMemObject(mem);
+    if (mem != nullptr) {
+      clReleaseMemObject(mem);
+    }
   }
 }

@@ -44,6 +44,8 @@ namespace alcube::physics::opencl::dtos {
       float elasticity;
       float dynamicFrictionCoefficient;
       float staticFrictionCoefficient;
+      unsigned int springIndices[16];
+      unsigned int springCount;
   };
 #pragma pack(pop)
 
@@ -66,9 +68,9 @@ namespace alcube::physics::opencl::dtos {
       float momentOfInertia;
       float massForIntersection;
       float massForCollision;
-      int isFloating;
       unsigned short intersectionCount;
       unsigned short collisionCount;
+      int isFloating;
       unsigned char collisionIndices[16];
       Intersection intersections[16];
   };
@@ -78,10 +80,16 @@ namespace alcube::physics::opencl::dtos {
   class Spring {
     public:
       float k;
-      cl_float3 startPositionModelSpace;
-      cl_float3 endPositionModelSpace;
-      cl_float3 endCellPosition;
-      cl_float4 endCellRotation;
+      cl_float3 nodePositionsModelSpace[2];
+      unsigned short cellIndices[2];
+  };
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+  class SpringVar {
+    public:
+      cl_float3 linearImpulses[2];
+      cl_float3 angularImpulses[2];
   };
 #pragma pack(pop)
 }

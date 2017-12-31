@@ -2,6 +2,31 @@ void accumulatePenaltyImpulse(
   __global Intersection* intersection,
   const float deltaTime,
   float3* acc
+);
+
+void accumulateFrictionalImpulse(
+  __global const Cell* cell,
+  __global CellVar* cellVar,
+  __global const Cell* cells,
+  __global CellVar* cellVars,
+  __global Intersection* intersection,
+  float3* linearMomentumAcc,
+  float3* angularMomentumAcc
+);
+
+void accumulateConstraintImpulse(
+  __global const Cell* cell,
+  __global CellVar* cellVar,
+  __global const Cell* cells,
+  __global CellVar* cellVars,
+  __global Intersection* intersection,
+  float3* acc
+);
+
+void accumulatePenaltyImpulse(
+  __global Intersection* intersection,
+  const float deltaTime,
+  float3* acc
 ) {
   *acc += (-64.0f * log2(intersection->length + 1.0f) * deltaTime) * intersection->normal;
 }
