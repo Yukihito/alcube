@@ -43,7 +43,6 @@ namespace alcube::physics {
       utils::opencl::Memory* gridStartIndices;
       utils::opencl::Memory* gridEndIndices;
       utils::opencl::Memory* springs;
-      utils::opencl::Memory* springVars;
   };
 
   class Kernels {
@@ -58,6 +57,8 @@ namespace alcube::physics {
       cl_kernel updateByFrictionalImpulse;
       cl_kernel collectCollisions;
       cl_kernel updateByConstraintImpulse;
+      cl_kernel calcSpringImpulses;
+      cl_kernel updateBySpringImpulse;
       cl_kernel motion;
       cl_kernel postProcessing;
   };

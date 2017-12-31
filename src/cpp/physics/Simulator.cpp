@@ -29,6 +29,7 @@ namespace alcube::physics {
       "../src/kernels/physics/broadphase.cl",
       "../src/kernels/physics/narrowphase.cl",
       "../src/kernels/physics/constraintresolving.cl",
+      "../src/kernels/physics/softbody.cl",
       "../src/kernels/physics/motion.cl"
     });
     kernels.fillGridIndex = kernelFactory->create(program, "fillGridIndex");
@@ -41,6 +42,8 @@ namespace alcube::physics {
     kernels.updateByFrictionalImpulse = kernelFactory->create(program, "updateByFrictionalImpulse");
     kernels.collectCollisions = kernelFactory->create(program, "collectCollisions");
     kernels.updateByConstraintImpulse = kernelFactory->create(program, "updateByConstraintImpulse");
+    kernels.calcSpringImpulses = kernelFactory->create(program, "calcSpringImpulses");
+    kernels.updateBySpringImpulse = kernelFactory->create(program, "updateBySpringImpulse");
     kernels.motion = kernelFactory->create(program, "motion");
     kernels.postProcessing = kernelFactory->create(program, "postProcessing");
 
@@ -82,7 +85,6 @@ namespace alcube::physics {
     memories.gridStartIndices = memoryManager->define("gridStartIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
     memories.gridEndIndices = memoryManager->define("gridEndIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
     memories.springs = memoryManager->define("springs", sizeof(opencl::dtos::Spring), dtos.springs, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
-    memories.springVars = memoryManager->define("springVars", sizeof(opencl::dtos::SpringVar), nullptr, CL_MEM_READ_WRITE);
   }
 
   void Simulator::setUpComputingSize() {
@@ -146,7 +148,6 @@ namespace alcube::physics {
     memories.gridStartIndices->count = allGridCount;
     memories.gridEndIndices->count = allGridCount;
     memories.springs->count = springCount;
-    memories.springVars->count = springCount;
     if (!allocated) {
       memories.cells->allocationCount = maxCellCount;
       memories.cellVars->allocationCount = maxCellCount;
@@ -156,7 +157,6 @@ namespace alcube::physics {
       memories.gridStartIndices->allocationCount = allGridCount;
       memories.gridEndIndices->allocationCount = allGridCount;
       memories.springs->allocationCount = maxSpringCount;
-      memories.springVars->allocationCount = maxSpringCount;
       memoryManager->allocate();
       allocated = true;
     } else {
@@ -259,6 +259,25 @@ namespace alcube::physics {
   }
 
   void Simulator::motion(float deltaTime) {
+    int splitCount = 8;
+    float splitDeltaTime = deltaTime / splitCount;
+    for (int i = 0; i < splitCount; i++) {
+      if (springCount > 0) {
+        queue->push(kernels.calcSpringImpulses, {springCount}, {
+          memArg(memories.cellVars),
+          memArg(memories.springs),
+          memArg(memories.currentStates),
+          floatArg(splitDeltaTime)
+        });
+      }
+      queue->push(kernels.updateBySpringImpulse, {cellCount}, {
+        memArg(memories.cells),
+        memArg(memories.cellVars),
+        memArg(memories.currentStates),
+        floatArg(splitDeltaTime)
+      });
+    }
+    /*
     queue->push(kernels.motion, {cellCount}, {
       memArg(memories.cells),
       memArg(memories.cellVars),
@@ -266,12 +285,14 @@ namespace alcube::physics {
       memArg(memories.nextStates),
       floatArg(deltaTime)
     });
-
+*/
     queue->push(kernels.postProcessing, {cellCount}, {
       memArg(memories.grid),
       memArg(memories.cells),
       memArg(memories.cellVars),
-      memArg(memories.nextStates)
+      memArg(memories.currentStates),
+      memArg(memories.nextStates),
+      floatArg(deltaTime)
     });
   }
 

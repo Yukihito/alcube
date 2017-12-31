@@ -50,7 +50,7 @@ namespace alcube::physics::samples::particles {
   }
 
   void ParticlesSample::onInit() {
-    maxCellCount = 65536;
+    maxCellCount = 65536 / 2;
     deltaTime = 1.0f / 30.0f;
     unsigned int gridEdgeLength = 8;
     unsigned int xGridCount = 64;

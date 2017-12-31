@@ -73,6 +73,8 @@ namespace alcube::physics::opencl::dtos {
       int isFloating;
       unsigned char collisionIndices[16];
       Intersection intersections[16];
+      cl_float3 springLinearImpulse;
+      cl_float3 springAngularImpulse;
   };
 #pragma pack(pop)
 
@@ -82,14 +84,6 @@ namespace alcube::physics::opencl::dtos {
       float k;
       cl_float3 nodePositionsModelSpace[2];
       unsigned short cellIndices[2];
-  };
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-  class SpringVar {
-    public:
-      cl_float3 linearImpulses[2];
-      cl_float3 angularImpulses[2];
   };
 #pragma pack(pop)
 }
