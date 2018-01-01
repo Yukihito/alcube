@@ -28,6 +28,7 @@ typedef struct __attribute__ ((packed)) CellStruct {
   float dynamicFrictionCoefficient;
   float staticFrictionCoefficient;
   uint springIndices[16];
+  uchar springNodeIndices[16];
   uint springCount;
 } Cell;
 
@@ -50,8 +51,6 @@ typedef struct __attribute__ ((packed)) CellVarStruct {
   int isFloating;
   unsigned char collisionIndices[16];
   Intersection intersections[16];
-  float3 springLinearImpulse;
-  float3 springAngularImpulse;
 } CellVar;
 
 typedef struct __attribute__ ((packed)) SpringStruct {
@@ -59,6 +58,11 @@ typedef struct __attribute__ ((packed)) SpringStruct {
   float3 nodePositionsModelSpace[2];
   ushort cellIndices[2];
 } Spring;
+
+typedef struct __attribute__ ((packed)) SpringVarStruct {
+  float3 linearImpulses[2];
+  float3 angularImpulses[2];
+} SpringVar;
 
 float4 mulQuat(float4* q, float4* r);
 float3 rotateByQuat(float3* v, float4* q);

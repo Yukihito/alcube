@@ -7,7 +7,7 @@ namespace alcube::physics::samples::balls {
     glm::vec3 diffuse
   ) {
     shape = &shapes->triangles.sphere;
-    shader = &shaders->tile;
+    shader = &shaders->standard;
     material = new drawing::Material();
     material->diffuse = diffuse;
     material->ambient = diffuse / 2.0f;
@@ -19,7 +19,7 @@ namespace alcube::physics::samples::balls {
   }
 
   drawing::Material* ColorBall::getMaterial() {
-    bool showLinearMomentum = false;
+    bool showLinearMomentum =false;
     if(showLinearMomentum) {
       /*
       glm::vec3 diffuse = glm::vec3(
@@ -35,9 +35,9 @@ namespace alcube::physics::samples::balls {
        */
 
       glm::vec3 diffuse = glm::vec3(
-        sqrtf(linearMomentum.x * linearMomentum.x) / 15.0f,
-        sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f,
-        sqrtf(linearMomentum.z * linearMomentum.z) / 15.0f);
+        1.0f - (sqrtf(linearMomentum.x * linearMomentum.x) / 15.0f),
+        1.0f - (sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f),
+        1.0f - (sqrtf(linearMomentum.z * linearMomentum.z) / 15.0f));
 
       material->diffuse = diffuse;
       material->ambient = diffuse / 2.0f;

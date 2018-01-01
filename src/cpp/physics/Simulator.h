@@ -43,6 +43,7 @@ namespace alcube::physics {
       utils::opencl::Memory* gridStartIndices;
       utils::opencl::Memory* gridEndIndices;
       utils::opencl::Memory* springs;
+      utils::opencl::Memory* springVars;
   };
 
   class Kernels {
@@ -59,7 +60,6 @@ namespace alcube::physics {
       cl_kernel updateByConstraintImpulse;
       cl_kernel calcSpringImpulses;
       cl_kernel updateBySpringImpulse;
-      cl_kernel motion;
       cl_kernel postProcessing;
   };
 
@@ -77,6 +77,8 @@ namespace alcube::physics {
       );
 
       void add(Cell* cell);
+      void add(Spring* spring);
+      Cell* getCell(unsigned long i);
       void update(float deltaTime);
       float gravity;
       Dtos dtos;

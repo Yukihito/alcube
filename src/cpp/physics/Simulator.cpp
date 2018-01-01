@@ -22,6 +22,7 @@ namespace alcube::physics {
     memoryManager = new utils::opencl::MemoryManager(resources);
     queue = new utils::opencl::CommandQueue(resources);
     cells = {};
+    springs = {};
     gravity = 0.0f;
 
     cl_program program = programFactory->create({
@@ -44,7 +45,6 @@ namespace alcube::physics {
     kernels.updateByConstraintImpulse = kernelFactory->create(program, "updateByConstraintImpulse");
     kernels.calcSpringImpulses = kernelFactory->create(program, "calcSpringImpulses");
     kernels.updateBySpringImpulse = kernelFactory->create(program, "updateBySpringImpulse");
-    kernels.motion = kernelFactory->create(program, "motion");
     kernels.postProcessing = kernelFactory->create(program, "postProcessing");
 
     dtos.grid = new opencl::dtos::Grid();
@@ -85,6 +85,7 @@ namespace alcube::physics {
     memories.gridStartIndices = memoryManager->define("gridStartIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
     memories.gridEndIndices = memoryManager->define("gridEndIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE);
     memories.springs = memoryManager->define("springs", sizeof(opencl::dtos::Spring), dtos.springs, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR);
+    memories.springVars = memoryManager->define("springVars", sizeof(opencl::dtos::SpringVar), nullptr, CL_MEM_READ_WRITE);
   }
 
   void Simulator::setUpComputingSize() {
@@ -95,25 +96,16 @@ namespace alcube::physics {
   }
 
   void Simulator::setUpSpring(unsigned int springIndex, unsigned char nodeIndex) {
-    dtos.springs[springIndex].cellIndices[nodeIndex] = springs[springIndex]->nodes[nodeIndex].cell->index;
+    unsigned short cellIndex = springs[springIndex]->nodes[nodeIndex].cell->index;
+    dtos.springs[springIndex].cellIndices[nodeIndex] = cellIndex;
     assignClFloat3(dtos.springs[springIndex].nodePositionsModelSpace[nodeIndex], springs[springIndex]->nodes[nodeIndex].position);
-    opencl::dtos::Cell* cell = &dtos.cells[springs[springIndex]->nodes[nodeIndex].cell->index];
+    opencl::dtos::Cell* cell = &dtos.cells[cellIndex];
     cell->springIndices[cell->springCount] = springIndex;
+    cell->springNodeIndices[cell->springCount] = nodeIndex;
     cell->springCount++;
   }
 
   void Simulator::input() {
-    for (unsigned int i = 0; i < cellCount; i++) {
-      cells[i]->index = (unsigned short)i;
-      dtos.cells[i].springCount = 0;
-    }
-
-    for (unsigned int i = 0; i < springCount; i++) {
-      dtos.springs[i].k = springs[i]->k;
-      setUpSpring(i, 0);
-      setUpSpring(i, 1);
-    }
-
     for (int i = 0; i < cellCount; i++) {
       Cell* cell = cells[i];
       dtos.cells[i].radius = cell->radius;
@@ -126,6 +118,13 @@ namespace alcube::physics {
       assignClFloat3(dtos.currentStates[i].angularMomentum, cell->angularMomentum);
       assignClFloat3(dtos.currentStates[i].position, cell->position);
       assignClFloat4(dtos.currentStates[i].rotation, cell->rotation);
+      cell->index = (unsigned short)i;
+      dtos.cells[i].springCount = 0;
+    }
+    for (unsigned int i = 0; i < springCount; i++) {
+      dtos.springs[i].k = springs[i]->k;
+      setUpSpring(i, 0);
+      setUpSpring(i, 1);
     }
   }
 
@@ -148,6 +147,7 @@ namespace alcube::physics {
     memories.gridStartIndices->count = allGridCount;
     memories.gridEndIndices->count = allGridCount;
     memories.springs->count = springCount;
+    memories.springVars->count = springCount;
     if (!allocated) {
       memories.cells->allocationCount = maxCellCount;
       memories.cellVars->allocationCount = maxCellCount;
@@ -157,6 +157,7 @@ namespace alcube::physics {
       memories.gridStartIndices->allocationCount = allGridCount;
       memories.gridEndIndices->allocationCount = allGridCount;
       memories.springs->allocationCount = maxSpringCount;
+      memories.springVars->allocationCount = maxSpringCount;
       memoryManager->allocate();
       allocated = true;
     } else {
@@ -226,6 +227,7 @@ namespace alcube::physics {
       memArg(memories.grid),
       memArg(memories.cells),
       memArg(memories.cellVars),
+      memArg(memories.springs),
       memArg(memories.currentStates),
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),
@@ -266,6 +268,7 @@ namespace alcube::physics {
         queue->push(kernels.calcSpringImpulses, {springCount}, {
           memArg(memories.cellVars),
           memArg(memories.springs),
+          memArg(memories.springVars),
           memArg(memories.currentStates),
           floatArg(splitDeltaTime)
         });
@@ -274,18 +277,11 @@ namespace alcube::physics {
         memArg(memories.cells),
         memArg(memories.cellVars),
         memArg(memories.currentStates),
+        memArg(memories.springVars),
         floatArg(splitDeltaTime)
       });
     }
-    /*
-    queue->push(kernels.motion, {cellCount}, {
-      memArg(memories.cells),
-      memArg(memories.cellVars),
-      memArg(memories.currentStates),
-      memArg(memories.nextStates),
-      floatArg(deltaTime)
-    });
-*/
+
     queue->push(kernels.postProcessing, {cellCount}, {
       memArg(memories.grid),
       memArg(memories.cells),
@@ -317,5 +313,13 @@ namespace alcube::physics {
 
   void Simulator::add(Cell *cell) {
     cells.push_back(cell);
+  }
+
+  Cell* Simulator::getCell(unsigned long i) {
+    return cells[i];
+  }
+
+  void Simulator::add(Spring *spring) {
+    springs.push_back(spring);
   }
 }

@@ -26,6 +26,7 @@ __kernel void collectIntersections(
   __global const Grid* grid,
   __global const Cell* cells,
   __global CellVar* cellVars,
+  __global const Spring* springs,
   __global RigidBodyState* currentStates,
   __global GridAndCellRelation* relations,
   __global uint* gridStartIndices,
