@@ -26,8 +26,8 @@ void main(){
 	float LightPower = 50.0f;
 
 	// Material properties
-	//float pattern = sin(UV.x * 3.1415 * 8.0f) * sin(UV.y * 3.1415 * 8.0f) < 0.0f ? 0.3f : 1.0f;
-	float pattern = ((sin(UV.x * 3.1415 * 8.0f) * sin(UV.y * 3.1415 * 8.0f)) + 1.0f) / 2.0f;
+	float pattern = sin(UV.x * 3.1415 * 8.0f) * sin(UV.y * 3.1415 * 8.0f) < 0.0f ? 0.3f : 1.0f;
+	//float pattern = ((sin(UV.x * 3.1415 * 8.0f) * sin(UV.y * 3.1415 * 8.0f)) + 1.0f) / 2.0f;
 
 	vec3 MaterialDiffuseColor = diffuse * vec3(pattern, pattern, pattern);// texture( myTextureSampler, UV ).rgb;
 	vec3 MaterialAmbientColor = MaterialDiffuseColor * ambient;

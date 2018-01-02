@@ -81,6 +81,7 @@ namespace alcube::physics {
       Cell* getCell(unsigned long i);
       void update(float deltaTime);
       float gravity;
+      float sphericalShellRadius;
       Dtos dtos;
       Memories memories;
       Kernels kernels;

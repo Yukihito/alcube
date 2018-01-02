@@ -31,6 +31,7 @@ __kernel void collectIntersections(
   __global GridAndCellRelation* relations,
   __global uint* gridStartIndices,
   __global uint* gridEndIndices,
+  const float sphericalShellRadius,
   const float deltaTime,
   const float gravityAcceleration
 ) {
@@ -100,6 +101,14 @@ __kernel void collectIntersections(
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= 16;
     }
+  }
+
+  float shellIntersectionLength = length(position) + radius - sphericalShellRadius;
+  if (!isFullOfIntersection && shellIntersectionLength + smallValue > 0.0f) {
+    setIntersection(
+      &cellVar->intersections[intersectionCount], 2, 0, shellIntersectionLength, 0.0f, normalize(position));
+    intersectionCount++;
+    isFullOfIntersection = intersectionCount >= 16;
   }
 
   float momentOfInertia = (2.0f / 5.0f) * mass * radius * radius;

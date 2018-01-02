@@ -19,7 +19,7 @@ namespace alcube::physics::samples::balls {
   }
 
   drawing::Material* ColorBall::getMaterial() {
-    bool showLinearMomentum =false;
+    bool showLinearMomentum = false;
     if(showLinearMomentum) {
       /*
       glm::vec3 diffuse = glm::vec3(
@@ -50,7 +50,7 @@ namespace alcube::physics::samples::balls {
     windowHeight = 600;
     fps = 30;
     appName = "BallsSample";
-    isMultiSampleEnabled = true;
+    isMultiSampleEnabled = false;
   }
 
   void ManyBallsSample::add(ColorBall *ball) {

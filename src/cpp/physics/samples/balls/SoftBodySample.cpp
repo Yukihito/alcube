@@ -50,6 +50,7 @@ namespace alcube::physics::samples::balls {
       zGridCount
     );
     physicsSimulator->gravity = gravity;
+    //physicsSimulator->sphericalShellRadius = ((gridEdgeLength * xGridCount) / 2.0f) - 1.0f;
     profiler = new utils::Profiler();
     profiler->setShowInterval(1000);
     profiler->enabled = true;
@@ -64,8 +65,8 @@ namespace alcube::physics::samples::balls {
       for (int y = 0; y < softBodySize; y++) {
         for (int x = 0; x < softBodySize; x++) {
           auto ball = new ColorBall(shapes, shaders, glm::vec3(
-            randReal3(mt),
             //1.0f, 0.4f, 0.4f
+            randReal3(mt),
             randReal3(mt),
             randReal3(mt)
           ));
@@ -120,7 +121,6 @@ namespace alcube::physics::samples::balls {
             springZ->k = k;
             physicsSimulator->add(springZ);
           }
-
           index++;
         }
       }

@@ -24,6 +24,7 @@ namespace alcube::physics {
     cells = {};
     springs = {};
     gravity = 0.0f;
+    sphericalShellRadius = 100000.0f;
 
     cl_program program = programFactory->create({
       "../src/kernels/physics/common.cl",
@@ -232,6 +233,7 @@ namespace alcube::physics {
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),
       memArg(memories.gridEndIndices),
+      floatArg(sphericalShellRadius),
       floatArg(deltaTime),
       floatArg(gravity)
     });
