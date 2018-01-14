@@ -1,7 +1,8 @@
 #ifndef ALCUBE_SIMPLESPHERESAMPLE_H
 #define ALCUBE_SIMPLESPHERESAMPLE_H
 
-#include <GLUT/glut.h>
+//#include <GLUT/glut.h>
+#include <GL/glut.h>
 #include "../Drawer.h"
 #include "../shapes/Shapes.h"
 #include "../shaders/Shaders.h"

@@ -3,7 +3,8 @@
 
 #include <mutex>
 #include <cstdlib>
-#include <GLUT/glut.h>
+#include <GL/glut.h>
+//#include <GLUT/glut.h>
 #include <string>
 #include <thread>
 #include <iostream>

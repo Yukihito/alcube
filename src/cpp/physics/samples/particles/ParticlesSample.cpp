@@ -18,9 +18,7 @@ namespace alcube::physics::samples::particles {
   }
 
   glm::mat4 Particles::getModelMat() {
-    static float t = 0.0f;
-    t += 0.01f;
-    return glm::rotate(t, glm::vec3(0.0f, 1.0f, 0.0f));
+    return glm::mat4();
   }
 
   void Particles::update(std::vector<Cell *> &cells) {
@@ -50,7 +48,7 @@ namespace alcube::physics::samples::particles {
   }
 
   void ParticlesSample::onInit() {
-    maxCellCount = 65536 / 2;
+    maxCellCount = 50000;//65536;
     deltaTime = 1.0f / 30.0f;
     unsigned int gridEdgeLength = 8;
     unsigned int xGridCount = 64;

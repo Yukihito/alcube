@@ -17,5 +17,4 @@ namespace alcube::drawing {
   };
 }
 
-
 #endif //ALCUBE_SHAPE_H

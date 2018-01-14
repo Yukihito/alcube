@@ -20,5 +20,4 @@ namespace alcube::physics::rigidbody {
   };
 }
 
-
 #endif //ALCUBE_RIGIDBODY_H

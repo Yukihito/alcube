@@ -14,6 +14,12 @@ namespace alcube::utils::opencl {
     arg.ptr = &i;
     return arg;
   }
+            KernelArg kernelargs::ushortArg(unsigned short& i) {
+              KernelArg arg = KernelArg();
+              arg.size = sizeof(cl_ushort);
+              arg.ptr = &i;
+              return arg;
+            }
 
   KernelArg kernelargs::floatArg(float& f) {
     KernelArg arg = KernelArg();
@@ -60,6 +66,7 @@ namespace alcube::utils::opencl {
     );
     if (status != CL_SUCCESS) {
       std::cout << "clEnqueueNDRangeKernel failure: " << status << std::endl;
+      std::cout << "ranges: " << ranges[0] << std::endl;
     }
   }
 

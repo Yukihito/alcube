@@ -1,7 +1,9 @@
+#define GL_GLEXT_PROTOTYPES
 #ifndef ALCUBE_SHADER_H
 #define ALCUBE_SHADER_H
 
-#include <OpenGL/gl3.h>
+//#include <GL/gl3.h>
+#include <GL/gl.h>
 #include <iostream>
 #include <vector>
 #include "../utils/FileUtil.h"
@@ -27,6 +29,5 @@ namespace alcube::drawing {
       void setVertexBuffer(VBO* vbo, GLuint location);
   };
 }
-
 
 #endif //ALCUBE_SHADER_H

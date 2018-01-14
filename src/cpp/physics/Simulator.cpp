@@ -173,11 +173,12 @@ namespace alcube::physics {
   }
 
   void Simulator::computeBroadPhase() {
+    unsigned short maxCellCountShort = (unsigned short)maxCellCount;
     // Initialize grid and cell relations
     queue->push(kernels.initGridAndCellRelations, {cellCountForBitonicSort}, {
       memArg(memories.gridAndCellRelations),
       uintArg(allGridCount),
-      uintArg(maxCellCount)
+      ushortArg(maxCellCountShort)
     });
 
     // Set grid index to rigid body state, and register grid and cell relations.
@@ -309,8 +310,11 @@ namespace alcube::physics {
     motion(deltaTime);
     read(memories.nextStates, dtos.nextStates);
     cellsMutex->lock();
+
     output();
+
     cellsMutex->unlock();
+
   }
 
   void Simulator::add(Cell *cell) {

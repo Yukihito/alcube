@@ -3,6 +3,7 @@
 
 #include "../../Shape.h"
 #include <cstddef>
+#include <cmath>
 
 namespace alcube::drawing::shapes::triangles {
   class Sphere : public Shape {

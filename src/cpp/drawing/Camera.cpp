@@ -18,4 +18,3 @@ namespace alcube::drawing {
     this->far = far;
   }
 }
-

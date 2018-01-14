@@ -17,5 +17,4 @@ namespace alcube::physics {
   };
 }
 
-
 #endif //ALCUBE_SPRING_H

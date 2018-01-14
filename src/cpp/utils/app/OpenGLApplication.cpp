@@ -98,7 +98,7 @@ namespace alcube::utils::app {
   void OpenGLApplication::setupWindow(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitWindowSize(windowWidth, windowHeight);
-    unsigned int displayMode = GLUT_3_2_CORE_PROFILE | GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH;
+    unsigned int displayMode = /*GLUT_3_2_CORE_PROFILE | */GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH;
     if (isMultiSampleEnabled) {
       displayMode = displayMode | GLUT_MULTISAMPLE;
     }

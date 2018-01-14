@@ -6,6 +6,8 @@
 #include "../utils/FileUtil.h"
 #include <vector>
 #include <unordered_map>
+#include <mutex>
+#include <GL/glut.h>
 
 namespace alcube::drawing {
   class Drawer {

@@ -15,6 +15,7 @@ namespace alcube::utils::opencl {
   namespace kernelargs {
     KernelArg memArg(Memory* mem);
     KernelArg uintArg(unsigned int& i);
+    KernelArg ushortArg(unsigned short& i);
     KernelArg floatArg(float& f);
   }
 

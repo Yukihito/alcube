@@ -1,7 +1,7 @@
 #ifndef ALCUBE_DTOS_H
 #define ALCUBE_DTOS_H
 
-#include <OpenCL/opencl.h>
+#include <CL/cl.h>
 
 namespace alcube::physics::opencl::dtos {
 #pragma pack(push, 1)

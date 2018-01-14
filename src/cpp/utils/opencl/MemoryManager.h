@@ -4,7 +4,7 @@
 #include "Memory.h"
 #include "Resources.h"
 #include <vector>
-#include <OpenCL/opencl.h>
+#include <CL/cl.h>
 
 namespace alcube::utils::opencl {
   class MemoryManager {

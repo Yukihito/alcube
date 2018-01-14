@@ -4,7 +4,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include <glm/vec3.hpp>
-#include <OpenCL/opencl.h>
+#include <CL/cl.h>
 
 namespace alcube::utils::opencl::conversions {
   void assignClFloat3(cl_float3& clv, glm::vec3& glmv);

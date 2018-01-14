@@ -8,4 +8,3 @@ namespace alcube::drawing::shapes::points {
     return particles;
   }
 }
-

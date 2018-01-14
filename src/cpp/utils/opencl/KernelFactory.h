@@ -1,7 +1,7 @@
 #ifndef ALCUBE_OPENCL_KERNELFACTORY_H
 #define ALCUBE_OPENCL_KERNELFACTORY_H
 
-#include <OpenCL/opencl.h>
+#include <CL/cl.h>
 #include <string>
 #include "Resources.h"
 #include "../FileUtil.h"

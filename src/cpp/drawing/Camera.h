@@ -31,5 +31,4 @@ namespace alcube::drawing {
   };
 }
 
-
 #endif //ALCUBE_CAMERA_H

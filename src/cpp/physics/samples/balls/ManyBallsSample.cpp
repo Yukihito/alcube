@@ -59,14 +59,15 @@ namespace alcube::physics::samples::balls {
   }
 
   void ManyBallsSample::onInit() {
+    printSystemInfo();
     maxCellCount = 16384; // 2^14
-    int ballCount = 32;
+    int ballCount =12376;
     deltaTime = 1.0f / 30.0f;
     float gravity = 9.8f;
     unsigned int gridEdgeLength = 8;
-    unsigned int xGridCount = 2;
-    unsigned int yGridCount = 2;
-    unsigned int zGridCount = 2;
+    unsigned int xGridCount = 8;
+    unsigned int yGridCount = 8;
+    unsigned int zGridCount = 8;
     float near = 0.1f;
     float far = gridEdgeLength * xGridCount * 4.0f;
     shaders = new drawing::shaders::Shaders(new utils::FileUtil());

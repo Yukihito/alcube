@@ -1,3 +1,4 @@
+#include <iostream>
 #include "conversions.h"
 
 namespace alcube::utils::opencl::conversions {

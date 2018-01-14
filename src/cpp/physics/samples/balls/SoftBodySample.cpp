@@ -15,6 +15,7 @@ namespace alcube::physics::samples::balls {
   }
 
   void SoftBodySample::onInit() {
+    printSystemInfo();
     maxCellCount = 16384; // 2^14
     int softBodySize = 12;
     deltaTime = 1.0f / 30.0f;

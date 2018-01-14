@@ -1,7 +1,7 @@
 #ifndef ALCUBE_OPENCL_RESOURCES_H
 #define ALCUBE_OPENCL_RESOURCES_H
 
-#include <OpenCL/opencl.h>
+#include <CL/cl.h>
 #include <iostream>
 #include <vector>
 

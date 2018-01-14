@@ -1,7 +1,7 @@
 #ifndef ALCUBE_OPENCL_MEMORY_H
 #define ALCUBE_OPENCL_MEMORY_H
 
-#include <OpenCL/opencl.h>
+#include <CL/opencl.h>
 #include <string>
 #include <iostream>
 

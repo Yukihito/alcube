@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.8)
 project(alcube)
 
-set(CMAKE_CXX_STANDARD 11)
+set(CMAKE_CXX_STANDARD 17)
 
 set(SOURCE_FILES src/cpp/main.cpp src/cpp/utils/Profiler.cpp src/cpp/utils/Profiler.h src/cpp/drawing/Shader.cpp src/cpp/drawing/Shader.h src/cpp/drawing/Buffer.cpp src/cpp/drawing/Buffer.h src/cpp/drawing/Camera.cpp src/cpp/drawing/Camera.h src/cpp/drawing/Shape.cpp src/cpp/drawing/Shape.h src/cpp/drawing/Drawable.cpp src/cpp/drawing/Drawable.h src/cpp/drawing/shapes/triangles/Sphere.cpp src/cpp/drawing/shapes/triangles/Sphere.h src/cpp/drawing/Drawer.cpp src/cpp/drawing/Drawer.h src/cpp/utils/FileUtil.cpp src/cpp/utils/FileUtil.h src/cpp/drawing/samples/SimpleSphereSample.cpp src/cpp/drawing/samples/SimpleSphereSample.h src/cpp/drawing/Context.cpp src/cpp/drawing/Context.h src/cpp/drawing/shaders/SimpleShader.cpp src/cpp/drawing/shaders/SimpleShader.h src/cpp/drawing/shaders/StandardShader.cpp src/cpp/drawing/shaders/StandardShader.h src/cpp/drawing/shapes/triangles/TrianglesProvider.cpp src/cpp/drawing/shapes/triangles/TrianglesProvider.h src/cpp/drawing/shapes/Shapes.cpp src/cpp/drawing/shapes/Shapes.h src/cpp/drawing/shaders/Shaders.cpp src/cpp/drawing/shaders/Shaders.h src/cpp/drawing/shapes/points/Sphere.cpp src/cpp/drawing/shapes/points/Sphere.h src/cpp/drawing/shapes/points/PointsProvider.cpp src/cpp/drawing/shapes/points/PointsProvider.h src/cpp/physics/opencl/dtos.h src/cpp/utils/opencl/Memory.cpp src/cpp/utils/opencl/Memory.h src/cpp/physics/Cell.cpp src/cpp/physics/Cell.h src/cpp/physics/rigidbody/RigidBody.cpp src/cpp/physics/rigidbody/RigidBody.h src/cpp/physics/rigidbody/Sphere.cpp src/cpp/physics/rigidbody/Sphere.h src/cpp/utils/opencl/conversions.h src/cpp/utils/opencl/conversions.cpp src/cpp/utils/opencl/Resources.cpp src/cpp/utils/opencl/Resources.h src/cpp/utils/opencl/MemoryManager.cpp src/cpp/utils/opencl/MemoryManager.h src/cpp/utils/opencl/CommandQueue.cpp src/cpp/utils/opencl/CommandQueue.h src/cpp/utils/opencl/ProgramFactory.cpp src/cpp/utils/opencl/ProgramFactory.h src/cpp/utils/opencl/KernelFactory.cpp src/cpp/utils/opencl/KernelFactory.h src/cpp/physics/Simulator.cpp src/cpp/physics/Simulator.h src/cpp/physics/samples/BenchmarkSample.cpp src/cpp/physics/samples/BenchmarkSample.h src/cpp/utils/alcubemath.h src/cpp/utils/alcubemath.cpp src/cpp/physics/samples/balls/BallsSample.cpp src/cpp/physics/samples/balls/BallsSample.h src/cpp/utils/app/Application.cpp src/cpp/utils/app/Application.h src/cpp/utils/app/OpenGLApplication.cpp src/cpp/utils/app/OpenGLApplication.h src/cpp/utils/Mouse.cpp src/cpp/utils/Mouse.h src/cpp/utils/Keyboard.cpp src/cpp/utils/Keyboard.h src/cpp/physics/samples/particles/ParticlesSample.cpp src/cpp/physics/samples/particles/ParticlesSample.h src/cpp/drawing/shapes/points/Particles.cpp src/cpp/drawing/shapes/points/Particles.h src/cpp/drawing/shaders/ParticleShader.cpp src/cpp/drawing/shaders/ParticleShader.h src/cpp/drawing/Material.cpp src/cpp/drawing/Material.h src/cpp/physics/samples/balls/ManyBallsSample.cpp src/cpp/physics/samples/balls/ManyBallsSample.h src/cpp/drawing/shaders/TileShader.cpp src/cpp/drawing/shaders/TileShader.h src/cpp/physics/Spring.cpp src/cpp/physics/Spring.h src/cpp/physics/samples/balls/SoftBodySample.cpp src/cpp/physics/samples/balls/SoftBodySample.h)
 add_executable(alcube ${SOURCE_FILES})
@@ -47,9 +47,19 @@ IF (APPLE)
             GLM_LIBRARY)
     set (EXTRA_LIBS ${GLUT_LIBRARY} ${OpenGL_LIBRARY})
 ENDIF (APPLE)
-
+#find_package(OPENGL_gl)
+find_package(OpenGL REQUIRED)
+find_package(GLUT REQUIRED)
+find_package(OpenCL REQUIRED)
+include_directories(${OpenGL_gl_INCLUDE_DIR} ${GLUT_INCLUDE_DIRS} ${OpenCL_INCLUDE_DIR})
+set (EXTRA_LIBS ${GLUT_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY})
+message(status "dump start")
+message(status ${OpenCL_LIBRARY})
 target_link_libraries(alcube ${EXTRA_LIBS})
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-deprecated-declarations -framework OpenCL -lyaml-cpp")
+#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-deprecated-declarations -L/lib64 -lglut -lGLU -lGL -lm -pthread -lOpenCL")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wno-deprecated-declarations -pthread -Wc++1z-extensions")
+
+# -L/opt/amdgpu-pro/lib/x86_64-linux-gnu
 
 add_executable(tests test/cpp/physics/SimulatorTest.cpp)
 target_link_libraries(tests gtest_main alcube_lib)
