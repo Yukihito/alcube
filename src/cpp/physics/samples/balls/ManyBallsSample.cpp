@@ -46,8 +46,8 @@ namespace alcube::physics::samples::balls {
   }
 
   void ManyBallsSample::initWindowParams() {
-    windowWidth = 800;
-    windowHeight = 600;
+    windowWidth = 1600;
+    windowHeight = 1200;
     fps = 30;
     appName = "BallsSample";
     isMultiSampleEnabled = false;
@@ -62,6 +62,7 @@ namespace alcube::physics::samples::balls {
     printSystemInfo();
     maxCellCount = 16384; // 2^14
     int ballCount =12376;
+    //int ballCount = 32;
     deltaTime = 1.0f / 30.0f;
     float gravity = 9.8f;
     unsigned int gridEdgeLength = 8;
@@ -95,6 +96,7 @@ namespace alcube::physics::samples::balls {
       zGridCount
     );
     physicsSimulator->gravity = gravity;
+    //physicsSimulator->sphericalShellRadius = gridEdgeLength * xGridCount / 2;
     profiler = new utils::Profiler();
     profiler->setShowInterval(1000);
     profiler->enabled = true;

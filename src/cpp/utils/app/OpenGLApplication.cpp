@@ -102,6 +102,7 @@ namespace alcube::utils::app {
     if (isMultiSampleEnabled) {
       displayMode = displayMode | GLUT_MULTISAMPLE;
     }
+
     glutInitDisplayMode(displayMode);
     glutCreateWindow(appName.c_str());
   }
