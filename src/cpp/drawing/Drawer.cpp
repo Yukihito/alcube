@@ -62,9 +62,6 @@ namespace alcube::drawing {
         glBindVertexArray(0);
       }
     }
-    //glFlush();
-    glutSwapBuffers();
-    glFinish();
   }
 
   Drawer::Drawer(Camera* camera, std::mutex *drawablesMutex) {

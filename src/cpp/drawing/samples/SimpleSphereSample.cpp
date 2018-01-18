@@ -33,26 +33,39 @@ namespace alcube::drawing::samples {
     auto shaders = new shaders::Shaders(new utils::FileUtil());
     auto shapes = new shapes::Shapes();
     camera = new Camera(
-      glm::vec3(0.0f, 0.0f, 20.0f),
+      glm::vec3(0.0f, 0.0f, 200.0f),
       glm::quat(),
       glm::radians(45.0f),
       (float)windowWidth,
       (float)windowHeight,
       0.1f,
-      100.0f
+      10000.0f
     );
     drawer = new Drawer(camera, &drawablesMutex);
     glm::vec3 pos1 = glm::vec3();
-    glm::vec3 pos2 = glm::vec3(5.0f, -4.0f, 0.0f);
-    drawer->add(new SimpleSphere(pos1, shapes, shaders));
-    drawer->add(new SimpleSphere(pos2, shapes, shaders));
+    for (int i = 0; i < 1000; i++) {
+      auto sphere = new SimpleSphere(pos1, shapes, shaders);
+      spheres.push_back(sphere);
+      drawer->add(sphere);
+    }
   }
 
   void SimpleSphereSample::onDraw() {
     drawer->draw();
   }
 
-  void SimpleSphereSample::onUpdate() {}
+  void SimpleSphereSample::onUpdate() {
+    static float a = 0.0f;
+    a += 0.04f;
+    float offset = 0.0f;
+    for (SimpleSphere* sphere: spheres) {
+      sphere->position = glm::vec3(50.0f * cosf(a + offset), 50.0f * sinf(a + offset), 0.0f);
+      offset += (3.1415f * 2.0f) / spheres.size();
+    }
 
-  void SimpleSphereSample::onClose() {}
+  }
+
+  void SimpleSphereSample::onClose() {
+
+  }
 }

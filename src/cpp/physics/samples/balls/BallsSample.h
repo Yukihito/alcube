@@ -23,6 +23,7 @@ namespace alcube::physics::samples::balls {
   class Profilers {
     public:
       int update;
+      int draw;
       int all;
   };
 

@@ -1,8 +1,6 @@
 #ifndef ALCUBE_SIMPLESPHERESAMPLE_H
 #define ALCUBE_SIMPLESPHERESAMPLE_H
 
-//#include <GLUT/glut.h>
-#include <GL/glut.h>
 #include "../Drawer.h"
 #include "../shapes/Shapes.h"
 #include "../shaders/Shaders.h"
@@ -12,10 +10,10 @@ namespace alcube::drawing::samples {
   class SimpleSphere : public Drawable {
     public:
       explicit SimpleSphere(glm::vec3& position, shapes::Shapes* shapes, shaders::Shaders* shaders);
+      glm::vec3 position;
     protected:
       glm::mat4 getModelMat() override;
       Material* getMaterial() override;
-      glm::vec3 position;
       Material* material;
   };
 
@@ -27,6 +25,7 @@ namespace alcube::drawing::samples {
       void onUpdate() override;
       void onClose() override;
     private:
+      std::vector<SimpleSphere*> spheres;
       Drawer* drawer;
       Camera* camera;
       std::mutex drawablesMutex;

@@ -1,8 +1,10 @@
 #define GL_GLEXT_PROTOTYPES
 #ifndef ALCUBE_BUFFER_H
 #define ALCUBE_BUFFER_H
-#include <GL/gl.h>
-#include <GL/glx.h>
+//#include <GL/gl.h>
+//#include <GL/glx.h>
+#include <GL/glew.h>
+//#include <GL/wglew.h>
 #include <cstddef>
 
 namespace alcube::drawing {

@@ -48,11 +48,15 @@ IF (APPLE)
     set (EXTRA_LIBS ${GLUT_LIBRARY} ${OpenGL_LIBRARY})
 ENDIF (APPLE)
 #find_package(OPENGL_gl)
+
 find_package(OpenGL REQUIRED)
-find_package(GLUT REQUIRED)
+#find_package(GLUT REQUIRED)
 find_package(OpenCL REQUIRED)
-include_directories(${OpenGL_gl_INCLUDE_DIR} ${GLUT_INCLUDE_DIRS} ${OpenCL_INCLUDE_DIR})
-set (EXTRA_LIBS ${GLUT_LIBRARY} ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY})
+find_package(GLEW REQUIRED)
+find_package(glfw3 REQUIRED)
+
+include_directories(${OpenGL_gl_INCLUDE_DIR} ${OpenCL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS}) # ${GLUT_INCLUDE_DIRS}
+set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${GLEW_LIBRARIES} glfw) # ${GLUT_LIBRARY}
 message(status "dump start")
 message(status ${OpenCL_LIBRARY})
 target_link_libraries(alcube ${EXTRA_LIBS})

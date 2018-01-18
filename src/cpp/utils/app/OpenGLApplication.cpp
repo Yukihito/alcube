@@ -9,6 +9,7 @@ namespace alcube::utils::app {
     endStatusMutex.lock();
     endStatus = 1;
     endStatusMutex.unlock();
+    std::cout << "close 1" << std::endl;
   }
 
   void OpenGLApplication::drawEvent() {
@@ -22,8 +23,9 @@ namespace alcube::utils::app {
       exit(0);
     }
     appInst->endStatusMutex.unlock();
-    glutPostRedisplay();
-    glutTimerFunc(1000 / appInst->fps, drawTimerEvent, 0);
+    //glutPostRedisplay();
+    //glutTimerFunc(1000 / appInst->fps, drawTimerEvent, 0);
+    drawEvent();
   }
 
   void OpenGLApplication::exitEvent() {
@@ -64,9 +66,9 @@ namespace alcube::utils::app {
     appName = "";
   }
 
-  void OpenGLApplication::keyEvent(unsigned char key, int x, int y) {
-    appInst->keyboard->onKeyDown(key);
-    int esc = 27;
+  void OpenGLApplication::keyEvent(int key, int x, int y) {
+    //appInst->keyboard->onKeyDown(key);
+    int esc = 256;
     if (key == esc) {
       appInst->close();
     }
@@ -95,21 +97,47 @@ namespace alcube::utils::app {
   void OpenGLApplication::mouseEvent(int button, int state,int x, int y) {
   }
 
+  void OpenGLApplication::glfwKeyCallback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    if (action == GLFW_PRESS) {
+      std::cout << "key: " << key << std::endl;
+      keyEvent(key, 0, 0);
+    }
+  }
+
   void OpenGLApplication::setupWindow(int argc, char **argv) {
+    /*
     glutInit(&argc, argv);
     glutInitWindowSize(windowWidth, windowHeight);
-    unsigned int displayMode = /*GLUT_3_2_CORE_PROFILE | */GLUT_DOUBLE | GLUT_RGBA | GLUT_DEPTH;
+    unsigned int displayMode = GLUT_SINGLE | GLUT_RGBA | GLUT_DEPTH;
     if (isMultiSampleEnabled) {
       displayMode = displayMode | GLUT_MULTISAMPLE;
     }
 
     glutInitDisplayMode(displayMode);
     glutCreateWindow(appName.c_str());
+    */
+    if (!glfwInit()) {
+      exit(1);
+    }
+    window = glfwCreateWindow(windowWidth, windowHeight, appName.c_str(), nullptr, nullptr);
+    if (!window) {
+        glfwTerminate();
+        exit(1);
+    }
+    glfwMakeContextCurrent(window);
+    glfwSwapInterval(1);
+
+    GLenum err = glewInit();
+
+    if (err != GLEW_OK) {
+        fprintf(stderr, "Error: %s\n", glewGetErrorString(err));
+    }
   }
 
   void OpenGLApplication::setEventListeners() {
     atexit(exitEvent);
-    glutDisplayFunc(drawEvent);
+    //glutDisplayFunc(drawEvent);
+    /*
     glutKeyboardFunc(keyEvent);
     glutSpecialFunc(specialKeyEvent);
     glutKeyboardUpFunc(keyUpEvent);
@@ -117,7 +145,9 @@ namespace alcube::utils::app {
     glutMotionFunc(motionEvent);
     glutPassiveMotionFunc(passiveMotionEvent);
     glutMouseFunc(mouseEvent);
-    glutTimerFunc(1000 / fps, drawTimerEvent, 0);
+     */
+    glfwSetKeyCallback(window, glfwKeyCallback);
+    //glutTimerFunc(1000 / fps, drawTimerEvent, 0);
   }
 
   void OpenGLApplication::printSystemInfo() {
@@ -135,7 +165,29 @@ namespace alcube::utils::app {
     setEventListeners();
     std::thread th = std::thread(updateLoop);
     th.detach();
-    glutMainLoop();
+
+        /* Loop until the user closes the window */
+    while (!glfwWindowShouldClose(window)) {
+      std::chrono::system_clock::time_point drawingStartTime = std::chrono::system_clock::now();
+        /* Render here */
+      drawTimerEvent(0);
+      /* Swap front and back buffers */
+      glfwSwapBuffers(window);
+
+      /* Poll for and process events */
+      glfwPollEvents();
+      std::chrono::system_clock::time_point drawingEndTime = std::chrono::system_clock::now();
+      int elapsedTime = (int) std::chrono::duration_cast<std::chrono::milliseconds>(drawingEndTime - drawingStartTime).count();
+      int nextFlameInterval = (1000 / appInst->fps) - elapsedTime;
+
+      if (nextFlameInterval > 0) {
+        std::chrono::milliseconds intervalMs(nextFlameInterval);
+        std::this_thread::sleep_for(intervalMs);
+      }
+    }
+
+    glfwTerminate();
+    //glutMainLoop();
   }
 }
 #pragma clang diagnostic pop

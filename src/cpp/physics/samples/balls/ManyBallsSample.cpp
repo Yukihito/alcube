@@ -61,7 +61,8 @@ namespace alcube::physics::samples::balls {
   void ManyBallsSample::onInit() {
     printSystemInfo();
     maxCellCount = 16384; // 2^14
-    int ballCount =12376;
+    //int ballCount =12376;
+    int ballCount = 2000;
     //int ballCount = 32;
     deltaTime = 1.0f / 30.0f;
     float gravity = 9.8f;
@@ -102,6 +103,7 @@ namespace alcube::physics::samples::balls {
     profiler->enabled = true;
     profilers.update = profiler->create("update");
     profilers.all = profiler->create("all");
+    profilers.draw = profiler->create("draw");
 
     float w = xGridCount * gridEdgeLength - 1.0f;
     std::random_device rnd;
@@ -134,7 +136,9 @@ namespace alcube::physics::samples::balls {
   }
 
   void ManyBallsSample::onDraw() {
+    profiler->start(profilers.draw);
     drawer->draw();
+    profiler->stop(profilers.draw);
   }
 
   void ManyBallsSample::onUpdate() {

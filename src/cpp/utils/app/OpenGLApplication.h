@@ -1,16 +1,20 @@
 #ifndef ALCUBE_OPENGLAPPLICATION_H
 #define ALCUBE_OPENGLAPPLICATION_H
 
+#include <GL/glew.h>
 #include <mutex>
 #include <cstdlib>
-#include <GL/glut.h>
-//#include <GLUT/glut.h>
 #include <string>
 #include <thread>
 #include <iostream>
 #include "Application.h"
 #include "../Mouse.h"
 #include "../Keyboard.h"
+#include <GLFW/glfw3.h>
+//#include <GL/glx.h>
+//#include <GL/glut.h>
+
+
 
 namespace alcube::utils::app {
   class OpenGLApplication : public Application {
@@ -41,15 +45,17 @@ namespace alcube::utils::app {
       static void updateLoop();
       static void exitEvent();
       static void drawTimerEvent(int value);
-      static void keyEvent(unsigned char key, int x, int y);
+      static void keyEvent(int key, int x, int y);
       static void keyUpEvent(unsigned char key, int x, int y);
       static void specialKeyEvent(int key, int x, int y);
       static void specialKeyUpEvent(int key, int x, int y);
       static void mouseEvent(int button,int state,int x,int y);
       static void motionEvent(int x, int y);
       static void passiveMotionEvent(int x, int y);
+      static void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
       int endStatus;
       std::mutex endStatusMutex;
+      GLFWwindow* window;
   };
 }
 
