@@ -50,7 +50,6 @@ namespace alcube::physics::samples::balls {
     windowHeight = 1200;
     fps = 30;
     appName = "BallsSample";
-    isMultiSampleEnabled = false;
   }
 
   void ManyBallsSample::add(ColorBall *ball) {
@@ -61,8 +60,8 @@ namespace alcube::physics::samples::balls {
   void ManyBallsSample::onInit() {
     printSystemInfo();
     maxCellCount = 16384; // 2^14
-    //int ballCount =12376;
-    int ballCount = 2000;
+    int ballCount =12376;
+    //int ballCount = 2000;
     //int ballCount = 32;
     deltaTime = 1.0f / 30.0f;
     float gravity = 9.8f;

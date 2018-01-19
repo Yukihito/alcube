@@ -5,15 +5,11 @@
 namespace alcube::utils {
   class Keyboard {
     public:
-      bool isKeyPressed(unsigned char keyCode);
-      void onKeyDown(unsigned char keyCode);
-      void onKeyUp(unsigned char keyCode);
-      bool isSpecialKeyPressed(int keyCode);
-      void onSpecialKeyDown(int keyCode);
-      void onSpecialKeyUp(int keyCode);
+      bool isKeyPressed(int keyCode);
+      void onKeyDown(int keyCode);
+      void onKeyUp(int keyCode);
     private:
-      std::unordered_map<unsigned char, bool> pressed;
-      std::unordered_map<int, bool> pressedSpecial;
+      std::unordered_map<int, bool> pressed;
   };
 }
 

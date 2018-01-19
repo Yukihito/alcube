@@ -25,7 +25,6 @@ namespace alcube::drawing::samples {
     windowHeight = 600;
     fps = 30;
     appName = "SimpleSphereSample";
-    isMultiSampleEnabled = false;
   }
 
   void SimpleSphereSample::onInit() {

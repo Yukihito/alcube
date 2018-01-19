@@ -1,27 +1,15 @@
 #include "Keyboard.h"
 
 namespace alcube::utils {
-  bool Keyboard::isKeyPressed(unsigned char keyCode) {
+  bool Keyboard::isKeyPressed(int keyCode) {
     return pressed[keyCode];
   }
 
-  void Keyboard::onKeyDown(unsigned char keyCode) {
+  void Keyboard::onKeyDown(int keyCode) {
     pressed[keyCode] = true;
   }
 
-  void Keyboard::onKeyUp(unsigned char keyCode) {
+  void Keyboard::onKeyUp(int keyCode) {
     pressed[keyCode] = false;
-  }
-
-  bool Keyboard::isSpecialKeyPressed(int keyCode) {
-    return pressedSpecial[keyCode];
-  }
-
-  void Keyboard::onSpecialKeyDown(int keyCode) {
-    pressedSpecial[keyCode] = true;
-  }
-
-  void Keyboard::onSpecialKeyUp(int keyCode) {
-    pressedSpecial[keyCode] = false;
   }
 }

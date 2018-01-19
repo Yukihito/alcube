@@ -44,7 +44,6 @@ namespace alcube::physics::samples::particles {
     windowHeight = 600;
     fps = 30;
     appName = "ParticlesSample";
-    isMultiSampleEnabled = false;
   }
 
   void ParticlesSample::onInit() {

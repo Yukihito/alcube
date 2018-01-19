@@ -15,7 +15,6 @@ namespace alcube::physics::samples::balls {
     windowHeight = 600;
     fps = 30;
     appName = "BallsSample";
-    isMultiSampleEnabled = false;
   }
 
   void BallsSample::add(Ball *ball) {

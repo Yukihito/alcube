@@ -6,7 +6,6 @@ namespace alcube::physics::samples::balls {
     windowHeight = 1200;
     fps = 30;
     appName = "SoftBodySample";
-    isMultiSampleEnabled = true;
   }
 
   void SoftBodySample::add(ColorBall *ball) {
@@ -17,13 +16,13 @@ namespace alcube::physics::samples::balls {
   void SoftBodySample::onInit() {
     printSystemInfo();
     maxCellCount = 65536; // 2^14
-    int softBodySize = 24;
-    deltaTime = 1.0f / 30.0f;
+    int softBodySize = 12;
+    deltaTime = 1.0f / (float)fps;
     float gravity = 9.8f;
     unsigned int gridEdgeLength = 8;
-    unsigned int xGridCount = 16;
-    unsigned int yGridCount = 16;
-    unsigned int zGridCount = 16;
+    unsigned int xGridCount = 8;
+    unsigned int yGridCount = 8;
+    unsigned int zGridCount = 8;
     float near = 0.1f;
     float far = gridEdgeLength * xGridCount * 4.0f;
     shaders = new drawing::shaders::Shaders(new utils::FileUtil());

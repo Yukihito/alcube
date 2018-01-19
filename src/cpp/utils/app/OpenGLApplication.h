@@ -11,8 +11,6 @@
 #include "../Mouse.h"
 #include "../Keyboard.h"
 #include <GLFW/glfw3.h>
-//#include <GL/glx.h>
-//#include <GL/glut.h>
 
 
 
@@ -24,35 +22,24 @@ namespace alcube::utils::app {
       unsigned int windowWidth = 800;
       unsigned int windowHeight = 600;
       unsigned int fps = 30;
-      bool isMultiSampleEnabled = false;
       std::string appName = "";
 
       Keyboard* keyboard = nullptr;
-      Mouse* mouse = nullptr;
 
       virtual void initWindowParams();
       virtual void onInit() = 0;
       virtual void onUpdate() = 0;
       virtual void onDraw() = 0;
       virtual void onClose() = 0;
-
       void close();
       void printSystemInfo();
     private:
       void setupWindow(int argc, char* argv[]);
       void setEventListeners();
       static void drawEvent();
-      static void updateLoop();
       static void exitEvent();
-      static void drawTimerEvent(int value);
-      static void keyEvent(int key, int x, int y);
-      static void keyUpEvent(unsigned char key, int x, int y);
-      static void specialKeyEvent(int key, int x, int y);
-      static void specialKeyUpEvent(int key, int x, int y);
-      static void mouseEvent(int button,int state,int x,int y);
-      static void motionEvent(int x, int y);
-      static void passiveMotionEvent(int x, int y);
-      static void glfwKeyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+      static void keyEvent(GLFWwindow* window, int key, int scancode, int action, int mods);
+      static void updateLoop();
       int endStatus;
       std::mutex endStatusMutex;
       GLFWwindow* window;
