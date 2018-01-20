@@ -47,6 +47,8 @@ namespace alcube::physics::opencl::dtos {
       unsigned int springIndices[16];
       unsigned char springNodeIndices[16];
       unsigned int springCount;
+      int alterEgoIndex;
+      float radiusForAlterEgo;
   };
 #pragma pack(pop)
 

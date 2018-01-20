@@ -8,6 +8,8 @@ namespace alcube::physics {
     public:
       explicit Cell();
       unsigned short index;
+      Cell* alterEgo;
+      float radiusForAlterEgo;
   };
 }
 

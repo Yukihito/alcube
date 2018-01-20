@@ -18,15 +18,21 @@ namespace alcube::utils::app {
   class OpenGLApplication : public Application {
     public:
       void runApp(int argc, char **argv) override;
+      explicit OpenGLApplication(
+        unsigned int windowWidth,
+        unsigned int windowHeight,
+        unsigned int fps,
+        std::string appName
+      );
     protected:
-      unsigned int windowWidth = 800;
-      unsigned int windowHeight = 600;
-      unsigned int fps = 30;
-      std::string appName = "";
+      unsigned int windowWidth;
+      unsigned int windowHeight;
+      unsigned int fps;
+      std::string appName;
 
       Keyboard* keyboard = nullptr;
 
-      virtual void initWindowParams();
+      //virtual void initWindowParams();
       virtual void onInit() = 0;
       virtual void onUpdate() = 0;
       virtual void onDraw() = 0;

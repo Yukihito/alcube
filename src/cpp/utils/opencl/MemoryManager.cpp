@@ -9,14 +9,18 @@ namespace alcube::utils::opencl {
     const std::string &name,
     size_t size,
     void *hostPtr,
-    cl_mem_flags memFlags
+    cl_mem_flags memFlags,
+    size_t allocationCount,
+    size_t count
   ) {
     auto mem = new Memory(
       name,
       size,
       resources->context,
       hostPtr,
-      memFlags
+      memFlags,
+      allocationCount,
+      count
     );
     memories.push_back(mem);
     return mem;

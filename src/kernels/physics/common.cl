@@ -30,6 +30,8 @@ typedef struct __attribute__ ((packed)) CellStruct {
   uint springIndices[16];
   uchar springNodeIndices[16];
   uint springCount;
+  int alterEgoIndex;
+  float radiusForAlterEgo;
 } Cell;
 
 typedef struct __attribute__ ((packed)) IntersectionStruct {

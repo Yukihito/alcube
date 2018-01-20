@@ -1,56 +1,7 @@
 #include "ManyBallsSample.h"
 
 namespace alcube::physics::samples::balls {
-  ColorBall::ColorBall(
-    drawing::shapes::Shapes *shapes,
-    drawing::shaders::Shaders *shaders,
-    glm::vec3 diffuse
-  ) {
-    shape = &shapes->triangles.sphere;
-    shader = &shaders->standard;
-    material = new drawing::Material();
-    material->diffuse = diffuse;
-    material->ambient = diffuse / 2.0f;
-    material->specular = glm::vec3(0.3f, 0.3f, 0.3f);
-  }
-
-  glm::mat4 ColorBall::getModelMat() {
-    return glm::translate(position) * glm::toMat4(rotation) * glm::scale(glm::vec3(radius, radius, radius));
-  }
-
-  drawing::Material* ColorBall::getMaterial() {
-    bool showLinearMomentum = false;
-    if(showLinearMomentum) {
-      /*
-      glm::vec3 diffuse = glm::vec3(
-        sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f,
-        0.0f,
-        0.0f);
-      if (linearMomentum.y > 0.0f) {
-        diffuse = glm::vec3(
-          0.0f,
-          sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f,
-          0.0f);
-      }
-       */
-
-      glm::vec3 diffuse = glm::vec3(
-        1.0f - (sqrtf(linearMomentum.x * linearMomentum.x) / 15.0f),
-        1.0f - (sqrtf(linearMomentum.y * linearMomentum.y) / 15.0f),
-        1.0f - (sqrtf(linearMomentum.z * linearMomentum.z) / 15.0f));
-
-      material->diffuse = diffuse;
-      material->ambient = diffuse / 2.0f;
-    }
-    return this->material;
-  }
-
-  void ManyBallsSample::initWindowParams() {
-    windowWidth = 1600;
-    windowHeight = 1200;
-    fps = 30;
-    appName = "BallsSample";
-  }
+  ManyBallsSample::ManyBallsSample() : OpenGLApplication(1600, 1200, 30, "BallsSample") {}
 
   void ManyBallsSample::add(ColorBall *ball) {
     drawer->add(ball);
@@ -63,7 +14,7 @@ namespace alcube::physics::samples::balls {
     int ballCount =12376;
     //int ballCount = 2000;
     //int ballCount = 32;
-    deltaTime = 1.0f / 30.0f;
+    deltaTime = 1.0f / (float)fps;
     float gravity = 9.8f;
     unsigned int gridEdgeLength = 8;
     unsigned int xGridCount = 8;
@@ -96,7 +47,6 @@ namespace alcube::physics::samples::balls {
       zGridCount
     );
     physicsSimulator->gravity = gravity;
-    //physicsSimulator->sphericalShellRadius = gridEdgeLength * xGridCount / 2;
     profiler = new utils::Profiler();
     profiler->setShowInterval(1000);
     profiler->enabled = true;
@@ -110,23 +60,11 @@ namespace alcube::physics::samples::balls {
     std::uniform_real_distribution<float> randReal(-w/2, w/2);
     std::uniform_real_distribution<float> randReal2(-10, 10);
     std::uniform_real_distribution<float> randReal3(0, 1);
-
+    bool showsLinerMomentum = false;
     for (int i = 0; i < ballCount; i++) {
-      auto ball = new ColorBall(shapes, shaders, glm::vec3(
-        randReal3(mt),
-        randReal3(mt),
-        randReal3(mt)
-      ));
-      ball->position = glm::vec3(
-        randReal(mt),
-        randReal(mt),
-        randReal(mt)
-      );
-      ball->linearMomentum = glm::vec3(
-        randReal2(mt),
-        randReal2(mt),
-        randReal2(mt)
-      );
+      auto ball = new ColorBall(shapes, shaders, glm::vec3(randReal3(mt), randReal3(mt), randReal3(mt)), showsLinerMomentum);
+      ball->position = glm::vec3(randReal(mt), randReal(mt), randReal(mt));
+      ball->linearMomentum = glm::vec3(randReal2(mt), randReal2(mt), randReal2(mt));
       ball->elasticity = 0.8f;
       add(ball);
     }
@@ -144,11 +82,8 @@ namespace alcube::physics::samples::balls {
     profiler->start(profilers.update);
     physicsSimulator->update(deltaTime);
     profiler->stop(profilers.update);
-
     profiler->stop(profilers.all);
-
     profiler->update();
-
     profiler->start(profilers.all);
   }
 

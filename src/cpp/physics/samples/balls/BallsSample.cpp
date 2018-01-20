@@ -10,12 +10,7 @@ namespace alcube::physics::samples::balls {
     return glm::translate(position);
   }
 
-  void BallsSample::initWindowParams() {
-    windowWidth = 800;
-    windowHeight = 600;
-    fps = 30;
-    appName = "BallsSample";
-  }
+  BallsSample::BallsSample() : OpenGLApplication(800, 600, 30, "BallsSample") {}
 
   void BallsSample::add(Ball *ball) {
     drawer->add(ball);

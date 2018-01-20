@@ -9,6 +9,7 @@
 #include "../../../drawing/shaders/Shaders.h"
 #include "../../../utils/app/OpenGLApplication.h"
 #include "../../../utils/Profiler.h"
+#include "Profilers.h"
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtx/transform.hpp>
 
@@ -20,16 +21,10 @@ namespace alcube::physics::samples::balls {
       glm::mat4 getModelMat() override;
   };
 
-  class Profilers {
-    public:
-      int update;
-      int draw;
-      int all;
-  };
-
   class BallsSample : public utils::app::OpenGLApplication {
+    public:
+      explicit BallsSample();
     protected:
-      void initWindowParams() override;
       void onInit() override;
       void onDraw() override;
       void onUpdate() override;

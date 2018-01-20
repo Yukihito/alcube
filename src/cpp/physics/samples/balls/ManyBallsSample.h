@@ -11,24 +11,14 @@
 #include "../../../utils/Profiler.h"
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtx/transform.hpp>
-#include "BallsSample.h"
+#include "ColorBall.h"
+#include "Profilers.h"
 
 namespace alcube::physics::samples::balls {
-  class ColorBall : public drawing::Drawable, public Cell {
-    public:
-      ColorBall(drawing::shapes::Shapes *shapes, drawing::shaders::Shaders *shaders, glm::vec3 diffuse);
-
-    protected:
-      glm::mat4 getModelMat() override;
-      drawing::Material* getMaterial() override;
-    private:
-      drawing::Material* material;
-  };
-
   class ManyBallsSample : public utils::app::OpenGLApplication {
+    public:
+      explicit ManyBallsSample();
     protected:
-      void initWindowParams() override;
-
       void onInit() override;
 
       void onDraw() override;

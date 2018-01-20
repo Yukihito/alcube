@@ -18,8 +18,9 @@ namespace alcube::drawing::samples {
   };
 
   class SimpleSphereSample : public utils::app::OpenGLApplication {
+    public:
+      explicit SimpleSphereSample();
     protected:
-      void initWindowParams() override;
       void onInit() override;
       void onDraw() override;
       void onUpdate() override;

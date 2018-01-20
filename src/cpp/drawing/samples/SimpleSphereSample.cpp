@@ -20,12 +20,7 @@ namespace alcube::drawing::samples {
     return this->material;
   }
 
-  void SimpleSphereSample::initWindowParams() {
-    windowWidth = 800;
-    windowHeight = 600;
-    fps = 30;
-    appName = "SimpleSphereSample";
-  }
+  SimpleSphereSample::SimpleSphereSample() : OpenGLApplication(800, 600, 30, "SimpleSphereSample") {}
 
   void SimpleSphereSample::onInit() {
     printSystemInfo();
@@ -42,7 +37,7 @@ namespace alcube::drawing::samples {
     );
     drawer = new Drawer(camera, &drawablesMutex);
     glm::vec3 pos1 = glm::vec3();
-    for (int i = 0; i < 1000; i++) {
+    for (int i = 0; i < 100; i++) {
       auto sphere = new SimpleSphere(pos1, shapes, shaders);
       spheres.push_back(sphere);
       drawer->add(sphere);

@@ -34,8 +34,9 @@ namespace alcube::physics::samples::particles {
   };
 
   class ParticlesSample : public utils::app::OpenGLApplication {
+    public:
+      explicit ParticlesSample();
     protected:
-      void initWindowParams() override;
       void onInit() override;
       void onDraw() override;
       void onUpdate() override;

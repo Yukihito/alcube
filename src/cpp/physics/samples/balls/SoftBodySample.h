@@ -11,14 +11,14 @@
 #include "../../../utils/Profiler.h"
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtx/transform.hpp>
-#include "ManyBallsSample.h"
+#include "ColorBall.h"
+#include "Profilers.h"
 
 namespace alcube::physics::samples::balls {
-
   class SoftBodySample : public utils::app::OpenGLApplication {
+    public:
+      explicit SoftBodySample();
     protected:
-      void initWindowParams() override;
-
       void onInit() override;
 
       void onDraw() override;

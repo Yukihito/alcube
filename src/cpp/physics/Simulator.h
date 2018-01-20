@@ -16,6 +16,7 @@
 #include "opencl/dtos.h"
 #include "Cell.h"
 #include "Spring.h"
+#include "../utils/opencl/Simulator.h"
 
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
@@ -63,7 +64,7 @@ namespace alcube::physics {
       cl_kernel postProcessing;
   };
 
-  class Simulator {
+  class Simulator : public utils::opencl::Simulator {
     public:
       explicit Simulator(
         utils::opencl::Resources* resources,
@@ -79,24 +80,12 @@ namespace alcube::physics {
       void add(Cell* cell);
       void add(Spring* spring);
       Cell* getCell(unsigned long i);
-      void update(float deltaTime);
+      void update(float deltaTime) override;
       float gravity;
       float sphericalShellRadius;
       Dtos dtos;
       Memories memories;
       Kernels kernels;
-      bool allocated;
-      void setUpComputingSize();
-      void setUpMemories();
-      void tearDownMemories();
-      void input();
-      void output();
-      void computeBroadPhase();
-      void computeNarrowPhase(float deltaTime);
-      void resolveConstraints(float deltaTime);
-      void motion(float deltaTime);
-      void read(utils::opencl::Memory* memory, void* hostPtr);
-      void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);
     private:
       std::mutex* cellsMutex;
       std::vector<Cell*> cells;
@@ -108,10 +97,16 @@ namespace alcube::physics {
       unsigned int maxCellCountForBitonicSort;
       unsigned int springCount;
       unsigned int maxSpringCount;
-      utils::opencl::CommandQueue* queue;
-      utils::opencl::KernelFactory* kernelFactory;
-      utils::opencl::ProgramFactory* programFactory;
-      utils::opencl::MemoryManager* memoryManager;
+      void setUpComputingSize();
+      void setUpMemories();
+      void input();
+      void output();
+      void computeBroadPhase();
+      void computeNarrowPhase(float deltaTime);
+      void resolveConstraints(float deltaTime);
+      void motion(float deltaTime);
+
+      void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);
   };
 }
 

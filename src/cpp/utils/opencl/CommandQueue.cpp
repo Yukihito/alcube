@@ -14,12 +14,13 @@ namespace alcube::utils::opencl {
     arg.ptr = &i;
     return arg;
   }
-            KernelArg kernelargs::ushortArg(unsigned short& i) {
-              KernelArg arg = KernelArg();
-              arg.size = sizeof(cl_ushort);
-              arg.ptr = &i;
-              return arg;
-            }
+
+  KernelArg kernelargs::ushortArg(unsigned short& i) {
+    KernelArg arg = KernelArg();
+    arg.size = sizeof(cl_ushort);
+    arg.ptr = &i;
+    return arg;
+  }
 
   KernelArg kernelargs::floatArg(float& f) {
     KernelArg arg = KernelArg();

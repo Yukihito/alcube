@@ -13,7 +13,9 @@ namespace alcube::utils::opencl {
         const std::string& name,
         size_t size,
         void* hostPtr,
-        cl_mem_flags memFlags
+        cl_mem_flags memFlags,
+        size_t allocationCount,
+        size_t count
       );
       void allocate();
       void release();

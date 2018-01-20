@@ -43,6 +43,8 @@ __kernel void collectIntersections(
   float3 position = currentState->position;
   float* positionPtr = (float*)&position;
   float radius = cell->radius;
+  int alterEgoIndex = cell->alterEgoIndex;
+  float radiusForAlterEgo = cell->radiusForAlterEgo;
   float mass = cell->mass;
   float smallValue = 0.0001f;
   bool isFullOfIntersection = false;
@@ -65,7 +67,7 @@ __kernel void collectIntersections(
 	    continue;
 	  }
 	  float3 w = currentStates[otherCellIndex].position - position;
-	  float r = radius + cells[otherCellIndex].radius;
+	  float r = alterEgoIndex == -1 || alterEgoIndex != otherCellIndex ? radius + cells[otherCellIndex].radius : radiusForAlterEgo + cells[otherCellIndex].radiusForAlterEgo;
 	  float rr = r * r;
 	  float ww = dot(w, w);
 	  if (ww > 0.0f && ww <= rr + smallValue) {

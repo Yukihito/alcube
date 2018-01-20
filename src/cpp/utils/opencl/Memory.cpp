@@ -7,15 +7,17 @@ namespace alcube::utils::opencl {
     size_t size,
     cl_context& context,
     void* hostPtr,
-    cl_mem_flags memFlags
+    cl_mem_flags memFlags,
+    size_t allocationCount,
+    size_t count
   ) {
     this->hostPtr = hostPtr;
     this->name = name;
     this->size = size;
     this->context = context;
-    this->count = 1;
+    this->count = count;
     this->memFlags = memFlags;
-    this->allocationCount = 1;
+    this->allocationCount = allocationCount;
   }
 
   void Memory::allocate() {

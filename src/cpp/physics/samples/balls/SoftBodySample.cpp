@@ -1,12 +1,7 @@
 #include "SoftBodySample.h"
 
 namespace alcube::physics::samples::balls {
-  void SoftBodySample::initWindowParams() {
-    windowWidth = 1600;
-    windowHeight = 1200;
-    fps = 30;
-    appName = "SoftBodySample";
-  }
+  SoftBodySample::SoftBodySample() : OpenGLApplication(1600, 1200, 30, "SoftBodySample") {}
 
   void SoftBodySample::add(ColorBall *ball) {
     drawer->add(ball);
@@ -61,26 +56,18 @@ namespace alcube::physics::samples::balls {
     std::uniform_real_distribution<float> randReal3(0, 1);
     std::uniform_real_distribution<float> randReal(0, 0.5);
     float softBodyEdgeLength = softBodySize * 2.0f;
+    bool showsLinearMomentum = false;
     for (int z = 0; z < softBodySize; z++) {
       for (int y = 0; y < softBodySize; y++) {
         for (int x = 0; x < softBodySize; x++) {
-          auto ball = new ColorBall(shapes, shaders, glm::vec3(
-            //1.0f, 0.4f, 0.4f
-            randReal3(mt),
-            randReal3(mt),
-            randReal3(mt)
-          ));
+          auto ball = new ColorBall(shapes, shaders, glm::vec3(randReal3(mt), randReal3(mt), randReal3(mt)), showsLinearMomentum);
           ball->mass = 0.2f;
           ball->position = glm::vec3(
             x * 2.0f - (softBodyEdgeLength / 2.0f),
             y * 2.0f - (softBodyEdgeLength / 2.0f),
             z * 2.0f - (softBodyEdgeLength / 2.0f)
           );
-          ball->linearMomentum = glm::vec3(
-            /*randReal(mt)*/5.0f,
-            /*randReal(mt)*/0.0f,
-            /*randReal(mt)*/3.0f
-          );
+          ball->linearMomentum = glm::vec3(5.0f, 0.0f, 3.0f);
           ball->elasticity = 0.0f;
           add(ball);
         }

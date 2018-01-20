@@ -1,9 +1,25 @@
 #include "OpenGLApplication.h"
 
+#include <utility>
+
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 namespace alcube::utils::app {
   OpenGLApplication* appInst;
+
+  OpenGLApplication::OpenGLApplication(
+    unsigned int windowWidth,
+    unsigned int windowHeight,
+    unsigned int fps,
+    std::string appName
+  ) {
+    this->windowWidth = windowWidth;
+    this->windowHeight = windowHeight;
+    this->fps = fps;
+    this->appName = std::move(appName);
+    keyboard = new Keyboard();
+    endStatus = 0;
+  }
 
   void OpenGLApplication::close() {
     endStatusMutex.lock();
@@ -44,13 +60,6 @@ namespace alcube::utils::app {
     appInst->endStatusMutex.lock();
     appInst->endStatus = 2;
     appInst->endStatusMutex.unlock();
-  }
-
-  void OpenGLApplication::initWindowParams() {
-    windowWidth = 800;
-    windowHeight = 600;
-    fps = 30;
-    appName = "";
   }
 
   void OpenGLApplication::keyEvent(GLFWwindow *window, int key, int scancode, int action, int mods) {
@@ -95,15 +104,11 @@ namespace alcube::utils::app {
 
   void OpenGLApplication::runApp(int argc, char **argv) {
     appInst = this;
-    endStatus = 0;
-    initWindowParams();
     setupWindow(argc, argv);
-    keyboard = new Keyboard();
     onInit();
     setEventListeners();
     std::thread th = std::thread(updateLoop);
     th.detach();
-
     while (!glfwWindowShouldClose(window)) {
       std::chrono::system_clock::time_point drawingStartTime = std::chrono::system_clock::now();
       appInst->endStatusMutex.lock();

@@ -39,12 +39,7 @@ namespace alcube::physics::samples::particles {
     particlesShape->particleCount = (unsigned int)cells.size();
   }
 
-  void ParticlesSample::initWindowParams() {
-    windowWidth = 800;
-    windowHeight = 600;
-    fps = 30;
-    appName = "ParticlesSample";
-  }
+  ParticlesSample::ParticlesSample() : OpenGLApplication(800, 600, 30, "ParticlesSample") {}
 
   void ParticlesSample::onInit() {
     maxCellCount = 65536;
