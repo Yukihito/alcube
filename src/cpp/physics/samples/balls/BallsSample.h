@@ -9,7 +9,7 @@
 #include "../../../drawing/shaders/Shaders.h"
 #include "../../../utils/app/OpenGLApplication.h"
 #include "../../../utils/Profiler.h"
-#include "Profilers.h"
+#include "../BaseApplication.h"
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtx/transform.hpp>
 
@@ -21,27 +21,12 @@ namespace alcube::physics::samples::balls {
       glm::mat4 getModelMat() override;
   };
 
-  class BallsSample : public utils::app::OpenGLApplication {
+  class BallsSample : public BaseApplication {
     public:
       explicit BallsSample();
     protected:
       void onInit() override;
-      void onDraw() override;
-      void onUpdate() override;
-      void onClose() override;
     private:
-      drawing::Drawer* drawer;
-      drawing::Camera* camera;
-      drawing::shaders::Shaders* shaders;
-      drawing::shapes::Shapes* shapes;
-      utils::opencl::Resources* resources;
-      utils::FileUtil* fileUtil;
-      utils::Profiler* profiler;
-      Simulator* physicsSimulator;
-      std::mutex mutex;
-      Profilers profilers;
-      unsigned int maxCellCount;
-      float deltaTime;
       void add(Ball* ball);
   };
 }

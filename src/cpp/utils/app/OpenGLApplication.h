@@ -29,10 +29,7 @@ namespace alcube::utils::app {
       unsigned int windowHeight;
       unsigned int fps;
       std::string appName;
-
       Keyboard* keyboard = nullptr;
-
-      //virtual void initWindowParams();
       virtual void onInit() = 0;
       virtual void onUpdate() = 0;
       virtual void onDraw() = 0;

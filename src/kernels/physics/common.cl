@@ -66,38 +66,33 @@ typedef struct __attribute__ ((packed)) SpringVarStruct {
   float3 angularImpulses[2];
 } SpringVar;
 
-float4 mulQuat(float4* q, float4* r);
-float3 rotateByQuat(float3* v, float4* q);
-float4 createQuatFromDisplacement(float3* angularDisplacement);
+float4 mulQuat(float4 q, float4 r);
+float3 rotateByQuat(float3 v, float4 q);
+float4 createQuatFromDisplacement(float3 angularDisplacement);
 
 float4 mulQuat(
-  float4* q,
-  float4* r
+  float4 q,
+  float4 r
 ) {
-  float3 u = (float3)(q->x, q->y, q->z);
-  float3 v = (float3)(r->x, r->y, r->z);
-  float3 ipart = v * q->w + u * r->w + cross(u, v);
-  float tpart = q->w * r->w - dot(u, v);
-  return (float4)(ipart.x, ipart.y, ipart.z, tpart);
+  float4 result;
+  result.xyz = r.xyz * q.w + q.xyz * r.w + cross(q.xyz, r.xyz);
+  result.w = q.w * r.w - dot(q.xyz, r.xyz);
+  return result;
 }
 
 float3 rotateByQuat(
-  float3* v,
-  float4* q
+  float3 v,
+  float4 q
 ) {
-  float4 p = (float4)(v->x, v->y, v->z, 0.0f);
-  float4 r = (float4)(-q->x, -q->y, -q->z, q->w);
-  float4 qp = mulQuat(q, &p);
-  float4 qpr = mulQuat(&qp, &r);
-  return (float3)(qpr.x, qpr.y, qpr.z);
+  return mulQuat(mulQuat(q, (float4)(v.x, v.y, v.z, 0.0f)), (float4)(-q.x, -q.y, -q.z, q.w)).xyz;
 }
 
 float4 createQuatFromDisplacement(
-  float3* angularDisplacement
+  float3 angularDisplacement
 ) {
-  float4 q = (float4)(0.0f);
-  float halfRotationScalar = length(*angularDisplacement) / 2.0f;
+  float halfRotationScalar = length(angularDisplacement) / 2.0f;
+  float4 q;
   q.w = cos(halfRotationScalar);
-  q.xyz = normalize(*angularDisplacement) * sin(halfRotationScalar);
+  q.xyz = normalize(angularDisplacement) * sin(halfRotationScalar);
   return q;
 }

@@ -41,6 +41,7 @@ namespace alcube::drawing {
     context.vp = vp;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    drawablesMutex->lock();
     for (auto shaderShapesDrawables : drawables) {
       Shader* shader = shaderShapesDrawables.first;
       auto shapesDrawables = *shaderShapesDrawables.second;
@@ -52,9 +53,7 @@ namespace alcube::drawing {
         shader->setupBuffer(buffer);
         auto drawables = *shapeDrawables.second;
         for (Drawable* drawable: drawables) {
-          drawablesMutex->lock();
           drawable->draw(context);
-          drawablesMutex->unlock();
         }
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -62,6 +61,7 @@ namespace alcube::drawing {
         glBindVertexArray(0);
       }
     }
+    drawablesMutex->unlock();
   }
 
   Drawer::Drawer(Camera* camera, std::mutex *drawablesMutex) {

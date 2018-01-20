@@ -12,8 +12,8 @@ __kernel void calcSpringImpulses(
   float4 rot0 = currentStates[spring->cellIndices[0]].rotation;
   float3 pm1 = spring->nodePositionsModelSpace[1];
   float4 rot1 = currentStates[spring->cellIndices[1]].rotation;
-  float3 p0 = rotateByQuat(&pm0, &rot0);
-  float3 p1 = rotateByQuat(&pm1, &rot1);
+  float3 p0 = rotateByQuat(pm0, rot0);
+  float3 p1 = rotateByQuat(pm1, rot1);
   float3 impulse = ((p1 + currentStates[spring->cellIndices[1]].position) - (p0 + currentStates[spring->cellIndices[0]].position));
   float3 direction = normalize(impulse);
   float len = length(impulse);
@@ -42,9 +42,6 @@ __kernel void updateBySpringImpulse(
   }
   cellVar->linearVelocity += linearImpulse / cell->mass;
   cellVar->angularVelocity += angularImpulse / cellVar->momentOfInertia;
-  float4 currentRotation = currentStates[cellIndex].rotation;
-  float3 rotationDiff = cellVar->angularVelocity * deltaTime;
-  float4 rotationDiffQuat = createQuatFromDisplacement(&rotationDiff);
   currentStates[cellIndex].position += cellVar->linearVelocity * deltaTime;
-  currentStates[cellIndex].rotation = mulQuat(&rotationDiffQuat, &currentRotation);
+  currentStates[cellIndex].rotation = mulQuat(createQuatFromDisplacement(cellVar->angularVelocity * deltaTime), currentStates[cellIndex].rotation);
 }

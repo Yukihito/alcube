@@ -1,9 +1,7 @@
 #include "OpenGLApplication.h"
 
-#include <utility>
-
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wdeprecated-declarations"
+//#pragma clang diagnostic push
+//#pragma clang diagnostic ignored "-Wdeprecated-declarations"
 namespace alcube::utils::app {
   OpenGLApplication* appInst;
 
@@ -130,4 +128,4 @@ namespace alcube::utils::app {
     }
   }
 }
-#pragma clang diagnostic pop
+//#pragma clang diagnostic pop

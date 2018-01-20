@@ -1,7 +1,7 @@
 #include "SoftBodySample.h"
 
 namespace alcube::physics::samples::balls {
-  SoftBodySample::SoftBodySample() : OpenGLApplication(1600, 1200, 30, "SoftBodySample") {}
+  SoftBodySample::SoftBodySample() : BaseApplication(1600, 1200, 30, "SoftBodySample") {}
 
   void SoftBodySample::add(ColorBall *ball) {
     drawer->add(ball);
@@ -9,48 +9,8 @@ namespace alcube::physics::samples::balls {
   }
 
   void SoftBodySample::onInit() {
-    printSystemInfo();
-    maxCellCount = 65536; // 2^14
+    initBase(64, 65536);
     int softBodySize = 12;
-    deltaTime = 1.0f / (float)fps;
-    float gravity = 9.8f;
-    unsigned int gridEdgeLength = 8;
-    unsigned int xGridCount = 8;
-    unsigned int yGridCount = 8;
-    unsigned int zGridCount = 8;
-    float near = 0.1f;
-    float far = gridEdgeLength * xGridCount * 4.0f;
-    shaders = new drawing::shaders::Shaders(new utils::FileUtil());
-    shapes = new drawing::shapes::Shapes();
-    camera = new drawing::Camera(
-      glm::vec3(0.0f, 0.0f, far / 2.0f),
-      glm::quat(),
-      glm::radians(45.0f),
-      (float)windowWidth,
-      (float)windowHeight,
-      near,
-      far
-    );
-    drawer = new drawing::Drawer(camera, &mutex);
-    resources = new utils::opencl::Resources();
-    fileUtil = new utils::FileUtil();
-    physicsSimulator = new Simulator(
-      resources,
-      fileUtil,
-      &mutex,
-      maxCellCount,
-      gridEdgeLength,
-      xGridCount,
-      yGridCount,
-      zGridCount
-    );
-    physicsSimulator->gravity = gravity;
-    //physicsSimulator->sphericalShellRadius = ((gridEdgeLength * xGridCount) / 2.0f) - 1.0f;
-    profiler = new utils::Profiler();
-    profiler->setShowInterval(1000);
-    profiler->enabled = true;
-    profilers.update = profiler->create("update");
-    profilers.all = profiler->create("all");
     std::random_device rnd;
     std::mt19937 mt(rnd());
     std::uniform_real_distribution<float> randReal3(0, 1);
@@ -112,28 +72,5 @@ namespace alcube::physics::samples::balls {
         }
       }
     }
-
-    profiler->start(profilers.all);
-  }
-
-  void SoftBodySample::onDraw() {
-    drawer->draw();
-  }
-
-  void SoftBodySample::onUpdate() {
-    profiler->start(profilers.update);
-    physicsSimulator->update(deltaTime);
-    profiler->stop(profilers.update);
-
-    profiler->stop(profilers.all);
-
-    profiler->update();
-
-    profiler->start(profilers.all);
-  }
-
-  void SoftBodySample::onClose() {
-    physicsSimulator->tearDownMemories();
-    resources->release();
   }
 }

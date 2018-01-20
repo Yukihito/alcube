@@ -23,4 +23,8 @@ __kernel void postProcessing(
 
   nextStates[cellIndex].position = clamp(currentStates[cellIndex].position, corner, -corner);
   nextStates[cellIndex].rotation = currentStates[cellIndex].rotation;
+  //currentStates[cellIndex].position = nextStates[cellIndex].position;
+  //currentStates[cellIndex].rotation = nextStates[cellIndex].rotation;
+  //currentStates[cellIndex].linearMomentum = nextStates[cellIndex].linearMomentum;
+  //currentStates[cellIndex].angularMomentum = nextStates[cellIndex].angularMomentum;
 }
