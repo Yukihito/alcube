@@ -171,6 +171,7 @@ namespace alcube::physics {
       memArg(memories.grid),
       memArg(memories.cells),
       memArg(memories.currentStates),
+      memArg(memories.nextStates),
       memArg(memories.gridAndCellRelations)
     });
 
@@ -215,7 +216,6 @@ namespace alcube::physics {
       memArg(memories.cells),
       memArg(memories.cellVars),
       memArg(memories.springs),
-      memArg(memories.currentStates),
       memArg(memories.nextStates),
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),

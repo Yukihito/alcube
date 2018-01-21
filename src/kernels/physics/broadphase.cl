@@ -12,6 +12,7 @@ __kernel void fillGridIndex(
   __global const Grid* grid,
   __global const Cell* cells,
   __global const RigidBodyState* currentStates,
+  __global RigidBodyState* nextStates,
   __global GridAndCellRelation* relations
 ) {
   size_t cellIndex = get_global_id(0);
@@ -24,6 +25,7 @@ __kernel void fillGridIndex(
   uint gridIndex = (uint)p.x + (uint)p.y * grid->xCount + (uint)p.z * grid->xCount * grid->yCount;
   relations[cellIndex].cellIndex = cellIndex;
   relations[cellIndex].gridIndex = gridIndex;
+  nextStates[cellIndex] = currentStates[cellIndex];
 }
 
 __kernel void merge(

@@ -27,7 +27,6 @@ __kernel void collectIntersections(
   __global const Cell* cells,
   __global CellVar* cellVars,
   __global const Spring* springs,
-  __global const RigidBodyState* currentStates,
   __global RigidBodyState* nextStates,
   __global GridAndCellRelation* relations,
   __global uint* gridStartIndices,
@@ -38,10 +37,10 @@ __kernel void collectIntersections(
 ) {
   size_t cellIndex = get_global_id(0);
   float edgeLength = (float)grid->edgeLength;
-  __global const RigidBodyState* currentState = &currentStates[cellIndex];
+  __global RigidBodyState* nextState = &nextStates[cellIndex];
   __global CellVar* cellVar = &cellVars[cellIndex];
   __global const Cell* cell = &cells[cellIndex];
-  float3 position = currentState->position;
+  float3 position = nextState->position;
   float* positionPtr = (float*)&position;
   float radius = cell->radius;
   int alterEgoIndex = cell->alterEgoIndex;
@@ -67,7 +66,7 @@ __kernel void collectIntersections(
 	  if (otherCellIndex == cellIndex) {
 	    continue;
 	  }
-	  float3 w = currentStates[otherCellIndex].position - position;
+	  float3 w = nextStates[otherCellIndex].position - position;
 	  float r = alterEgoIndex == -1 || alterEgoIndex != otherCellIndex ? radius + cells[otherCellIndex].radius : radiusForAlterEgo + cells[otherCellIndex].radiusForAlterEgo;
 	  float rr = r * r;
 	  float ww = dot(w, w);
@@ -118,12 +117,12 @@ __kernel void collectIntersections(
   cellVar->momentOfInertia = momentOfInertia;
   float gravityTranslation = gravityAcceleration * deltaTime;
   float gravity = isFloating ? -gravityTranslation : 0.0f;
-  cellVar->linearVelocity = currentState->linearMomentum / mass + (float3)(0.0f, gravity, 0.0f);
+  cellVar->linearVelocity = nextState->linearMomentum / mass + (float3)(0.0f, gravity, 0.0f);
   float ySpeed = cellVar->linearVelocity.y;
   if (!isFloating && ySpeed * ySpeed < gravityTranslation * gravityTranslation * 16.0f) {
     cellVar->linearVelocity.y = 0.0f;
   }
-  cellVar->angularVelocity = currentState->angularMomentum / momentOfInertia;
+  cellVar->angularVelocity = nextState->angularMomentum / momentOfInertia;
   cellVar->isFloating = isFloating ? 1 : 0;
 
   cellVar->intersectionCount = intersectionCount;
@@ -131,10 +130,4 @@ __kernel void collectIntersections(
 
   cellVar->massForIntersection = mass / intersectionCount;
   cellVar->massForCollision = mass;
-
-  __global RigidBodyState* nextState = &nextStates[cellIndex];
-  nextState->linearMomentum = currentState->linearMomentum;
-  nextState->angularMomentum = currentState->angularMomentum;
-  nextState->position = currentState->position;
-  nextState->rotation = currentState->rotation;
 }
