@@ -32,7 +32,6 @@ namespace alcube::physics::opencl::dtos {
       cl_float4 rotation;
       cl_float3 linearMomentum;
       cl_float3 angularMomentum;
-      unsigned int gridIndex;
   };
 #pragma pack(pop)
 

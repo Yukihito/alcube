@@ -76,7 +76,7 @@ namespace alcube::physics {
 
     memories.grid = memoryManager->define("grid", sizeof(opencl::dtos::Grid), dtos.grid, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, 1, 1);
     memories.cells = memoryManager->define("cells", sizeof(opencl::dtos::Cell), dtos.cells, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxCellCount, 0);
-    memories.currentStates = memoryManager->define("currentStates", sizeof(opencl::dtos::RigidBodyState), dtos.currentStates, CL_MEM_READ_WRITE | CL_MEM_USE_HOST_PTR, maxCellCount, 0);
+    memories.currentStates = memoryManager->define("currentStates", sizeof(opencl::dtos::RigidBodyState), dtos.currentStates, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxCellCount, 0);
     memories.cellVars = memoryManager->define("cellVars", sizeof(opencl::dtos::CellVar), nullptr, CL_MEM_READ_WRITE, maxCellCount, 0);
     memories.nextStates = memoryManager->define("nextStates", sizeof(opencl::dtos::RigidBodyState), nullptr, CL_MEM_READ_WRITE, maxCellCount, 0);
     memories.gridAndCellRelations = memoryManager->define("gridAndCellRelations", sizeof(opencl::dtos::GridAndCellRelation), nullptr, CL_MEM_READ_WRITE, maxCellCountForBitonicSort, 0);
@@ -112,7 +112,6 @@ namespace alcube::physics {
       dtos.cells[i].staticFrictionCoefficient = cell->staticFrictionCoefficient;
       dtos.cells[i].dynamicFrictionCoefficient = cell->dynamicFrictionCoefficient;
       dtos.cells[i].radiusForAlterEgo = cell->radiusForAlterEgo;
-      dtos.currentStates[i].gridIndex = 0;
       assignClFloat3(dtos.currentStates[i].linearMomentum, cell->linearMomentum);
       assignClFloat3(dtos.currentStates[i].angularMomentum, cell->angularMomentum);
       assignClFloat3(dtos.currentStates[i].position, cell->position);
@@ -217,6 +216,7 @@ namespace alcube::physics {
       memArg(memories.cellVars),
       memArg(memories.springs),
       memArg(memories.currentStates),
+      memArg(memories.nextStates),
       memArg(memories.gridAndCellRelations),
       memArg(memories.gridStartIndices),
       memArg(memories.gridEndIndices),
@@ -258,24 +258,22 @@ namespace alcube::physics {
           memArg(memories.cellVars),
           memArg(memories.springs),
           memArg(memories.springVars),
-          memArg(memories.currentStates),
+          memArg(memories.nextStates),
           floatArg(splitDeltaTime)
         });
       }
       queue->push(kernels.updateBySpringImpulse, {cellCount}, {
         memArg(memories.cells),
         memArg(memories.cellVars),
-        memArg(memories.currentStates),
+        memArg(memories.nextStates),
         memArg(memories.springVars),
         floatArg(splitDeltaTime)
       });
     }
-
     queue->push(kernels.postProcessing, {cellCount}, {
       memArg(memories.grid),
       memArg(memories.cells),
       memArg(memories.cellVars),
-      memArg(memories.currentStates),
       memArg(memories.nextStates),
       floatArg(deltaTime)
     });

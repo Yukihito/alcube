@@ -27,7 +27,8 @@ __kernel void collectIntersections(
   __global const Cell* cells,
   __global CellVar* cellVars,
   __global const Spring* springs,
-  __global RigidBodyState* currentStates,
+  __global const RigidBodyState* currentStates,
+  __global RigidBodyState* nextStates,
   __global GridAndCellRelation* relations,
   __global uint* gridStartIndices,
   __global uint* gridEndIndices,
@@ -37,7 +38,7 @@ __kernel void collectIntersections(
 ) {
   size_t cellIndex = get_global_id(0);
   float edgeLength = (float)grid->edgeLength;
-  __global RigidBodyState* currentState = &currentStates[cellIndex];
+  __global const RigidBodyState* currentState = &currentStates[cellIndex];
   __global CellVar* cellVar = &cellVars[cellIndex];
   __global const Cell* cell = &cells[cellIndex];
   float3 position = currentState->position;
@@ -130,4 +131,10 @@ __kernel void collectIntersections(
 
   cellVar->massForIntersection = mass / intersectionCount;
   cellVar->massForCollision = mass;
+
+  __global RigidBodyState* nextState = &nextStates[cellIndex];
+  nextState->linearMomentum = currentState->linearMomentum;
+  nextState->angularMomentum = currentState->angularMomentum;
+  nextState->position = currentState->position;
+  nextState->rotation = currentState->rotation;
 }

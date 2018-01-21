@@ -11,7 +11,7 @@ __kernel void initGridAndCellRelations(
 __kernel void fillGridIndex(
   __global const Grid* grid,
   __global const Cell* cells,
-  __global RigidBodyState* currentStates,
+  __global const RigidBodyState* currentStates,
   __global GridAndCellRelation* relations
 ) {
   size_t cellIndex = get_global_id(0);
@@ -22,7 +22,6 @@ __kernel void fillGridIndex(
   uint3 gridCorner1 = (uint3)(grid->xCount - 1, grid->yCount - 1, grid->zCount - 1);
   uint3 p = clamp(convert_uint3(positionGridSpace / edgeLength), gridCorner0, gridCorner1);
   uint gridIndex = (uint)p.x + (uint)p.y * grid->xCount + (uint)p.z * grid->xCount * grid->yCount;
-  currentStates[cellIndex].gridIndex = gridIndex;
   relations[cellIndex].cellIndex = cellIndex;
   relations[cellIndex].gridIndex = gridIndex;
 }

@@ -10,6 +10,7 @@ namespace alcube::physics::samples::balls {
 
   void ManyBallsSample::onInit() {
     initBase(64, 16384);
+    //int ballCount = 16384;
     int ballCount =12376;
     //int ballCount = 5626;
     //int ballCount = 2000;
