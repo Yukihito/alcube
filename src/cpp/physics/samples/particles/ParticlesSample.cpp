@@ -19,7 +19,7 @@ namespace alcube::physics::samples::particles {
 
   glm::mat4 Particles::getModelMat() {
     static float t = 0.0f;
-    t += 0.01f;
+    t += 0.001f;
     return glm::rotate(t, glm::vec3(0.0f, 1.0f, 0.0f));
   }
 

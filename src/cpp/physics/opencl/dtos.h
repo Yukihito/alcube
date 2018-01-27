@@ -1,5 +1,5 @@
-#ifndef ALCUBE_DTOS_H
-#define ALCUBE_DTOS_H
+#ifndef ALCUBE_PHYSICS_OPENCL_DTOS_H
+#define ALCUBE_PHYSICS_OPENCL_DTOS_H
 
 #include <CL/cl.h>
 
@@ -95,4 +95,4 @@ namespace alcube::physics::opencl::dtos {
   };
 #pragma pack(pop)
 }
-#endif //ALCUBE_DTOS_H
+#endif //ALCUBE_PHYSICS_OPENCL_DTOS_H

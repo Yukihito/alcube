@@ -1,13 +1,13 @@
-#ifndef ALCUBE_PARTICLESSAMPLE_H
-#define ALCUBE_PARTICLESSAMPLE_H
+#ifndef ALCUBE_FLUIDSAMPLE_H
+#define ALCUBE_FLUIDSAMPLE_H
 
 #include "../BaseApplication.h"
 #include "Particles.h"
 
 namespace alcube::physics::samples::particles {
-  class ParticlesSample : public BaseApplication {
+  class FluidSample : public BaseApplication {
     public:
-      explicit ParticlesSample();
+      explicit FluidSample();
     protected:
       void onInit() override;
 
@@ -18,4 +18,4 @@ namespace alcube::physics::samples::particles {
   };
 }
 
-#endif //ALCUBE_PARTICLESSAMPLE_H
+#endif //ALCUBE_FLUIDSAMPLE_H
