@@ -23,6 +23,8 @@ typedef struct __attribute__ ((packed)) RigidBodyStateStruct {
 typedef struct __attribute__ ((packed)) CellStruct {
   float radius;
   float mass;
+  unsigned short type;
+  short padding;
   float elasticity;
   float dynamicFrictionCoefficient;
   float staticFrictionCoefficient;
@@ -39,9 +41,12 @@ typedef struct __attribute__ ((packed)) IntersectionStruct {
   float length;
   float speed;
   float3 normal;
+  float3 relativePosition;
+  float distance;
 } Intersection;
 
 typedef struct __attribute__ ((packed)) CellVarStruct {
+  Cell constants;
   float3 linearVelocity;
   float3 angularVelocity;
   float momentOfInertia;
@@ -50,8 +55,8 @@ typedef struct __attribute__ ((packed)) CellVarStruct {
   ushort intersectionCount;
   ushort collisionCount;
   int isFloating;
-  unsigned char collisionIndices[16];
-  Intersection intersections[16];
+  unsigned char collisionIndices[32];
+  Intersection intersections[32];
 } CellVar;
 
 typedef struct __attribute__ ((packed)) SpringStruct {
@@ -64,6 +69,35 @@ typedef struct __attribute__ ((packed)) SpringVarStruct {
   float3 linearImpulses[2];
   float3 angularImpulses[2];
 } SpringVar;
+
+typedef struct __attribute__ ((packed)) FluidStateStruct {
+  float3 velocity;
+  float pressure;
+  float density;
+  float3 force;
+} FluidState;
+
+typedef struct __attribute__ ((packed)) FluidSettingsStruct {
+  float stiffness;
+  float density;
+  float viscosity;
+  float particleMass;
+  float effectiveRadius;
+  float poly6Constant;
+  float spikyGradientConstant;
+  float viscosityLaplacianConstant;
+} FluidSettings;
+
+typedef struct __attribute__ ((packed)) ConstantsStruct {
+  Grid grid;
+  FluidSettings fluidSettings;
+  float gravityAcceleration;
+  float deltaTime;
+  float splitDeltaTime;
+  float sphericalShellRadius;
+  unsigned short rigidBodyParticleCount;
+  unsigned short fluidParticleCount;
+} Constants;
 
 float4 mulQuat(float4 q, float4 r);
 float3 rotateByQuat(float3 v, float4 q);

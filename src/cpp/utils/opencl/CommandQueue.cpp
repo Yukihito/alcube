@@ -50,7 +50,7 @@ namespace alcube::utils::opencl {
     for (KernelArg arg: args) {
       status = clSetKernelArg(op, i, arg.size, arg.ptr);
       if (status != CL_SUCCESS) {
-        std::cout << "clSetKernelArg failure: " << status << std::endl;
+        std::cout << "clSetKernelArg failure: " << status << ", index: " << i << std::endl;
       }
       i++;
     }

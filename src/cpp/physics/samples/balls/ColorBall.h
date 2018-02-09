@@ -1,7 +1,3 @@
-//
-// Created by yukihito on 18/01/20.
-//
-
 #ifndef ALCUBE_COLORBALL_H
 #define ALCUBE_COLORBALL_H
 

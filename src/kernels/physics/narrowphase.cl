@@ -2,44 +2,48 @@ void setIntersection(
   __global Intersection* intersection,
   ushort type,
   ushort otherIndex,
-  float length,
+  float intersectionLength,
   float speed,
-  float3 normal
+  float3 normal,
+  float3 relativePosition
 );
 
 void setIntersection(
   __global Intersection* intersection,
   ushort type,
   ushort otherIndex,
-  float length,
+  float intersectionLength,
   float speed,
-  float3 normal
+  float3 normal,
+  float3 relativePosition
 ) {
   intersection->type = type;
   intersection->otherIndex = otherIndex;
-  intersection->length = length;
+  intersection->length = intersectionLength;
   intersection->speed = speed;
   intersection->normal = normal;
+  intersection->relativePosition = relativePosition;
+  intersection->distance = length(relativePosition);
 }
 
 __kernel void collectIntersections(
-  __global const Grid* grid,
-  __global const Cell* cells,
   __global CellVar* cellVars,
   __global const Spring* springs,
   __global RigidBodyState* nextStates,
   __global GridAndCellRelation* relations,
   __global uint* gridStartIndices,
   __global uint* gridEndIndices,
-  const float sphericalShellRadius,
-  const float deltaTime,
-  const float gravityAcceleration
+  __global Constants* constants
 ) {
+  float sphericalShellRadius = constants->sphericalShellRadius;
+  float deltaTime = constants->deltaTime;
+  float gravityAcceleration = constants->gravityAcceleration;
+  __global Grid* grid = &constants->grid;
   size_t cellIndex = get_global_id(0);
   float edgeLength = (float)grid->edgeLength;
   __global RigidBodyState* nextState = &nextStates[cellIndex];
   __global CellVar* cellVar = &cellVars[cellIndex];
-  __global const Cell* cell = &cells[cellIndex];
+  __global Cell* cell = &(cellVars[cellIndex].constants);
   float3 position = nextState->position;
   float* positionPtr = (float*)&position;
   float radius = cell->radius;
@@ -47,6 +51,7 @@ __kernel void collectIntersections(
   float radiusForAlterEgo = cell->radiusForAlterEgo;
   float mass = cell->mass;
   float smallValue = 0.0001f;
+  uchar maxIntersection = 32;
   bool isFullOfIntersection = false;
   bool isFloating = true;
   float effectiveRadius = radius + 3.0f;
@@ -66,15 +71,15 @@ __kernel void collectIntersections(
 	  if (otherCellIndex == cellIndex) {
 	    continue;
 	  }
+	  __global Cell* otherCell = &(cellVars[otherCellIndex].constants);
 	  float3 w = nextStates[otherCellIndex].position - position;
-	  float r = alterEgoIndex == -1 || alterEgoIndex != otherCellIndex ? radius + cells[otherCellIndex].radius : radiusForAlterEgo + cells[otherCellIndex].radiusForAlterEgo;
+	  float r = alterEgoIndex == -1 || alterEgoIndex != otherCellIndex ? radius + otherCell->radius : radiusForAlterEgo + otherCell->radiusForAlterEgo;
 	  float rr = r * r;
 	  float ww = dot(w, w);
 	  if (ww > 0.0f && ww <= rr + smallValue) {
-	    setIntersection(
-              &cellVar->intersections[intersectionCount], 0, otherCellIndex, r - length(w), 0.0f, normalize(w));
+	    setIntersection(&cellVar->intersections[intersectionCount], otherCell->type, otherCellIndex, r - length(w), 0.0f, normalize(w), w);
 	    intersectionCount++;
-	    isFullOfIntersection = intersectionCount >= 16;
+	    isFullOfIntersection = intersectionCount >= maxIntersection;
 	  }
 	}
       }
@@ -85,10 +90,9 @@ __kernel void collectIntersections(
   float* cornerPtr = (float*)&corner;
   for (uint i = 0; i < 3 && !isFullOfIntersection; i++) {
     if (positionPtr[i] <= cornerPtr[i]) {
-      setIntersection(
-        &cellVar->intersections[intersectionCount], 1, i, cornerPtr[i] - positionPtr[i], 0.0f, -grid->normals[i]);
+      setIntersection(&cellVar->intersections[intersectionCount], 1, i, cornerPtr[i] - positionPtr[i], 0.0f, -grid->normals[i], grid->normals[i] * radius);
       intersectionCount++;
-      isFullOfIntersection = intersectionCount >= 16;
+      isFullOfIntersection = intersectionCount >= maxIntersection;
       if (i == 1) {
 	isFloating = false;
       }
@@ -98,19 +102,17 @@ __kernel void collectIntersections(
   for (uint i = 3; i < 6 && !isFullOfIntersection; i++) {
     uint pi = i - 3;
     if (positionPtr[pi] >= -cornerPtr[pi]) {
-      setIntersection(
-        &cellVar->intersections[intersectionCount], 1, i, positionPtr[pi] + cornerPtr[pi], 0.0f, -grid->normals[i]);
+      setIntersection(&cellVar->intersections[intersectionCount], 1, i, positionPtr[pi] + cornerPtr[pi], 0.0f, -grid->normals[i], grid->normals[i] * radius);
       intersectionCount++;
-      isFullOfIntersection = intersectionCount >= 16;
+      isFullOfIntersection = intersectionCount >= maxIntersection;
     }
   }
 
   float shellIntersectionLength = length(position) + radius - sphericalShellRadius;
   if (!isFullOfIntersection && shellIntersectionLength + smallValue > 0.0f) {
-    setIntersection(
-      &cellVar->intersections[intersectionCount], 2, 0, shellIntersectionLength, 0.0f, normalize(position));
+    setIntersection(&cellVar->intersections[intersectionCount], 2, 0, shellIntersectionLength, 0.0f, normalize(position), -normalize(position) * radius);
     intersectionCount++;
-    isFullOfIntersection = intersectionCount >= 16;
+    isFullOfIntersection = intersectionCount >= maxIntersection;
   }
 
   float momentOfInertia = (2.0f / 5.0f) * mass * radius * radius;

@@ -1,3 +1,24 @@
+__kernel void inputConstants(
+  __global Constants* constants,
+  __global const Grid* grid,
+  __global const FluidSettings* fluidSettings,
+  const float gravityAcceleration,
+  const float deltaTime,
+  const float splitDeltaTime,
+  const float sphericalShellRadius,
+  const ushort rigidBodyParticleCount,
+  const ushort fluidParticleCount
+) {
+  constants->grid = grid[0];
+  constants->fluidSettings = fluidSettings[0];
+  constants->gravityAcceleration = gravityAcceleration;
+  constants->deltaTime = deltaTime;
+  constants->splitDeltaTime = splitDeltaTime;
+  constants->sphericalShellRadius = sphericalShellRadius;
+  constants->rigidBodyParticleCount = rigidBodyParticleCount;
+  constants->fluidParticleCount = fluidParticleCount;
+}
+
 __kernel void initGridAndCellRelations(
   __global GridAndCellRelation* relations,
   const uint gridIndex,
@@ -11,6 +32,7 @@ __kernel void initGridAndCellRelations(
 __kernel void fillGridIndex(
   __global const Grid* grid,
   __global const Cell* cells,
+  __global CellVar* cellVars,
   __global const RigidBodyState* currentStates,
   __global RigidBodyState* nextStates,
   __global GridAndCellRelation* relations
@@ -26,6 +48,7 @@ __kernel void fillGridIndex(
   relations[cellIndex].cellIndex = cellIndex;
   relations[cellIndex].gridIndex = gridIndex;
   nextStates[cellIndex] = currentStates[cellIndex];
+  cellVars[cellIndex].constants = cells[cellIndex];
 }
 
 __kernel void merge(

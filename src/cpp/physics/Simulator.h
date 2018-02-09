@@ -17,6 +17,7 @@
 #include "Cell.h"
 #include "Spring.h"
 #include "../utils/opencl/Simulator.h"
+#include "FluidParticle.h"
 
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
@@ -31,6 +32,10 @@ namespace alcube::physics {
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
       opencl::dtos::Spring* springs;
+      opencl::dtos::FluidSettings* fluidSettings;
+      opencl::dtos::FluidState* inputFluidStates;
+      opencl::dtos::FluidState* fluidStates;
+      opencl::dtos::Constants* constants;
   };
 
   class Memories {
@@ -45,6 +50,10 @@ namespace alcube::physics {
       utils::opencl::Memory* gridEndIndices;
       utils::opencl::Memory* springs;
       utils::opencl::Memory* springVars;
+      utils::opencl::Memory* fluidSettings;
+      utils::opencl::Memory* inputFluidStates;
+      utils::opencl::Memory* fluidStates;
+      utils::opencl::Memory* constants;
   };
 
   class Kernels {
@@ -62,6 +71,11 @@ namespace alcube::physics {
       cl_kernel calcSpringImpulses;
       cl_kernel updateBySpringImpulse;
       cl_kernel postProcessing;
+      cl_kernel inputFluid;
+      cl_kernel updateDensityAndPressure;
+      cl_kernel updateFluidForce;
+      cl_kernel moveFluid;
+      cl_kernel inputConstants;
   };
 
   class Simulator : public utils::opencl::Simulator {
@@ -79,6 +93,7 @@ namespace alcube::physics {
 
       void add(Cell* cell);
       void add(Spring* spring);
+      void add(FluidParticle* fluidParticle);
       Cell* getCell(unsigned long i);
       void update(float deltaTime) override;
       float gravity;
@@ -89,22 +104,28 @@ namespace alcube::physics {
     private:
       std::mutex* cellsMutex;
       std::vector<Cell*> cells;
+      std::vector<FluidParticle*> fluidParticles;
       std::vector<Spring*> springs;
       unsigned int allGridCount;
-      unsigned int cellCount;
-      unsigned int maxCellCount;
-      unsigned int cellCountForBitonicSort;
-      unsigned int maxCellCountForBitonicSort;
+      unsigned int rigidBodyParticleCount;
+      unsigned int maxParticleCount;
+      unsigned int particleCount;
+      unsigned int particleCountForBitonicSort;
+      unsigned int maxParticleCountForBitonicSort;
       unsigned int springCount;
       unsigned int maxSpringCount;
+      unsigned int fluidParticleCount;
+      bool initialized;
       void setUpComputingSize();
       void setUpMemories();
+      void initGPUMemory(float deltaTime);
       void input();
       void output();
       void computeBroadPhase();
-      void computeNarrowPhase(float deltaTime);
+      void computeNarrowPhase();
       void resolveConstraints(float deltaTime);
       void motion(float deltaTime);
+      void updateFluid(float deltaTime);
 
       void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);
   };

@@ -13,6 +13,7 @@
 #include <glm/gtx/transform.hpp>
 #include "ColorBall.h"
 #include "../BaseApplication.h"
+#include "../DrawableFluidParticle.h"
 
 namespace alcube::physics::samples::balls {
   class ManyBallsSample : public BaseApplication {
@@ -22,6 +23,7 @@ namespace alcube::physics::samples::balls {
       void onInit() override;
     private:
       void add(ColorBall *ball);
+      void add(DrawableFluidParticle *particle);
   };
 }
 #endif //ALCUBE_MANYBALLSSAMPLE_H
