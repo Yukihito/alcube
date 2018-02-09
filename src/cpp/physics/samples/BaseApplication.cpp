@@ -44,7 +44,6 @@ namespace alcube::physics::samples {
       zGridCount
     );
     physicsSimulator->gravity = gravity;
-    //physicsSimulator->sphericalShellRadius = ((gridEdgeLength * xGridCount) / 2.0f) - 1.0f;
     profiler = new utils::Profiler();
     profiler->setShowInterval(1000);
     profiler->enabled = true;
@@ -63,6 +62,7 @@ namespace alcube::physics::samples {
   void BaseApplication::onUpdate() {
     profiler->start(profilers.update);
     physicsSimulator->update(deltaTime);
+    drawer->updateDrawableBuffers();
     profiler->stop(profilers.update);
     profiler->stop(profilers.all);
     profiler->update();

@@ -223,12 +223,8 @@ namespace alcube::physics {
 
     for (int i = 0; i < fluidParticleCount; i++) {
       int globalIndex = i + rigidBodyParticleCount;
-      //Cell* cell = cells[globalIndex];
       FluidParticle* particle = fluidParticles[i];
-      //assignGlmVec3(cell->linearMomentum, dtos.nextStates[globalIndex].linearMomentum);
-      //assignGlmVec3(cell->angularMomentum, dtos.nextStates[globalIndex].angularMomentum);
       assignGlmVec3(particle->position, dtos.nextStates[globalIndex].position);
-      //assignGlmQuat(cell->rotation, dtos.nextStates[globalIndex].rotation);
     }
   }
 
@@ -402,9 +398,9 @@ namespace alcube::physics {
     updateFluid(deltaTime);
     read(memories.nextStates, dtos.nextStates);
 
-    cellsMutex->lock();
+    //cellsMutex->lock();
     output();
-    cellsMutex->unlock();
+    //cellsMutex->unlock();
   }
 
   void Simulator::add(Cell *cell) {

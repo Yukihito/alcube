@@ -118,7 +118,7 @@ namespace alcube::utils::app {
       glfwPollEvents();
       std::chrono::system_clock::time_point drawingEndTime = std::chrono::system_clock::now();
       int elapsedTime = (int) std::chrono::duration_cast<std::chrono::milliseconds>(drawingEndTime - drawingStartTime).count();
-      int nextFlameInterval = (1000 / appInst->fps) - elapsedTime;
+      int nextFlameInterval = (1000 / /*appInst->fps*/30) - elapsedTime;
       if (nextFlameInterval > 0) {
         std::chrono::milliseconds intervalMs(nextFlameInterval);
         std::this_thread::sleep_for(intervalMs);

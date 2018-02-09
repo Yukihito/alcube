@@ -18,9 +18,11 @@ namespace alcube::drawing {
       );
       void add(Drawable* drawable);
       void draw();
+      void updateDrawableBuffers();
     private:
-      Camera* camera;
       std::mutex* drawablesMutex;
+      int drawableBufferIndex[1];
+      Camera* camera;
       std::mutex drawablesQueueMutex;
       std::vector<Drawable*> drawablesQueue;
       std::unordered_map<Shader*, std::unordered_map<Shape*, std::vector<Drawable*>*>*> drawables;

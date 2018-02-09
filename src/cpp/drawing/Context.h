@@ -11,7 +11,7 @@ namespace alcube::drawing {
       glm::mat4 vp;
       glm::mat4 v;
       glm::mat4 m;
-      Material* material;
+      Material material;
   };
 }
 

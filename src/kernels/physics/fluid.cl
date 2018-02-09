@@ -85,40 +85,6 @@ __kernel void updateFluidForce(
   fluidState->force = force;
 }
 
-/*
-__kernel void updateFluidForce2(
-  __global CellVar* cellVars,
-  __global FluidState* fluidStates,
-  __global Constants* constants
-) {
-  __global FluidSettings* fluidSettings = &constants->fluidSettings;
-  float gravity = constants->gravityAcceleration;
-  size_t cellIndex = get_global_id(0);
-  __global CellVar* cellVar = &cellVars[cellIndex];
-  __global FluidState* fluidState = &fluidStates[cellIndex];
-  uchar count = cellVar->intersectionCount;
-  __global Intersection* intersections = cellVar->intersections;
-  float density = fluidState->density;
-  float3 velocity = fluidState->velocity;
-  float3 force = (float3)(0.0f, -gravity * density, 0.0f);
-  float pressurePart1 = -density * fluidSettings->particleMass;
-  float pressurePart2 = (fluidState->pressure / (density * density));
-  float viscosityPart1 = fluidSettings->viscosity * fluidSettings->particleMass;
-  for (uchar i = 0; i < count; i++) {
-    float q = intersections[i].length;
-    unsigned short otherIndex = intersections[i].otherIndex;
-    float otherDensity = intersections[i].type == 3 ? fluidStates[otherIndex].density : 1.0f;
-    float otherPressure = intersections[i].type == 3 ? fluidStates[otherIndex].pressure : 1.0f;
-    float3 otherVelocity = intersections[i].type == 3 ? fluidStates[otherIndex].velocity : (float3)(0.0f);
-    force +=
-      // pressure
-      pressurePart1 * (pressurePart2 + (otherPressure / (otherDensity * otherDensity))) * fluidSettings->spikyGradientConstant * q * q * intersections[i].normal
-      // viscosity
-      + viscosityPart1 * ((otherVelocity - velocity) / otherDensity) * fluidSettings->viscosityLaplacianConstant * q;
-  }
-  fluidState->force = force;
-}
-*/
 __kernel void moveFluid(
   __global FluidState* fluidStates,
   __global RigidBodyState* nextStates,
@@ -133,4 +99,6 @@ __kernel void moveFluid(
   nextState->position += constants->deltaTime * fluidState->velocity;
   float3 corner = grid->origin + (float3)(0.0001f);
   nextState->position = clamp(nextState->position, corner, -corner);
+  nextState->linearMomentum = fluidState->velocity * constants->fluidSettings.particleMass;
+  nextState->angularMomentum = (float3)(0.0f);
 }

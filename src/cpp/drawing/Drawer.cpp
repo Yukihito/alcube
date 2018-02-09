@@ -14,6 +14,7 @@ namespace alcube::drawing {
 
   void Drawer::add(Drawable* drawable) {
     drawablesQueueMutex.lock();
+    drawable->bufferIndex = drawableBufferIndex;
     drawablesQueue.push_back(drawable);
     drawablesQueueMutex.unlock();
   }
@@ -41,7 +42,6 @@ namespace alcube::drawing {
     context.vp = vp;
 
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    drawablesMutex->lock();
     for (auto shaderShapesDrawables : drawables) {
       Shader* shader = shaderShapesDrawables.first;
       auto shapesDrawables = *shaderShapesDrawables.second;
@@ -61,12 +61,30 @@ namespace alcube::drawing {
         glBindVertexArray(0);
       }
     }
+    drawablesMutex->lock();
+    drawableBufferIndex[0] = drawableBufferIndex[0] == 0 ? 1 : 0;
+    drawablesMutex->unlock();
+  }
+
+  void Drawer::updateDrawableBuffers() {
+    drawablesMutex->lock();
+    for (auto shaderShapesDrawables : drawables) {
+      auto shapesDrawables = *shaderShapesDrawables.second;
+      for (auto shapeDrawables : shapesDrawables) {
+        auto drawables = *shapeDrawables.second;
+        for (Drawable *drawable: drawables) {
+          drawable->updateBuffer();
+        }
+      }
+    }
     drawablesMutex->unlock();
   }
 
   Drawer::Drawer(Camera* camera, std::mutex *drawablesMutex) {
     this->drawablesMutex = drawablesMutex;
     this->camera = camera;
+    drawableBufferIndex[0] = 0;
+
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);

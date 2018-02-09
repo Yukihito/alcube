@@ -1,3 +1,8 @@
+#define PARTICLE_TYPE_RIGID_BODY      = 0
+#define PARTICLE_TYPE_FACE            = 1
+#define PARTICLE_TYPE_SPHERICAL_SHELL = 2
+#define PARTICLE_TYPE_FLUID           = 3
+
 typedef struct __attribute__ ((packed)) GridStruct {
   unsigned int xCount;
   unsigned int yCount;

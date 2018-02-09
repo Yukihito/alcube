@@ -92,6 +92,9 @@ __kernel void updateByFrictionalImpulse(
   float3 impulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
+    if (intersections[i].type == 3) {
+      continue;
+    }
     accumulateFrictionalImpulse(cell, cellVar, cells, cellVars, &intersections[i], &impulse, &angularImpulse);
   }
   cellVar->linearVelocity += impulse / cell->mass;
@@ -113,7 +116,7 @@ __kernel void collectCollisions(
   for (uchar i = 0; i < count; i++) {
     float3 relativeSpeed = intersections[i].type == 0 ? cellVars[intersections[i].otherIndex].linearVelocity - cellVar->linearVelocity : - cellVar->linearVelocity;
     intersections[i].speed = dot(intersections[i].normal, relativeSpeed);
-    if (intersections[i].speed < 0.0f) {
+    if (intersections[i].type != 3 && intersections[i].speed < 0.0f) {
       cellVar->collisionIndices[collisionCount] = i;
       collisionCount++;
     }
@@ -159,6 +162,9 @@ __kernel void updateByConstraintImpulse(
 
   float3 impulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
+    if (intersections[cellVar->collisionIndices[i]].type == 3) {
+      continue;
+    }
     accumulateConstraintImpulse(cell, cellVar, cells, cellVars, &intersections[cellVar->collisionIndices[i]], &impulse);
   }
   cellVar->linearVelocity = impulse / cell->mass;
