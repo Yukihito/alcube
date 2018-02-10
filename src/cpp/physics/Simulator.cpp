@@ -5,20 +5,18 @@ namespace alcube::physics {
   Simulator::Simulator(
     utils::opencl::Resources *resources,
     utils::FileUtil* fileUtil,
-    std::mutex* cellsMutex,
-    unsigned int maxParticleCount,
+    unsigned int maxActorCount,
     unsigned int gridEdgeLength,
     unsigned int xGridCount,
     unsigned int yGridCount,
     unsigned int zGridCount
   ) : utils::opencl::Simulator(resources, fileUtil) {
-    this->cellsMutex = cellsMutex;
-    this->maxParticleCount = maxParticleCount;
-    this->maxParticleCountForBitonicSort = utils::math::powerOf2(maxParticleCount);
-    this->maxSpringCount = maxParticleCount * 16;
+    this->maxActorCount = maxActorCount;
+    this->maxActorCountForBitonicSort = utils::math::powerOf2(maxActorCount);
+    this->maxSpringCount = maxActorCount * 16;
     this->allGridCount = xGridCount * yGridCount * zGridCount;
 
-    cells = {};
+    softBodyParticles = {};
     springs = {};
     fluidParticles = {};
     gravity = 0.0f;
@@ -37,7 +35,7 @@ namespace alcube::physics {
     kernels.merge = kernelFactory->create(program, "merge");
     kernels.bitonic = kernelFactory->create(program, "bitonic");
     kernels.setGridRelationIndexRange = kernelFactory->create(program, "setGridRelationIndexRange");
-    kernels.initGridAndCellRelations = kernelFactory->create(program, "initGridAndCellRelations");
+    kernels.initGridAndActorRelations = kernelFactory->create(program, "initGridAndActorRelations");
     kernels.collectIntersections = kernelFactory->create(program, "collectIntersections");
     kernels.updateByPenaltyImpulse = kernelFactory->create(program, "updateByPenaltyImpulse");
     kernels.updateByFrictionalImpulse = kernelFactory->create(program, "updateByFrictionalImpulse");
@@ -72,13 +70,13 @@ namespace alcube::physics {
       dtos.grid->normals[i].s[0] = 0.0f;
       dtos.grid->normals[i].s[i - 3] = -1.0f;
     }
-    dtos.cells = new opencl::dtos::Cell[maxParticleCount];
-    dtos.cellVars = new opencl::dtos::CellVar[maxParticleCount];
-    dtos.currentStates = new opencl::dtos::RigidBodyState[maxParticleCount];
-    dtos.nextStates = new opencl::dtos::RigidBodyState[maxParticleCount];
-    dtos.gridAndCellRelations = new opencl::dtos::GridAndCellRelation[maxParticleCount];
-    dtos.fluidStates = new opencl::dtos::FluidState[maxParticleCount];
-    dtos.inputFluidStates = new opencl::dtos::FluidState[maxParticleCount];
+    dtos.actors = new opencl::dtos::Actor[maxActorCount];
+    dtos.actorStates = new opencl::dtos::ActorState[maxActorCount];
+    dtos.currentStates = new opencl::dtos::RigidBodyState[maxActorCount];
+    dtos.nextStates = new opencl::dtos::RigidBodyState[maxActorCount];
+    dtos.gridAndActorRelations = new opencl::dtos::GridAndActorRelation[maxActorCount];
+    dtos.fluidStates = new opencl::dtos::FluidState[maxActorCount];
+    dtos.inputFluidStates = new opencl::dtos::FluidState[maxActorCount];
     dtos.gridStartIndices = new unsigned int[allGridCount];
     dtos.gridEndIndices = new unsigned int[allGridCount];
     dtos.springs = new opencl::dtos::Spring[maxSpringCount];
@@ -94,17 +92,17 @@ namespace alcube::physics {
     dtos.fluidSettings->viscosityLaplacianConstant = 45.0f / (CL_M_PI_F * powf(dtos.fluidSettings->effectiveRadius, 6));
 
     memories.grid = memoryManager->define("grid", sizeof(opencl::dtos::Grid), dtos.grid, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, 1, 1);
-    memories.cells = memoryManager->define("cells", sizeof(opencl::dtos::Cell), dtos.cells, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxParticleCount, 0);
-    memories.currentStates = memoryManager->define("currentStates", sizeof(opencl::dtos::RigidBodyState), dtos.currentStates, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxParticleCount, 0);
-    memories.cellVars = memoryManager->define("cellVars", sizeof(opencl::dtos::CellVar), nullptr, CL_MEM_READ_WRITE, maxParticleCount, 0);
-    memories.nextStates = memoryManager->define("nextStates", sizeof(opencl::dtos::RigidBodyState), nullptr, CL_MEM_READ_WRITE, maxParticleCount, 0);
-    memories.gridAndCellRelations = memoryManager->define("gridAndCellRelations", sizeof(opencl::dtos::GridAndCellRelation), nullptr, CL_MEM_READ_WRITE, maxParticleCountForBitonicSort, 0);
+    memories.actors = memoryManager->define("actors", sizeof(opencl::dtos::Actor), dtos.actors, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxActorCount, 0);
+    memories.currentStates = memoryManager->define("currentStates", sizeof(opencl::dtos::RigidBodyState), dtos.currentStates, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxActorCount, 0);
+    memories.actorStates = memoryManager->define("actorStates", sizeof(opencl::dtos::ActorState), nullptr, CL_MEM_READ_WRITE, maxActorCount, 0);
+    memories.nextStates = memoryManager->define("nextStates", sizeof(opencl::dtos::RigidBodyState), nullptr, CL_MEM_READ_WRITE, maxActorCount, 0);
+    memories.gridAndActorRelations = memoryManager->define("gridAndActorRelations", sizeof(opencl::dtos::GridAndActorRelation), nullptr, CL_MEM_READ_WRITE, maxActorCountForBitonicSort, 0);
     memories.gridStartIndices = memoryManager->define("gridStartIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE, allGridCount, allGridCount);
     memories.gridEndIndices = memoryManager->define("gridEndIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE, allGridCount, allGridCount);
     memories.springs = memoryManager->define("springs", sizeof(opencl::dtos::Spring), dtos.springs, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxSpringCount, 0);
     memories.springVars = memoryManager->define("springVars", sizeof(opencl::dtos::SpringVar), nullptr, CL_MEM_READ_WRITE, maxSpringCount, 0);
-    memories.inputFluidStates = memoryManager->define("inputFluidStates", sizeof(opencl::dtos::FluidState), dtos.inputFluidStates, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxParticleCount, 0);
-    memories.fluidStates = memoryManager->define("fluidStates", sizeof(opencl::dtos::FluidState), nullptr, CL_MEM_READ_WRITE, maxParticleCount, 0);
+    memories.inputFluidStates = memoryManager->define("inputFluidStates", sizeof(opencl::dtos::FluidState), dtos.inputFluidStates, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxActorCount, 0);
+    memories.fluidStates = memoryManager->define("fluidStates", sizeof(opencl::dtos::FluidState), nullptr, CL_MEM_READ_WRITE, maxActorCount, 0);
     memories.fluidSettings = memoryManager->define("fluidSettings", sizeof(opencl::dtos::FluidSettings), dtos.fluidSettings, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, 1, 1);
     memories.constants = memoryManager->define("constants", sizeof(opencl::dtos::Constants), nullptr, CL_MEM_READ_WRITE, 1, 1);
     memoryManager->allocate();
@@ -112,27 +110,27 @@ namespace alcube::physics {
   }
 
   void Simulator::setUpComputingSize() {
-    rigidBodyParticleCount = (unsigned int)cells.size();
+    softBodyParticleCount = (unsigned int)softBodyParticles.size();
     fluidParticleCount = (unsigned int)fluidParticles.size();
-    particleCount = rigidBodyParticleCount + fluidParticleCount;
+    actorCount = softBodyParticleCount + fluidParticleCount;
     springCount = (unsigned int)springs.size();
-    particleCountForBitonicSort = utils::math::powerOf2(particleCount);
+    actorCountForBitonicSort = utils::math::powerOf2(actorCount);
   }
 
   void Simulator::setUpSpring(unsigned int springIndex, unsigned char nodeIndex) {
-    unsigned short cellIndex = springs[springIndex]->nodes[nodeIndex].cell->index;
-    dtos.springs[springIndex].cellIndices[nodeIndex] = cellIndex;
+    unsigned short actorIndex = springs[springIndex]->nodes[nodeIndex].particle->index;
+    dtos.springs[springIndex].actorIndices[nodeIndex] = actorIndex;
     assignClFloat3(dtos.springs[springIndex].nodePositionsModelSpace[nodeIndex], springs[springIndex]->nodes[nodeIndex].position);
-    opencl::dtos::Cell* cell = &dtos.cells[cellIndex];
-    cell->springIndices[cell->springCount] = springIndex;
-    cell->springNodeIndices[cell->springCount] = nodeIndex;
-    cell->springCount++;
+    opencl::dtos::Actor* actor = &dtos.actors[actorIndex];
+    actor->springIndices[actor->springCount] = springIndex;
+    actor->springNodeIndices[actor->springCount] = nodeIndex;
+    actor->springCount++;
   }
 
   void Simulator::initGPUMemory(float deltaTime) {
     int splitCount = 8;
     float splitDeltaTime = deltaTime / splitCount;
-    auto rigidBodyParticleCountShort = (unsigned short)rigidBodyParticleCount;
+    auto rigidBodyParticleCountShort = (unsigned short)softBodyParticleCount;
     auto fluidParticleCountShort = (unsigned short)fluidParticleCount;
 
     queue->push(kernels.inputConstants, {1}, {
@@ -157,39 +155,39 @@ namespace alcube::physics {
   void Simulator::input() {
 
     glm::vec3 vec3Zero = glm::vec3(0.0f, 0.0f, 0.0f);
-    for (int i = 0; i < rigidBodyParticleCount; i++) {
-      Cell* cell = cells[i];
-      dtos.cells[i].radius = cell->radius;
-      dtos.cells[i].mass = cell->mass;
-      dtos.cells[i].elasticity = cell->elasticity;
-      dtos.cells[i].staticFrictionCoefficient = cell->staticFrictionCoefficient;
-      dtos.cells[i].dynamicFrictionCoefficient = cell->dynamicFrictionCoefficient;
-      dtos.cells[i].radiusForAlterEgo = cell->radiusForAlterEgo;
-      dtos.cells[i].type = 0;
-      assignClFloat3(dtos.currentStates[i].linearMomentum, cell->linearMomentum);
-      assignClFloat3(dtos.currentStates[i].angularMomentum, cell->angularMomentum);
-      assignClFloat3(dtos.currentStates[i].position, cell->position);
-      assignClFloat4(dtos.currentStates[i].rotation, cell->rotation);
-      cell->index = (unsigned short)i;
-      dtos.cells[i].springCount = 0;
+    for (int i = 0; i < softBodyParticleCount; i++) {
+      SoftBodyParticle* softBodyParticle = softBodyParticles[i];
+      dtos.actors[i].radius = softBodyParticle->radius;
+      dtos.actors[i].mass = softBodyParticle->mass;
+      dtos.actors[i].elasticity = softBodyParticle->elasticity;
+      dtos.actors[i].staticFrictionCoefficient = softBodyParticle->staticFrictionCoefficient;
+      dtos.actors[i].dynamicFrictionCoefficient = softBodyParticle->dynamicFrictionCoefficient;
+      dtos.actors[i].radiusForAlterEgo = softBodyParticle->radiusForAlterEgo;
+      dtos.actors[i].type = 0;
+      assignClFloat3(dtos.currentStates[i].linearMomentum, softBodyParticle->linearMomentum);
+      assignClFloat3(dtos.currentStates[i].angularMomentum, softBodyParticle->angularMomentum);
+      assignClFloat3(dtos.currentStates[i].position, softBodyParticle->position);
+      assignClFloat4(dtos.currentStates[i].rotation, softBodyParticle->rotation);
+      softBodyParticle->index = (unsigned short)i;
+      dtos.actors[i].springCount = 0;
     }
     for (int i = 0; i < fluidParticleCount; i++) {
-      int globalIndex = i + rigidBodyParticleCount;
+      int globalIndex = i + softBodyParticleCount;
       FluidParticle* fluidParticle = fluidParticles[i];
-      dtos.cells[globalIndex].radius = dtos.fluidSettings->effectiveRadius / 2.0f;
-      dtos.cells[globalIndex].mass = dtos.fluidSettings->particleMass;
-      dtos.cells[globalIndex].elasticity = 0.0f;
-      dtos.cells[globalIndex].staticFrictionCoefficient = 0.0f;
-      dtos.cells[globalIndex].dynamicFrictionCoefficient = 0.0f;
-      dtos.cells[globalIndex].radiusForAlterEgo = 1.0f;
-      dtos.cells[globalIndex].alterEgoIndex = -1;
-      dtos.cells[globalIndex].type = 3;
+      dtos.actors[globalIndex].radius = dtos.fluidSettings->effectiveRadius / 2.0f;
+      dtos.actors[globalIndex].mass = dtos.fluidSettings->particleMass;
+      dtos.actors[globalIndex].elasticity = 0.0f;
+      dtos.actors[globalIndex].staticFrictionCoefficient = 0.0f;
+      dtos.actors[globalIndex].dynamicFrictionCoefficient = 0.0f;
+      dtos.actors[globalIndex].radiusForAlterEgo = 1.0f;
+      dtos.actors[globalIndex].alterEgoIndex = -1;
+      dtos.actors[globalIndex].type = 3;
       glm::quat quatIdent = glm::quat();
       assignClFloat3(dtos.currentStates[globalIndex].linearMomentum, vec3Zero);
       assignClFloat3(dtos.currentStates[globalIndex].angularMomentum, vec3Zero);
       assignClFloat3(dtos.currentStates[globalIndex].position, fluidParticle->position);
       assignClFloat4(dtos.currentStates[globalIndex].rotation, quatIdent);
-      dtos.cells[i].springCount = 0;
+      dtos.actors[i].springCount = 0;
 
       opencl::dtos::FluidState* fluidState = &dtos.inputFluidStates[i];
       fluidState->density = 0.0f;
@@ -202,75 +200,75 @@ namespace alcube::physics {
       setUpSpring(i, 0);
       setUpSpring(i, 1);
     }
-    for (int i = 0; i < rigidBodyParticleCount; i++) {
-      Cell* cell = cells[i];
-      if (cell->alterEgo == nullptr) {
-        dtos.cells[i].alterEgoIndex = -1;
+    for (int i = 0; i < softBodyParticleCount; i++) {
+      SoftBodyParticle* softBodyParticle = softBodyParticles[i];
+      if (softBodyParticle->alterEgo == nullptr) {
+        dtos.actors[i].alterEgoIndex = -1;
       } else {
-        dtos.cells[i].alterEgoIndex = cell->alterEgo->index;
+        dtos.actors[i].alterEgoIndex = softBodyParticle->alterEgo->index;
       }
     }
   }
 
   void Simulator::output() {
-    for (int i = 0; i < rigidBodyParticleCount; i++) {
-      Cell* cell = cells[i];
-      assignGlmVec3(cell->linearMomentum, dtos.nextStates[i].linearMomentum);
-      assignGlmVec3(cell->angularMomentum, dtos.nextStates[i].angularMomentum);
-      assignGlmVec3(cell->position, dtos.nextStates[i].position);
-      assignGlmQuat(cell->rotation, dtos.nextStates[i].rotation);
+    for (int i = 0; i < softBodyParticleCount; i++) {
+      SoftBodyParticle* softBodyParticle = softBodyParticles[i];
+      assignGlmVec3(softBodyParticle->linearMomentum, dtos.nextStates[i].linearMomentum);
+      assignGlmVec3(softBodyParticle->angularMomentum, dtos.nextStates[i].angularMomentum);
+      assignGlmVec3(softBodyParticle->position, dtos.nextStates[i].position);
+      assignGlmQuat(softBodyParticle->rotation, dtos.nextStates[i].rotation);
     }
 
     for (int i = 0; i < fluidParticleCount; i++) {
-      int globalIndex = i + rigidBodyParticleCount;
+      int globalIndex = i + softBodyParticleCount;
       FluidParticle* particle = fluidParticles[i];
       assignGlmVec3(particle->position, dtos.nextStates[globalIndex].position);
     }
   }
 
   void Simulator::setUpMemories() {
-    memories.cells->count = particleCount;
-    memories.cellVars->count = particleCount;
-    memories.currentStates->count = particleCount;
-    memories.nextStates->count = particleCount;
-    memories.gridAndCellRelations->count = particleCountForBitonicSort;
+    memories.actors->count = actorCount;
+    memories.actorStates->count = actorCount;
+    memories.currentStates->count = actorCount;
+    memories.nextStates->count = actorCount;
+    memories.gridAndActorRelations->count = actorCountForBitonicSort;
     memories.springs->count = springCount;
     memories.springVars->count = springCount;
     memories.fluidStates->count = fluidParticleCount;
     memories.inputFluidStates->count = fluidParticleCount;
-    queue->write(memories.cells);
+    queue->write(memories.actors);
     queue->write(memories.currentStates);
     queue->write(memories.springs);
   }
 
   void Simulator::computeBroadPhase() {
-    auto maxParticleCountShort = (unsigned short)maxParticleCount;
-    // Initialize grid and cell relations
-    queue->push(kernels.initGridAndCellRelations, {particleCountForBitonicSort}, {
-      memArg(memories.gridAndCellRelations),
+    auto maxParticleCountShort = (unsigned short)maxActorCount;
+    // Initialize grid and particle relations
+    queue->push(kernels.initGridAndActorRelations, {actorCountForBitonicSort}, {
+      memArg(memories.gridAndActorRelations),
       uintArg(allGridCount),
       ushortArg(maxParticleCountShort)
     });
 
-    // Set grid index to rigid body state, and register grid and cell relations.
-    queue->push(kernels.fillGridIndex, {particleCount}, {
+    // Set grid index to rigid body state, and register grid and particle relations.
+    queue->push(kernels.fillGridIndex, {actorCount}, {
       memArg(memories.grid),
-      memArg(memories.cells),
-      memArg(memories.cellVars),
+      memArg(memories.actors),
+      memArg(memories.actorStates),
       memArg(memories.currentStates),
       memArg(memories.nextStates),
-      memArg(memories.gridAndCellRelations)
+      memArg(memories.gridAndActorRelations)
     });
 
-    // Sort grid and cell relations (Bitonic sort)
-    auto stageCount = (int)log2(particleCountForBitonicSort);
+    // Sort grid and particle relations (Bitonic sort)
+    auto stageCount = (int)log2(actorCountForBitonicSort);
     int passCount = 0;
     for (int i = 0; i < stageCount - 1; i++) {
       for (int j = 0; j < passCount + 1; j++) {
         auto distance = (unsigned int)(1 << (i - j));
         auto stageDistance = (unsigned int)(1 << i);
-        queue->push(kernels.bitonic, {particleCountForBitonicSort}, {
-          memArg(memories.gridAndCellRelations),
+        queue->push(kernels.bitonic, {actorCountForBitonicSort}, {
+          memArg(memories.gridAndActorRelations),
           uintArg(distance),
           uintArg(stageDistance)
         });
@@ -280,29 +278,29 @@ namespace alcube::physics {
     passCount = stageCount;
     for (int i = 0; i < passCount; i++) {
       auto distance = (unsigned int)(1 << (stageCount - (i + 1)));
-      queue->push(kernels.merge, {particleCountForBitonicSort}, {
-        memArg(memories.gridAndCellRelations),
+      queue->push(kernels.merge, {actorCountForBitonicSort}, {
+        memArg(memories.gridAndActorRelations),
         uintArg(distance)
       });
     }
 
-    // Setup grid and cell relation ranges
+    // Setup grid and particle relation ranges
     queue->pushZeroFill(memories.gridStartIndices);
     queue->pushZeroFill(memories.gridEndIndices);
-    queue->push(kernels.setGridRelationIndexRange, {particleCount > 1 ? particleCount - 1 : 1}, {
-      memArg(memories.gridAndCellRelations),
+    queue->push(kernels.setGridRelationIndexRange, {actorCount > 1 ? actorCount - 1 : 1}, {
+      memArg(memories.gridAndActorRelations),
       memArg(memories.gridStartIndices),
       memArg(memories.gridEndIndices),
-      uintArg(particleCount)
+      uintArg(actorCount)
     });
   }
 
   void Simulator::computeNarrowPhase() {
-    queue->push(kernels.collectIntersections, {particleCount}, {
-      memArg(memories.cellVars),
+    queue->push(kernels.collectIntersections, {actorCount}, {
+      memArg(memories.actorStates),
       memArg(memories.springs),
       memArg(memories.nextStates),
-      memArg(memories.gridAndCellRelations),
+      memArg(memories.gridAndActorRelations),
       memArg(memories.gridStartIndices),
       memArg(memories.gridEndIndices),
       memArg(memories.constants)
@@ -310,25 +308,25 @@ namespace alcube::physics {
   }
 
   void Simulator::resolveConstraints(float deltaTime) {
-    queue->push(kernels.updateByPenaltyImpulse, {rigidBodyParticleCount}, {
-      memArg(memories.cells),
-      memArg(memories.cellVars),
+    queue->push(kernels.updateByPenaltyImpulse, {softBodyParticleCount}, {
+      memArg(memories.actors),
+      memArg(memories.actorStates),
       floatArg(deltaTime)
     });
 
     for (int i = 0; i < 16; i++) {
-      queue->push(kernels.collectCollisions, {rigidBodyParticleCount}, {
-        memArg(memories.cells),
-        memArg(memories.cellVars)
+      queue->push(kernels.collectCollisions, {softBodyParticleCount}, {
+        memArg(memories.actors),
+        memArg(memories.actorStates)
       });
-      queue->push(kernels.updateByConstraintImpulse, {rigidBodyParticleCount}, {
-        memArg(memories.cells),
-        memArg(memories.cellVars)
+      queue->push(kernels.updateByConstraintImpulse, {softBodyParticleCount}, {
+        memArg(memories.actors),
+        memArg(memories.actorStates)
       });
     }
-    queue->push(kernels.updateByFrictionalImpulse, {rigidBodyParticleCount}, {
-      memArg(memories.cells),
-      memArg(memories.cellVars)
+    queue->push(kernels.updateByFrictionalImpulse, {softBodyParticleCount}, {
+      memArg(memories.actors),
+      memArg(memories.actorStates)
     });
   }
 
@@ -338,25 +336,25 @@ namespace alcube::physics {
     for (int i = 0; i < splitCount; i++) {
       if (springCount > 0) {
         queue->push(kernels.calcSpringImpulses, {springCount}, {
-          memArg(memories.cellVars),
+          memArg(memories.actorStates),
           memArg(memories.springs),
           memArg(memories.springVars),
           memArg(memories.nextStates),
           floatArg(splitDeltaTime)
         });
       }
-      queue->push(kernels.updateBySpringImpulse, {rigidBodyParticleCount}, {
-        memArg(memories.cells),
-        memArg(memories.cellVars),
+      queue->push(kernels.updateBySpringImpulse, {softBodyParticleCount}, {
+        memArg(memories.actors),
+        memArg(memories.actorStates),
         memArg(memories.nextStates),
         memArg(memories.springVars),
         floatArg(splitDeltaTime)
       });
     }
-    queue->push(kernels.postProcessing, {rigidBodyParticleCount}, {
+    queue->push(kernels.postProcessing, {softBodyParticleCount}, {
       memArg(memories.grid),
-      memArg(memories.cells),
-      memArg(memories.cellVars),
+      memArg(memories.actors),
+      memArg(memories.actorStates),
       memArg(memories.nextStates),
       floatArg(deltaTime)
     });
@@ -364,13 +362,13 @@ namespace alcube::physics {
 
   void Simulator::updateFluid(float deltaTime) {
     queue->push(kernels.updateDensityAndPressure, {fluidParticleCount}, {
-      memArg(memories.cellVars),
+      memArg(memories.actorStates),
       memArg(memories.fluidStates),
       memArg(memories.constants)
     });
 
     queue->push(kernels.updateFluidForce, {fluidParticleCount}, {
-      memArg(memories.cellVars),
+      memArg(memories.actorStates),
       memArg(memories.fluidStates),
       memArg(memories.constants)
     });
@@ -397,18 +395,15 @@ namespace alcube::physics {
     motion(deltaTime);
     updateFluid(deltaTime);
     read(memories.nextStates, dtos.nextStates);
-
-    //cellsMutex->lock();
     output();
-    //cellsMutex->unlock();
   }
 
-  void Simulator::add(Cell *cell) {
-    cells.push_back(cell);
+  void Simulator::add(SoftBodyParticle *softBodyParticle) {
+    softBodyParticles.push_back(softBodyParticle);
   }
 
-  Cell* Simulator::getCell(unsigned long i) {
-    return cells[i];
+  SoftBodyParticle* Simulator::getSoftBodyParticle(unsigned long i) {
+    return softBodyParticles[i];
   }
 
   void Simulator::add(Spring *spring) {

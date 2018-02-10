@@ -2,12 +2,11 @@
 
 namespace alcube::drawing {
   void Drawable::draw(Context& context) {
-    //glm::mat4 m = buffer[bufferIndex[0]].matrix;//getModelMat();
     int drawableBufferIndex = bufferIndex[0];
     glm::mat4 mvp = context.vp * buffer[drawableBufferIndex].matrix;
     context.mvp = mvp;
     context.m = buffer[bufferIndex[0]].matrix;
-    context.material = buffer[drawableBufferIndex].material;//getMaterial();
+    context.material = buffer[drawableBufferIndex].material;
     shader->shade(context);
     shape->draw();
   }

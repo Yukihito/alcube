@@ -5,7 +5,7 @@
 #include "../../../drawing/Drawable.h"
 #include "../../../drawing/shapes/Shapes.h"
 #include "../../../drawing/shaders/Shaders.h"
-#include "../../Cell.h"
+#include "../../SoftBodyParticle.h"
 #include "../../../drawing/Drawer.h"
 #include "../../../utils/opencl/Resources.h"
 #include "../../../utils/Profiler.h"
@@ -23,7 +23,7 @@ namespace alcube::physics::samples::particles {
       GLfloat *positions;
       GLfloat *colors;
 
-      void update(std::vector<Cell *> &cells);
+      void update(std::vector<SoftBodyParticle *> &cells);
 
     protected:
       glm::mat4 getModelMat() override;

@@ -1,7 +1,7 @@
-#include "Cell.h"
+#include "SoftBodyParticle.h"
 
 namespace alcube::physics {
-  Cell::Cell() : Sphere() {
+  SoftBodyParticle::SoftBodyParticle() : Sphere() {
     alterEgo = nullptr;
     radiusForAlterEgo = 0.0f;
   }

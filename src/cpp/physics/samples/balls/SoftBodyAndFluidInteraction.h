@@ -1,7 +1,7 @@
 #ifndef ALCUBE_SOFTBODYANDFLUIDINTERACTION_H
 #define ALCUBE_SOFTBODYANDFLUIDINTERACTION_H
 #include "../../../drawing/Drawable.h"
-#include "../../Cell.h"
+#include "../../SoftBodyParticle.h"
 #include "../../Simulator.h"
 #include "../../../drawing/Drawer.h"
 #include "../../../drawing/shapes/Shapes.h"

@@ -17,10 +17,10 @@ namespace alcube::physics::opencl::dtos {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-  class GridAndCellRelation {
+  class GridAndActorRelation {
     public:
       unsigned int gridIndex;
-      unsigned short cellIndex;
+      unsigned short actorIndex;
       short padding;
   };
 #pragma pack(pop)
@@ -36,7 +36,7 @@ namespace alcube::physics::opencl::dtos {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-  class Cell { // collider
+  class Actor { // actor
     public:
       // common
       float radius;
@@ -70,9 +70,9 @@ namespace alcube::physics::opencl::dtos {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-  class CellVar {
+  class ActorState {
     public:
-      Cell constants;
+      Actor constants;
       cl_float3 linearVelocity;
       cl_float3 angularVelocity;
       float momentOfInertia;
@@ -91,7 +91,7 @@ namespace alcube::physics::opencl::dtos {
     public:
       float k;
       cl_float3 nodePositionsModelSpace[2];
-      unsigned short cellIndices[2];
+      unsigned short actorIndices[2];
   };
 #pragma pack(pop)
 

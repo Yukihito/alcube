@@ -27,10 +27,10 @@ void setIntersection(
 }
 
 __kernel void collectIntersections(
-  __global CellVar* cellVars,
+  __global ActorState* actorStates,
   __global const Spring* springs,
   __global RigidBodyState* nextStates,
-  __global GridAndCellRelation* relations,
+  __global GridAndActorRelation* relations,
   __global uint* gridStartIndices,
   __global uint* gridEndIndices,
   __global Constants* constants
@@ -39,17 +39,17 @@ __kernel void collectIntersections(
   float deltaTime = constants->deltaTime;
   float gravityAcceleration = constants->gravityAcceleration;
   __global Grid* grid = &constants->grid;
-  size_t cellIndex = get_global_id(0);
+  size_t actorIndex = get_global_id(0);
   float edgeLength = (float)grid->edgeLength;
-  __global RigidBodyState* nextState = &nextStates[cellIndex];
-  __global CellVar* cellVar = &cellVars[cellIndex];
-  __global Cell* cell = &(cellVars[cellIndex].constants);
+  __global RigidBodyState* nextState = &nextStates[actorIndex];
+  __global ActorState* actorState = &actorStates[actorIndex];
+  __global Actor* actor = &(actorStates[actorIndex].constants);
   float3 position = nextState->position;
   float* positionPtr = (float*)&position;
-  float radius = cell->radius;
-  int alterEgoIndex = cell->alterEgoIndex;
-  float radiusForAlterEgo = cell->radiusForAlterEgo;
-  float mass = cell->mass;
+  float radius = actor->radius;
+  int alterEgoIndex = actor->alterEgoIndex;
+  float radiusForAlterEgo = actor->radiusForAlterEgo;
+  float mass = actor->mass;
   float smallValue = 0.0001f;
   uchar maxIntersection = 32;
   bool isFullOfIntersection = false;
@@ -67,17 +67,17 @@ __kernel void collectIntersections(
 	uint checkStartIndex = gridStartIndices[gridIndex];
 	uint checkEndIndex = gridEndIndices[gridIndex];
 	for (uint i = checkStartIndex; i < checkEndIndex && !isFullOfIntersection; i++) {
-	  ushort otherCellIndex = relations[i].cellIndex;
-	  if (otherCellIndex == cellIndex) {
+	  ushort otherActorIndex = relations[i].actorIndex;
+	  if (otherActorIndex == actorIndex) {
 	    continue;
 	  }
-	  __global Cell* otherCell = &(cellVars[otherCellIndex].constants);
-	  float3 w = nextStates[otherCellIndex].position - position;
-	  float r = alterEgoIndex == -1 || alterEgoIndex != otherCellIndex ? radius + otherCell->radius : radiusForAlterEgo + otherCell->radiusForAlterEgo;
+	  __global Actor* otherActor = &(actorStates[otherActorIndex].constants);
+	  float3 w = nextStates[otherActorIndex].position - position;
+	  float r = alterEgoIndex == -1 || alterEgoIndex != otherActorIndex ? radius + otherActor->radius : radiusForAlterEgo + otherActor->radiusForAlterEgo;
 	  float rr = r * r;
 	  float ww = dot(w, w);
 	  if (ww > 0.0f && ww <= rr + smallValue) {
-	    setIntersection(&cellVar->intersections[intersectionCount], otherCell->type, otherCellIndex, r - length(w), 0.0f, normalize(w), w);
+	    setIntersection(&actorState->intersections[intersectionCount], otherActor->type, otherActorIndex, r - length(w), 0.0f, normalize(w), w);
 	    intersectionCount++;
 	    isFullOfIntersection = intersectionCount >= maxIntersection;
 	  }
@@ -90,7 +90,7 @@ __kernel void collectIntersections(
   float* cornerPtr = (float*)&corner;
   for (uint i = 0; i < 3 && !isFullOfIntersection; i++) {
     if (positionPtr[i] <= cornerPtr[i]) {
-      setIntersection(&cellVar->intersections[intersectionCount], 1, i, cornerPtr[i] - positionPtr[i], 0.0f, -grid->normals[i], grid->normals[i] * radius);
+      setIntersection(&actorState->intersections[intersectionCount], 1, i, cornerPtr[i] - positionPtr[i], 0.0f, -grid->normals[i], grid->normals[i] * radius);
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= maxIntersection;
       if (i == 1) {
@@ -102,7 +102,7 @@ __kernel void collectIntersections(
   for (uint i = 3; i < 6 && !isFullOfIntersection; i++) {
     uint pi = i - 3;
     if (positionPtr[pi] >= -cornerPtr[pi]) {
-      setIntersection(&cellVar->intersections[intersectionCount], 1, i, positionPtr[pi] + cornerPtr[pi], 0.0f, -grid->normals[i], grid->normals[i] * radius);
+      setIntersection(&actorState->intersections[intersectionCount], 1, i, positionPtr[pi] + cornerPtr[pi], 0.0f, -grid->normals[i], grid->normals[i] * radius);
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= maxIntersection;
     }
@@ -110,26 +110,26 @@ __kernel void collectIntersections(
 
   float shellIntersectionLength = length(position) + radius - sphericalShellRadius;
   if (!isFullOfIntersection && shellIntersectionLength + smallValue > 0.0f) {
-    setIntersection(&cellVar->intersections[intersectionCount], 2, 0, shellIntersectionLength, 0.0f, normalize(position), -normalize(position) * radius);
+    setIntersection(&actorState->intersections[intersectionCount], 2, 0, shellIntersectionLength, 0.0f, normalize(position), -normalize(position) * radius);
     intersectionCount++;
     isFullOfIntersection = intersectionCount >= maxIntersection;
   }
 
   float momentOfInertia = (2.0f / 5.0f) * mass * radius * radius;
-  cellVar->momentOfInertia = momentOfInertia;
+  actorState->momentOfInertia = momentOfInertia;
   float gravityTranslation = gravityAcceleration * deltaTime;
   float gravity = isFloating ? -gravityTranslation : 0.0f;
-  cellVar->linearVelocity = nextState->linearMomentum / mass + (float3)(0.0f, gravity, 0.0f);
-  float ySpeed = cellVar->linearVelocity.y;
+  actorState->linearVelocity = nextState->linearMomentum / mass + (float3)(0.0f, gravity, 0.0f);
+  float ySpeed = actorState->linearVelocity.y;
   if (!isFloating && ySpeed * ySpeed < gravityTranslation * gravityTranslation * 16.0f) {
-    cellVar->linearVelocity.y = 0.0f;
+    actorState->linearVelocity.y = 0.0f;
   }
-  cellVar->angularVelocity = nextState->angularMomentum / momentOfInertia;
-  cellVar->isFloating = isFloating ? 1 : 0;
+  actorState->angularVelocity = nextState->angularMomentum / momentOfInertia;
+  actorState->isFloating = isFloating ? 1 : 0;
 
-  cellVar->intersectionCount = intersectionCount;
-  cellVar->collisionCount = 0;
+  actorState->intersectionCount = intersectionCount;
+  actorState->collisionCount = 0;
 
-  cellVar->massForIntersection = mass / intersectionCount;
-  cellVar->massForCollision = mass;
+  actorState->massForIntersection = mass / intersectionCount;
+  actorState->massForCollision = mass;
 }

@@ -3,14 +3,12 @@
 namespace alcube::physics::samples {
   void BenchmarkSample::runApp(int argc, char **argv) {
     unsigned int maxCellCount = 16384; // 2^14
-    std::mutex mutex;
     float deltaTime = 1.0f / 30.0f;
     auto resources = new utils::opencl::Resources();
     auto fileUtil = new utils::FileUtil();
     auto simulator = new Simulator(
       resources,
       fileUtil,
-      &mutex,
       maxCellCount,
       8,
       64,
@@ -27,7 +25,7 @@ namespace alcube::physics::samples {
     std::uniform_real_distribution<float> randReal2(-1, 1);
 
     for (int i = 0; i < maxCellCount; i++) {
-      auto cell = new Cell();
+      auto cell = new SoftBodyParticle();
       cell->position = glm::vec3(
         randReal(mt),
         randReal(mt),

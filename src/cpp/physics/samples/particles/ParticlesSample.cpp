@@ -23,7 +23,7 @@ namespace alcube::physics::samples::particles {
     return glm::rotate(t, glm::vec3(0.0f, 1.0f, 0.0f));
   }
 
-  void Particles::update(std::vector<Cell *> &cells) {
+  void Particles::update(std::vector<SoftBodyParticle *> &cells) {
     for (int i = 0; i < cells.size(); i++) {
       int j = i * 3;
       positions[j + 0] = cells[i]->position.x;
@@ -51,7 +51,7 @@ namespace alcube::physics::samples::particles {
     std::uniform_real_distribution<float> randReal3(-1, 1);
 
     for (int i = 0; i < maxCellCount; i++) {
-      auto cell = new Cell();
+      auto cell = new SoftBodyParticle();
       cell->position = glm::vec3(
         randReal(mt),
         randReal(mt),
@@ -63,7 +63,7 @@ namespace alcube::physics::samples::particles {
         randReal2(mt)
       );
       /*
-      cell->angularMomentum = glm::vec3(
+      particle->angularMomentum = glm::vec3(
         randReal2(mt),
         randReal2(mt),
         randReal2(mt)

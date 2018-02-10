@@ -19,7 +19,7 @@ namespace alcube::physics::samples::particles {
     for (int i = 0; i < size; i++) {
       for (int j = 0; j < i + 1; j++) {
         for (int k = 0; k < i + 1; k++) {
-          auto cell = new Cell();
+          auto cell = new SoftBodyParticle();
           cell->position = -glm::vec3((float)j * 2.0f, (float)i * 2.0f, (float)k * 2.0f) + glm::vec3((w / 2 - 1.0f), padding, (w / 2 - 1.0f)) + 0.01f * glm::vec3(randReal(mt), randReal(mt), randReal(mt));
           cell->mass = (4.0f / 3.0f) * 3.14f * 3.14f * 3.14f * 0.1f;
           physicsSimulator->add(cell);

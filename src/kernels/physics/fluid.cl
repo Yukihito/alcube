@@ -24,17 +24,17 @@ __kernel void inputFluid(
 }
 
 __kernel void updateDensityAndPressure(
-  __global CellVar* cellVars,
+  __global ActorState* actorStates,
   __global FluidState* fluidStates,
   __global Constants* constants
 ) {
   size_t fluidParticleIndex = get_global_id(0);
   ushort particleIndex = fluidParticleIndex + constants->rigidBodyParticleCount;
   __global FluidSettings* fluidSettings = &constants->fluidSettings;
-  __global CellVar* cellVar = &cellVars[particleIndex];
+  __global ActorState* actorState = &actorStates[particleIndex];
   __global FluidState* fluidState = &fluidStates[fluidParticleIndex];
-  uchar count = cellVar->intersectionCount;
-  __global Intersection* intersections = cellVar->intersections;
+  uchar count = actorState->intersectionCount;
+  __global Intersection* intersections = actorState->intersections;
   float hh = fluidSettings->effectiveRadius * fluidSettings->effectiveRadius;
   float density = fluidSettings->particleMass * fluidSettings->poly6Constant * hh * hh * hh;
   for (uchar i = 0; i < count; i++) {
@@ -48,7 +48,7 @@ __kernel void updateDensityAndPressure(
 
 
 __kernel void updateFluidForce(
-  __global CellVar* cellVars,
+  __global ActorState* actorStates,
   __global FluidState* fluidStates,
   __global Constants* constants
 ) {
@@ -56,10 +56,10 @@ __kernel void updateFluidForce(
   float gravity = constants->gravityAcceleration;
   size_t fluidParticleIndex = get_global_id(0);
   ushort particleIndex = fluidParticleIndex + constants->rigidBodyParticleCount;
-  __global CellVar* cellVar = &cellVars[particleIndex];
+  __global ActorState* actorState = &actorStates[particleIndex];
   __global FluidState* fluidState = &fluidStates[fluidParticleIndex];
-  uchar count = cellVar->intersectionCount;
-  __global Intersection* intersections = cellVar->intersections;
+  uchar count = actorState->intersectionCount;
+  __global Intersection* intersections = actorState->intersections;
   float density = fluidState->density;
   float3 velocity = fluidState->velocity;
   float3 force = (float3)(0.0f, -gravity * density, 0.0f);

@@ -13,7 +13,7 @@ namespace alcube::physics::samples::particles {
 
       void onDraw() override;
     private:
-      std::vector<Cell*> cells;
+      std::vector<SoftBodyParticle*> cells;
       Particles* particles;
   };
 }

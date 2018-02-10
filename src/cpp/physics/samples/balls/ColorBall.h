@@ -2,7 +2,7 @@
 #define ALCUBE_COLORBALL_H
 
 #include "../../../drawing/Material.h"
-#include "../../Cell.h"
+#include "../../SoftBodyParticle.h"
 #include "../../../drawing/shapes/Shapes.h"
 #include "../../../drawing/shaders/Shaders.h"
 #include "../../../drawing/Drawable.h"
@@ -11,7 +11,7 @@
 
 namespace alcube::physics::samples::balls {
 
-  class ColorBall : public drawing::Drawable, public Cell {
+  class ColorBall : public drawing::Drawable, public SoftBodyParticle {
     public:
       ColorBall(drawing::shapes::Shapes *shapes, drawing::shaders::Shaders *shaders, glm::vec3 diffuse, bool showsLinearMomentum);
 

@@ -2,7 +2,7 @@
 #define ALCUBE_BALLSSAMPLE_H
 
 #include "../../../drawing/Drawable.h"
-#include "../../Cell.h"
+#include "../../SoftBodyParticle.h"
 #include "../../Simulator.h"
 #include "../../../drawing/Drawer.h"
 #include "../../../drawing/shapes/Shapes.h"
@@ -14,7 +14,7 @@
 #include <glm/gtx/transform.hpp>
 
 namespace alcube::physics::samples::balls {
-  class Ball : public drawing::Drawable, public Cell {
+  class Ball : public drawing::Drawable, public SoftBodyParticle {
     public:
       Ball(drawing::shapes::Shapes* shapes, drawing::shaders::Shaders* shaders);
     protected:

@@ -36,7 +36,6 @@ namespace alcube::physics::samples {
     physicsSimulator = new Simulator(
       resources,
       fileUtil,
-      &mutex,
       maxCellCount,
       gridEdgeLength,
       xGridCount,

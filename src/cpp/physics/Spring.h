@@ -1,12 +1,12 @@
 #ifndef ALCUBE_SPRING_H
 #define ALCUBE_SPRING_H
 
-#include "Cell.h"
+#include "SoftBodyParticle.h"
 
 namespace alcube::physics {
   class SpringNode {
     public:
-      Cell* cell;
+      SoftBodyParticle* particle;
       glm::vec3 position;
   };
 

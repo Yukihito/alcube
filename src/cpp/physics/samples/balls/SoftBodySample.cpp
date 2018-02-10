@@ -1,7 +1,7 @@
 #include "SoftBodySample.h"
 
 namespace alcube::physics::samples::balls {
-  SoftBodySample::SoftBodySample() : BaseApplication(1600, 1200, 30, "SoftBodySample") {}
+  SoftBodySample::SoftBodySample() : BaseApplication(1600, 1200, 60, "SoftBodySample") {}
 
   void SoftBodySample::add(ColorBall *ball) {
     drawer->add(ball);
@@ -41,9 +41,9 @@ namespace alcube::physics::samples::balls {
         for (int x = 0; x < softBodySize; x++) {
           if (x + 1 < softBodySize) {
             auto springX = new Spring();
-            springX->nodes[0].cell = physicsSimulator->getCell(index);
+            springX->nodes[0].particle = physicsSimulator->getSoftBodyParticle(index);
             springX->nodes[0].position = glm::vec3(1.0f, 0.0f, 0.0f);
-            springX->nodes[1].cell = physicsSimulator->getCell(index + 1);
+            springX->nodes[1].particle = physicsSimulator->getSoftBodyParticle(index + 1);
             springX->nodes[1].position = glm::vec3(-1.0f, 0.0f, 0.0f);
             springX->k = k;
             physicsSimulator->add(springX);
@@ -51,9 +51,9 @@ namespace alcube::physics::samples::balls {
 
           if (y + 1 < softBodySize) {
             auto springY = new Spring();
-            springY->nodes[0].cell = physicsSimulator->getCell(index);
+            springY->nodes[0].particle = physicsSimulator->getSoftBodyParticle(index);
             springY->nodes[0].position = glm::vec3(0.0f, 1.0f, 0.0f);
-            springY->nodes[1].cell = physicsSimulator->getCell(index + softBodySize);
+            springY->nodes[1].particle = physicsSimulator->getSoftBodyParticle(index + softBodySize);
             springY->nodes[1].position = glm::vec3(0.0f, -1.0f, 0.0f);
             springY->k = k;
             physicsSimulator->add(springY);
@@ -61,9 +61,9 @@ namespace alcube::physics::samples::balls {
 
           if (z + 1 < softBodySize) {
             auto springZ = new Spring();
-            springZ->nodes[0].cell = physicsSimulator->getCell(index);
+            springZ->nodes[0].particle = physicsSimulator->getSoftBodyParticle(index);
             springZ->nodes[0].position = glm::vec3(0.0f, 0.0f, 1.0f);
-            springZ->nodes[1].cell = physicsSimulator->getCell(index + softBodySize * softBodySize);
+            springZ->nodes[1].particle = physicsSimulator->getSoftBodyParticle(index + softBodySize * softBodySize);
             springZ->nodes[1].position = glm::vec3(0.0f, 0.0f, -1.0f);
             springZ->k = k;
             physicsSimulator->add(springZ);

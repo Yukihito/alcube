@@ -12,7 +12,7 @@ namespace alcube::physics {
       Simulator *simulator;
       utils::opencl::Resources *resources;
       std::mutex mutex;
-      std::vector<alcube::physics::Cell *> cells;
+      std::vector<alcube::physics::SoftBodyParticle *> cells;
       unsigned short maxCellCount = 16384; // 2^14
       unsigned int gridEdgeLength = 8;
       unsigned int xGridCount = 64;
@@ -38,7 +38,7 @@ namespace alcube::physics {
 
       virtual void TearDown() { // NOLINT
         resources->release();
-        for (Cell *cell: cells) {
+        for (SoftBodyParticle *cell: cells) {
           delete cell;
         }
         cells.clear();
@@ -50,7 +50,7 @@ namespace alcube::physics {
         std::uniform_real_distribution<float> randReal(-50, 50);
 
         for (int i = 0; i < count; i++) {
-          auto cell = new Cell();
+          auto cell = new SoftBodyParticle();
           cell->position = glm::vec3(
             randReal(mt),
             randReal(mt),
@@ -60,7 +60,7 @@ namespace alcube::physics {
         }
       }
 
-      void addCell(Cell* cell) {
+      void addCell(SoftBodyParticle* cell) {
         simulator->add(cell);
         cells.push_back(cell);
       }
@@ -70,7 +70,7 @@ namespace alcube::physics {
         simulator->input();
         simulator->setUpMemories();
         simulator->computeBroadPhase();
-        simulator->read(simulator->memories.gridAndCellRelations, simulator->dtos.gridAndCellRelations);
+        simulator->read(simulator->memories.gridAndActorRelations, simulator->dtos.gridAndActorRelations);
         simulator->read(simulator->memories.gridStartIndices, simulator->dtos.gridStartIndices);
         simulator->read(simulator->memories.gridEndIndices, simulator->dtos.gridEndIndices);
         simulator->tearDownMemories();
@@ -82,7 +82,7 @@ namespace alcube::physics {
         simulator->setUpMemories();
         simulator->computeBroadPhase();
         simulator->computeNarrowPhase(deltaTime);
-        simulator->read(simulator->memories.cellVars, simulator->dtos.cellVars);
+        simulator->read(simulator->memories.actorStates, simulator->dtos.actorStates);
         simulator->tearDownMemories();
       }
 
@@ -94,7 +94,7 @@ namespace alcube::physics {
         simulator->computeNarrowPhase(deltaTime);
         simulator->motion(deltaTime);
         simulator->resolveIntersection();
-        simulator->read(simulator->memories.cellVars, simulator->dtos.cellVars);
+        simulator->read(simulator->memories.actorStates, simulator->dtos.actorStates);
         simulator->read(simulator->memories.nextStates, simulator->dtos.nextStates);
         simulator->tearDownMemories();
       }
@@ -108,9 +108,9 @@ namespace alcube::physics {
     bool foundInvalidOrderRelation = false;
     bool foundInvalidGridIndexRelation = false;
     bool foundInvalidCellIndexRelation = false;
-    unsigned int prevGridIndex = simulator->dtos.gridAndCellRelations[0].gridIndex;
+    unsigned int prevGridIndex = simulator->dtos.gridAndActorRelations[0].gridIndex;
     for (int i = 0; i < allCellCount; i++) {
-      auto relation = simulator->dtos.gridAndCellRelations[i];
+      auto relation = simulator->dtos.gridAndActorRelations[i];
       if (relation.gridIndex < prevGridIndex) {
         foundInvalidOrderRelation = true;
         break;
@@ -119,7 +119,7 @@ namespace alcube::physics {
         foundInvalidGridIndexRelation = true;
         break;
       }
-      if (relation.cellIndex >= allCellCount) {
+      if (relation.actorIndex >= allCellCount) {
         foundInvalidCellIndexRelation = true;
         break;
       }
@@ -135,8 +135,8 @@ namespace alcube::physics {
     for (unsigned int i = 0; i < allGridCount; i++) {
       for (unsigned int j = simulator->dtos.gridStartIndices[i]; j < simulator->dtos.gridEndIndices[i]; j++) {
         registeredCellCount++;
-        auto relation = simulator->dtos.gridAndCellRelations[j];
-        if (relation.cellIndex >= allCellCount) {
+        auto relation = simulator->dtos.gridAndActorRelations[j];
+        if (relation.actorIndex >= allCellCount) {
           foundInvalidCellIndex = true;
         }
         if (relation.gridIndex >= allGridCount) {
@@ -150,7 +150,7 @@ namespace alcube::physics {
   }
 
   TEST_F(SimulatorTest, broadPhase2) { // NOLINT
-    // Expected gridAndCellRelations are
+    // Expected gridAndActorRelations are
     // 0 ~ allCellCount - 1               : Sorted relations.
     // allCellCount ~ sortTargetCount - 1 : Padding values.
     // sortTargetCount ~ maxCellCount     : Not initialized values.
@@ -163,9 +163,9 @@ namespace alcube::physics {
     bool foundInvalidOrderRelation = false;
     bool foundInvalidGridIndexRelation = false;
     bool foundInvalidCellIndexRelation = false;
-    unsigned int prevGridIndex = simulator->dtos.gridAndCellRelations[0].gridIndex;
+    unsigned int prevGridIndex = simulator->dtos.gridAndActorRelations[0].gridIndex;
     for (int i = 0; i < allCellCount; i++) {
-      auto relation = simulator->dtos.gridAndCellRelations[i];
+      auto relation = simulator->dtos.gridAndActorRelations[i];
       if (relation.gridIndex < prevGridIndex) {
         foundInvalidOrderRelation = true;
         break;
@@ -174,7 +174,7 @@ namespace alcube::physics {
         foundInvalidGridIndexRelation = true;
         break;
       }
-      if (relation.cellIndex >= allCellCount) {
+      if (relation.actorIndex >= allCellCount) {
         foundInvalidCellIndexRelation = true;
         break;
       }
@@ -185,8 +185,8 @@ namespace alcube::physics {
     ASSERT_FALSE(foundInvalidGridIndexRelation);
     bool foundInvalidPaddingRelation = false;
     for (int i = allCellCount; i < sortTargetCount; i++) {
-      auto relation = simulator->dtos.gridAndCellRelations[i];
-      if (relation.gridIndex != allGridCount || relation.cellIndex != maxCellCount) {
+      auto relation = simulator->dtos.gridAndActorRelations[i];
+      if (relation.gridIndex != allGridCount || relation.actorIndex != maxCellCount) {
         foundInvalidPaddingRelation = true;
       }
     }
@@ -198,8 +198,8 @@ namespace alcube::physics {
     for (unsigned int i = 0; i < allGridCount; i++) {
       for (unsigned int j = simulator->dtos.gridStartIndices[i]; j < simulator->dtos.gridEndIndices[i]; j++) {
         registeredCellCount++;
-        auto relation = simulator->dtos.gridAndCellRelations[j];
-        if (relation.cellIndex >= allCellCount) {
+        auto relation = simulator->dtos.gridAndActorRelations[j];
+        if (relation.actorIndex >= allCellCount) {
           foundInvalidCellIndex = true;
         }
         if (relation.gridIndex >= allGridCount) {
@@ -217,23 +217,23 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellIndices[0], 1);
+    ASSERT_FALSE(simulator->dtos.actorStates[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellIndices[0], 1);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellIndices[0], 0);
+    ASSERT_FALSE(simulator->dtos.actorStates[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellIndices[0], 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase2) { // NOLINT
@@ -241,21 +241,21 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.actorStates[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellCount, 0);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.actorStates[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellCount, 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase3) { // NOLINT
@@ -263,23 +263,23 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f + movingDistance + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.actorStates[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellCount, 0);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.actorStates[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellCount, 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase4) { // NOLINT
@@ -287,27 +287,27 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_TRUE(simulator->dtos.cellVars[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellIndices[0], 1);
-    ASSERT_EQ(simulator->dtos.cellVars[0].collisionCellIndex, 1);
+    ASSERT_TRUE(simulator->dtos.actorStates[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellIndices[0], 1);
+    ASSERT_EQ(simulator->dtos.actorStates[0].collisionCellIndex, 1);
 
-    ASSERT_TRUE(simulator->dtos.cellVars[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellIndices[0], 0);
-    ASSERT_EQ(simulator->dtos.cellVars[1].collisionCellIndex, 0);
+    ASSERT_TRUE(simulator->dtos.actorStates[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellIndices[0], 0);
+    ASSERT_EQ(simulator->dtos.actorStates[1].collisionCellIndex, 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase5) { // NOLINT
@@ -315,23 +315,23 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(-1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f + movingDistance + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.actorStates[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellCount, 0);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 0);
+    ASSERT_FALSE(simulator->dtos.actorStates[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellCount, 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase6) { // NOLINT
@@ -339,25 +339,25 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(-1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
     addCell(cell1);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellIndices[0], 1);
+    ASSERT_FALSE(simulator->dtos.actorStates[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellIndices[0], 1);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellIndices[0], 0);
+    ASSERT_FALSE(simulator->dtos.actorStates[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellIndices[0], 0);
   }
 
   TEST_F(SimulatorTest, narrowPhase7) { // NOLINT
@@ -365,13 +365,13 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.5f, 0.0f);
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f + smallDistance, 0.0f, 0.0f);
-    auto cell2 = new Cell();
+    auto cell2 = new SoftBodyParticle();
     cell1->position = glm::vec3(0.0f, 2.0f + smallDistance, 0.0f);
 
     addCell(cell0);
@@ -379,20 +379,20 @@ namespace alcube::physics {
     addCell(cell2);
     simulateNarrowPhase(deltaTime);
 
-    ASSERT_TRUE(simulator->dtos.cellVars[0].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[0].collisionCellIndex, 1);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellCount, 2);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellIndices[0], 1);
-    ASSERT_EQ(simulator->dtos.cellVars[0].neighborCellIndices[1], 2);
+    ASSERT_TRUE(simulator->dtos.actorStates[0].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[0].collisionCellIndex, 1);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellCount, 2);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellIndices[0], 1);
+    ASSERT_EQ(simulator->dtos.actorStates[0].neighborCellIndices[1], 2);
 
-    ASSERT_TRUE(simulator->dtos.cellVars[1].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[1].collisionCellIndex, 0);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cellVars[1].neighborCellIndices[0], 0);
+    ASSERT_TRUE(simulator->dtos.actorStates[1].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[1].collisionCellIndex, 0);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.actorStates[1].neighborCellIndices[0], 0);
 
-    ASSERT_FALSE(simulator->dtos.cellVars[2].collisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[2].neighborCellCount, 1);
-    ASSERT_EQ(simulator->dtos.cellVars[2].neighborCellIndices[0], 0);
+    ASSERT_FALSE(simulator->dtos.actorStates[2].collisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[2].neighborCellCount, 1);
+    ASSERT_EQ(simulator->dtos.actorStates[2].neighborCellIndices[0], 0);
   }
 
   TEST_F(SimulatorTest, all1) { // NOLINT
@@ -400,12 +400,12 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -421,13 +421,13 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     cell0->elasticity = 0.5f;
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -443,13 +443,13 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     cell0->elasticity = 0.0f;
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -466,13 +466,13 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
     glm::vec3 corner = -glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
-    auto cell = new Cell();
+    auto cell = new SoftBodyParticle();
     cell->position = glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
     cell->linearMomentum = glm::vec3(-0.5f, -1.0f, -0.5f);
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_TRUE(simulator->dtos.cellVars[0].wallCollisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[0].collisionWallAxis, 1);
+    ASSERT_TRUE(simulator->dtos.actorStates[0].wallCollisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[0].collisionWallAxis, 1);
     ASSERT_GT(simulator->dtos.nextStates[0].linearMomentum.x, -0.5f);
     ASSERT_GT(simulator->dtos.nextStates[0].linearMomentum.y, 1.0f);
     ASSERT_GT(simulator->dtos.nextStates[0].linearMomentum.z, -0.5f);
@@ -482,16 +482,16 @@ namespace alcube::physics {
   }
 
   TEST_F(SimulatorTest, all5) { // NOLINT
-    // Cell intersects corner (Grid start position) occurs.
+    // SoftBodyParticle intersects corner (Grid start position) occurs.
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
     glm::vec3 corner = -glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
-    auto cell = new Cell();
+    auto cell = new SoftBodyParticle();
     cell->position = glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_FALSE(simulator->dtos.cellVars[0].wallCollisionOccurred);
+    ASSERT_FALSE(simulator->dtos.actorStates[0].wallCollisionOccurred);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x + 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y + 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z + 1.0f);
@@ -503,14 +503,14 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
     glm::vec3 corner = glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
-    auto cell = new Cell();
+    auto cell = new SoftBodyParticle();
     cell->position = -glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
     cell->linearMomentum = glm::vec3(0.5f, 1.0f, 0.5f);
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_TRUE(simulator->dtos.cellVars[0].wallCollisionOccurred);
-    ASSERT_EQ(simulator->dtos.cellVars[0].collisionWallAxis, 1);
-    ASSERT_EQ(simulator->dtos.cellVars[0].collisionType, 0);
+    ASSERT_TRUE(simulator->dtos.actorStates[0].wallCollisionOccurred);
+    ASSERT_EQ(simulator->dtos.actorStates[0].collisionWallAxis, 1);
+    ASSERT_EQ(simulator->dtos.actorStates[0].collisionType, 0);
     ASSERT_LT(simulator->dtos.nextStates[0].linearMomentum.x, 0.5f);
     ASSERT_LT(simulator->dtos.nextStates[0].linearMomentum.y, -1.0f);
     ASSERT_LT(simulator->dtos.nextStates[0].linearMomentum.z, 0.5f);
@@ -520,16 +520,16 @@ namespace alcube::physics {
   }
 
   TEST_F(SimulatorTest, all7) { // NOLINT
-    // Cell intersects corner (Grid end position) occurs.
+    // SoftBodyParticle intersects corner (Grid end position) occurs.
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
     glm::vec3 corner = glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
-    auto cell = new Cell();
+    auto cell = new SoftBodyParticle();
     cell->position = -glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
     addCell(cell);
     simulateAll(deltaTime);
-    ASSERT_FALSE(simulator->dtos.cellVars[0].wallCollisionOccurred);
+    ASSERT_FALSE(simulator->dtos.actorStates[0].wallCollisionOccurred);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.x, corner.x - 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.y, corner.y - 1.0f);
     ASSERT_EQ(simulator->dtos.nextStates[0].position.z, corner.z - 1.0f);
@@ -540,12 +540,12 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new Cell();
+    auto cell0 = new SoftBodyParticle();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.5f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new Cell();
+    auto cell1 = new SoftBodyParticle();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
     cell1->linearMomentum = glm::vec3(-1.0f, -0.5f, 0.0f);
 
@@ -554,8 +554,8 @@ namespace alcube::physics {
     addCell(cell0);
     addCell(cell1);
     simulateAll(deltaTime);
-    ASSERT_TRUE(simulator->dtos.cellVars[0].collisionOccurred);
-    ASSERT_TRUE(simulator->dtos.cellVars[1].collisionOccurred);
+    ASSERT_TRUE(simulator->dtos.actorStates[0].collisionOccurred);
+    ASSERT_TRUE(simulator->dtos.actorStates[1].collisionOccurred);
     cl_float3 m0 = simulator->dtos.nextStates[0].linearMomentum;
     cl_float3 m1 = simulator->dtos.nextStates[1].linearMomentum;
 

@@ -2,7 +2,6 @@
 #define ALCUBE_PHYSICS_SIMULATOR_H
 
 #include <vector>
-#include <mutex>
 #include <random>
 #include "../utils/opencl/CommandQueue.h"
 #include "../utils/opencl/conversions.h"
@@ -14,7 +13,7 @@
 #include "../utils/opencl/conversions.h"
 #include "../utils/alcubemath.h"
 #include "opencl/dtos.h"
-#include "Cell.h"
+#include "SoftBodyParticle.h"
 #include "Spring.h"
 #include "../utils/opencl/Simulator.h"
 #include "FluidParticle.h"
@@ -24,11 +23,11 @@ namespace alcube::physics {
   class Dtos {
     public:
       opencl::dtos::Grid* grid;
-      opencl::dtos::Cell* cells;
-      opencl::dtos::CellVar* cellVars;
+      opencl::dtos::Actor* actors;
+      opencl::dtos::ActorState* actorStates;
       opencl::dtos::RigidBodyState* currentStates;
       opencl::dtos::RigidBodyState* nextStates;
-      opencl::dtos::GridAndCellRelation* gridAndCellRelations;
+      opencl::dtos::GridAndActorRelation* gridAndActorRelations;
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
       opencl::dtos::Spring* springs;
@@ -41,11 +40,11 @@ namespace alcube::physics {
   class Memories {
     public:
       utils::opencl::Memory* grid;
-      utils::opencl::Memory* cells;
-      utils::opencl::Memory* cellVars;
+      utils::opencl::Memory* actors;
+      utils::opencl::Memory* actorStates;
       utils::opencl::Memory* currentStates;
       utils::opencl::Memory* nextStates;
-      utils::opencl::Memory* gridAndCellRelations;
+      utils::opencl::Memory* gridAndActorRelations;
       utils::opencl::Memory* gridStartIndices;
       utils::opencl::Memory* gridEndIndices;
       utils::opencl::Memory* springs;
@@ -62,7 +61,7 @@ namespace alcube::physics {
       cl_kernel merge;
       cl_kernel bitonic;
       cl_kernel setGridRelationIndexRange;
-      cl_kernel initGridAndCellRelations;
+      cl_kernel initGridAndActorRelations;
       cl_kernel collectIntersections;
       cl_kernel updateByPenaltyImpulse;
       cl_kernel updateByFrictionalImpulse;
@@ -83,18 +82,17 @@ namespace alcube::physics {
       explicit Simulator(
         utils::opencl::Resources* resources,
         utils::FileUtil* fileUtil,
-        std::mutex* cellsMutex,
-        unsigned int maxCellCount,
+        unsigned int maxActorCount,
         unsigned int gridEdgeLength,
         unsigned int xGridCount,
         unsigned int yGridCount,
         unsigned int zGridCount
       );
 
-      void add(Cell* cell);
+      void add(SoftBodyParticle* softBodyParticle);
       void add(Spring* spring);
       void add(FluidParticle* fluidParticle);
-      Cell* getCell(unsigned long i);
+      SoftBodyParticle* getSoftBodyParticle(unsigned long i);
       void update(float deltaTime) override;
       float gravity;
       float sphericalShellRadius;
@@ -102,16 +100,15 @@ namespace alcube::physics {
       Memories memories;
       Kernels kernels;
     private:
-      std::mutex* cellsMutex;
-      std::vector<Cell*> cells;
+      std::vector<SoftBodyParticle*> softBodyParticles;
       std::vector<FluidParticle*> fluidParticles;
       std::vector<Spring*> springs;
       unsigned int allGridCount;
-      unsigned int rigidBodyParticleCount;
-      unsigned int maxParticleCount;
-      unsigned int particleCount;
-      unsigned int particleCountForBitonicSort;
-      unsigned int maxParticleCountForBitonicSort;
+      unsigned int softBodyParticleCount;
+      unsigned int maxActorCount;
+      unsigned int actorCount;
+      unsigned int actorCountForBitonicSort;
+      unsigned int maxActorCountForBitonicSort;
       unsigned int springCount;
       unsigned int maxSpringCount;
       unsigned int fluidParticleCount;

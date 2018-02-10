@@ -19,46 +19,46 @@ __kernel void inputConstants(
   constants->fluidParticleCount = fluidParticleCount;
 }
 
-__kernel void initGridAndCellRelations(
-  __global GridAndCellRelation* relations,
+__kernel void initGridAndActorRelations(
+  __global GridAndActorRelation* relations,
   const uint gridIndex,
-  const unsigned short cellIndex
+  const unsigned short actorIndex
 ) {
   size_t i = get_global_id(0);
   relations[i].gridIndex = gridIndex;
-  relations[i].cellIndex = cellIndex;
+  relations[i].actorIndex = actorIndex;
 }
 
 __kernel void fillGridIndex(
   __global const Grid* grid,
-  __global const Cell* cells,
-  __global CellVar* cellVars,
+  __global const Actor* actors,
+  __global ActorState* actorStates,
   __global const RigidBodyState* currentStates,
   __global RigidBodyState* nextStates,
-  __global GridAndCellRelation* relations
+  __global GridAndActorRelation* relations
 ) {
-  size_t cellIndex = get_global_id(0);
+  size_t actorIndex = get_global_id(0);
   float edgeLength = grid->edgeLength;
-  float3 position = currentStates[cellIndex].position;
+  float3 position = currentStates[actorIndex].position;
   float3 positionGridSpace = position - grid->origin;
   uint3 gridCorner0 = (uint3)(0);
   uint3 gridCorner1 = (uint3)(grid->xCount - 1, grid->yCount - 1, grid->zCount - 1);
   uint3 p = clamp(convert_uint3(positionGridSpace / edgeLength), gridCorner0, gridCorner1);
   uint gridIndex = (uint)p.x + (uint)p.y * grid->xCount + (uint)p.z * grid->xCount * grid->yCount;
-  relations[cellIndex].cellIndex = cellIndex;
-  relations[cellIndex].gridIndex = gridIndex;
-  nextStates[cellIndex] = currentStates[cellIndex];
-  cellVars[cellIndex].constants = cells[cellIndex];
+  relations[actorIndex].actorIndex = actorIndex;
+  relations[actorIndex].gridIndex = gridIndex;
+  nextStates[actorIndex] = currentStates[actorIndex];
+  actorStates[actorIndex].constants = actors[actorIndex];
 }
 
 __kernel void merge(
-  __global GridAndCellRelation* relations,
+  __global GridAndActorRelation* relations,
   const uint distance
 ) {
   uint index = get_global_id(0);
   if (index % (distance << 1) < distance) {
-    GridAndCellRelation left = relations[index];
-    GridAndCellRelation right = relations[index + distance];
+    GridAndActorRelation left = relations[index];
+    GridAndActorRelation right = relations[index + distance];
     bool b = left.gridIndex < right.gridIndex;
     relations[index] = b ? left : right;
     relations[index + distance] = b ? right : left;
@@ -66,15 +66,15 @@ __kernel void merge(
 }
 
 __kernel void bitonic(
-  __global GridAndCellRelation* relations,
+  __global GridAndActorRelation* relations,
   const uint distance,
   const uint stageDistance
 ) {
   uint index = get_global_id(0);
   if (index % (distance << 1) < distance) {
     uint middleDistance = stageDistance << 1; // * 2
-    GridAndCellRelation left = relations[index];
-    GridAndCellRelation right = relations[index + distance];
+    GridAndActorRelation left = relations[index];
+    GridAndActorRelation right = relations[index + distance];
     bool b1 = left.gridIndex < right.gridIndex;
     bool b2 = index % (middleDistance << 1) >= middleDistance;
     bool b3 = !(b1 ^ b2);
@@ -84,10 +84,10 @@ __kernel void bitonic(
 }
 
 __kernel void setGridRelationIndexRange(
-  __global GridAndCellRelation* relations,
+  __global GridAndActorRelation* relations,
   __global uint* gridStartIndices,
   __global uint* gridEndIndices,
-  const uint cellCount
+  const uint actorCount
 ) {
   uint current = get_global_id(0);
   uint next = current + 1;
@@ -100,7 +100,7 @@ __kernel void setGridRelationIndexRange(
     gridEndIndices[currentGridIndex] = next;
     gridStartIndices[nextGridIndex] = next;
   }
-  if (next == cellCount - 1) {
+  if (next == actorCount - 1) {
     gridEndIndices[nextGridIndex] = next + 1;
   }
 }

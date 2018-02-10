@@ -30,6 +30,7 @@ namespace alcube::utils::opencl {
       char buffer[65536];
       clGetProgramBuildInfo(program, this->resources->deviceId, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &length);
       std::cout << "--- Build log ---\n " << buffer << std::endl;
+      exit(1);
     }
     this->resources->programs.push_back(program);
     return program;

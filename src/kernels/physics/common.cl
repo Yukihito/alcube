@@ -12,11 +12,11 @@ typedef struct __attribute__ ((packed)) GridStruct {
   float3 normals[6];
 } Grid;
 
-typedef struct __attribute__ ((packed)) GridAndCellRelationStruct {
+typedef struct __attribute__ ((packed)) GridAndActorRelationStruct {
   unsigned int gridIndex;
-  unsigned short cellIndex;
+  unsigned short actorIndex;
   short padding;
-} GridAndCellRelation;
+} GridAndActorRelation;
 
 typedef struct __attribute__ ((packed)) RigidBodyStateStruct {
   float3 position;
@@ -25,7 +25,7 @@ typedef struct __attribute__ ((packed)) RigidBodyStateStruct {
   float3 angularMomentum;
 } RigidBodyState;
 
-typedef struct __attribute__ ((packed)) CellStruct {
+typedef struct __attribute__ ((packed)) ActorStruct {
   float radius;
   float mass;
   unsigned short type;
@@ -38,7 +38,7 @@ typedef struct __attribute__ ((packed)) CellStruct {
   uint springCount;
   int alterEgoIndex;
   float radiusForAlterEgo;
-} Cell;
+} Actor;
 
 typedef struct __attribute__ ((packed)) IntersectionStruct {
   unsigned short type;
@@ -50,8 +50,8 @@ typedef struct __attribute__ ((packed)) IntersectionStruct {
   float distance;
 } Intersection;
 
-typedef struct __attribute__ ((packed)) CellVarStruct {
-  Cell constants;
+typedef struct __attribute__ ((packed)) ActorStateStruct {
+  Actor constants;
   float3 linearVelocity;
   float3 angularVelocity;
   float momentOfInertia;
@@ -62,12 +62,12 @@ typedef struct __attribute__ ((packed)) CellVarStruct {
   int isFloating;
   unsigned char collisionIndices[32];
   Intersection intersections[32];
-} CellVar;
+} ActorState;
 
 typedef struct __attribute__ ((packed)) SpringStruct {
   float k;
   float3 nodePositionsModelSpace[2];
-  ushort cellIndices[2];
+  ushort actorIndices[2];
 } Spring;
 
 typedef struct __attribute__ ((packed)) SpringVarStruct {
