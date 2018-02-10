@@ -1,0 +1,10 @@
+{
+  "name": "alcube",
+  "version": "0.0.0",
+  "description": "Artificial life simulator.",
+  "private": true,
+  "devDependencies": {
+    "coffeescript": "^2.2.1",
+    "gulp": "^3.9.1"
+  }
+}

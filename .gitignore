@@ -1,3 +1,6 @@
 .idea/*
 cmake-build-debug/*
 cmake-build-release/*
+package-lock.json
+node_modules/*
+venv/*
