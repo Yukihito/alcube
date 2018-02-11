@@ -1,0 +1,9 @@
+#ifndef ALCUBE_PHYSICS_OPENCL_DTOS_H
+#define ALCUBE_PHYSICS_OPENCL_DTOS_H
+
+#include <CL/cl.h>
+
+namespace alcube::physics::opencl::dtos {
+$classes
+}
+#endif //ALCUBE_PHYSICS_OPENCL_DTOS_H

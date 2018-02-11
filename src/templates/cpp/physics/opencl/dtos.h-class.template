@@ -1,0 +1,6 @@
+#pragma pack(push, 1)
+  class $class_name {
+    public:
+$fields
+  };
+#pragma pack(pop)

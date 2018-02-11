@@ -1,0 +1,3 @@
+typedef struct __attribute__ ((packed)) ${name}Struct {
+$fields
+} $name;

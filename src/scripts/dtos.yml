@@ -59,13 +59,13 @@ Spring:
   - ushort[2] actorIndices
 
 SpringVar:
-  - float3[2] linearImpulses[2]
-  - float3[2] angularImpulses[2]
+  - float3[2] linearImpulses
+  - float3[2] angularImpulses
 
 FluidState:
   - float3 velocity
-  - float pressure
-  - float density
+  - float  pressure
+  - float  density
   - float3 force
 
 FluidSettings:
