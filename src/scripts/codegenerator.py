@@ -206,7 +206,9 @@ def generate(create_text):
     if raw_struct_definitions is None:
         raise InputNotSpecified()
     struct_definitions = []
-    for name, raw_field_definitions in raw_struct_definitions.items():
+    items = list(raw_struct_definitions.items())
+    items.sort()
+    for name, raw_field_definitions in items:
         struct_definition = StructDefinition(name, raw_field_definitions)
         struct_definitions.append(struct_definition)
 

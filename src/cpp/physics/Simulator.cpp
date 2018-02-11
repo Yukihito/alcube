@@ -23,6 +23,7 @@ namespace alcube::physics {
     sphericalShellRadius = 100000.0f;
 
     cl_program program = programFactory->create({
+      "../src/kernels/physics/dtos.cl",
       "../src/kernels/physics/common.cl",
       "../src/kernels/physics/broadphase.cl",
       "../src/kernels/physics/narrowphase.cl",
