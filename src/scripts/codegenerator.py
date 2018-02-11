@@ -36,6 +36,10 @@ class UndefinedTypeFieldDefinitions(Exception):
         self.field_definitions = field_definitions
 
 
+class InputNotSpecified(Exception):
+    pass
+
+
 class FieldDefinition:
     """
     :type owner: StructDefinition
@@ -198,14 +202,11 @@ def generate(create_text):
     defined_type_definitions_map = dict()
     for type_definition in builtin_type_definitions:
         defined_type_definitions_map[type_definition.name] = type_definition
-
-    source_dir_path = path.dirname(path.abspath(__file__))
-    dtos_definition_file_path = '{}/dtos.yml'.format(source_dir_path)
-    with open(dtos_definition_file_path, encoding='utf-8') as file:
-        raw_definitions = yaml.load(file)
-
+    raw_struct_definitions = yaml.load(sys.stdin.read())
+    if raw_struct_definitions is None:
+        raise InputNotSpecified()
     struct_definitions = []
-    for name, raw_field_definitions in raw_definitions.items():
+    for name, raw_field_definitions in raw_struct_definitions.items():
         struct_definition = StructDefinition(name, raw_field_definitions)
         struct_definitions.append(struct_definition)
 
@@ -262,6 +263,9 @@ def _main():
         for field_definition in e.field_definitions:
             print('Undefined type used in definition of {}#{}: {}'.format(
                 field_definition.owner.name, field_definition.name, field_definition.type_name), file=sys.stderr)
+        exit(1)
+    except InputNotSpecified:
+        print('Input not specified', file=sys.stderr)
         exit(1)
 
 
