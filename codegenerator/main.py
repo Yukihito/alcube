@@ -5,6 +5,7 @@ from typing import Dict
 import sys
 from string import Template
 import argparse
+from . import errors
 
 
 def load_template(template_path):
@@ -20,24 +21,6 @@ class TypeDefinition:
         self.name = name
         self.cpp_name = cpp_name
         self.size = size
-
-
-class InvalidFieldFormatDefinition(Exception):
-    def __init__(self, type_name, specified_text):
-        self.type_name = type_name
-        self.specified_text = specified_text
-
-
-class UndefinedTypeFieldDefinitions(Exception):
-    """
-    :type field_definitions: list[FieldDefinition]
-    """
-    def __init__(self, field_definitions):
-        self.field_definitions = field_definitions
-
-
-class InputNotSpecified(Exception):
-    pass
 
 
 class FieldDefinition:
@@ -77,7 +60,7 @@ class StructDefinition:
             regex = r'^\s*(?P<type_name>\w+)(?P<length>(\[\d+\])?)\s+(?P<field_name>\w+)\s*$'
             result = re.match(regex, raw_field_definition)
             if result is None:
-                raise InvalidFieldFormatDefinition(name, raw_field_definition)
+                raise errors.InvalidFieldFormatDefinition(name, raw_field_definition)
             type_name = result.group('type_name')
             length = None
             field_name = result.group('field_name')
@@ -122,7 +105,7 @@ def create_cpp_text(struct_definitions):
     :type struct_definitions: list[StructDefinition]
     """
     source_dir_path = path.dirname(path.abspath(__file__))
-    template_dir_path = '{}/templates/cpp/physics/opencl'.format(source_dir_path[:-len('/scripts')])
+    template_dir_path = '{}/src/templates/cpp/physics/opencl'.format(source_dir_path[:-len('/codegenerator')])
     root_template = load_template('{}/dtos.h.template'.format(template_dir_path))
     class_template = load_template('{}/dtos.h-class.template'.format(template_dir_path))
     field_template = load_template('{}/dtos.h-field.template'.format(template_dir_path))
@@ -155,7 +138,7 @@ def create_kernel_text(struct_definitions):
     :type struct_definitions: list[StructDefinition]
     """
     source_dir_path = path.dirname(path.abspath(__file__))
-    template_dir_path = '{}/templates/kernels/physics'.format(source_dir_path[:-len('/scripts')])
+    template_dir_path = '{}/src/templates/kernels/physics'.format(source_dir_path[:-len('/codegenerator')])
     root_template = load_template('{}/generatedcode.cl.template'.format(template_dir_path))
     struct_template = load_template('{}/generatedcode.cl-struct.template'.format(template_dir_path))
     field_template = load_template('{}/generatedcode.cl-field.template'.format(template_dir_path))
@@ -204,7 +187,7 @@ def generate(create_text):
         defined_type_definitions_map[type_definition.name] = type_definition
     raw_struct_definitions = yaml.load(sys.stdin.read())
     if raw_struct_definitions is None:
-        raise InputNotSpecified()
+        raise errors.InputNotSpecified()
     struct_definitions = []
     items = list(raw_struct_definitions.items())
     items.sort()
@@ -233,42 +216,54 @@ def generate(create_text):
             for field_definition in struct_definition.fields:
                 if field_definition.type_name not in defined_type_definitions_map:
                     undefined_type_field_definitions.append(field_definition)
-        raise UndefinedTypeFieldDefinitions(undefined_type_field_definitions)
+        raise errors.UndefinedTypeFieldDefinitions(undefined_type_field_definitions)
     print(create_text(sorted_struct_definitions))
 
 
-def _main():
+def route():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        '-f', '--format',
+        type=str,
+        help='File format to generate. e.g. cpp, kernel'
+    )
+    args = parser.parse_args()
+    if args.format == 'cpp':
+        generate(create_cpp_text)
+    elif args.format == 'kernel':
+        generate(create_kernel_text)
+    elif args.format is None:
+        raise errors.FormatNotSpecified(parser)
+    else:
+        raise errors.UnsupportedFormat(args.format)
+
+
+def handle_error(f):
     try:
-        parser = argparse.ArgumentParser()
-        parser.add_argument(
-            '-f', '--format',
-            type=str,
-            help='File format to generate. e.g. cpp, kernel'
-        )
-        args = parser.parse_args()
-        if args.format == 'cpp':
-            generate(create_cpp_text)
-        elif args.format == 'kernel':
-            generate(create_kernel_text)
-        elif args.format is None:
-            print('--format or -f required', file=sys.stderr)
-            parser.print_help()
-            exit(1)
-        else:
-            print('Unsupported format: {} ("cpp" or "kernel" required.)'.format(args.format), file=sys.stderr)
-            exit(1)
-    except InvalidFieldFormatDefinition as e:
+        f()
+    except errors.InvalidFieldFormatDefinition as e:
         print('Invalid field format in definition of {}: {}'.format(
             e.type_name, e.specified_text), file=sys.stderr)
         exit(1)
-    except UndefinedTypeFieldDefinitions as e:
+    except errors.UndefinedTypeFieldDefinitions as e:
         for field_definition in e.field_definitions:
             print('Undefined type used in definition of {}#{}: {}'.format(
                 field_definition.owner.name, field_definition.name, field_definition.type_name), file=sys.stderr)
         exit(1)
-    except InputNotSpecified:
+    except errors.InputNotSpecified:
         print('Input not specified', file=sys.stderr)
         exit(1)
+    except errors.UnsupportedFormat as e:
+        print('Unsupported format: {} ("cpp" or "kernel" required.)'.format(e.format), file=sys.stderr)
+        exit(1)
+    except errors.FormatNotSpecified as e:
+        print('--format or -f required', file=sys.stderr)
+        e.parser.print_help()
+        exit(1)
+
+
+def _main():
+    handle_error(route)
 
 
 if __name__ == '__main__':

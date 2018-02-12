@@ -15,7 +15,7 @@ module.exports = do ->
       else if file.isBuffer()
         yaml_text = String file.contents
         compiled_text = ''
-        cmd = spawn 'python', ['src/scripts/codegenerator.py', '-f', format]
+        cmd = spawn 'python', ['-m', 'codegenerator.main', '-f', format]
         cmd.stdin.write yaml_text
         cmd.stdin.end()
         cmd.stdout.setEncoding 'utf-8'
