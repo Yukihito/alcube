@@ -14,6 +14,7 @@ namespace alcube::physics {
     resources,
     fileUtil,
     maxActorCount,
+    utils::math::powerOf2(maxActorCount),
     maxActorCount * 16,
     xGridCount * yGridCount * zGridCount
   ) {

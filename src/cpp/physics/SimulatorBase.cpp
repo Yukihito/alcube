@@ -5,11 +5,12 @@ namespace alcube::physics {
     utils::opencl::Resources *resources,
     utils::FileUtil *fileUtil,
     unsigned int maxActorCount,
+    unsigned int maxActorCountForBitonicSort,
     unsigned int maxSpringCount,
     unsigned int allGridCount
   ) : utils::opencl::Simulator(resources, fileUtil) {
     this->maxActorCount = maxActorCount;
-    this->maxActorCountForBitonicSort = utils::math::powerOf2(maxActorCount);
+    this->maxActorCountForBitonicSort = maxActorCountForBitonicSort;
     this->maxSpringCount = maxSpringCount;
     this->allGridCount = allGridCount;
 

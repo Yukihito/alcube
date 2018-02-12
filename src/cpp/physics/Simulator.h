@@ -17,6 +17,7 @@
 #include "../utils/opencl/Simulator.h"
 #include "FluidParticle.h"
 #include "SimulatorBase.h"
+#include "../utils/alcubemath.h"
 
 namespace alcube::physics {
   using namespace utils::opencl::conversions;

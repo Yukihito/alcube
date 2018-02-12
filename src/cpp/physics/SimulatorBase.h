@@ -2,7 +2,6 @@
 #define ALCUBE_PHYSICS_SIMULATORBASE_H
 #include "../utils/opencl/Simulator.h"
 #include "opencl/dtos.h"
-#include "../utils/alcubemath.h"
 
 namespace alcube::physics {
   class Dtos {
@@ -67,6 +66,7 @@ namespace alcube::physics {
         utils::opencl::Resources* resources,
         utils::FileUtil* fileUtil,
         unsigned int maxActorCount,
+        unsigned int maxActorCountForBitonicSort,
         unsigned int maxSpringCount,
         unsigned int allGridCount
       );
