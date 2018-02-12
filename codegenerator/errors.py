@@ -24,3 +24,8 @@ class UnsupportedFormat(Exception):
 class FormatNotSpecified(Exception):
     def __init__(self, parser):
         self.parser = parser
+
+
+class UnknownTarget(Exception):
+    def __init__(self, specified_target):
+        self.target = specified_target
