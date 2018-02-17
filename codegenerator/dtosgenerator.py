@@ -1,4 +1,3 @@
-from os import path
 from .utils import *
 from .definitionloader import Definition
 
@@ -7,12 +6,10 @@ def create_cpp_text(struct_definitions):
     """
     :type struct_definitions: list[StructDefinition]
     """
-    source_dir_path = path.dirname(path.abspath(__file__))
-    template_dir_path = '{}/src/templates/cpp/gpu'.format(source_dir_path[:-len('/codegenerator')])
-    root_template = load_template('{}/dtos.h.template'.format(template_dir_path))
-    class_template = load_template('{}/dtos.h-class.template'.format(template_dir_path))
-    field_template = load_template('{}/dtos.h-field.template'.format(template_dir_path))
-    field_with_index_template = load_template('{}/dtos.h-field-with-index.template'.format(template_dir_path))
+    root_template = load_template('cpp/gpu/dtos.h.template')
+    class_template = load_template('cpp/gpu/dtos.h-class.template')
+    field_template = load_template('cpp/gpu/dtos.h-field.template')
+    field_with_index_template = load_template('cpp/gpu/dtos.h-field-with-index.template')
     classes_texts = []
     for struct_definition in struct_definitions:
         fields_texts = []
@@ -40,12 +37,10 @@ def create_clc_text(struct_definitions):
     """
     :type struct_definitions: list[StructDefinition]
     """
-    source_dir_path = path.dirname(path.abspath(__file__))
-    template_dir_path = '{}/src/templates/kernels'.format(source_dir_path[:-len('/codegenerator')])
-    root_template = load_template('{}/dtos.cl.template'.format(template_dir_path))
-    struct_template = load_template('{}/dtos.cl-struct.template'.format(template_dir_path))
-    field_template = load_template('{}/dtos.cl-field.template'.format(template_dir_path))
-    field_with_index_template = load_template('{}/dtos.cl-field-with-index.template'.format(template_dir_path))
+    root_template = load_template('kernels/dtos.cl.template')
+    struct_template = load_template('kernels/dtos.cl-struct.template')
+    field_template = load_template('kernels/dtos.cl-field.template')
+    field_with_index_template = load_template('kernels/dtos.cl-field-with-index.template')
     structs_texts = []
     for struct_definition in struct_definitions:
         fields_texts = []
