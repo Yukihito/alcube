@@ -1,0 +1,11 @@
+  class RawKernels {
+    public:
+$raw_kernels
+  };
+
+  class Kernels {
+    public:
+      utils::opencl::CommandQueue* queue;
+      RawKernels rawKernels;
+$kernel_functions
+  };

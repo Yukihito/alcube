@@ -1,6 +1,13 @@
-namespace: alcube::physics::opencl::dtos
+kernels-directories:
+  - src/kernels/physics
 
-dtos:
+variables:
+  - maxActorCount
+  - maxActorCountForBitonicSort
+  - maxSpringCount
+  - allGridCount
+
+dto-structs:
   Grid:
     - uint      xCount
     - uint      yCount
@@ -91,3 +98,63 @@ dtos:
     - float sphericalShellRadius
     - ushort rigidBodyParticleCount
     - ushort fluidParticleCount
+
+dto-instances:
+  - name: grid
+    type: Grid
+    host-ptr: true
+
+  - name: actors
+    type: Actor
+    length: maxActorCount
+    host-ptr: true
+
+  - name: currentStates
+    type: RigidBodyState
+    length: maxActorCount
+    host-ptr: true
+
+  - name: springs
+    type: Spring
+    length: maxSpringCount
+    host-ptr: true
+
+  - name: inputFluidStates
+    type: FluidState
+    length: maxActorCount
+    host-ptr: true
+
+  - name: fluidSettings
+    type: FluidSettings
+    host-ptr: true
+
+  - name: actorStates
+    type: ActorState
+    length: maxActorCount
+
+  - name: nextStates
+    type: RigidBodyState
+    length: maxActorCount
+
+  - name: gridAndActorRelations
+    type: GridAndActorRelation
+    length: maxActorCountForBitonicSort
+
+  - name: gridStartIndices
+    type: unsigned int
+    length: allGridCount
+
+  - name: gridEndIndices
+    type: unsigned int
+    length: allGridCount
+
+  - name: springVars
+    type: SpringVar
+    length: maxSpringCount
+
+  - name: fluidStates
+    type: FluidState
+    length: maxActorCount
+
+  - name: constants
+    type: Constants

@@ -1,0 +1,41 @@
+#ifndef ALCUBE_GPU_H
+#define ALCUBE_GPU_H
+
+#include "../utils/opencl/Simulator.h"
+#include "dtos.h"
+
+namespace alcube::gpu {
+$memories
+
+$dtos
+
+$kernels
+
+  class GPU {
+    public:
+      Kernels kernels;
+      Memories memories;
+      Dtos dtos;
+      utils::opencl::ResourcesProvider* resourcesProvider;
+      explicit GPU(
+        utils::opencl::ResourcesProvider* resourcesProvider,
+$variables
+      );
+    private:
+      utils::opencl::Memory* defineHostMemory(
+        const std::string& name,
+        size_t size,
+        void* hostPtr,
+        size_t allocationCount
+      );
+
+      utils::opencl::Memory* defineGPUMemory(
+        const std::string& name,
+        size_t size,
+        size_t allocationCount
+      );
+  };
+
+}
+
+#endif //ALCUBE_GPU_H

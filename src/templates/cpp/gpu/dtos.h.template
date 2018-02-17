@@ -3,7 +3,7 @@
 
 #include <CL/cl.h>
 
-namespace $namespace {
+namespace alcube::gpu::dtos {
 $classes
 }
 #endif //ALCUBE_PHYSICS_OPENCL_DTOS_H

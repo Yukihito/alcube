@@ -1,0 +1,8 @@
+  namespace memories {
+$memory_classes
+  }
+
+  class Memories {
+    public:
+$memory_instances
+  };

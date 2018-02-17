@@ -24,7 +24,7 @@ def route():
         else:
             raise errors.UnsupportedFormat(args.format)
     elif args.target == 'prototypes':
-        simulatorbasegenerator.generate_function_prototypes()
+        simulatorbasegenerator.generate_clc_function_prototypes()
     else:
         raise errors.UnknownTarget(args.target)
 

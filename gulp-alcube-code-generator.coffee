@@ -8,7 +8,7 @@ module.exports = do ->
   generateDto = (format) ->
     taskOf ['-m', 'codegenerator.main', 'dto', '-f', format]
 
-  generatePrototypes = ->
+  generateFunctionPrototypes = ->
     taskOf ['-m', 'codegenerator.main', 'prototypes']
 
   taskOf = (options) ->
@@ -48,5 +48,5 @@ module.exports = do ->
   class CodeGenerator
     @generateDtoCpp: -> generateDto('cpp')
     @generateDtoClc: -> generateDto('clc')
-    @generatePrototypes: -> generatePrototypes()
+    @generateFunctionPrototypes: -> generateFunctionPrototypes()
   CodeGenerator
