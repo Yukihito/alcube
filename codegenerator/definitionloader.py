@@ -22,10 +22,26 @@ class DTOInstance:
 
 
 class TypeDefinition:
-    def __init__(self, name, cpp_name, size):
+    def __init__(self, name, cpp_name, size, is_struct=True):
         self.name = name
         self.cpp_name = cpp_name
         self.size = size
+        self.is_struct = is_struct
+
+    def get_cpp_dto_type_name_with_namespace(self):
+        if self.is_struct:
+            return 'dtos::{}'.format(self.name)
+        else:
+            return self.cpp_name
+
+    def get_cpp_memory_type_name(self):
+        if self.is_struct:
+            return self.name
+        else:
+            return '{}Memory'.format(self.name.capitalize())
+
+    def get_cpp_memory_type_name_with_namespace(self):
+        return 'memories::{}'.format(self.get_cpp_memory_type_name())
 
 
 class FieldDefinition:
@@ -127,18 +143,18 @@ class Definition:
 
     def load_dto_structs(self):
         builtin_type_definitions = {
-            TypeDefinition('char', 'char', 1),
-            TypeDefinition('uchar', 'unsigned char', 1),
-            TypeDefinition('short', 'short', 2),
-            TypeDefinition('ushort', 'unsigned short', 2),
-            TypeDefinition('int', 'int', 4),
-            TypeDefinition('uint', 'unsigned int', 4),
-            TypeDefinition('long', 'long', 8),
-            TypeDefinition('ulong', 'unsigned long', 8),
-            TypeDefinition('float', 'float', 4),
-            TypeDefinition('double', 'double', 8),
-            TypeDefinition('float3', 'cl_float3', 4 * 3),
-            TypeDefinition('float4', 'cl_float4', 4 * 4)
+            TypeDefinition('char', 'char', 1, is_struct=False),
+            TypeDefinition('uchar', 'unsigned char', 1, is_struct=False),
+            TypeDefinition('short', 'short', 2, is_struct=False),
+            TypeDefinition('ushort', 'unsigned short', 2, is_struct=False),
+            TypeDefinition('int', 'int', 4, is_struct=False),
+            TypeDefinition('uint', 'unsigned int', 4, is_struct=False),
+            TypeDefinition('long', 'long', 8, is_struct=False),
+            TypeDefinition('ulong', 'unsigned long', 8, is_struct=False),
+            TypeDefinition('float', 'float', 4, is_struct=False),
+            TypeDefinition('double', 'double', 8, is_struct=False),
+            TypeDefinition('float3', 'cl_float3', 4 * 3, is_struct=False),
+            TypeDefinition('float4', 'cl_float4', 4 * 4, is_struct=False)
         }
 
         defined_type_definitions_map = dict()

@@ -2,7 +2,7 @@ import sys
 import argparse
 from . import errors
 from . import dtosgenerator
-from . import simulatorbasegenerator
+from . import functionprototypesgenerator
 
 
 def route():
@@ -24,7 +24,7 @@ def route():
         else:
             raise errors.UnsupportedFormat(args.format)
     elif args.target == 'prototypes':
-        simulatorbasegenerator.generate_clc_function_prototypes()
+        functionprototypesgenerator.generate_clc_function_prototypes()
     else:
         raise errors.UnknownTarget(args.target)
 

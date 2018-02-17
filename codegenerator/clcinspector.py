@@ -108,37 +108,5 @@ def create_function_prototypes(text):
     return function_prototypes
 
 
-# def create_clc_primitive_type_names():
-#     number_type_names = ['char', 'short', 'int', 'long', 'float', 'double']
-#     primitive_type_names = {'void'}
-#     for number_type_name in number_type_names:
-#         scalar_type_names = [
-#             number_type_name,
-#             'u{}'.format(number_type_name),
-#             'unsigned {}'.format(number_type_name)
-#         ]
-#         for scalar_type_name in scalar_type_names:
-#             primitive_type_names.add(scalar_type_name)
-#             for i in range(2, 10):
-#                 primitive_type_names.add(scalar_type_name + str(i))
-#     return primitive_type_names
-#
-#
-# def collect_struct_names(function_prototypes):
-#     """
-#     :type function_prototypes: list[FunctionPrototype]
-#     :return: list[name]
-#     """
-#     primitive_type_names = create_clc_primitive_type_names()
-#     struct_type_names = set()
-#     for function_prototype in function_prototypes:
-#         if function_prototype.rtype.name not in primitive_type_names:
-#             struct_type_names.add(function_prototype.rtype.name)
-#         for param in function_prototype.params:
-#             if param.param_type.name not in primitive_type_names:
-#                 struct_type_names.add(param.param_type.name)
-#     return sorted(list(struct_type_names))
-
-
 def create_function_prototypes_text(function_prototypes):
     return '\n\n'.join(map(lambda p: p.create_clc_text(), function_prototypes))
