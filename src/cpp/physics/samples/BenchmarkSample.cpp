@@ -4,11 +4,10 @@ namespace alcube::physics::samples {
   void BenchmarkSample::runApp(int argc, char **argv) {
     unsigned int maxCellCount = 16384; // 2^14
     float deltaTime = 1.0f / 30.0f;
-    auto resources = new utils::opencl::Resources();
     auto fileUtil = new utils::FileUtil();
+    auto resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
     auto simulator = new Simulator(
-      resources,
-      fileUtil,
+      resourcesProvider,
       maxCellCount,
       8,
       64,
@@ -45,7 +44,7 @@ namespace alcube::physics::samples {
       profiler->stop(timerId);
     }
 
-    resources->release();
+    resourcesProvider->resources->release();
     profiler->update();
   }
 }

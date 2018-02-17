@@ -37,7 +37,7 @@ namespace alcube::physics::samples::particles {
     particlesShape->particleCount = (unsigned int)cells.size();
   }
 
-  ParticlesSample::ParticlesSample() : BaseApplication(1600, 1200, 30, "ParticlesSample") {}
+  ParticlesSample::ParticlesSample() : ApplicationBase(1600, 1200, 30, "ParticlesSample") {}
 
   void ParticlesSample::onInit() {
     initBase(512, 65536);
@@ -83,6 +83,6 @@ namespace alcube::physics::samples::particles {
 
   void ParticlesSample::onDraw() {
     particles->update(cells);
-    BaseApplication::onDraw();
+    ApplicationBase::onDraw();
   }
 }

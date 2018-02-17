@@ -1,14 +1,39 @@
 #include "SimulatorBase.h"
 
 namespace alcube::physics {
+  using namespace utils::opencl::kernelargs;
+  namespace memories {
+    opencl::dtos::Grid& Grid::at(int i) {
+      return dto[i];
+    }
+
+    opencl::dtos::FluidSettings& FluidSettings::at(int i) {
+      return dto[i];
+    }
+
+    opencl::dtos::FluidState& FluidState::at(int i) {
+      return dto[i];
+    }
+  }
+
+  void Kernels::inputFluid(
+    unsigned int workSize,
+    memories::FluidState &inputFluidStates,
+    memories::FluidState &fluidStates
+  ) {
+    queue->push(rawKernels.inputFluid, {workSize}, {
+      memArg(inputFluidStates.memory),
+      memArg(fluidStates.memory)
+    });
+  }
+
   SimulatorBase::SimulatorBase(
-    utils::opencl::Resources *resources,
-    utils::FileUtil *fileUtil,
+    utils::opencl::ResourcesProvider *resourcesProvider,
     unsigned int maxActorCount,
     unsigned int maxActorCountForBitonicSort,
     unsigned int maxSpringCount,
     unsigned int allGridCount
-  ) : utils::opencl::Simulator(resources, fileUtil) {
+  ) : utils::opencl::Simulator(resourcesProvider) {
     this->maxActorCount = maxActorCount;
     this->maxActorCountForBitonicSort = maxActorCountForBitonicSort;
     this->maxSpringCount = maxSpringCount;
@@ -25,24 +50,24 @@ namespace alcube::physics {
         "../src/kernels/physics/fluid.cl"
     });
 
-    kernels.fillGridIndex = kernelFactory->create(program, "fillGridIndex");
-    kernels.merge = kernelFactory->create(program, "merge");
-    kernels.bitonic = kernelFactory->create(program, "bitonic");
-    kernels.setGridRelationIndexRange = kernelFactory->create(program, "setGridRelationIndexRange");
-    kernels.initGridAndActorRelations = kernelFactory->create(program, "initGridAndActorRelations");
-    kernels.collectIntersections = kernelFactory->create(program, "collectIntersections");
-    kernels.updateByPenaltyImpulse = kernelFactory->create(program, "updateByPenaltyImpulse");
-    kernels.updateByFrictionalImpulse = kernelFactory->create(program, "updateByFrictionalImpulse");
-    kernels.collectCollisions = kernelFactory->create(program, "collectCollisions");
-    kernels.updateByConstraintImpulse = kernelFactory->create(program, "updateByConstraintImpulse");
-    kernels.calcSpringImpulses = kernelFactory->create(program, "calcSpringImpulses");
-    kernels.updateBySpringImpulse = kernelFactory->create(program, "updateBySpringImpulse");
-    kernels.postProcessing = kernelFactory->create(program, "postProcessing");
-    kernels.inputFluid = kernelFactory->create(program, "inputFluid");
-    kernels.updateDensityAndPressure = kernelFactory->create(program, "updateDensityAndPressure");
-    kernels.updateFluidForce = kernelFactory->create(program, "updateFluidForce");
-    kernels.moveFluid = kernelFactory->create(program, "moveFluid");
-    kernels.inputConstants = kernelFactory->create(program, "inputConstants");
+    _kernels.fillGridIndex = kernelFactory->create(program, "fillGridIndex");
+    _kernels.merge = kernelFactory->create(program, "merge");
+    _kernels.bitonic = kernelFactory->create(program, "bitonic");
+    _kernels.setGridRelationIndexRange = kernelFactory->create(program, "setGridRelationIndexRange");
+    _kernels.initGridAndActorRelations = kernelFactory->create(program, "initGridAndActorRelations");
+    _kernels.collectIntersections = kernelFactory->create(program, "collectIntersections");
+    _kernels.updateByPenaltyImpulse = kernelFactory->create(program, "updateByPenaltyImpulse");
+    _kernels.updateByFrictionalImpulse = kernelFactory->create(program, "updateByFrictionalImpulse");
+    _kernels.collectCollisions = kernelFactory->create(program, "collectCollisions");
+    _kernels.updateByConstraintImpulse = kernelFactory->create(program, "updateByConstraintImpulse");
+    _kernels.calcSpringImpulses = kernelFactory->create(program, "calcSpringImpulses");
+    _kernels.updateBySpringImpulse = kernelFactory->create(program, "updateBySpringImpulse");
+    _kernels.postProcessing = kernelFactory->create(program, "postProcessing");
+    _kernels.inputFluid = kernelFactory->create(program, "inputFluid");
+    _kernels.updateDensityAndPressure = kernelFactory->create(program, "updateDensityAndPressure");
+    _kernels.updateFluidForce = kernelFactory->create(program, "updateFluidForce");
+    _kernels.moveFluid = kernelFactory->create(program, "moveFluid");
+    _kernels.inputConstants = kernelFactory->create(program, "inputConstants");
 
     dtos.grid = new opencl::dtos::Grid();
     dtos.fluidSettings = new opencl::dtos::FluidSettings();
@@ -57,21 +82,50 @@ namespace alcube::physics {
     dtos.gridEndIndices = new unsigned int[allGridCount];
     dtos.springs = new opencl::dtos::Spring[maxSpringCount];
 
-    memories.grid = memoryManager->define("grid", sizeof(opencl::dtos::Grid), dtos.grid, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, 1, 1);
-    memories.actors = memoryManager->define("actors", sizeof(opencl::dtos::Actor), dtos.actors, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxActorCount, 0);
-    memories.currentStates = memoryManager->define("currentStates", sizeof(opencl::dtos::RigidBodyState), dtos.currentStates, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxActorCount, 0);
-    memories.actorStates = memoryManager->define("actorStates", sizeof(opencl::dtos::ActorState), nullptr, CL_MEM_READ_WRITE, maxActorCount, 0);
-    memories.nextStates = memoryManager->define("nextStates", sizeof(opencl::dtos::RigidBodyState), nullptr, CL_MEM_READ_WRITE, maxActorCount, 0);
-    memories.gridAndActorRelations = memoryManager->define("gridAndActorRelations", sizeof(opencl::dtos::GridAndActorRelation), nullptr, CL_MEM_READ_WRITE, maxActorCountForBitonicSort, 0);
-    memories.gridStartIndices = memoryManager->define("gridStartIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE, allGridCount, allGridCount);
-    memories.gridEndIndices = memoryManager->define("gridEndIndices", sizeof(unsigned int), nullptr, CL_MEM_READ_WRITE, allGridCount, allGridCount);
-    memories.springs = memoryManager->define("springs", sizeof(opencl::dtos::Spring), dtos.springs, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxSpringCount, 0);
-    memories.springVars = memoryManager->define("springVars", sizeof(opencl::dtos::SpringVar), nullptr, CL_MEM_READ_WRITE, maxSpringCount, 0);
-    memories.inputFluidStates = memoryManager->define("inputFluidStates", sizeof(opencl::dtos::FluidState), dtos.inputFluidStates, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, maxActorCount, 0);
-    memories.fluidStates = memoryManager->define("fluidStates", sizeof(opencl::dtos::FluidState), nullptr, CL_MEM_READ_WRITE, maxActorCount, 0);
-    memories.fluidSettings = memoryManager->define("fluidSettings", sizeof(opencl::dtos::FluidSettings), dtos.fluidSettings, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, 1, 1);
-    memories.constants = memoryManager->define("constants", sizeof(opencl::dtos::Constants), nullptr, CL_MEM_READ_WRITE, 1, 1);
+    memories._grid             = defineHostMemory("grid", sizeof(opencl::dtos::Grid), dtos.grid, 1);
+    memories._actors           = defineHostMemory("actors", sizeof(opencl::dtos::Actor), dtos.actors, maxActorCount);
+    memories._currentStates    = defineHostMemory("currentStates", sizeof(opencl::dtos::RigidBodyState), dtos.currentStates, maxActorCount);
+    memories._springs          = defineHostMemory("springs", sizeof(opencl::dtos::Spring), dtos.springs, maxSpringCount);
+    memories._inputFluidStates = defineHostMemory("inputFluidStates", sizeof(opencl::dtos::FluidState), dtos.inputFluidStates, maxActorCount);
+    memories._fluidSettings    = defineHostMemory("fluidSettings", sizeof(opencl::dtos::FluidSettings), dtos.fluidSettings, 1);
+
+    memories._actorStates           = defineGPUMemory("actorStates", sizeof(opencl::dtos::ActorState), maxActorCount);
+    memories._nextStates            = defineGPUMemory("nextStates", sizeof(opencl::dtos::RigidBodyState), maxActorCount);
+    memories._gridAndActorRelations = defineGPUMemory("gridAndActorRelations", sizeof(opencl::dtos::GridAndActorRelation), maxActorCountForBitonicSort);
+    memories._gridStartIndices      = defineGPUMemory("gridStartIndices", sizeof(unsigned int), allGridCount);
+    memories._gridEndIndices        = defineGPUMemory("gridEndIndices", sizeof(unsigned int), allGridCount);
+    memories._springVars            = defineGPUMemory("springVars", sizeof(opencl::dtos::SpringVar), maxSpringCount);
+    memories._fluidStates           = defineGPUMemory("fluidStates", sizeof(opencl::dtos::FluidState), maxActorCount);
+    memories._constants             = defineGPUMemory("constants", sizeof(opencl::dtos::Constants), 1);
+
+    memories.grid.dto = dtos.grid;
+    memories.grid.memory = memories._grid;
+    memories.inputFluidStates.dto = dtos.inputFluidStates;
+    memories.inputFluidStates.memory = memories._inputFluidStates;
+    memories.fluidSettings.dto = dtos.fluidSettings;
+    memories.fluidSettings.memory = memories._fluidSettings;
+    memories.fluidStates.dto = dtos.fluidStates;
+    memories.fluidStates.memory = memories._fluidStates;
 
     memoryManager->allocate();
+    kernels.rawKernels = _kernels;
+    kernels.queue = queue;
+  }
+
+  utils::opencl::Memory* SimulatorBase::defineHostMemory(
+    const std::string &name,
+    size_t size,
+    void *hostPtr,
+    size_t allocationCount
+  ) {
+    return memoryManager->define(name, size, hostPtr, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, allocationCount);
+  }
+
+  utils::opencl::Memory* SimulatorBase::defineGPUMemory(
+    const std::string &name,
+    size_t size,
+    size_t allocationCount
+  ) {
+    return memoryManager->define(name, size, nullptr, CL_MEM_READ_WRITE, allocationCount);
   }
 }

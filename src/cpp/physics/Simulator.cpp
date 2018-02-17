@@ -3,16 +3,14 @@
 namespace alcube::physics {
   using namespace utils::opencl::kernelargs;
   Simulator::Simulator(
-    utils::opencl::Resources *resources,
-    utils::FileUtil* fileUtil,
+    utils::opencl::ResourcesProvider *resourcesProvider,
     unsigned int maxActorCount,
     unsigned int gridEdgeLength,
     unsigned int xGridCount,
     unsigned int yGridCount,
     unsigned int zGridCount
   ) : SimulatorBase(
-    resources,
-    fileUtil,
+    resourcesProvider,
     maxActorCount,
     utils::math::powerOf2(maxActorCount),
     maxActorCount * 16,
@@ -24,24 +22,25 @@ namespace alcube::physics {
     gravity = 0.0f;
     sphericalShellRadius = 100000.0f;
 
-    dtos.grid->edgeLength = gridEdgeLength;
-    dtos.grid->xCount = xGridCount;
-    dtos.grid->yCount = yGridCount;
-    dtos.grid->zCount = zGridCount;
-    dtos.grid->origin.s[0] = -(float)((xGridCount * gridEdgeLength) / 2);
-    dtos.grid->origin.s[1] = -(float)((yGridCount * gridEdgeLength) / 2);
-    dtos.grid->origin.s[2] = -(float)((zGridCount * gridEdgeLength) / 2);
+    auto grid = &memories.grid.at(0);
+    grid->edgeLength = gridEdgeLength;
+    grid->xCount = xGridCount;
+    grid->yCount = yGridCount;
+    grid->zCount = zGridCount;
+    grid->origin.s[0] = -(float)((xGridCount * gridEdgeLength) / 2);
+    grid->origin.s[1] = -(float)((yGridCount * gridEdgeLength) / 2);
+    grid->origin.s[2] = -(float)((zGridCount * gridEdgeLength) / 2);
     for (int i = 0; i < 3; i++) {
-      dtos.grid->normals[i].s[0] = 0.0f;
-      dtos.grid->normals[i].s[0] = 0.0f;
-      dtos.grid->normals[i].s[0] = 0.0f;
-      dtos.grid->normals[i].s[i] = 1.0f;
+      grid->normals[i].s[0] = 0.0f;
+      grid->normals[i].s[0] = 0.0f;
+      grid->normals[i].s[0] = 0.0f;
+      grid->normals[i].s[i] = 1.0f;
     }
     for (int i = 3; i < 6; i++) {
-      dtos.grid->normals[i].s[0] = 0.0f;
-      dtos.grid->normals[i].s[0] = 0.0f;
-      dtos.grid->normals[i].s[0] = 0.0f;
-      dtos.grid->normals[i].s[i - 3] = -1.0f;
+      grid->normals[i].s[0] = 0.0f;
+      grid->normals[i].s[0] = 0.0f;
+      grid->normals[i].s[0] = 0.0f;
+      grid->normals[i].s[i - 3] = -1.0f;
     }
 
     dtos.fluidSettings->stiffness = 16.0f;
@@ -80,10 +79,10 @@ namespace alcube::physics {
     auto rigidBodyParticleCountShort = (unsigned short)softBodyParticleCount;
     auto fluidParticleCountShort = (unsigned short)fluidParticleCount;
 
-    queue->push(kernels.inputConstants, {1}, {
-      memArg(memories.constants),
-      memArg(memories.grid),
-      memArg(memories.fluidSettings),
+    queue->push(_kernels.inputConstants, {1}, {
+      memArg(memories._constants),
+      memArg(memories._grid),
+      memArg(memories._fluidSettings),
       floatArg(gravity),
       floatArg(deltaTime),
       floatArg(splitDeltaTime),
@@ -92,11 +91,14 @@ namespace alcube::physics {
       ushortArg(fluidParticleCountShort)
     });
 
-    queue->write(memories.inputFluidStates);
-    queue->push(kernels.inputFluid, {fluidParticleCount}, {
-      memArg(memories.inputFluidStates),
-      memArg(memories.fluidStates)
+    queue->write(memories._inputFluidStates);
+    /*
+    queue->push(_kernels.inputFluid, {fluidParticleCount}, {
+      memArg(memories._inputFluidStates),
+      memArg(memories._fluidStates)
     });
+     */
+    kernels.inputFluid(fluidParticleCount, memories.inputFluidStates, memories.fluidStates);
   }
 
   void Simulator::input() {
@@ -136,7 +138,7 @@ namespace alcube::physics {
       assignClFloat4(dtos.currentStates[globalIndex].rotation, quatIdent);
       dtos.actors[i].springCount = 0;
 
-      opencl::dtos::FluidState* fluidState = &dtos.inputFluidStates[i];
+      opencl::dtos::FluidState* fluidState = &memories.inputFluidStates.at(i);//&dtos.inputFluidStates[i];
       fluidState->density = 0.0f;
       assignClFloat3(fluidState->force, vec3Zero);
       fluidState->pressure = 0.0f;
@@ -174,37 +176,37 @@ namespace alcube::physics {
   }
 
   void Simulator::setUpMemories() {
-    memories.actors->count = actorCount;
-    memories.actorStates->count = actorCount;
-    memories.currentStates->count = actorCount;
-    memories.nextStates->count = actorCount;
-    memories.gridAndActorRelations->count = actorCountForBitonicSort;
-    memories.springs->count = springCount;
-    memories.springVars->count = springCount;
-    memories.fluidStates->count = fluidParticleCount;
-    memories.inputFluidStates->count = fluidParticleCount;
-    queue->write(memories.actors);
-    queue->write(memories.currentStates);
-    queue->write(memories.springs);
+    memories._actors->count = actorCount;
+    memories._actorStates->count = actorCount;
+    memories._currentStates->count = actorCount;
+    memories._nextStates->count = actorCount;
+    memories._gridAndActorRelations->count = actorCountForBitonicSort;
+    memories._springs->count = springCount;
+    memories._springVars->count = springCount;
+    memories._fluidStates->count = fluidParticleCount;
+    memories._inputFluidStates->count = fluidParticleCount;
+    queue->write(memories._actors);
+    queue->write(memories._currentStates);
+    queue->write(memories._springs);
   }
 
   void Simulator::computeBroadPhase() {
     auto maxParticleCountShort = (unsigned short)maxActorCount;
     // Initialize grid and particle relations
-    queue->push(kernels.initGridAndActorRelations, {actorCountForBitonicSort}, {
-      memArg(memories.gridAndActorRelations),
+    queue->push(_kernels.initGridAndActorRelations, {actorCountForBitonicSort}, {
+      memArg(memories._gridAndActorRelations),
       uintArg(allGridCount),
       ushortArg(maxParticleCountShort)
     });
 
     // Set grid index to rigid body state, and register grid and particle relations.
-    queue->push(kernels.fillGridIndex, {actorCount}, {
-      memArg(memories.grid),
-      memArg(memories.actors),
-      memArg(memories.actorStates),
-      memArg(memories.currentStates),
-      memArg(memories.nextStates),
-      memArg(memories.gridAndActorRelations)
+    queue->push(_kernels.fillGridIndex, {actorCount}, {
+      memArg(memories._grid),
+      memArg(memories._actors),
+      memArg(memories._actorStates),
+      memArg(memories._currentStates),
+      memArg(memories._nextStates),
+      memArg(memories._gridAndActorRelations)
     });
 
     // Sort grid and particle relations (Bitonic sort)
@@ -214,8 +216,8 @@ namespace alcube::physics {
       for (int j = 0; j < passCount + 1; j++) {
         auto distance = (unsigned int)(1 << (i - j));
         auto stageDistance = (unsigned int)(1 << i);
-        queue->push(kernels.bitonic, {actorCountForBitonicSort}, {
-          memArg(memories.gridAndActorRelations),
+        queue->push(_kernels.bitonic, {actorCountForBitonicSort}, {
+          memArg(memories._gridAndActorRelations),
           uintArg(distance),
           uintArg(stageDistance)
         });
@@ -225,55 +227,55 @@ namespace alcube::physics {
     passCount = stageCount;
     for (int i = 0; i < passCount; i++) {
       auto distance = (unsigned int)(1 << (stageCount - (i + 1)));
-      queue->push(kernels.merge, {actorCountForBitonicSort}, {
-        memArg(memories.gridAndActorRelations),
+      queue->push(_kernels.merge, {actorCountForBitonicSort}, {
+        memArg(memories._gridAndActorRelations),
         uintArg(distance)
       });
     }
 
     // Setup grid and particle relation ranges
-    queue->pushZeroFill(memories.gridStartIndices);
-    queue->pushZeroFill(memories.gridEndIndices);
-    queue->push(kernels.setGridRelationIndexRange, {actorCount > 1 ? actorCount - 1 : 1}, {
-      memArg(memories.gridAndActorRelations),
-      memArg(memories.gridStartIndices),
-      memArg(memories.gridEndIndices),
+    queue->pushZeroFill(memories._gridStartIndices);
+    queue->pushZeroFill(memories._gridEndIndices);
+    queue->push(_kernels.setGridRelationIndexRange, {actorCount > 1 ? actorCount - 1 : 1}, {
+      memArg(memories._gridAndActorRelations),
+      memArg(memories._gridStartIndices),
+      memArg(memories._gridEndIndices),
       uintArg(actorCount)
     });
   }
 
   void Simulator::computeNarrowPhase() {
-    queue->push(kernels.collectIntersections, {actorCount}, {
-      memArg(memories.actorStates),
-      memArg(memories.springs),
-      memArg(memories.nextStates),
-      memArg(memories.gridAndActorRelations),
-      memArg(memories.gridStartIndices),
-      memArg(memories.gridEndIndices),
-      memArg(memories.constants)
+    queue->push(_kernels.collectIntersections, {actorCount}, {
+      memArg(memories._actorStates),
+      memArg(memories._springs),
+      memArg(memories._nextStates),
+      memArg(memories._gridAndActorRelations),
+      memArg(memories._gridStartIndices),
+      memArg(memories._gridEndIndices),
+      memArg(memories._constants)
     });
   }
 
   void Simulator::resolveConstraints(float deltaTime) {
-    queue->push(kernels.updateByPenaltyImpulse, {softBodyParticleCount}, {
-      memArg(memories.actors),
-      memArg(memories.actorStates),
+    queue->push(_kernels.updateByPenaltyImpulse, {softBodyParticleCount}, {
+      memArg(memories._actors),
+      memArg(memories._actorStates),
       floatArg(deltaTime)
     });
 
     for (int i = 0; i < 16; i++) {
-      queue->push(kernels.collectCollisions, {softBodyParticleCount}, {
-        memArg(memories.actors),
-        memArg(memories.actorStates)
+      queue->push(_kernels.collectCollisions, {softBodyParticleCount}, {
+        memArg(memories._actors),
+        memArg(memories._actorStates)
       });
-      queue->push(kernels.updateByConstraintImpulse, {softBodyParticleCount}, {
-        memArg(memories.actors),
-        memArg(memories.actorStates)
+      queue->push(_kernels.updateByConstraintImpulse, {softBodyParticleCount}, {
+        memArg(memories._actors),
+        memArg(memories._actorStates)
       });
     }
-    queue->push(kernels.updateByFrictionalImpulse, {softBodyParticleCount}, {
-      memArg(memories.actors),
-      memArg(memories.actorStates)
+    queue->push(_kernels.updateByFrictionalImpulse, {softBodyParticleCount}, {
+      memArg(memories._actors),
+      memArg(memories._actorStates)
     });
   }
 
@@ -282,48 +284,48 @@ namespace alcube::physics {
     float splitDeltaTime = deltaTime / splitCount;
     for (int i = 0; i < splitCount; i++) {
       if (springCount > 0) {
-        queue->push(kernels.calcSpringImpulses, {springCount}, {
-          memArg(memories.actorStates),
-          memArg(memories.springs),
-          memArg(memories.springVars),
-          memArg(memories.nextStates),
+        queue->push(_kernels.calcSpringImpulses, {springCount}, {
+          memArg(memories._actorStates),
+          memArg(memories._springs),
+          memArg(memories._springVars),
+          memArg(memories._nextStates),
           floatArg(splitDeltaTime)
         });
       }
-      queue->push(kernels.updateBySpringImpulse, {softBodyParticleCount}, {
-        memArg(memories.actors),
-        memArg(memories.actorStates),
-        memArg(memories.nextStates),
-        memArg(memories.springVars),
+      queue->push(_kernels.updateBySpringImpulse, {softBodyParticleCount}, {
+        memArg(memories._actors),
+        memArg(memories._actorStates),
+        memArg(memories._nextStates),
+        memArg(memories._springVars),
         floatArg(splitDeltaTime)
       });
     }
-    queue->push(kernels.postProcessing, {softBodyParticleCount}, {
-      memArg(memories.grid),
-      memArg(memories.actors),
-      memArg(memories.actorStates),
-      memArg(memories.nextStates),
+    queue->push(_kernels.postProcessing, {softBodyParticleCount}, {
+      memArg(memories._grid),
+      memArg(memories._actors),
+      memArg(memories._actorStates),
+      memArg(memories._nextStates),
       floatArg(deltaTime)
     });
   }
 
   void Simulator::updateFluid(float deltaTime) {
-    queue->push(kernels.updateDensityAndPressure, {fluidParticleCount}, {
-      memArg(memories.actorStates),
-      memArg(memories.fluidStates),
-      memArg(memories.constants)
+    queue->push(_kernels.updateDensityAndPressure, {fluidParticleCount}, {
+      memArg(memories._actorStates),
+      memArg(memories._fluidStates),
+      memArg(memories._constants)
     });
 
-    queue->push(kernels.updateFluidForce, {fluidParticleCount}, {
-      memArg(memories.actorStates),
-      memArg(memories.fluidStates),
-      memArg(memories.constants)
+    queue->push(_kernels.updateFluidForce, {fluidParticleCount}, {
+      memArg(memories._actorStates),
+      memArg(memories._fluidStates),
+      memArg(memories._constants)
     });
 
-    queue->push(kernels.moveFluid, {fluidParticleCount}, {
-      memArg(memories.fluidStates),
-      memArg(memories.nextStates),
-      memArg(memories.constants)
+    queue->push(_kernels.moveFluid, {fluidParticleCount}, {
+      memArg(memories._fluidStates),
+      memArg(memories._nextStates),
+      memArg(memories._constants)
     });
   }
 
@@ -341,7 +343,7 @@ namespace alcube::physics {
     resolveConstraints(deltaTime);
     motion(deltaTime);
     updateFluid(deltaTime);
-    read(memories.nextStates, dtos.nextStates);
+    read(memories._nextStates, dtos.nextStates);
     output();
   }
 

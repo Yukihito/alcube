@@ -1,11 +1,11 @@
 #include "Simulator.h"
 
 namespace alcube::utils::opencl {
-  Simulator::Simulator(Resources *resources, FileUtil *fileUtil) {
-    kernelFactory = new utils::opencl::KernelFactory(resources, fileUtil);
-    programFactory = new utils::opencl::ProgramFactory(resources, fileUtil);
-    memoryManager = new utils::opencl::MemoryManager(resources);
-    queue = new utils::opencl::CommandQueue(resources);
+  Simulator::Simulator(ResourcesProvider *resourcesProvider) {
+    kernelFactory = resourcesProvider->kernelFactory;
+    programFactory = resourcesProvider->programFactory;
+    memoryManager = resourcesProvider->memoryManager;
+    queue = resourcesProvider->queue;
   }
 
 

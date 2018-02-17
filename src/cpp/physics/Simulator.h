@@ -26,8 +26,7 @@ namespace alcube::physics {
   class Simulator : public SimulatorBase {
     public:
       explicit Simulator(
-        utils::opencl::Resources* resources,
-        utils::FileUtil* fileUtil,
+        utils::opencl::ResourcesProvider* resourcesProvider,
         unsigned int maxActorCount,
         unsigned int gridEdgeLength,
         unsigned int xGridCount,

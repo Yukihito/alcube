@@ -2,7 +2,7 @@
 
 namespace alcube::physics::samples::particles {
 
-  FluidSample::FluidSample() : BaseApplication(1600, 1200, 60, "FluidSample") {}
+  FluidSample::FluidSample() : ApplicationBase(1600, 1200, 60, "FluidSample") {}
 
   void FluidSample::onInit() {
     initBase(128, 65536);
@@ -38,6 +38,6 @@ namespace alcube::physics::samples::particles {
 
   void FluidSample::onDraw() {
     particles->update(cells);
-    BaseApplication::onDraw();
+    ApplicationBase::onDraw();
   }
 }

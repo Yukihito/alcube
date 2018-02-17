@@ -18,9 +18,9 @@ namespace alcube::physics::samples {
       int all;
   };
 
-  class BaseApplication : public utils::app::OpenGLApplication {
+  class ApplicationBase : public utils::app::OpenGLApplication {
     public:
-      explicit BaseApplication(
+      explicit ApplicationBase(
         unsigned int windowWidth,
         unsigned int windowHeight,
         unsigned int fps,
@@ -38,7 +38,7 @@ namespace alcube::physics::samples {
       drawing::Camera *camera;
       drawing::shaders::Shaders *shaders;
       drawing::shapes::Shapes *shapes;
-      utils::opencl::Resources *resources;
+      utils::opencl::ResourcesProvider *resourcesProvider;
       utils::FileUtil *fileUtil;
       utils::Profiler *profiler;
       Simulator *physicsSimulator;

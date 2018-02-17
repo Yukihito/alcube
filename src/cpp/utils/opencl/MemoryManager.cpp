@@ -10,8 +10,7 @@ namespace alcube::utils::opencl {
     size_t size,
     void *hostPtr,
     cl_mem_flags memFlags,
-    size_t allocationCount,
-    size_t count
+    size_t allocationCount
   ) {
     auto mem = new Memory(
       name,
@@ -19,8 +18,7 @@ namespace alcube::utils::opencl {
       resources->context,
       hostPtr,
       memFlags,
-      allocationCount,
-      count
+      allocationCount
     );
     memories.push_back(mem);
     return mem;

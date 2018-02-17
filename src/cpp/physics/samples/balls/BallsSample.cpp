@@ -10,7 +10,7 @@ namespace alcube::physics::samples::balls {
     return glm::translate(position) * glm::toMat4(rotation) * glm::scale(glm::vec3(radius, radius, radius));
   }
 
-  BallsSample::BallsSample() : BaseApplication(1600, 1200, 60, "BallsSample") {}
+  BallsSample::BallsSample() : ApplicationBase(1600, 1200, 60, "BallsSample") {}
 
   void BallsSample::add(Ball *ball) {
     drawer->add(ball);

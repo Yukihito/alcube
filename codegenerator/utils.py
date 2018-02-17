@@ -1,9 +1,13 @@
 from string import Template
 
 
-def load_template(template_path):
+def load_text(text_path):
     text = ''
-    with open(template_path, encoding='utf-8') as file:
+    with open(text_path, encoding='utf-8') as file:
         for line in file:
             text += line
-    return Template(text)
+    return text
+
+
+def load_template(template_path):
+    return Template(load_text(template_path))

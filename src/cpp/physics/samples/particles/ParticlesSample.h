@@ -1,11 +1,11 @@
 #ifndef ALCUBE_PARTICLESSAMPLE_H
 #define ALCUBE_PARTICLESSAMPLE_H
 
-#include "../BaseApplication.h"
+#include "../ApplicationBase.h"
 #include "Particles.h"
 
 namespace alcube::physics::samples::particles {
-  class ParticlesSample : public BaseApplication {
+  class ParticlesSample : public ApplicationBase {
     public:
       explicit ParticlesSample();
     protected:

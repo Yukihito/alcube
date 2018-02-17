@@ -23,8 +23,7 @@ namespace alcube::utils::opencl {
         cl_context& context,
         void* hostPtr,
         cl_mem_flags memFlags,
-        size_t allocationCount,
-        size_t count
+        size_t allocationCount
       );
     private:
       cl_mem_flags memFlags;

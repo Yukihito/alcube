@@ -70,9 +70,9 @@ namespace alcube::physics {
         simulator->input();
         simulator->setUpMemories();
         simulator->computeBroadPhase();
-        simulator->read(simulator->memories.gridAndActorRelations, simulator->dtos.gridAndActorRelations);
-        simulator->read(simulator->memories.gridStartIndices, simulator->dtos.gridStartIndices);
-        simulator->read(simulator->memories.gridEndIndices, simulator->dtos.gridEndIndices);
+        simulator->read(simulator->memories._gridAndActorRelations, simulator->dtos.gridAndActorRelations);
+        simulator->read(simulator->memories._gridStartIndices, simulator->dtos.gridStartIndices);
+        simulator->read(simulator->memories._gridEndIndices, simulator->dtos.gridEndIndices);
         simulator->tearDownMemories();
       }
 
@@ -82,7 +82,7 @@ namespace alcube::physics {
         simulator->setUpMemories();
         simulator->computeBroadPhase();
         simulator->computeNarrowPhase(deltaTime);
-        simulator->read(simulator->memories.actorStates, simulator->dtos.actorStates);
+        simulator->read(simulator->memories._actorStates, simulator->dtos.actorStates);
         simulator->tearDownMemories();
       }
 
@@ -94,8 +94,8 @@ namespace alcube::physics {
         simulator->computeNarrowPhase(deltaTime);
         simulator->motion(deltaTime);
         simulator->resolveIntersection();
-        simulator->read(simulator->memories.actorStates, simulator->dtos.actorStates);
-        simulator->read(simulator->memories.nextStates, simulator->dtos.nextStates);
+        simulator->read(simulator->memories._actorStates, simulator->dtos.actorStates);
+        simulator->read(simulator->memories._nextStates, simulator->dtos.nextStates);
         simulator->tearDownMemories();
       }
   };

@@ -1,7 +1,7 @@
 #include "SoftBodySample.h"
 
 namespace alcube::physics::samples::balls {
-  SoftBodySample::SoftBodySample() : BaseApplication(1600, 1200, 60, "SoftBodySample") {}
+  SoftBodySample::SoftBodySample() : ApplicationBase(1600, 1200, 60, "SoftBodySample") {}
 
   void SoftBodySample::add(ColorBall *ball) {
     drawer->add(ball);

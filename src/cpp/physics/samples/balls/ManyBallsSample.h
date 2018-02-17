@@ -12,11 +12,11 @@
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtx/transform.hpp>
 #include "ColorBall.h"
-#include "../BaseApplication.h"
+#include "../ApplicationBase.h"
 #include "../DrawableFluidParticle.h"
 
 namespace alcube::physics::samples::balls {
-  class ManyBallsSample : public BaseApplication {
+  class ManyBallsSample : public ApplicationBase {
     public:
       explicit ManyBallsSample();
     protected:

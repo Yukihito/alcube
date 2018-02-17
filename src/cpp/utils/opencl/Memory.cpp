@@ -8,14 +8,13 @@ namespace alcube::utils::opencl {
     cl_context& context,
     void* hostPtr,
     cl_mem_flags memFlags,
-    size_t allocationCount,
-    size_t count
+    size_t allocationCount
   ) {
     this->hostPtr = hostPtr;
     this->name = name;
     this->size = size;
     this->context = context;
-    this->count = count;
+    this->count = allocationCount;
     this->memFlags = memFlags;
     this->allocationCount = allocationCount;
   }

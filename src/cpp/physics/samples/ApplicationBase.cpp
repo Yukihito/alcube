@@ -1,14 +1,14 @@
-#include "BaseApplication.h"
+#include "ApplicationBase.h"
 
 namespace alcube::physics::samples {
-  BaseApplication::BaseApplication(
+  ApplicationBase::ApplicationBase(
     unsigned int windowWidth,
     unsigned int windowHeight,
     unsigned int fps,
     const std::string& appName
   ) : OpenGLApplication(windowWidth, windowHeight, fps, appName) {}
 
-  void BaseApplication::initBase(unsigned int worldSize, unsigned int maxCellCount) {
+  void ApplicationBase::initBase(unsigned int worldSize, unsigned int maxCellCount) {
     printSystemInfo();
     this->maxCellCount = maxCellCount;
     deltaTime = 1.0f / (float)fps;
@@ -31,11 +31,10 @@ namespace alcube::physics::samples {
       far
     );
     drawer = new drawing::Drawer(camera, &mutex);
-    resources = new utils::opencl::Resources();
     fileUtil = new utils::FileUtil();
+    resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
     physicsSimulator = new Simulator(
-      resources,
-      fileUtil,
+      resourcesProvider,
       maxCellCount,
       gridEdgeLength,
       xGridCount,
@@ -52,13 +51,13 @@ namespace alcube::physics::samples {
     profiler->start(profilers.all);
   }
 
-  void BaseApplication::onDraw() {
+  void ApplicationBase::onDraw() {
     profiler->start(profilers.draw);
     drawer->draw();
     profiler->stop(profilers.draw);
   }
 
-  void BaseApplication::onUpdate() {
+  void ApplicationBase::onUpdate() {
     profiler->start(profilers.update);
     physicsSimulator->update(deltaTime);
     drawer->updateDrawableBuffers();
@@ -68,9 +67,9 @@ namespace alcube::physics::samples {
     profiler->start(profilers.all);
   }
 
-  void BaseApplication::onClose() {
+  void ApplicationBase::onClose() {
     physicsSimulator->tearDownMemories();
-    resources->release();
+    resourcesProvider->resources->release();
   }
 
 

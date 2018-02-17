@@ -14,9 +14,9 @@ namespace alcube::utils::opencl {
         size_t size,
         void* hostPtr,
         cl_mem_flags memFlags,
-        size_t allocationCount,
-        size_t count
+        size_t allocationCount
       );
+
       void allocate();
       void release();
       explicit MemoryManager(Resources* resources);

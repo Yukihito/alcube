@@ -9,7 +9,7 @@
 #include "../../../drawing/shaders/Shaders.h"
 #include "../../../utils/app/OpenGLApplication.h"
 #include "../../../utils/Profiler.h"
-#include "../BaseApplication.h"
+#include "../ApplicationBase.h"
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtx/transform.hpp>
 
@@ -21,7 +21,7 @@ namespace alcube::physics::samples::balls {
       glm::mat4 getModelMat() override;
   };
 
-  class BallsSample : public BaseApplication {
+  class BallsSample : public ApplicationBase {
     public:
       explicit BallsSample();
     protected:

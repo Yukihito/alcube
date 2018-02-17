@@ -5,7 +5,7 @@
 #include <glm/vec3.hpp>
 #include <iostream>
 #include "../Simulator.h"
-#include "../../utils/opencl/Resources.h"
+#include "../../utils/opencl/ResourcesProvider.h"
 #include "../../utils/FileUtil.h"
 #include "../../utils/Profiler.h"
 #include "../../utils/app/Application.h"

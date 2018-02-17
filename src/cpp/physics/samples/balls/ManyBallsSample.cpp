@@ -1,7 +1,7 @@
 #include "ManyBallsSample.h"
 
 namespace alcube::physics::samples::balls {
-  ManyBallsSample::ManyBallsSample() : BaseApplication(1600, 1200, 60, "BallsSample") {}
+  ManyBallsSample::ManyBallsSample() : ApplicationBase(1600, 1200, 60, "BallsSample") {}
 
   void ManyBallsSample::add(ColorBall *ball) {
     drawer->add(ball);

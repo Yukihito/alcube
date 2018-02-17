@@ -16,6 +16,8 @@ namespace alcube::utils::opencl {
       std::vector<cl_kernel> kernels = {};
       std::vector<cl_command_queue> queues = {};
       std::vector<cl_program> programs = {};
+
+
       explicit Resources();
       void release();
   };

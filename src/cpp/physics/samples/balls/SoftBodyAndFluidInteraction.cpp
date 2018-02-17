@@ -1,7 +1,7 @@
 #include "SoftBodyAndFluidInteraction.h"
 
 namespace alcube::physics::samples::balls {
-  SoftBodyAndFluidInteraction::SoftBodyAndFluidInteraction() : BaseApplication(1600, 1200, 60, "SoftBodyAndFluidInteraction") {}
+  SoftBodyAndFluidInteraction::SoftBodyAndFluidInteraction() : ApplicationBase(1600, 1200, 60, "SoftBodyAndFluidInteraction") {}
 
   void SoftBodyAndFluidInteraction::add(ColorBall *ball) {
     drawer->add(ball);

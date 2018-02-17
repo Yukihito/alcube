@@ -6,8 +6,7 @@
 namespace alcube::biology {
   class Simulator : utils::opencl::Simulator {
     public:
-      Simulator(utils::opencl::Resources *resources, utils::FileUtil *fileUtil);
-
+      explicit Simulator(utils::opencl::ResourcesProvider *resourcesProvider);
   };
 }
 
