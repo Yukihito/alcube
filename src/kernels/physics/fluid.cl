@@ -1,20 +1,3 @@
-/*
-float poly6(float r, float h) {
-  float q = h * h - r * r;
-  return (315.0f / (64.0f * 3.14159f * pow(h, 9))) * q * q * q;
-}
-
-float3 spikyGradient(float r, float3 n, float h) {
-  float q = h - r;
-  return (45.0f / (3.14159f * pow(h, 6))) * q * q * n;
-}
-
-float viscosityLaplacian(float r, float h) {
-  float q = h - r;
-  return (45.0f / (3.14159f * pow(h, 6))) * q;
-}
-*/
-
 __kernel void inputFluid(
   __global FluidState* inputFluidStates,
   __global FluidState* fluidStates

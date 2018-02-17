@@ -6,16 +6,6 @@ void setIntersection(
   float speed,
   float3 normal,
   float3 relativePosition
-);
-
-void setIntersection(
-  __global Intersection* intersection,
-  ushort type,
-  ushort otherIndex,
-  float intersectionLength,
-  float speed,
-  float3 normal,
-  float3 relativePosition
 ) {
   intersection->type = type;
   intersection->otherIndex = otherIndex;

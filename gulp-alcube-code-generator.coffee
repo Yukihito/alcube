@@ -5,7 +5,13 @@ gutil = require 'gulp-util'
 PLUGIN_NAME = 'gulp-alcube-code-generator'
 
 module.exports = do ->
-  generate = (format) ->
+  generateDto = (format) ->
+    taskOf ['-m', 'codegenerator.main', 'dto', '-f', format]
+
+  generatePrototypes = ->
+    taskOf ['-m', 'codegenerator.main', 'prototypes']
+
+  taskOf = (options) ->
     through.obj (file, encoding, callback) ->
       if file.isNull()
         callback()
@@ -15,7 +21,7 @@ module.exports = do ->
       else if file.isBuffer()
         yaml_text = String file.contents
         compiled_text = ''
-        cmd = spawn 'python', ['-m', 'codegenerator.main', 'dto', '-f', format]
+        cmd = spawn 'python', options
         cmd.stdin.write yaml_text
         cmd.stdin.end()
         cmd.stdout.setEncoding 'utf-8'
@@ -38,7 +44,9 @@ module.exports = do ->
       else
         console.warn 'Unexpected flow'
         callback()
+
   class CodeGenerator
-    @generateCpp: -> generate('cpp')
-    @generateKernel: -> generate('kernel')
+    @generateDtoCpp: -> generateDto('cpp')
+    @generateDtoClc: -> generateDto('clc')
+    @generatePrototypes: -> generatePrototypes()
   CodeGenerator

@@ -2,6 +2,7 @@ import sys
 import argparse
 from . import errors
 from . import dtosgenerator
+from . import simulatorbasegenerator
 
 
 def route():
@@ -10,18 +11,20 @@ def route():
     parser.add_argument(
         '-f', '--format',
         type=str,
-        help='File format to generate. e.g. cpp, kernel'
+        help='File format to generate. e.g. cpp, clc'
     )
     args = parser.parse_args()
     if args.target == 'dto':
         if args.format == 'cpp':
             dtosgenerator.generate(dtosgenerator.create_cpp_text)
-        elif args.format == 'kernel':
-            dtosgenerator.generate(dtosgenerator.create_kernel_text)
+        elif args.format == 'clc':
+            dtosgenerator.generate(dtosgenerator.create_clc_text)
         elif args.format is None:
             raise errors.FormatNotSpecified(parser)
         else:
             raise errors.UnsupportedFormat(args.format)
+    elif args.target == 'prototypes':
+        simulatorbasegenerator.generate_function_prototypes()
     else:
         raise errors.UnknownTarget(args.target)
 
@@ -42,7 +45,7 @@ def handle_error(f):
         print('Input not specified', file=sys.stderr)
         exit(1)
     except errors.UnsupportedFormat as e:
-        print('Unsupported format: {} ("cpp" or "kernel" required.)'.format(e.format), file=sys.stderr)
+        print('Unsupported format: {} ("cpp" or "clc" required.)'.format(e.format), file=sys.stderr)
         exit(1)
     except errors.FormatNotSpecified as e:
         print('--format or -f required', file=sys.stderr)

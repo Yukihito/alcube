@@ -3,10 +3,6 @@
 #define PARTICLE_TYPE_SPHERICAL_SHELL = 2
 #define PARTICLE_TYPE_FLUID           = 3
 
-float4 mulQuat(float4 q, float4 r);
-float3 rotateByQuat(float3 v, float4 q);
-float4 createQuatFromDisplacement(float3 angularDisplacement);
-
 float4 mulQuat(float4 q, float4 r) {
   float4 result;
   result.xyz = r.xyz * q.w + q.xyz * r.w + cross(q.xyz, r.xyz);

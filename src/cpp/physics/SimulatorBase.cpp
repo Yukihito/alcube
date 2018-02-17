@@ -39,17 +39,7 @@ namespace alcube::physics {
     this->maxSpringCount = maxSpringCount;
     this->allGridCount = allGridCount;
 
-    cl_program program = programFactory->create({
-        "../src/kernels/physics/dtos.cl",
-        "../src/kernels/physics/common.cl",
-        "../src/kernels/physics/broadphase.cl",
-        "../src/kernels/physics/narrowphase.cl",
-        "../src/kernels/physics/constraintresolving.cl",
-        "../src/kernels/physics/softbody.cl",
-        "../src/kernels/physics/motion.cl",
-        "../src/kernels/physics/fluid.cl"
-    });
-
+    cl_program program = programFactory->create("../src/kernels/generated-code/all.cl");
     _kernels.fillGridIndex = kernelFactory->create(program, "fillGridIndex");
     _kernels.merge = kernelFactory->create(program, "merge");
     _kernels.bitonic = kernelFactory->create(program, "bitonic");

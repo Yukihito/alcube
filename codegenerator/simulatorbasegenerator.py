@@ -42,6 +42,11 @@ class TypeWithModifiers:
             result += ' (pointer)'
         return result
 
+    def create_cpp_text(self):
+        modifiers_text = ' '.join(self.modifiers)
+        name_text = '{}*'.format(self.name) if self.is_pointer else self.name
+        return '{} {}'.format(modifiers_text, name_text) if len(self.modifiers) > 0 else name_text
+
 
 class ParamPrototype:
     def __init__(self, param_type: TypeWithModifiers, name):
@@ -50,6 +55,9 @@ class ParamPrototype:
 
     def __str__(self):
         return '{}: {}'.format(self.name, str(self.param_type))
+
+    def create_cpp_text(self):
+        return '{} {}'.format(self.param_type.create_cpp_text(), self.name)
 
 
 class FunctionPrototype:
@@ -68,6 +76,12 @@ class FunctionPrototype:
             name = '(kernel) {}'.format(name)
         return '{}: {}\n\t{}'.format(name, str(self.rtype), '\n\t'.join(map(str, self.params)))
 
+    def create_cpp_text(self):
+        params_text = '({})'.format(', '.join(map(lambda p: p.create_cpp_text(), self.params)))
+        rtype_text = '__kernel {}'.format(
+            self.rtype.create_cpp_text()) if self.is_kernel else self.rtype.create_cpp_text()
+        return '{} {}{};'.format(rtype_text, self.name, params_text)
+
 
 def create_aggregated_kernel_text(definition):
     kernels_directory_path = definition['kernels-directory']
@@ -77,7 +91,7 @@ def create_aggregated_kernel_text(definition):
         length = None if 'length' not in raw_dto else raw_dto['length']
         is_host_ptr = 'host-ptr' in raw_dto and raw_dto['host-ptr']
         dtos.append(DTO(raw_dto['name'], raw_dto['type'], length, is_host_ptr))
-    file_names = ['dtos.cl'] + sorted([
+    file_names = sorted([
         p for p in [
             os.path.relpath(x, kernels_directory_path)
             for x in glob(os.path.join(kernels_directory_path, '*.cl'))
@@ -100,8 +114,12 @@ def trim_comment(text):
     return text
 
 
+def trim_define_macro(text):
+    return re.sub(r'#define[^\n]*', '', text)
+
+
 def create_function_prototypes(text):
-    text_without_comment = trim_comment(text)
+    text_without_comment = trim_define_macro(trim_comment(text))
     function_name_regex = r'([\w\*][\w\*\s]*)'
     params_regex = r'([^\)]*)'
     function_regex = r'\s*' + function_name_regex + '\(' + params_regex + '\)\s*\{'
@@ -168,6 +186,10 @@ def collect_struct_names(function_prototypes):
     return sorted(list(struct_type_names))
 
 
+def create_function_prototypes_text(function_prototypes):
+    return '\n\n'.join(map(lambda p: p.create_cpp_text(), function_prototypes))
+
+
 def generate():
     definition = yaml.load(sys.stdin.read())
     variables = definition['variables']
@@ -175,12 +197,19 @@ def generate():
     function_prototypes = create_function_prototypes(aggregated_text)
     print('\n'.join(map(str, function_prototypes)))
     print('\n'.join(collect_struct_names(function_prototypes)))
+    function_prototypes_text = create_function_prototypes_text(filter(lambda p: not p.is_kernel, function_prototypes))
+    print(function_prototypes_text)
 
 
-
-
-
+def generate_function_prototypes():
+    definition = yaml.load(sys.stdin.read())
+    aggregated_text = create_aggregated_kernel_text(definition)
+    function_prototypes = create_function_prototypes(aggregated_text)
+    function_prototypes_text = create_function_prototypes_text(filter(lambda p: not p.is_kernel, function_prototypes))
+    print(function_prototypes_text)
 
 
 if __name__ == '__main__':
-    generate()
+    # generate()
+    generate_function_prototypes()
+    pass

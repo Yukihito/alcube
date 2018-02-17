@@ -91,7 +91,7 @@ class StructDefinition:
             field.type_definition = defined_type_definitions_map[field.type_name]
 
 
-def create_cpp_text(struct_definitions):
+def create_cpp_text(struct_definitions, namespace):
     """
     :type struct_definitions: list[StructDefinition]
     """
@@ -120,11 +120,11 @@ def create_cpp_text(struct_definitions):
             class_name=struct_definition.name,
             fields='\n'.join(fields_texts)
         ))
-    text = root_template.substitute(classes='\n\n'.join(classes_texts))
+    text = root_template.substitute(classes='\n\n'.join(classes_texts), namespace=namespace)
     return text
 
 
-def create_kernel_text(struct_definitions):
+def create_clc_text(struct_definitions, namespace):
     """
     :type struct_definitions: list[StructDefinition]
     """
@@ -176,9 +176,13 @@ def generate(create_text):
     defined_type_definitions_map = dict()
     for type_definition in builtin_type_definitions:
         defined_type_definitions_map[type_definition.name] = type_definition
-    raw_struct_definitions = yaml.load(sys.stdin.read())
-    if raw_struct_definitions is None:
+    yaml_file = yaml.load(sys.stdin.read())
+    if yaml_file is None:
         raise errors.InputNotSpecified()
+    raw_struct_definitions = yaml_file['dtos']
+
+    namespace = yaml_file['namespace']
+
     struct_definitions = []
     items = list(raw_struct_definitions.items())
     items.sort()
@@ -208,4 +212,4 @@ def generate(create_text):
                 if field_definition.type_name not in defined_type_definitions_map:
                     undefined_type_field_definitions.append(field_definition)
         raise errors.UndefinedTypeFieldDefinitions(undefined_type_field_definitions)
-    print(create_text(sorted_struct_definitions))
+    print(create_text(sorted_struct_definitions, namespace))

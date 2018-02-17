@@ -3,7 +3,7 @@
 
 #include <CL/cl.h>
 
-namespace alcube::physics::opencl::dtos {
+namespace $namespace {
 $classes
 }
 #endif //ALCUBE_PHYSICS_OPENCL_DTOS_H
