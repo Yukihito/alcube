@@ -31,13 +31,13 @@ gulp.task 'generate-gpu-interface-header', ->
   gulp.src [definition_file]
     .pipe CodeGenerator.generateGPUInterfaceHeader()
     .pipe rename 'GPU.h'
-    .pipe gulp.dest 'dist'
+    .pipe gulp.dest 'src/cpp/gpu'
 
 gulp.task 'generate-gpu-interface-cpp', ->
   gulp.src [definition_file]
     .pipe CodeGenerator.generateGPUInterfaceCpp()
     .pipe rename 'GPU.cpp'
-    .pipe gulp.dest 'dist'
+    .pipe gulp.dest 'src/cpp/gpu'
 
 gulp.task 'concat-clc', ->
   gulp.src [
