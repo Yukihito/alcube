@@ -1,1 +1,0 @@
-    memories.${name}.memory = define${location}Memory("${name}", sizeof(${type_name}), dtos.${name}, ${length});

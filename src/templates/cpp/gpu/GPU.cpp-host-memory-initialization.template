@@ -1,0 +1,1 @@
+    memories.${name}.memory = defineHostMemory("${name}", sizeof(${type_name}), dtos.${name}, ${length});

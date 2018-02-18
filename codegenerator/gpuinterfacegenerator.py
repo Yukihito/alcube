@@ -81,8 +81,9 @@ def generate_cpp_header_file():
     memory_instance_texts = []
     for dto_instance in definition.dto_instances:
         type_definition = type_definitions[dto_instance.type_name]
-        dto_type_name = type_definition.get_cpp_dto_type_name_with_namespace()
-        memory_instance_text = memory_instance_template.substitute(dto_type_name=dto_type_name, name=dto_instance.name)
+        memory_type_name = type_definition.get_cpp_memory_type_name_with_namespace()
+        memory_instance_text = memory_instance_template.substitute(
+            memory_type_name=memory_type_name, name=dto_instance.name)
         memory_instance_texts.append(memory_instance_text)
     memory_instances_text = '\n'.join(memory_instance_texts)
 
@@ -157,10 +158,16 @@ def generate_cpp_file():
                 type_name=type_name,
                 name=param.name
             ))
-            arg_texts.append(template.of('kernel-assignment').substitute(
-                wrapper_name=wrapper_name,
-                name=param.name
-            ))
+            if param.param_type.is_pointer:
+                arg_texts.append(template.of('kernel-assignment').substitute(
+                    wrapper_name=wrapper_name,
+                    name=param.name
+                ))
+            else:
+                arg_texts.append(template.of('kernel-assignment-for-builtin-type').substitute(
+                    wrapper_name=wrapper_name,
+                    name=param.name
+                ))
         params_text = ',\n'.join(param_texts)
         args_text = ',\n'.join(arg_texts)
         kernel_texts.append(template.of('kernel').substitute(
@@ -190,14 +197,19 @@ def generate_cpp_file():
         memory_dto_assignment_texts.append(template.of('memory-dto-assignment').substitute(
             name=dto_instance.name
         ))
-        location = 'Host' if dto_instance.is_host_ptr else 'GPU'
-        length = '1' if dto_instance is None else dto_instance.length
-        memory_initialization_texts.append(template.of('memory-initialization').substitute(
-            name=dto_instance.name,
-            location=location,
-            type_name=dto_type_name,
-            length=length
-        ))
+        length = '1' if dto_instance.length is None else dto_instance.length
+        if dto_instance.is_host_ptr:
+            memory_initialization_texts.append(template.of('host-memory-initialization').substitute(
+                name=dto_instance.name,
+                type_name=dto_type_name,
+                length=length
+            ))
+        else:
+            memory_initialization_texts.append(template.of('gpu-memory-initialization').substitute(
+                name=dto_instance.name,
+                type_name=dto_type_name,
+                length=length
+            ))
     memory_initializations_text = '\n'.join(memory_initialization_texts)
     memory_dto_assignments_text = '\n'.join(memory_dto_assignment_texts)
     memories_initialization_text = template.of('memories-initialization').substitute(

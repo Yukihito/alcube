@@ -2,9 +2,16 @@
 
 namespace alcube::gpu {
   using namespace utils::opencl::kernelargs;
-  // Memories
   namespace memories {
-    dtos::Grid& Grid::at(int i) {
+    dtos::Actor& Actor::at(int i) {
+      return dto[i];
+    }
+
+    dtos::ActorState& ActorState::at(int i) {
+      return dto[i];
+    }
+
+    dtos::Constants& Constants::at(int i) {
       return dto[i];
     }
 
@@ -15,13 +22,226 @@ namespace alcube::gpu {
     dtos::FluidState& FluidState::at(int i) {
       return dto[i];
     }
+
+    dtos::Grid& Grid::at(int i) {
+      return dto[i];
+    }
+
+    dtos::GridAndActorRelation& GridAndActorRelation::at(int i) {
+      return dto[i];
+    }
+
+    dtos::Intersection& Intersection::at(int i) {
+      return dto[i];
+    }
+
+    dtos::RigidBodyState& RigidBodyState::at(int i) {
+      return dto[i];
+    }
+
+    dtos::Spring& Spring::at(int i) {
+      return dto[i];
+    }
+
+    dtos::SpringVar& SpringVar::at(int i) {
+      return dto[i];
+    }
+
+    char& CharMemory::at(int i) {
+      return dto[i];
+    }
+
+    double& DoubleMemory::at(int i) {
+      return dto[i];
+    }
+
+    float& FloatMemory::at(int i) {
+      return dto[i];
+    }
+
+    cl_float3& Float3Memory::at(int i) {
+      return dto[i];
+    }
+
+    cl_float4& Float4Memory::at(int i) {
+      return dto[i];
+    }
+
+    int& IntMemory::at(int i) {
+      return dto[i];
+    }
+
+    long& LongMemory::at(int i) {
+      return dto[i];
+    }
+
+    short& ShortMemory::at(int i) {
+      return dto[i];
+    }
+
+    unsigned char& UcharMemory::at(int i) {
+      return dto[i];
+    }
+
+    unsigned int& UintMemory::at(int i) {
+      return dto[i];
+    }
+
+    unsigned long& UlongMemory::at(int i) {
+      return dto[i];
+    }
+
+    unsigned short& UshortMemory::at(int i) {
+      return dto[i];
+    }
   }
 
-  // Kernels
+  void Kernels::inputConstants(
+    unsigned int workSize,
+    memories::Constants& constants,
+    memories::Grid& grid,
+    memories::FluidSettings& fluidSettings,
+    float gravityAcceleration,
+    float deltaTime,
+    float splitDeltaTime,
+    float sphericalShellRadius,
+    unsigned short rigidBodyParticleCount,
+    unsigned short fluidParticleCount
+  ) {
+    queue->push(rawKernels.inputConstants, {workSize}, {
+      memArg(constants.memory),
+      memArg(grid.memory),
+      memArg(fluidSettings.memory),
+      floatArg(gravityAcceleration),
+      floatArg(deltaTime),
+      floatArg(splitDeltaTime),
+      floatArg(sphericalShellRadius),
+      ushortArg(rigidBodyParticleCount),
+      ushortArg(fluidParticleCount)
+    });
+  }
+
+  void Kernels::initGridAndActorRelations(
+    unsigned int workSize,
+    memories::GridAndActorRelation& relations,
+    unsigned int gridIndex,
+    unsigned short actorIndex
+  ) {
+    queue->push(rawKernels.initGridAndActorRelations, {workSize}, {
+      memArg(relations.memory),
+      uintArg(gridIndex),
+      ushortArg(actorIndex)
+    });
+  }
+
+  void Kernels::fillGridIndex(
+    unsigned int workSize,
+    memories::Grid& grid,
+    memories::Actor& actors,
+    memories::ActorState& actorStates,
+    memories::RigidBodyState& currentStates,
+    memories::RigidBodyState& nextStates,
+    memories::GridAndActorRelation& relations
+  ) {
+    queue->push(rawKernels.fillGridIndex, {workSize}, {
+      memArg(grid.memory),
+      memArg(actors.memory),
+      memArg(actorStates.memory),
+      memArg(currentStates.memory),
+      memArg(nextStates.memory),
+      memArg(relations.memory)
+    });
+  }
+
+  void Kernels::merge(
+    unsigned int workSize,
+    memories::GridAndActorRelation& relations,
+    unsigned int distance
+  ) {
+    queue->push(rawKernels.merge, {workSize}, {
+      memArg(relations.memory),
+      uintArg(distance)
+    });
+  }
+
+  void Kernels::bitonic(
+    unsigned int workSize,
+    memories::GridAndActorRelation& relations,
+    unsigned int distance,
+    unsigned int stageDistance
+  ) {
+    queue->push(rawKernels.bitonic, {workSize}, {
+      memArg(relations.memory),
+      uintArg(distance),
+      uintArg(stageDistance)
+    });
+  }
+
+  void Kernels::setGridRelationIndexRange(
+    unsigned int workSize,
+    memories::GridAndActorRelation& relations,
+    memories::UintMemory& gridStartIndices,
+    memories::UintMemory& gridEndIndices,
+    unsigned int actorCount
+  ) {
+    queue->push(rawKernels.setGridRelationIndexRange, {workSize}, {
+      memArg(relations.memory),
+      memArg(gridStartIndices.memory),
+      memArg(gridEndIndices.memory),
+      uintArg(actorCount)
+    });
+  }
+
+  void Kernels::updateByPenaltyImpulse(
+    unsigned int workSize,
+    memories::Actor& actors,
+    memories::ActorState& actorStates,
+    float deltaTime
+  ) {
+    queue->push(rawKernels.updateByPenaltyImpulse, {workSize}, {
+      memArg(actors.memory),
+      memArg(actorStates.memory),
+      floatArg(deltaTime)
+    });
+  }
+
+  void Kernels::updateByFrictionalImpulse(
+    unsigned int workSize,
+    memories::Actor& actors,
+    memories::ActorState& actorStates
+  ) {
+    queue->push(rawKernels.updateByFrictionalImpulse, {workSize}, {
+      memArg(actors.memory),
+      memArg(actorStates.memory)
+    });
+  }
+
+  void Kernels::collectCollisions(
+    unsigned int workSize,
+    memories::Actor& actors,
+    memories::ActorState& actorStates
+  ) {
+    queue->push(rawKernels.collectCollisions, {workSize}, {
+      memArg(actors.memory),
+      memArg(actorStates.memory)
+    });
+  }
+
+  void Kernels::updateByConstraintImpulse(
+    unsigned int workSize,
+    memories::Actor& actors,
+    memories::ActorState& actorStates
+  ) {
+    queue->push(rawKernels.updateByConstraintImpulse, {workSize}, {
+      memArg(actors.memory),
+      memArg(actorStates.memory)
+    });
+  }
+
   void Kernels::inputFluid(
     unsigned int workSize,
-    memories::FluidState &inputFluidStates,
-    memories::FluidState &fluidStates
+    memories::FluidState& inputFluidStates,
+    memories::FluidState& fluidStates
   ) {
     queue->push(rawKernels.inputFluid, {workSize}, {
       memArg(inputFluidStates.memory),
@@ -29,7 +249,117 @@ namespace alcube::gpu {
     });
   }
 
-  // GPU
+  void Kernels::updateDensityAndPressure(
+    unsigned int workSize,
+    memories::ActorState& actorStates,
+    memories::FluidState& fluidStates,
+    memories::Constants& constants
+  ) {
+    queue->push(rawKernels.updateDensityAndPressure, {workSize}, {
+      memArg(actorStates.memory),
+      memArg(fluidStates.memory),
+      memArg(constants.memory)
+    });
+  }
+
+  void Kernels::updateFluidForce(
+    unsigned int workSize,
+    memories::ActorState& actorStates,
+    memories::FluidState& fluidStates,
+    memories::Constants& constants
+  ) {
+    queue->push(rawKernels.updateFluidForce, {workSize}, {
+      memArg(actorStates.memory),
+      memArg(fluidStates.memory),
+      memArg(constants.memory)
+    });
+  }
+
+  void Kernels::moveFluid(
+    unsigned int workSize,
+    memories::FluidState& fluidStates,
+    memories::RigidBodyState& nextStates,
+    memories::Constants& constants
+  ) {
+    queue->push(rawKernels.moveFluid, {workSize}, {
+      memArg(fluidStates.memory),
+      memArg(nextStates.memory),
+      memArg(constants.memory)
+    });
+  }
+
+  void Kernels::postProcessing(
+    unsigned int workSize,
+    memories::Grid& grid,
+    memories::Actor& actors,
+    memories::ActorState& actorStates,
+    memories::RigidBodyState& nextStates,
+    float deltaTime
+  ) {
+    queue->push(rawKernels.postProcessing, {workSize}, {
+      memArg(grid.memory),
+      memArg(actors.memory),
+      memArg(actorStates.memory),
+      memArg(nextStates.memory),
+      floatArg(deltaTime)
+    });
+  }
+
+  void Kernels::collectIntersections(
+    unsigned int workSize,
+    memories::ActorState& actorStates,
+    memories::Spring& springs,
+    memories::RigidBodyState& nextStates,
+    memories::GridAndActorRelation& relations,
+    memories::UintMemory& gridStartIndices,
+    memories::UintMemory& gridEndIndices,
+    memories::Constants& constants
+  ) {
+    queue->push(rawKernels.collectIntersections, {workSize}, {
+      memArg(actorStates.memory),
+      memArg(springs.memory),
+      memArg(nextStates.memory),
+      memArg(relations.memory),
+      memArg(gridStartIndices.memory),
+      memArg(gridEndIndices.memory),
+      memArg(constants.memory)
+    });
+  }
+
+  void Kernels::calcSpringImpulses(
+    unsigned int workSize,
+    memories::ActorState& actorStates,
+    memories::Spring& springs,
+    memories::SpringVar& springVars,
+    memories::RigidBodyState& nextStates,
+    float deltaTime
+  ) {
+    queue->push(rawKernels.calcSpringImpulses, {workSize}, {
+      memArg(actorStates.memory),
+      memArg(springs.memory),
+      memArg(springVars.memory),
+      memArg(nextStates.memory),
+      floatArg(deltaTime)
+    });
+  }
+
+  void Kernels::updateBySpringImpulse(
+    unsigned int workSize,
+    memories::Actor& actors,
+    memories::ActorState& actorStates,
+    memories::RigidBodyState& nextStates,
+    memories::SpringVar& springVars,
+    float deltaTime
+  ) {
+    queue->push(rawKernels.updateBySpringImpulse, {workSize}, {
+      memArg(actors.memory),
+      memArg(actorStates.memory),
+      memArg(nextStates.memory),
+      memArg(springVars.memory),
+      floatArg(deltaTime)
+    });
+  }
+
   GPU::GPU(
     utils::opencl::ResourcesProvider *resourcesProvider,
     unsigned int maxActorCount,
@@ -39,49 +369,72 @@ namespace alcube::gpu {
   ) {
     this->resourcesProvider = resourcesProvider;
     cl_program program = resourcesProvider->programFactory->create("../src/kernels/generated-code/all.cl");
-
     kernels.queue = resourcesProvider->queue;
-    kernels.rawKernels.fillGridIndex             = resourcesProvider->kernelFactory->create(program, "fillGridIndex");
-    kernels.rawKernels.merge                     = resourcesProvider->kernelFactory->create(program, "merge");
-    kernels.rawKernels.bitonic                   = resourcesProvider->kernelFactory->create(program, "bitonic");
-    kernels.rawKernels.setGridRelationIndexRange = resourcesProvider->kernelFactory->create(program, "setGridRelationIndexRange");
+
+    kernels.rawKernels.inputConstants = resourcesProvider->kernelFactory->create(program, "inputConstants");
     kernels.rawKernels.initGridAndActorRelations = resourcesProvider->kernelFactory->create(program, "initGridAndActorRelations");
-    kernels.rawKernels.collectIntersections      = resourcesProvider->kernelFactory->create(program, "collectIntersections");
-    kernels.rawKernels.updateByPenaltyImpulse    = resourcesProvider->kernelFactory->create(program, "updateByPenaltyImpulse");
+    kernels.rawKernels.fillGridIndex = resourcesProvider->kernelFactory->create(program, "fillGridIndex");
+    kernels.rawKernels.merge = resourcesProvider->kernelFactory->create(program, "merge");
+    kernels.rawKernels.bitonic = resourcesProvider->kernelFactory->create(program, "bitonic");
+    kernels.rawKernels.setGridRelationIndexRange = resourcesProvider->kernelFactory->create(program, "setGridRelationIndexRange");
+    kernels.rawKernels.updateByPenaltyImpulse = resourcesProvider->kernelFactory->create(program, "updateByPenaltyImpulse");
     kernels.rawKernels.updateByFrictionalImpulse = resourcesProvider->kernelFactory->create(program, "updateByFrictionalImpulse");
-    kernels.rawKernels.collectCollisions         = resourcesProvider->kernelFactory->create(program, "collectCollisions");
+    kernels.rawKernels.collectCollisions = resourcesProvider->kernelFactory->create(program, "collectCollisions");
     kernels.rawKernels.updateByConstraintImpulse = resourcesProvider->kernelFactory->create(program, "updateByConstraintImpulse");
-    kernels.rawKernels.calcSpringImpulses        = resourcesProvider->kernelFactory->create(program, "calcSpringImpulses");
-    kernels.rawKernels.updateBySpringImpulse     = resourcesProvider->kernelFactory->create(program, "updateBySpringImpulse");
-    kernels.rawKernels.postProcessing            = resourcesProvider->kernelFactory->create(program, "postProcessing");
-    kernels.rawKernels.inputFluid                = resourcesProvider->kernelFactory->create(program, "inputFluid");
-    kernels.rawKernels.updateDensityAndPressure  = resourcesProvider->kernelFactory->create(program, "updateDensityAndPressure");
-    kernels.rawKernels.updateFluidForce          = resourcesProvider->kernelFactory->create(program, "updateFluidForce");
-    kernels.rawKernels.moveFluid                 = resourcesProvider->kernelFactory->create(program, "moveFluid");
-    kernels.rawKernels.inputConstants            = resourcesProvider->kernelFactory->create(program, "inputConstants");
+    kernels.rawKernels.inputFluid = resourcesProvider->kernelFactory->create(program, "inputFluid");
+    kernels.rawKernels.updateDensityAndPressure = resourcesProvider->kernelFactory->create(program, "updateDensityAndPressure");
+    kernels.rawKernels.updateFluidForce = resourcesProvider->kernelFactory->create(program, "updateFluidForce");
+    kernels.rawKernels.moveFluid = resourcesProvider->kernelFactory->create(program, "moveFluid");
+    kernels.rawKernels.postProcessing = resourcesProvider->kernelFactory->create(program, "postProcessing");
+    kernels.rawKernels.collectIntersections = resourcesProvider->kernelFactory->create(program, "collectIntersections");
+    kernels.rawKernels.calcSpringImpulses = resourcesProvider->kernelFactory->create(program, "calcSpringImpulses");
+    kernels.rawKernels.updateBySpringImpulse = resourcesProvider->kernelFactory->create(program, "updateBySpringImpulse");
 
-    dtos.grid                  = new dtos::Grid();
-    dtos.fluidSettings         = new dtos::FluidSettings();
-    dtos.actors                = new dtos::Actor[maxActorCount];
-    dtos.actorStates           = new dtos::ActorState[maxActorCount];
-    dtos.currentStates         = new dtos::RigidBodyState[maxActorCount];
-    dtos.nextStates            = new dtos::RigidBodyState[maxActorCount];
-    dtos.gridAndActorRelations = new dtos::GridAndActorRelation[maxActorCount];
-    dtos.fluidStates           = new dtos::FluidState[maxActorCount];
-    dtos.inputFluidStates      = new dtos::FluidState[maxActorCount];
-    dtos.gridStartIndices      = new unsigned int[allGridCount];
-    dtos.gridEndIndices        = new unsigned int[allGridCount];
-    dtos.springs               = new dtos::Spring[maxSpringCount];
+    dtos.grid = new dtos::Grid();
+    dtos.actors = new dtos::Actor[maxActorCount];
+    dtos.currentStates = new dtos::RigidBodyState[maxActorCount];
+    dtos.springs = new dtos::Spring[maxSpringCount];
+    dtos.inputFluidStates = new dtos::FluidState[maxActorCount];
+    dtos.fluidSettings = new dtos::FluidSettings();
+    dtos.actorStates = new dtos::ActorState[maxActorCount];
+    dtos.nextStates = new dtos::RigidBodyState[maxActorCount];
+    dtos.gridAndActorRelations = new dtos::GridAndActorRelation[maxActorCountForBitonicSort];
+    dtos.gridStartIndices = new unsigned int[allGridCount];
+    dtos.gridEndIndices = new unsigned int[allGridCount];
+    dtos.springVars = new dtos::SpringVar[maxSpringCount];
+    dtos.fluidStates = new dtos::FluidState[maxActorCount];
+    dtos.constants = new dtos::Constants();
 
-    memories.grid.memory             = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);
+    memories.grid.memory = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);
+    memories.actors.memory = defineHostMemory("actors", sizeof(dtos::Actor), dtos.actors, maxActorCount);
+    memories.currentStates.memory = defineHostMemory("currentStates", sizeof(dtos::RigidBodyState), dtos.currentStates, maxActorCount);
+    memories.springs.memory = defineHostMemory("springs", sizeof(dtos::Spring), dtos.springs, maxSpringCount);
     memories.inputFluidStates.memory = defineHostMemory("inputFluidStates", sizeof(dtos::FluidState), dtos.inputFluidStates, maxActorCount);
-    memories.fluidSettings.memory    = defineHostMemory("fluidSettings", sizeof(dtos::FluidSettings), dtos.fluidSettings, 1);
-    memories.fluidStates.memory      = defineGPUMemory("fluidStates", sizeof(dtos::FluidState), maxActorCount);
+    memories.fluidSettings.memory = defineHostMemory("fluidSettings", sizeof(dtos::FluidSettings), dtos.fluidSettings, 1);
+    memories.actorStates.memory = defineGPUMemory("actorStates", sizeof(dtos::ActorState), maxActorCount);
+    memories.nextStates.memory = defineGPUMemory("nextStates", sizeof(dtos::RigidBodyState), maxActorCount);
+    memories.gridAndActorRelations.memory = defineGPUMemory("gridAndActorRelations", sizeof(dtos::GridAndActorRelation), maxActorCountForBitonicSort);
+    memories.gridStartIndices.memory = defineGPUMemory("gridStartIndices", sizeof(unsigned int), allGridCount);
+    memories.gridEndIndices.memory = defineGPUMemory("gridEndIndices", sizeof(unsigned int), allGridCount);
+    memories.springVars.memory = defineGPUMemory("springVars", sizeof(dtos::SpringVar), maxSpringCount);
+    memories.fluidStates.memory = defineGPUMemory("fluidStates", sizeof(dtos::FluidState), maxActorCount);
+    memories.constants.memory = defineGPUMemory("constants", sizeof(dtos::Constants), 1);
 
-    memories.grid.dto             = dtos.grid;
+    memories.grid.dto = dtos.grid;
+    memories.actors.dto = dtos.actors;
+    memories.currentStates.dto = dtos.currentStates;
+    memories.springs.dto = dtos.springs;
     memories.inputFluidStates.dto = dtos.inputFluidStates;
-    memories.fluidSettings.dto    = dtos.fluidSettings;
-    memories.fluidStates.dto      = dtos.fluidStates;
+    memories.fluidSettings.dto = dtos.fluidSettings;
+    memories.actorStates.dto = dtos.actorStates;
+    memories.nextStates.dto = dtos.nextStates;
+    memories.gridAndActorRelations.dto = dtos.gridAndActorRelations;
+    memories.gridStartIndices.dto = dtos.gridStartIndices;
+    memories.gridEndIndices.dto = dtos.gridEndIndices;
+    memories.springVars.dto = dtos.springVars;
+    memories.fluidStates.dto = dtos.fluidStates;
+    memories.constants.dto = dtos.constants;
+
 
     resourcesProvider->memoryManager->allocate();
   }

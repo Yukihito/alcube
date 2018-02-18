@@ -1,0 +1,1 @@
+    memories.${name}.memory = defineGPUMemory("${name}", sizeof(${type_name}), ${length});

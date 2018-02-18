@@ -2,6 +2,7 @@
 #define ALCUBE_GPU_H
 
 #include "../utils/opencl/Simulator.h"
+#include "../utils/opencl/Memory.h"
 #include "dtos.h"
 
 namespace alcube::gpu {
