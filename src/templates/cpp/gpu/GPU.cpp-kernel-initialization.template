@@ -1,0 +1,1 @@
+    kernels.rawKernels.${name} = resourcesProvider->kernelFactory->create(program, "${name}");

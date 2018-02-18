@@ -73,7 +73,7 @@ namespace alcube::gpu {
     dtos.gridEndIndices        = new unsigned int[allGridCount];
     dtos.springs               = new dtos::Spring[maxSpringCount];
 
-    memories.grid.memory             = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);;
+    memories.grid.memory             = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);
     memories.inputFluidStates.memory = defineHostMemory("inputFluidStates", sizeof(dtos::FluidState), dtos.inputFluidStates, maxActorCount);
     memories.fluidSettings.memory    = defineHostMemory("fluidSettings", sizeof(dtos::FluidSettings), dtos.fluidSettings, 1);
     memories.fluidStates.memory      = defineGPUMemory("fluidStates", sizeof(dtos::FluidState), maxActorCount);

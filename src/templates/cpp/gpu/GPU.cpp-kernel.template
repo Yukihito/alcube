@@ -1,0 +1,8 @@
+  void Kernels::${name}(
+    unsigned int workSize,
+$parameters
+  ) {
+    queue->push(rawKernels.${name}, {workSize}, {
+$assignments
+    });
+  }

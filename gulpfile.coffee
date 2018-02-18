@@ -64,7 +64,7 @@ gulp.task 'build', runSequence(
   ['generate-dtos-clc', 'generate-dtos-cpp'],
   'generate-function-prototypes',
   'generate-gpu-interface-header',
-  # 'generate-gpu-interface-cpp',
+  'generate-gpu-interface-cpp',
   'concat-clc'
 )
 

@@ -1,0 +1,44 @@
+#include "GPU.h"
+
+namespace alcube::gpu {
+  using namespace utils::opencl::kernelargs;
+  namespace memories {
+$memories
+  }
+
+$kernels
+
+  GPU::GPU(
+    utils::opencl::ResourcesProvider *resourcesProvider,
+$variables
+  ) {
+    this->resourcesProvider = resourcesProvider;
+    cl_program program = resourcesProvider->programFactory->create("../src/kernels/generated-code/all.cl");
+    kernels.queue = resourcesProvider->queue;
+
+$kernels_initialization
+
+$dtos_initialization
+
+$memories_initialization
+
+    resourcesProvider->memoryManager->allocate();
+  }
+
+  utils::opencl::Memory* GPU::defineHostMemory(
+    const std::string &name,
+    size_t size,
+    void *hostPtr,
+    size_t allocationCount
+  ) {
+    return resourcesProvider->memoryManager->define(name, size, hostPtr, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, allocationCount);
+  }
+
+  utils::opencl::Memory* GPU::defineGPUMemory(
+    const std::string &name,
+    size_t size,
+    size_t allocationCount
+  ) {
+    return resourcesProvider->memoryManager->define(name, size, nullptr, CL_MEM_READ_WRITE, allocationCount);
+  }
+}
