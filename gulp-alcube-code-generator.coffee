@@ -11,6 +11,12 @@ module.exports = do ->
   generateFunctionPrototypes = ->
     taskOf ['-m', 'codegenerator.main', 'prototypes']
 
+  generateGPUInterfaceHeader = ->
+    taskOf ['-m', 'codegenerator.main', 'gpuif_h']
+
+  generateGPUInterfaceCpp = ->
+    taskOf ['-m', 'codegenerator.main', 'gpuif_cpp']
+
   taskOf = (options) ->
     through.obj (file, encoding, callback) ->
       if file.isNull()
@@ -26,11 +32,11 @@ module.exports = do ->
         cmd.stdin.end()
         cmd.stdout.setEncoding 'utf-8'
         cmd.stdout.on 'data', (data) =>
-          compiled_text = data
+          compiled_text += data
         cmd.stderr.on 'data', (data) =>
           console.error data.toString()
         cmd.on 'close', (code) =>
-          console.log 'Child process exited with code ' + code
+          console.log 'Child process "' + options[2] + '" exited with code ' + code
           if code == 0
             output = new gutil.File
               cwd:  file.cwd
@@ -49,4 +55,6 @@ module.exports = do ->
     @generateDtoCpp: -> generateDto('cpp')
     @generateDtoClc: -> generateDto('clc')
     @generateFunctionPrototypes: -> generateFunctionPrototypes()
+    @generateGPUInterfaceHeader: -> generateGPUInterfaceHeader()
+    @generateGPUInterfaceCpp: -> generateGPUInterfaceCpp()
   CodeGenerator

@@ -3,6 +3,8 @@ import argparse
 from . import errors
 from . import dtosgenerator
 from . import functionprototypesgenerator
+from . import gpuinterfacegenerator
+from . import utils
 
 
 def route():
@@ -13,7 +15,15 @@ def route():
         type=str,
         help='File format to generate. e.g. cpp, clc'
     )
+    parser.add_argument(
+        '-i',
+        '--input',
+        type=str,
+        help='Input file name.'
+    )
     args = parser.parse_args()
+    if args.input:
+        utils.input_file_name = args.input
     if args.target == 'dto':
         if args.format == 'cpp':
             dtosgenerator.generate(dtosgenerator.create_cpp_text)
@@ -25,6 +35,10 @@ def route():
             raise errors.UnsupportedFormat(args.format)
     elif args.target == 'prototypes':
         functionprototypesgenerator.generate_clc_function_prototypes()
+    elif args.target == 'gpuif_h':
+        gpuinterfacegenerator.generate_cpp_header_file()
+    elif args.target == 'gpuif_cpp':
+        gpuinterfacegenerator.generate_cpp_file()
     else:
         raise errors.UnknownTarget(args.target)
 

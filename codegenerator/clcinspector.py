@@ -13,7 +13,7 @@ class TypeWithModifiers:
                 self.modifiers.append(token)
             else:
                 names.append(token)
-        self.name = ' '.join(names)
+        self.name = ' '.join(names).replace('unsigned ', 'u')
 
     def __str__(self):
         result = 'type name "{}", modifiers {}'.format(self.name, self.modifiers)
@@ -73,6 +73,10 @@ def trim_define_macro(text):
 
 
 def create_function_prototypes(text):
+    """
+    :param text:
+    :rtype : list[FunctionPrototype]
+    """
     text_without_comment = trim_define_macro(trim_comment(text))
     function_name_regex = r'([\w\*][\w\*\s]*)'
     params_regex = r'([^\)]*)'

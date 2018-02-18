@@ -3,12 +3,13 @@ import re
 from typing import Dict
 import sys
 from . import errors
+from . import utils
 
 
 class DTOInstance:
     def __init__(self, name, type_name, length, is_host_ptr):
         self.name = name
-        self.type_name = type_name
+        self.type_name = type_name.replace('unsigned ', 'u')
         self.length = length
         self.is_host_ptr = is_host_ptr
 
@@ -125,12 +126,20 @@ class StructDefinition:
 
 
 class Definition:
+    """
+    :type dto_instances: list[DTOInstance]
+    :type definition: None|dict
+    :type dto_types: dict[str, TypeDefinition]
+    :type dto_structs: list[StructDefinition]
+    :type variables: list[str]
+    """
     def __init__(self):
         self.kernels_directory_paths = []
         self.definition = None
         self.dto_instances = []
-        self.dto_types = []
-        self.dto_structs = {}
+        self.dto_types = {}
+        self.dto_structs = []
+        self.variables = []
 
     def load_dto_instances(self):
         raw_dto_instances = self.definition['dto-instances']
@@ -197,7 +206,11 @@ class Definition:
         self.dto_types = defined_type_definitions_map
 
     def load(self):
-        self.definition = yaml.load(sys.stdin.read())
+        if utils.input_file_name:
+            self.definition = yaml.load(utils.load_text((utils.input_file_name)))
+        else:
+            self.definition = yaml.load(sys.stdin.read())
         self.kernels_directory_paths = self.definition['kernels-directories']
+        self.variables = self.definition['variables']
         self.load_dto_instances()
         self.load_dto_structs()

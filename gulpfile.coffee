@@ -27,6 +27,18 @@ gulp.task 'generate-function-prototypes', ->
     .pipe rename 'prototypes.cl'
     .pipe gulp.dest generated_clc_dest
 
+gulp.task 'generate-gpu-interface-header', ->
+  gulp.src [definition_file]
+    .pipe CodeGenerator.generateGPUInterfaceHeader()
+    .pipe rename 'GPU.h'
+    .pipe gulp.dest 'dist'
+
+gulp.task 'generate-gpu-interface-cpp', ->
+  gulp.src [definition_file]
+    .pipe CodeGenerator.generateGPUInterfaceCpp()
+    .pipe rename 'GPU.cpp'
+    .pipe gulp.dest 'dist'
+
 gulp.task 'concat-clc', ->
   gulp.src [
     generated_clc_dest + '/dtos.cl',
@@ -51,6 +63,8 @@ gulp.task 'watch', ->
 gulp.task 'build', runSequence(
   ['generate-dtos-clc', 'generate-dtos-cpp'],
   'generate-function-prototypes',
+  'generate-gpu-interface-header',
+  # 'generate-gpu-interface-cpp',
   'concat-clc'
 )
 
