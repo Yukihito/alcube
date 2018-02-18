@@ -47,24 +47,18 @@ IF (APPLE)
             GLM_LIBRARY)
     set (EXTRA_LIBS ${GLUT_LIBRARY} ${OpenGL_LIBRARY})
 ENDIF (APPLE)
-#find_package(OPENGL_gl)
 
 find_package(OpenGL REQUIRED)
-#find_package(GLUT REQUIRED)
 find_package(OpenCL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 
-include_directories(${OpenGL_gl_INCLUDE_DIR} ${OpenCL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS}) # ${GLUT_INCLUDE_DIRS}
-set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${GLEW_LIBRARIES} glfw) # ${GLUT_LIBRARY}
+include_directories(${OpenGL_gl_INCLUDE_DIR} ${OpenCL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS})
+set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${GLEW_LIBRARIES} glfw)
 message(status "dump start")
 message(status ${OpenCL_LIBRARY})
 target_link_libraries(alcube ${EXTRA_LIBS})
-#set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++11 -Wno-deprecated-declarations -L/lib64 -lglut -lGLU -lGL -lm -pthread -lOpenCL")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wno-deprecated-declarations -pthread -Wc++1z-extensions")
-
-# -L/opt/amdgpu-pro/lib/x86_64-linux-gnu
-
 add_executable(tests test/cpp/physics/SimulatorTest.cpp)
 target_link_libraries(tests gtest_main alcube_lib)
 add_test(NAME test COMMAND tests)
