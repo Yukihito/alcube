@@ -39,6 +39,10 @@ gulp.task 'generate-gpu-interface-cpp', ->
     .pipe rename 'GPU.cpp'
     .pipe gulp.dest 'src/cpp/gpu'
 
+gulp.task 'compile-kernel', ->
+  gulp.src [definition_file]
+    .pipe CodeGenerator.compileKernel()
+
 gulp.task 'concat-clc', ->
   gulp.src [
     generated_clc_dest + '/dtos.cl',
@@ -57,15 +61,17 @@ gulp.task 'concat-clc', ->
 gulp.task 'clean', (callback) ->
   del ['dist'], callback
 
-gulp.task 'watch', ->
-  gulp.watch 'gpu-interface.yml', ['generate-dtos-clc' , 'generate-dtos-cpp']
-
-gulp.task 'build', runSequence(
-  ['generate-dtos-clc', 'generate-dtos-cpp'],
+gulp.task 'build', -> runSequence(
+  'generate-dtos-clc',
   'generate-function-prototypes',
+  'concat-clc',
+  'compile-kernel',
+  'generate-dtos-cpp',
   'generate-gpu-interface-header',
   'generate-gpu-interface-cpp',
-  'concat-clc'
 )
+
+gulp.task 'watch', ->
+  gulp.watch ['gpu-interface.yml', 'src/kernels/physics/*.cl'], ['build']
 
 gulp.task 'default', ['build']

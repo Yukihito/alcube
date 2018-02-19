@@ -5,6 +5,7 @@
 #include <string>
 #include "Resources.h"
 #include "../FileUtil.h"
+#include <iostream>
 
 namespace alcube::utils::opencl {
   class ProgramFactory {

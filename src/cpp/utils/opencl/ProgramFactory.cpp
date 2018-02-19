@@ -23,13 +23,13 @@ namespace alcube::utils::opencl {
     cl_int status;
     const char *src[] = {str};
     cl_program program = clCreateProgramWithSource(this->resources->context, 1, (const char **) &src, nullptr, nullptr);
-    status = clBuildProgram(program, 1, &this->resources->deviceId, nullptr, nullptr, nullptr);
-    std::cout << "status clBuildProgram: " << status << std::endl;
+    status = clBuildProgram(program, 1, &this->resources->deviceId, "-Werror", nullptr, nullptr);
     if (status != CL_SUCCESS) {
+      std::cerr << "status clBuildProgram: " << status << std::endl;
       size_t length;
       char buffer[65536];
       clGetProgramBuildInfo(program, this->resources->deviceId, CL_PROGRAM_BUILD_LOG, sizeof(buffer), buffer, &length);
-      std::cout << "--- Build log ---\n " << buffer << std::endl;
+      std::cerr << "--- Build log ---\n " << buffer << std::endl;
       exit(1);
     }
     this->resources->programs.push_back(program);

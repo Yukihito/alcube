@@ -6,18 +6,21 @@ PLUGIN_NAME = 'gulp-alcube-code-generator'
 
 module.exports = do ->
   generateDto = (format) ->
-    taskOf ['-m', 'codegenerator.main', 'dto', '-f', format]
+    taskOf 'python', ['-m', 'codegenerator.main', 'dto', '-f', format]
 
   generateFunctionPrototypes = ->
-    taskOf ['-m', 'codegenerator.main', 'prototypes']
+    taskOf 'python', ['-m', 'codegenerator.main', 'prototypes']
 
   generateGPUInterfaceHeader = ->
-    taskOf ['-m', 'codegenerator.main', 'gpuif_h']
+    taskOf 'python', ['-m', 'codegenerator.main', 'gpuif_h']
 
   generateGPUInterfaceCpp = ->
-    taskOf ['-m', 'codegenerator.main', 'gpuif_cpp']
+    taskOf 'python', ['-m', 'codegenerator.main', 'gpuif_cpp']
 
-  taskOf = (options) ->
+  compileKernel = ->
+    taskOf './cmake-build-release/kernel_compiler', []
+
+  taskOf = (command, options) ->
     through.obj (file, encoding, callback) ->
       if file.isNull()
         callback()
@@ -27,7 +30,7 @@ module.exports = do ->
       else if file.isBuffer()
         yaml_text = String file.contents
         compiled_text = ''
-        cmd = spawn 'python', options
+        cmd = spawn command, options
         cmd.stdin.write yaml_text
         cmd.stdin.end()
         cmd.stdout.setEncoding 'utf-8'
@@ -36,7 +39,8 @@ module.exports = do ->
         cmd.stderr.on 'data', (data) =>
           console.error data.toString()
         cmd.on 'close', (code) =>
-          console.log 'Child process "' + options[2] + '" exited with code ' + code
+          self = command + ' ' + options.join(' ')
+          console.log 'Child process "' + self + '" exited with code ' + code
           if code == 0
             output = new gutil.File
               cwd:  file.cwd
@@ -46,7 +50,7 @@ module.exports = do ->
             this.push output
             callback null, output
           else
-            callback()
+            callback('Abort on executing "' + self + '"')
       else
         console.warn 'Unexpected flow'
         callback()
@@ -57,4 +61,5 @@ module.exports = do ->
     @generateFunctionPrototypes: -> generateFunctionPrototypes()
     @generateGPUInterfaceHeader: -> generateGPUInterfaceHeader()
     @generateGPUInterfaceCpp: -> generateGPUInterfaceCpp()
+    @compileKernel: -> compileKernel()
   CodeGenerator
