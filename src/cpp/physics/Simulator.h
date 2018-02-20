@@ -15,7 +15,6 @@
 #include "Spring.h"
 #include "../utils/opencl/Simulator.h"
 #include "FluidParticle.h"
-#include "SimulatorBase.h"
 #include "../utils/alcubemath.h"
 #include "../gpu/GPU.h"
 
