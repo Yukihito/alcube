@@ -38,7 +38,7 @@ namespace alcube::physics {
       void add(Spring* spring);
       void add(FluidParticle* fluidParticle);
       SoftBodyParticle* getSoftBodyParticle(unsigned long i);
-      void update(float deltaTime);
+      void update(float deltaTime) override;
       float gravity;
       float sphericalShellRadius;
     private:
@@ -52,9 +52,7 @@ namespace alcube::physics {
       unsigned int maxActorCount;
       unsigned int actorCount;
       unsigned int actorCountForBitonicSort;
-      //unsigned int maxActorCountForBitonicSort;
       unsigned int springCount;
-      //unsigned int maxSpringCount;
       unsigned int fluidParticleCount;
 
       bool initialized;
