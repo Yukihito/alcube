@@ -11,161 +11,161 @@ namespace alcube::gpu {
       public:
         utils::opencl::Memory* memory;
         dtos::Actor* dto;
-        dtos::Actor& at(int i);
+        dtos::Actor* at(int i);
     };
 
     class ActorState {
       public:
         utils::opencl::Memory* memory;
         dtos::ActorState* dto;
-        dtos::ActorState& at(int i);
+        dtos::ActorState* at(int i);
     };
 
     class Constants {
       public:
         utils::opencl::Memory* memory;
         dtos::Constants* dto;
-        dtos::Constants& at(int i);
+        dtos::Constants* at(int i);
     };
 
     class FluidSettings {
       public:
         utils::opencl::Memory* memory;
         dtos::FluidSettings* dto;
-        dtos::FluidSettings& at(int i);
+        dtos::FluidSettings* at(int i);
     };
 
     class FluidState {
       public:
         utils::opencl::Memory* memory;
         dtos::FluidState* dto;
-        dtos::FluidState& at(int i);
+        dtos::FluidState* at(int i);
     };
 
     class Grid {
       public:
         utils::opencl::Memory* memory;
         dtos::Grid* dto;
-        dtos::Grid& at(int i);
+        dtos::Grid* at(int i);
     };
 
     class GridAndActorRelation {
       public:
         utils::opencl::Memory* memory;
         dtos::GridAndActorRelation* dto;
-        dtos::GridAndActorRelation& at(int i);
+        dtos::GridAndActorRelation* at(int i);
     };
 
     class Intersection {
       public:
         utils::opencl::Memory* memory;
         dtos::Intersection* dto;
-        dtos::Intersection& at(int i);
+        dtos::Intersection* at(int i);
     };
 
     class RigidBodyState {
       public:
         utils::opencl::Memory* memory;
         dtos::RigidBodyState* dto;
-        dtos::RigidBodyState& at(int i);
+        dtos::RigidBodyState* at(int i);
     };
 
     class Spring {
       public:
         utils::opencl::Memory* memory;
         dtos::Spring* dto;
-        dtos::Spring& at(int i);
+        dtos::Spring* at(int i);
     };
 
     class SpringVar {
       public:
         utils::opencl::Memory* memory;
         dtos::SpringVar* dto;
-        dtos::SpringVar& at(int i);
+        dtos::SpringVar* at(int i);
     };
 
     class CharMemory {
       public:
         utils::opencl::Memory* memory;
         char* dto;
-        char& at(int i);
+        char* at(int i);
     };
 
     class DoubleMemory {
       public:
         utils::opencl::Memory* memory;
         double* dto;
-        double& at(int i);
+        double* at(int i);
     };
 
     class FloatMemory {
       public:
         utils::opencl::Memory* memory;
         float* dto;
-        float& at(int i);
+        float* at(int i);
     };
 
     class Float3Memory {
       public:
         utils::opencl::Memory* memory;
         cl_float3* dto;
-        cl_float3& at(int i);
+        cl_float3* at(int i);
     };
 
     class Float4Memory {
       public:
         utils::opencl::Memory* memory;
         cl_float4* dto;
-        cl_float4& at(int i);
+        cl_float4* at(int i);
     };
 
     class IntMemory {
       public:
         utils::opencl::Memory* memory;
         int* dto;
-        int& at(int i);
+        int* at(int i);
     };
 
     class LongMemory {
       public:
         utils::opencl::Memory* memory;
         long* dto;
-        long& at(int i);
+        long* at(int i);
     };
 
     class ShortMemory {
       public:
         utils::opencl::Memory* memory;
         short* dto;
-        short& at(int i);
+        short* at(int i);
     };
 
     class UcharMemory {
       public:
         utils::opencl::Memory* memory;
         unsigned char* dto;
-        unsigned char& at(int i);
+        unsigned char* at(int i);
     };
 
     class UintMemory {
       public:
         utils::opencl::Memory* memory;
         unsigned int* dto;
-        unsigned int& at(int i);
+        unsigned int* at(int i);
     };
 
     class UlongMemory {
       public:
         utils::opencl::Memory* memory;
         unsigned long* dto;
-        unsigned long& at(int i);
+        unsigned long* at(int i);
     };
 
     class UshortMemory {
       public:
         utils::opencl::Memory* memory;
         unsigned short* dto;
-        unsigned short& at(int i);
+        unsigned short* at(int i);
     };
   }
 

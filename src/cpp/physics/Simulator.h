@@ -11,19 +11,19 @@
 #include "../utils/opencl/ProgramFactory.h"
 #include "../utils/opencl/Resources.h"
 #include "../utils/opencl/conversions.h"
-#include "opencl/dtos.h"
 #include "SoftBodyParticle.h"
 #include "Spring.h"
 #include "../utils/opencl/Simulator.h"
 #include "FluidParticle.h"
 #include "SimulatorBase.h"
 #include "../utils/alcubemath.h"
+#include "../gpu/GPU.h"
 
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
 
 
-  class Simulator : public SimulatorBase {
+  class Simulator: public utils::opencl::Simulator {
     public:
       explicit Simulator(
         utils::opencl::ResourcesProvider* resourcesProvider,
@@ -38,13 +38,24 @@ namespace alcube::physics {
       void add(Spring* spring);
       void add(FluidParticle* fluidParticle);
       SoftBodyParticle* getSoftBodyParticle(unsigned long i);
-      void update(float deltaTime) override;
+      void update(float deltaTime);
       float gravity;
       float sphericalShellRadius;
     private:
+      gpu::GPU gpu;
       std::vector<SoftBodyParticle*> softBodyParticles;
       std::vector<FluidParticle*> fluidParticles;
       std::vector<Spring*> springs;
+
+      unsigned int allGridCount;
+      unsigned int softBodyParticleCount;
+      unsigned int maxActorCount;
+      unsigned int actorCount;
+      unsigned int actorCountForBitonicSort;
+      //unsigned int maxActorCountForBitonicSort;
+      unsigned int springCount;
+      //unsigned int maxSpringCount;
+      unsigned int fluidParticleCount;
 
       bool initialized;
       void setUpComputingSize();

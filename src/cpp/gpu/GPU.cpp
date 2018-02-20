@@ -3,96 +3,96 @@
 namespace alcube::gpu {
   using namespace utils::opencl::kernelargs;
   namespace memories {
-    dtos::Actor& Actor::at(int i) {
-      return dto[i];
+    dtos::Actor* Actor::at(int i) {
+      return &dto[i];
     }
 
-    dtos::ActorState& ActorState::at(int i) {
-      return dto[i];
+    dtos::ActorState* ActorState::at(int i) {
+      return &dto[i];
     }
 
-    dtos::Constants& Constants::at(int i) {
-      return dto[i];
+    dtos::Constants* Constants::at(int i) {
+      return &dto[i];
     }
 
-    dtos::FluidSettings& FluidSettings::at(int i) {
-      return dto[i];
+    dtos::FluidSettings* FluidSettings::at(int i) {
+      return &dto[i];
     }
 
-    dtos::FluidState& FluidState::at(int i) {
-      return dto[i];
+    dtos::FluidState* FluidState::at(int i) {
+      return &dto[i];
     }
 
-    dtos::Grid& Grid::at(int i) {
-      return dto[i];
+    dtos::Grid* Grid::at(int i) {
+      return &dto[i];
     }
 
-    dtos::GridAndActorRelation& GridAndActorRelation::at(int i) {
-      return dto[i];
+    dtos::GridAndActorRelation* GridAndActorRelation::at(int i) {
+      return &dto[i];
     }
 
-    dtos::Intersection& Intersection::at(int i) {
-      return dto[i];
+    dtos::Intersection* Intersection::at(int i) {
+      return &dto[i];
     }
 
-    dtos::RigidBodyState& RigidBodyState::at(int i) {
-      return dto[i];
+    dtos::RigidBodyState* RigidBodyState::at(int i) {
+      return &dto[i];
     }
 
-    dtos::Spring& Spring::at(int i) {
-      return dto[i];
+    dtos::Spring* Spring::at(int i) {
+      return &dto[i];
     }
 
-    dtos::SpringVar& SpringVar::at(int i) {
-      return dto[i];
+    dtos::SpringVar* SpringVar::at(int i) {
+      return &dto[i];
     }
 
-    char& CharMemory::at(int i) {
-      return dto[i];
+    char* CharMemory::at(int i) {
+      return &dto[i];
     }
 
-    double& DoubleMemory::at(int i) {
-      return dto[i];
+    double* DoubleMemory::at(int i) {
+      return &dto[i];
     }
 
-    float& FloatMemory::at(int i) {
-      return dto[i];
+    float* FloatMemory::at(int i) {
+      return &dto[i];
     }
 
-    cl_float3& Float3Memory::at(int i) {
-      return dto[i];
+    cl_float3* Float3Memory::at(int i) {
+      return &dto[i];
     }
 
-    cl_float4& Float4Memory::at(int i) {
-      return dto[i];
+    cl_float4* Float4Memory::at(int i) {
+      return &dto[i];
     }
 
-    int& IntMemory::at(int i) {
-      return dto[i];
+    int* IntMemory::at(int i) {
+      return &dto[i];
     }
 
-    long& LongMemory::at(int i) {
-      return dto[i];
+    long* LongMemory::at(int i) {
+      return &dto[i];
     }
 
-    short& ShortMemory::at(int i) {
-      return dto[i];
+    short* ShortMemory::at(int i) {
+      return &dto[i];
     }
 
-    unsigned char& UcharMemory::at(int i) {
-      return dto[i];
+    unsigned char* UcharMemory::at(int i) {
+      return &dto[i];
     }
 
-    unsigned int& UintMemory::at(int i) {
-      return dto[i];
+    unsigned int* UintMemory::at(int i) {
+      return &dto[i];
     }
 
-    unsigned long& UlongMemory::at(int i) {
-      return dto[i];
+    unsigned long* UlongMemory::at(int i) {
+      return &dto[i];
     }
 
-    unsigned short& UshortMemory::at(int i) {
-      return dto[i];
+    unsigned short* UshortMemory::at(int i) {
+      return &dto[i];
     }
   }
 

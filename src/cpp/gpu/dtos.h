@@ -1,5 +1,5 @@
-#ifndef ALCUBE_PHYSICS_OPENCL_DTOS_H
-#define ALCUBE_PHYSICS_OPENCL_DTOS_H
+#ifndef ALCUBE_GPU_DTOS_H
+#define ALCUBE_GPU_DTOS_H
 
 #include <CL/cl.h>
 
@@ -144,5 +144,5 @@ namespace alcube::gpu::dtos {
   };
 #pragma pack(pop)
 }
-#endif //ALCUBE_PHYSICS_OPENCL_DTOS_H
+#endif //ALCUBE_GPU_DTOS_H
 

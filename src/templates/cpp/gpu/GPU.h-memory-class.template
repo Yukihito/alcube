@@ -2,5 +2,5 @@
       public:
         utils::opencl::Memory* memory;
         ${dto_type_name}* dto;
-        ${dto_type_name}& at(int i);
+        ${dto_type_name}* at(int i);
     };

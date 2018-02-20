@@ -9,20 +9,22 @@ namespace alcube::physics {
     unsigned int xGridCount,
     unsigned int yGridCount,
     unsigned int zGridCount
-  ) : SimulatorBase(
+  ) : utils::opencl::Simulator(resourcesProvider), gpu(
     resourcesProvider,
     maxActorCount,
     utils::math::powerOf2(maxActorCount),
     maxActorCount * 16,
     xGridCount * yGridCount * zGridCount
   ) {
+    this->maxActorCount = maxActorCount;
+    this->allGridCount = xGridCount * yGridCount * zGridCount;
     softBodyParticles = {};
     springs = {};
     fluidParticles = {};
     gravity = 0.0f;
     sphericalShellRadius = 100000.0f;
 
-    auto grid = &memories.grid.at(0);
+    auto grid = gpu.memories.grid.at(0);
     grid->edgeLength = gridEdgeLength;
     grid->xCount = xGridCount;
     grid->yCount = yGridCount;
@@ -43,14 +45,16 @@ namespace alcube::physics {
       grid->normals[i].s[i - 3] = -1.0f;
     }
 
-    dtos.fluidSettings->stiffness = 16.0f;
-    dtos.fluidSettings->density = 0.1f;
-    dtos.fluidSettings->viscosity = 8.0f;
-    dtos.fluidSettings->particleMass = (4.0f / 3.0f) * CL_M_PI_F * CL_M_PI_F * CL_M_PI_F * dtos.fluidSettings->density;
-    dtos.fluidSettings->effectiveRadius = 2.0f;
-    dtos.fluidSettings->poly6Constant = 315.0f / (64.0f * CL_M_PI_F * powf(dtos.fluidSettings->effectiveRadius, 9));
-    dtos.fluidSettings->spikyGradientConstant = 45.0f / (CL_M_PI_F * powf(dtos.fluidSettings->effectiveRadius, 6));
-    dtos.fluidSettings->viscosityLaplacianConstant = 45.0f / (CL_M_PI_F * powf(dtos.fluidSettings->effectiveRadius, 6));
+    auto fluidSettings = gpu.memories.fluidSettings.at(0);
+
+    fluidSettings->stiffness = 16.0f;
+    fluidSettings->density = 0.1f;
+    fluidSettings->viscosity = 8.0f;
+    fluidSettings->particleMass = (4.0f / 3.0f) * CL_M_PI_F * CL_M_PI_F * CL_M_PI_F * fluidSettings->density;
+    fluidSettings->effectiveRadius = 2.0f;
+    fluidSettings->poly6Constant = 315.0f / (64.0f * CL_M_PI_F * powf(fluidSettings->effectiveRadius, 9));
+    fluidSettings->spikyGradientConstant = 45.0f / (CL_M_PI_F * powf(fluidSettings->effectiveRadius, 6));
+    fluidSettings->viscosityLaplacianConstant = 45.0f / (CL_M_PI_F * powf(fluidSettings->effectiveRadius, 6));
 
     initialized = false;
   }
@@ -65,9 +69,9 @@ namespace alcube::physics {
 
   void Simulator::setUpSpring(unsigned int springIndex, unsigned char nodeIndex) {
     unsigned short actorIndex = springs[springIndex]->nodes[nodeIndex].particle->index;
-    dtos.springs[springIndex].actorIndices[nodeIndex] = actorIndex;
-    assignClFloat3(dtos.springs[springIndex].nodePositionsModelSpace[nodeIndex], springs[springIndex]->nodes[nodeIndex].position);
-    opencl::dtos::Actor* actor = &dtos.actors[actorIndex];
+    gpu.memories.springs.at(springIndex)->actorIndices[nodeIndex] = actorIndex;
+    assignClFloat3(gpu.memories.springs.at(springIndex)->nodePositionsModelSpace[nodeIndex], springs[springIndex]->nodes[nodeIndex].position);
+    auto actor = gpu.memories.actors.at(actorIndex);
     actor->springIndices[actor->springCount] = springIndex;
     actor->springNodeIndices[actor->springCount] = nodeIndex;
     actor->springCount++;
@@ -78,27 +82,21 @@ namespace alcube::physics {
     float splitDeltaTime = deltaTime / splitCount;
     auto rigidBodyParticleCountShort = (unsigned short)softBodyParticleCount;
     auto fluidParticleCountShort = (unsigned short)fluidParticleCount;
+    gpu.kernels.inputConstants(
+      1,
+      gpu.memories.constants,
+      gpu.memories.grid,
+      gpu.memories.fluidSettings,
+      gravity,
+      deltaTime,
+      splitDeltaTime,
+      sphericalShellRadius,
+      rigidBodyParticleCountShort,
+      fluidParticleCountShort
+    );
 
-    queue->push(_kernels.inputConstants, {1}, {
-      memArg(memories._constants),
-      memArg(memories._grid),
-      memArg(memories._fluidSettings),
-      floatArg(gravity),
-      floatArg(deltaTime),
-      floatArg(splitDeltaTime),
-      floatArg(sphericalShellRadius),
-      ushortArg(rigidBodyParticleCountShort),
-      ushortArg(fluidParticleCountShort)
-    });
-
-    queue->write(memories._inputFluidStates);
-    /*
-    queue->push(_kernels.inputFluid, {fluidParticleCount}, {
-      memArg(memories._inputFluidStates),
-      memArg(memories._fluidStates)
-    });
-     */
-    kernels.inputFluid(fluidParticleCount, memories.inputFluidStates, memories.fluidStates);
+    gpu.resourcesProvider->queue->write(gpu.memories.inputFluidStates.memory);
+    gpu.kernels.inputFluid(fluidParticleCountShort, gpu.memories.inputFluidStates, gpu.memories.fluidStates);
   }
 
   void Simulator::input() {
@@ -106,55 +104,59 @@ namespace alcube::physics {
     glm::vec3 vec3Zero = glm::vec3(0.0f, 0.0f, 0.0f);
     for (int i = 0; i < softBodyParticleCount; i++) {
       SoftBodyParticle* softBodyParticle = softBodyParticles[i];
-      dtos.actors[i].radius = softBodyParticle->radius;
-      dtos.actors[i].mass = softBodyParticle->mass;
-      dtos.actors[i].elasticity = softBodyParticle->elasticity;
-      dtos.actors[i].staticFrictionCoefficient = softBodyParticle->staticFrictionCoefficient;
-      dtos.actors[i].dynamicFrictionCoefficient = softBodyParticle->dynamicFrictionCoefficient;
-      dtos.actors[i].radiusForAlterEgo = softBodyParticle->radiusForAlterEgo;
-      dtos.actors[i].type = 0;
-      assignClFloat3(dtos.currentStates[i].linearMomentum, softBodyParticle->linearMomentum);
-      assignClFloat3(dtos.currentStates[i].angularMomentum, softBodyParticle->angularMomentum);
-      assignClFloat3(dtos.currentStates[i].position, softBodyParticle->position);
-      assignClFloat4(dtos.currentStates[i].rotation, softBodyParticle->rotation);
+      auto actor = gpu.memories.actors.at(i);
+      auto currentState = gpu.memories.currentStates.at(i);
+      actor->radius = softBodyParticle->radius;
+      actor->mass = softBodyParticle->mass;
+      actor->elasticity = softBodyParticle->elasticity;
+      actor->staticFrictionCoefficient = softBodyParticle->staticFrictionCoefficient;
+      actor->dynamicFrictionCoefficient = softBodyParticle->dynamicFrictionCoefficient;
+      actor->radiusForAlterEgo = softBodyParticle->radiusForAlterEgo;
+      actor->type = 0;
+      assignClFloat3(currentState->linearMomentum, softBodyParticle->linearMomentum);
+      assignClFloat3(currentState->angularMomentum, softBodyParticle->angularMomentum);
+      assignClFloat3(currentState->position, softBodyParticle->position);
+      assignClFloat4(currentState->rotation, softBodyParticle->rotation);
       softBodyParticle->index = (unsigned short)i;
-      dtos.actors[i].springCount = 0;
+      actor->springCount = 0;
     }
     for (int i = 0; i < fluidParticleCount; i++) {
       int globalIndex = i + softBodyParticleCount;
       FluidParticle* fluidParticle = fluidParticles[i];
-      dtos.actors[globalIndex].radius = dtos.fluidSettings->effectiveRadius / 2.0f;
-      dtos.actors[globalIndex].mass = dtos.fluidSettings->particleMass;
-      dtos.actors[globalIndex].elasticity = 0.0f;
-      dtos.actors[globalIndex].staticFrictionCoefficient = 0.0f;
-      dtos.actors[globalIndex].dynamicFrictionCoefficient = 0.0f;
-      dtos.actors[globalIndex].radiusForAlterEgo = 1.0f;
-      dtos.actors[globalIndex].alterEgoIndex = -1;
-      dtos.actors[globalIndex].type = 3;
+      auto actor = gpu.memories.actors.at(globalIndex);
+      auto currentStates = gpu.memories.currentStates.at(globalIndex);
+      actor->radius = gpu.memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
+      actor->mass = gpu.memories.fluidSettings.at(0)->particleMass;
+      actor->elasticity = 0.0f;
+      actor->staticFrictionCoefficient = 0.0f;
+      actor->dynamicFrictionCoefficient = 0.0f;
+      actor->radiusForAlterEgo = 1.0f;
+      actor->alterEgoIndex = -1;
+      actor->type = 3;
       glm::quat quatIdent = glm::quat();
-      assignClFloat3(dtos.currentStates[globalIndex].linearMomentum, vec3Zero);
-      assignClFloat3(dtos.currentStates[globalIndex].angularMomentum, vec3Zero);
-      assignClFloat3(dtos.currentStates[globalIndex].position, fluidParticle->position);
-      assignClFloat4(dtos.currentStates[globalIndex].rotation, quatIdent);
-      dtos.actors[i].springCount = 0;
+      assignClFloat3(currentStates->linearMomentum, vec3Zero);
+      assignClFloat3(currentStates->angularMomentum, vec3Zero);
+      assignClFloat3(currentStates->position, fluidParticle->position);
+      assignClFloat4(currentStates->rotation, quatIdent);
+      actor->springCount = 0;
 
-      opencl::dtos::FluidState* fluidState = &memories.inputFluidStates.at(i);//&dtos.inputFluidStates[i];
+      auto fluidState = gpu.memories.inputFluidStates.at(i);
       fluidState->density = 0.0f;
       assignClFloat3(fluidState->force, vec3Zero);
       fluidState->pressure = 0.0f;
       assignClFloat3(fluidState->velocity, vec3Zero);
     }
     for (unsigned int i = 0; i < springCount; i++) {
-      dtos.springs[i].k = springs[i]->k;
+      gpu.memories.springs.at(i)->k = springs[i]->k;
       setUpSpring(i, 0);
       setUpSpring(i, 1);
     }
     for (int i = 0; i < softBodyParticleCount; i++) {
       SoftBodyParticle* softBodyParticle = softBodyParticles[i];
       if (softBodyParticle->alterEgo == nullptr) {
-        dtos.actors[i].alterEgoIndex = -1;
+        gpu.memories.actors.at(i)->alterEgoIndex = -1;
       } else {
-        dtos.actors[i].alterEgoIndex = softBodyParticle->alterEgo->index;
+        gpu.memories.actors.at(i)->alterEgoIndex = softBodyParticle->alterEgo->index;
       }
     }
   }
@@ -162,52 +164,55 @@ namespace alcube::physics {
   void Simulator::output() {
     for (int i = 0; i < softBodyParticleCount; i++) {
       SoftBodyParticle* softBodyParticle = softBodyParticles[i];
-      assignGlmVec3(softBodyParticle->linearMomentum, dtos.nextStates[i].linearMomentum);
-      assignGlmVec3(softBodyParticle->angularMomentum, dtos.nextStates[i].angularMomentum);
-      assignGlmVec3(softBodyParticle->position, dtos.nextStates[i].position);
-      assignGlmQuat(softBodyParticle->rotation, dtos.nextStates[i].rotation);
+      auto nextState = gpu.memories.nextStates.at(i);
+      assignGlmVec3(softBodyParticle->linearMomentum, nextState->linearMomentum);
+      assignGlmVec3(softBodyParticle->angularMomentum, nextState->angularMomentum);
+      assignGlmVec3(softBodyParticle->position, nextState->position);
+      assignGlmQuat(softBodyParticle->rotation, nextState->rotation);
     }
 
     for (int i = 0; i < fluidParticleCount; i++) {
       int globalIndex = i + softBodyParticleCount;
       FluidParticle* particle = fluidParticles[i];
-      assignGlmVec3(particle->position, dtos.nextStates[globalIndex].position);
+      assignGlmVec3(particle->position, gpu.memories.nextStates.at(globalIndex)->position);
     }
   }
 
   void Simulator::setUpMemories() {
-    memories._actors->count = actorCount;
-    memories._actorStates->count = actorCount;
-    memories._currentStates->count = actorCount;
-    memories._nextStates->count = actorCount;
-    memories._gridAndActorRelations->count = actorCountForBitonicSort;
-    memories._springs->count = springCount;
-    memories._springVars->count = springCount;
-    memories._fluidStates->count = fluidParticleCount;
-    memories._inputFluidStates->count = fluidParticleCount;
-    queue->write(memories._actors);
-    queue->write(memories._currentStates);
-    queue->write(memories._springs);
+    gpu.memories.actors.memory->count = actorCount;
+    gpu.memories.actorStates.memory->count = actorCount;
+    gpu.memories.currentStates.memory->count = actorCount;
+    gpu.memories.nextStates.memory->count = actorCount;
+    gpu.memories.gridAndActorRelations.memory->count = actorCountForBitonicSort;
+    gpu.memories.springs.memory->count = springCount;
+    gpu.memories.springVars.memory->count = springCount;
+    gpu.memories.fluidStates.memory->count = fluidParticleCount;
+    gpu.memories.inputFluidStates.memory->count = fluidParticleCount;
+    gpu.resourcesProvider->queue->write(gpu.memories.actors.memory);
+    gpu.resourcesProvider->queue->write(gpu.memories.currentStates.memory);
+    gpu.resourcesProvider->queue->write(gpu.memories.springs.memory);
   }
 
   void Simulator::computeBroadPhase() {
     auto maxParticleCountShort = (unsigned short)maxActorCount;
     // Initialize grid and particle relations
-    queue->push(_kernels.initGridAndActorRelations, {actorCountForBitonicSort}, {
-      memArg(memories._gridAndActorRelations),
-      uintArg(allGridCount),
-      ushortArg(maxParticleCountShort)
-    });
+    gpu.kernels.initGridAndActorRelations(
+      actorCountForBitonicSort,
+      gpu.memories.gridAndActorRelations,
+      allGridCount,
+      maxParticleCountShort
+    );
 
     // Set grid index to rigid body state, and register grid and particle relations.
-    queue->push(_kernels.fillGridIndex, {actorCount}, {
-      memArg(memories._grid),
-      memArg(memories._actors),
-      memArg(memories._actorStates),
-      memArg(memories._currentStates),
-      memArg(memories._nextStates),
-      memArg(memories._gridAndActorRelations)
-    });
+    gpu.kernels.fillGridIndex(
+      actorCount,
+      gpu.memories.grid,
+      gpu.memories.actors,
+      gpu.memories.actorStates,
+      gpu.memories.currentStates,
+      gpu.memories.nextStates,
+      gpu.memories.gridAndActorRelations
+    );
 
     // Sort grid and particle relations (Bitonic sort)
     auto stageCount = (int)log2(actorCountForBitonicSort);
@@ -216,67 +221,76 @@ namespace alcube::physics {
       for (int j = 0; j < passCount + 1; j++) {
         auto distance = (unsigned int)(1 << (i - j));
         auto stageDistance = (unsigned int)(1 << i);
-        queue->push(_kernels.bitonic, {actorCountForBitonicSort}, {
-          memArg(memories._gridAndActorRelations),
-          uintArg(distance),
-          uintArg(stageDistance)
-        });
+        gpu.kernels.bitonic(
+          actorCountForBitonicSort,
+          gpu.memories.gridAndActorRelations,
+          distance,
+          stageDistance
+        );
       }
       passCount++;
     }
     passCount = stageCount;
     for (int i = 0; i < passCount; i++) {
       auto distance = (unsigned int)(1 << (stageCount - (i + 1)));
-      queue->push(_kernels.merge, {actorCountForBitonicSort}, {
-        memArg(memories._gridAndActorRelations),
-        uintArg(distance)
-      });
+      gpu.kernels.merge(
+        actorCountForBitonicSort,
+        gpu.memories.gridAndActorRelations,
+        distance
+      );
     }
 
     // Setup grid and particle relation ranges
-    queue->pushZeroFill(memories._gridStartIndices);
-    queue->pushZeroFill(memories._gridEndIndices);
-    queue->push(_kernels.setGridRelationIndexRange, {actorCount > 1 ? actorCount - 1 : 1}, {
-      memArg(memories._gridAndActorRelations),
-      memArg(memories._gridStartIndices),
-      memArg(memories._gridEndIndices),
-      uintArg(actorCount)
-    });
+    gpu.resourcesProvider->queue->pushZeroFill(gpu.memories.gridStartIndices.memory);
+    gpu.resourcesProvider->queue->pushZeroFill(gpu.memories.gridEndIndices.memory);
+    gpu.kernels.setGridRelationIndexRange(
+      actorCount > 1 ? actorCount - 1 : 1,
+      gpu.memories.gridAndActorRelations,
+      gpu.memories.gridStartIndices,
+      gpu.memories.gridEndIndices,
+      actorCount
+    );
   }
 
   void Simulator::computeNarrowPhase() {
-    queue->push(_kernels.collectIntersections, {actorCount}, {
-      memArg(memories._actorStates),
-      memArg(memories._springs),
-      memArg(memories._nextStates),
-      memArg(memories._gridAndActorRelations),
-      memArg(memories._gridStartIndices),
-      memArg(memories._gridEndIndices),
-      memArg(memories._constants)
-    });
+    gpu.kernels.collectIntersections(
+      actorCount,
+      gpu.memories.actorStates,
+      gpu.memories.springs,
+      gpu.memories.nextStates,
+      gpu.memories.gridAndActorRelations,
+      gpu.memories.gridStartIndices,
+      gpu.memories.gridEndIndices,
+      gpu.memories.constants
+    );
   }
 
   void Simulator::resolveConstraints(float deltaTime) {
-    queue->push(_kernels.updateByPenaltyImpulse, {softBodyParticleCount}, {
-      memArg(memories._actors),
-      memArg(memories._actorStates),
-      floatArg(deltaTime)
-    });
+    gpu.kernels.updateByPenaltyImpulse(
+      softBodyParticleCount,
+      gpu.memories.actors,
+      gpu.memories.actorStates,
+      deltaTime
+    );
 
     for (int i = 0; i < 16; i++) {
-      queue->push(_kernels.collectCollisions, {softBodyParticleCount}, {
-        memArg(memories._actors),
-        memArg(memories._actorStates)
-      });
-      queue->push(_kernels.updateByConstraintImpulse, {softBodyParticleCount}, {
-        memArg(memories._actors),
-        memArg(memories._actorStates)
-      });
+      gpu.kernels.collectCollisions(
+        softBodyParticleCount,
+        gpu.memories.actors,
+        gpu.memories.actorStates
+      );
+
+      gpu.kernels.updateByConstraintImpulse(
+        softBodyParticleCount,
+        gpu.memories.actors,
+        gpu.memories.actorStates
+      );
     }
-    queue->push(_kernels.updateByFrictionalImpulse, {softBodyParticleCount}, {
-      memArg(memories._actors),
-      memArg(memories._actorStates)
-    });
+    gpu.kernels.updateByFrictionalImpulse(
+      softBodyParticleCount,
+      gpu.memories.actors,
+      gpu.memories.actorStates
+    );
   }
 
   void Simulator::motion(float deltaTime) {
@@ -284,49 +298,55 @@ namespace alcube::physics {
     float splitDeltaTime = deltaTime / splitCount;
     for (int i = 0; i < splitCount; i++) {
       if (springCount > 0) {
-        queue->push(_kernels.calcSpringImpulses, {springCount}, {
-          memArg(memories._actorStates),
-          memArg(memories._springs),
-          memArg(memories._springVars),
-          memArg(memories._nextStates),
-          floatArg(splitDeltaTime)
-        });
+        gpu.kernels.calcSpringImpulses(
+          springCount,
+          gpu.memories.actorStates,
+          gpu.memories.springs,
+          gpu.memories.springVars,
+          gpu.memories.nextStates,
+          splitDeltaTime
+        );
       }
-      queue->push(_kernels.updateBySpringImpulse, {softBodyParticleCount}, {
-        memArg(memories._actors),
-        memArg(memories._actorStates),
-        memArg(memories._nextStates),
-        memArg(memories._springVars),
-        floatArg(splitDeltaTime)
-      });
+      gpu.kernels.updateBySpringImpulse(
+        softBodyParticleCount,
+        gpu.memories.actors,
+        gpu.memories.actorStates,
+        gpu.memories.nextStates,
+        gpu.memories.springVars,
+        splitDeltaTime
+      );
     }
-    queue->push(_kernels.postProcessing, {softBodyParticleCount}, {
-      memArg(memories._grid),
-      memArg(memories._actors),
-      memArg(memories._actorStates),
-      memArg(memories._nextStates),
-      floatArg(deltaTime)
-    });
+    gpu.kernels.postProcessing(
+      softBodyParticleCount,
+      gpu.memories.grid,
+      gpu.memories.actors,
+      gpu.memories.actorStates,
+      gpu.memories.nextStates,
+      deltaTime
+    );
   }
 
   void Simulator::updateFluid(float deltaTime) {
-    queue->push(_kernels.updateDensityAndPressure, {fluidParticleCount}, {
-      memArg(memories._actorStates),
-      memArg(memories._fluidStates),
-      memArg(memories._constants)
-    });
+    gpu.kernels.updateDensityAndPressure(
+      fluidParticleCount,
+      gpu.memories.actorStates,
+      gpu.memories.fluidStates,
+      gpu.memories.constants
+    );
 
-    queue->push(_kernels.updateFluidForce, {fluidParticleCount}, {
-      memArg(memories._actorStates),
-      memArg(memories._fluidStates),
-      memArg(memories._constants)
-    });
+    gpu.kernels.updateFluidForce(
+      fluidParticleCount,
+      gpu.memories.actorStates,
+      gpu.memories.fluidStates,
+      gpu.memories.constants
+    );
 
-    queue->push(_kernels.moveFluid, {fluidParticleCount}, {
-      memArg(memories._fluidStates),
-      memArg(memories._nextStates),
-      memArg(memories._constants)
-    });
+    gpu.kernels.moveFluid(
+      fluidParticleCount,
+      gpu.memories.fluidStates,
+      gpu.memories.nextStates,
+      gpu.memories.constants
+    );
   }
 
   void Simulator::update(float deltaTime) {
@@ -343,7 +363,7 @@ namespace alcube::physics {
     resolveConstraints(deltaTime);
     motion(deltaTime);
     updateFluid(deltaTime);
-    read(memories._nextStates, dtos.nextStates);
+    read(gpu.memories.nextStates.memory, gpu.memories.nextStates.dto);
     output();
   }
 
