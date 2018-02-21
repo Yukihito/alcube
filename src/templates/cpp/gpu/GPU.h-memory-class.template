@@ -3,4 +3,7 @@
         utils::opencl::Memory* memory;
         ${dto_type_name}* dto;
         ${dto_type_name}* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };

@@ -31,19 +31,17 @@ namespace alcube::physics {
     grid->xCount = xGridCount;
     grid->yCount = yGridCount;
     grid->zCount = zGridCount;
-    grid->origin.s[0] = -(float)((xGridCount * gridEdgeLength) / 2);
-    grid->origin.s[1] = -(float)((yGridCount * gridEdgeLength) / 2);
-    grid->origin.s[2] = -(float)((zGridCount * gridEdgeLength) / 2);
+    grid->origin = {
+      -(float)((xGridCount * gridEdgeLength) / 2),
+      -(float)((yGridCount * gridEdgeLength) / 2),
+      -(float)((zGridCount * gridEdgeLength) / 2)
+    };
     for (int i = 0; i < 3; i++) {
-      grid->normals[i].s[0] = 0.0f;
-      grid->normals[i].s[0] = 0.0f;
-      grid->normals[i].s[0] = 0.0f;
+      grid->normals[i] = {0.0f, 0.0f, 0.0f};
       grid->normals[i].s[i] = 1.0f;
     }
     for (int i = 3; i < 6; i++) {
-      grid->normals[i].s[0] = 0.0f;
-      grid->normals[i].s[0] = 0.0f;
-      grid->normals[i].s[0] = 0.0f;
+      grid->normals[i] = {0.0f, 0.0f, 0.0f};
       grid->normals[i].s[i - 3] = -1.0f;
     }
 
@@ -97,7 +95,7 @@ namespace alcube::physics {
       fluidParticleCountShort
     );
 
-    gpu.resourcesProvider->queue->write(gpu.memories.inputFluidStates.memory);
+    gpu.memories.inputFluidStates.write();
     gpu.kernels.inputFluid(fluidParticleCountShort, gpu.memories.inputFluidStates, gpu.memories.fluidStates);
   }
 
@@ -190,9 +188,9 @@ namespace alcube::physics {
     gpu.memories.springVars.memory->count = springCount;
     gpu.memories.fluidStates.memory->count = fluidParticleCount;
     gpu.memories.inputFluidStates.memory->count = fluidParticleCount;
-    gpu.resourcesProvider->queue->write(gpu.memories.actors.memory);
-    gpu.resourcesProvider->queue->write(gpu.memories.currentStates.memory);
-    gpu.resourcesProvider->queue->write(gpu.memories.springs.memory);
+    gpu.memories.actors.write();
+    gpu.memories.currentStates.write();
+    gpu.memories.springs.write();
   }
 
   void Simulator::computeBroadPhase() {
@@ -243,8 +241,8 @@ namespace alcube::physics {
     }
 
     // Setup grid and particle relation ranges
-    gpu.resourcesProvider->queue->pushZeroFill(gpu.memories.gridStartIndices.memory);
-    gpu.resourcesProvider->queue->pushZeroFill(gpu.memories.gridEndIndices.memory);
+    gpu.memories.gridStartIndices.zeroFill();
+    gpu.memories.gridEndIndices.zeroFill();
     gpu.kernels.setGridRelationIndexRange(
       actorCount > 1 ? actorCount - 1 : 1,
       gpu.memories.gridAndActorRelations,

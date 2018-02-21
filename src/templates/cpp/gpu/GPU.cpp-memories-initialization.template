@@ -1,3 +1,5 @@
 $memory_initializations
 
 $dto_assignments
+
+$resources_provider_assignments;

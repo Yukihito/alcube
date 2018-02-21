@@ -7,92 +7,276 @@ namespace alcube::gpu {
       return &dto[i];
     }
 
+    void Actor::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void Actor::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     dtos::ActorState* ActorState::at(int i) {
       return &dto[i];
+    }
+
+    void ActorState::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void ActorState::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
     dtos::Constants* Constants::at(int i) {
       return &dto[i];
     }
 
+    void Constants::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void Constants::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     dtos::FluidSettings* FluidSettings::at(int i) {
       return &dto[i];
+    }
+
+    void FluidSettings::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void FluidSettings::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
     dtos::FluidState* FluidState::at(int i) {
       return &dto[i];
     }
 
+    void FluidState::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void FluidState::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     dtos::Grid* Grid::at(int i) {
       return &dto[i];
+    }
+
+    void Grid::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void Grid::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
     dtos::GridAndActorRelation* GridAndActorRelation::at(int i) {
       return &dto[i];
     }
 
+    void GridAndActorRelation::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void GridAndActorRelation::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     dtos::Intersection* Intersection::at(int i) {
       return &dto[i];
+    }
+
+    void Intersection::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void Intersection::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
     dtos::RigidBodyState* RigidBodyState::at(int i) {
       return &dto[i];
     }
 
+    void RigidBodyState::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void RigidBodyState::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     dtos::Spring* Spring::at(int i) {
       return &dto[i];
+    }
+
+    void Spring::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void Spring::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
     dtos::SpringVar* SpringVar::at(int i) {
       return &dto[i];
     }
 
+    void SpringVar::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void SpringVar::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     char* CharMemory::at(int i) {
       return &dto[i];
+    }
+
+    void CharMemory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void CharMemory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
     double* DoubleMemory::at(int i) {
       return &dto[i];
     }
 
+    void DoubleMemory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void DoubleMemory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     float* FloatMemory::at(int i) {
       return &dto[i];
+    }
+
+    void FloatMemory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void FloatMemory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
     cl_float3* Float3Memory::at(int i) {
       return &dto[i];
     }
 
+    void Float3Memory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void Float3Memory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     cl_float4* Float4Memory::at(int i) {
       return &dto[i];
+    }
+
+    void Float4Memory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void Float4Memory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
     int* IntMemory::at(int i) {
       return &dto[i];
     }
 
+    void IntMemory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void IntMemory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     long* LongMemory::at(int i) {
       return &dto[i];
+    }
+
+    void LongMemory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void LongMemory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
     short* ShortMemory::at(int i) {
       return &dto[i];
     }
 
+    void ShortMemory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void ShortMemory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     unsigned char* UcharMemory::at(int i) {
       return &dto[i];
+    }
+
+    void UcharMemory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void UcharMemory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
     unsigned int* UintMemory::at(int i) {
       return &dto[i];
     }
 
+    void UintMemory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void UintMemory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     unsigned long* UlongMemory::at(int i) {
       return &dto[i];
     }
 
+    void UlongMemory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void UlongMemory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
     unsigned short* UshortMemory::at(int i) {
       return &dto[i];
+    }
+
+    void UshortMemory::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void UshortMemory::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
     }
   }
 
@@ -435,6 +619,20 @@ namespace alcube::gpu {
     memories.fluidStates.dto = dtos.fluidStates;
     memories.constants.dto = dtos.constants;
 
+    memories.grid.resourcesProvider = resourcesProvider;
+    memories.actors.resourcesProvider = resourcesProvider;
+    memories.currentStates.resourcesProvider = resourcesProvider;
+    memories.springs.resourcesProvider = resourcesProvider;
+    memories.inputFluidStates.resourcesProvider = resourcesProvider;
+    memories.fluidSettings.resourcesProvider = resourcesProvider;
+    memories.actorStates.resourcesProvider = resourcesProvider;
+    memories.nextStates.resourcesProvider = resourcesProvider;
+    memories.gridAndActorRelations.resourcesProvider = resourcesProvider;
+    memories.gridStartIndices.resourcesProvider = resourcesProvider;
+    memories.gridEndIndices.resourcesProvider = resourcesProvider;
+    memories.springVars.resourcesProvider = resourcesProvider;
+    memories.fluidStates.resourcesProvider = resourcesProvider;
+    memories.constants.resourcesProvider = resourcesProvider;;
 
     resourcesProvider->memoryManager->allocate();
   }

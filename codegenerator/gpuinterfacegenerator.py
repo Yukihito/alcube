@@ -191,6 +191,7 @@ def generate_cpp_file():
 
     memory_initialization_texts = []
     memory_dto_assignment_texts = []
+    memory_resources_provider_assignment_texts = []
     for dto_instance in definition.dto_instances:
         type_definition = type_definitions[dto_instance.type_name]
         dto_type_name = type_definition.get_cpp_dto_type_name_with_namespace()
@@ -210,11 +211,17 @@ def generate_cpp_file():
                 type_name=dto_type_name,
                 length=length
             ))
+        memory_resources_provider_assignment_texts.append(
+            template.of('memory-resources-provider-assignment').substitute(
+                name=dto_instance.name
+            ))
     memory_initializations_text = '\n'.join(memory_initialization_texts)
     memory_dto_assignments_text = '\n'.join(memory_dto_assignment_texts)
+    memory_resources_provider_assignments_text = '\n'.join(memory_resources_provider_assignment_texts)
     memories_initialization_text = template.of('memories-initialization').substitute(
         memory_initializations=memory_initializations_text,
-        dto_assignments=memory_dto_assignments_text
+        dto_assignments=memory_dto_assignments_text,
+        resources_provider_assignments=memory_resources_provider_assignments_text
     )
 
     text = template.root.substitute(

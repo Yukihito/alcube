@@ -1,3 +1,11 @@
     ${dto_type_name}* ${memory_type_name}::at(int i) {
       return &dto[i];
     }
+
+    void ${memory_type_name}::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void ${memory_type_name}::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }

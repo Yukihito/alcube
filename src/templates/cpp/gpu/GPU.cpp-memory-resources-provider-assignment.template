@@ -1,0 +1,1 @@
+    memories.${name}.resourcesProvider = resourcesProvider;

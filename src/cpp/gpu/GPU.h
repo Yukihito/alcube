@@ -12,6 +12,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::Actor* dto;
         dtos::Actor* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class ActorState {
@@ -19,6 +22,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::ActorState* dto;
         dtos::ActorState* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class Constants {
@@ -26,6 +32,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::Constants* dto;
         dtos::Constants* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class FluidSettings {
@@ -33,6 +42,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::FluidSettings* dto;
         dtos::FluidSettings* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class FluidState {
@@ -40,6 +52,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::FluidState* dto;
         dtos::FluidState* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class Grid {
@@ -47,6 +62,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::Grid* dto;
         dtos::Grid* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class GridAndActorRelation {
@@ -54,6 +72,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::GridAndActorRelation* dto;
         dtos::GridAndActorRelation* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class Intersection {
@@ -61,6 +82,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::Intersection* dto;
         dtos::Intersection* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class RigidBodyState {
@@ -68,6 +92,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::RigidBodyState* dto;
         dtos::RigidBodyState* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class Spring {
@@ -75,6 +102,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::Spring* dto;
         dtos::Spring* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class SpringVar {
@@ -82,6 +112,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         dtos::SpringVar* dto;
         dtos::SpringVar* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class CharMemory {
@@ -89,6 +122,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         char* dto;
         char* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class DoubleMemory {
@@ -96,6 +132,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         double* dto;
         double* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class FloatMemory {
@@ -103,6 +142,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         float* dto;
         float* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class Float3Memory {
@@ -110,6 +152,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         cl_float3* dto;
         cl_float3* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class Float4Memory {
@@ -117,6 +162,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         cl_float4* dto;
         cl_float4* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class IntMemory {
@@ -124,6 +172,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         int* dto;
         int* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class LongMemory {
@@ -131,6 +182,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         long* dto;
         long* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class ShortMemory {
@@ -138,6 +192,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         short* dto;
         short* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class UcharMemory {
@@ -145,6 +202,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         unsigned char* dto;
         unsigned char* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class UintMemory {
@@ -152,6 +212,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         unsigned int* dto;
         unsigned int* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class UlongMemory {
@@ -159,6 +222,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         unsigned long* dto;
         unsigned long* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
     class UshortMemory {
@@ -166,6 +232,9 @@ namespace alcube::gpu {
         utils::opencl::Memory* memory;
         unsigned short* dto;
         unsigned short* at(int i);
+        void write();
+        void zeroFill();
+        utils::opencl::ResourcesProvider* resourcesProvider;
     };
   }
 
