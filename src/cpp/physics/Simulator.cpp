@@ -1,7 +1,9 @@
 #include "Simulator.h"
 
+
 namespace alcube::physics {
   using namespace utils::opencl::kernelargs;
+
   Simulator::Simulator(
     utils::opencl::ResourcesProvider *resourcesProvider,
     unsigned int maxActorCount,
@@ -70,7 +72,7 @@ namespace alcube::physics {
   void Simulator::setUpSpring(unsigned int springIndex, unsigned char nodeIndex) {
     unsigned short actorIndex = springs[springIndex]->nodes[nodeIndex].particle->index;
     gpu.memories.springs.at(springIndex)->actorIndices[nodeIndex] = actorIndex;
-    assignClFloat3(gpu.memories.springs.at(springIndex)->nodePositionsModelSpace[nodeIndex], springs[springIndex]->nodes[nodeIndex].position);
+    gpu.memories.springs.at(springIndex)->nodePositionsModelSpace[nodeIndex] = toCl(springs[springIndex]->nodes[nodeIndex].position);
     auto actor = gpu.memories.actors.at(actorIndex);
     actor->springIndices[actor->springCount] = springIndex;
     actor->springNodeIndices[actor->springCount] = nodeIndex;
@@ -100,8 +102,6 @@ namespace alcube::physics {
   }
 
   void Simulator::input() {
-
-    glm::vec3 vec3Zero = glm::vec3(0.0f, 0.0f, 0.0f);
     for (int i = 0; i < softBodyParticleCount; i++) {
       SoftBodyParticle* softBodyParticle = softBodyParticles[i];
       auto actor = gpu.memories.actors.at(i);
@@ -113,10 +113,11 @@ namespace alcube::physics {
       actor->dynamicFrictionCoefficient = softBodyParticle->dynamicFrictionCoefficient;
       actor->radiusForAlterEgo = softBodyParticle->radiusForAlterEgo;
       actor->type = 0;
-      assignClFloat3(currentState->linearMomentum, softBodyParticle->linearMomentum);
-      assignClFloat3(currentState->angularMomentum, softBodyParticle->angularMomentum);
-      assignClFloat3(currentState->position, softBodyParticle->position);
-      assignClFloat4(currentState->rotation, softBodyParticle->rotation);
+
+      currentState->linearMomentum = toCl(softBodyParticle->linearMomentum);
+      currentState->angularMomentum = toCl(softBodyParticle->angularMomentum);
+      currentState->position = toCl(softBodyParticle->position);
+      currentState->rotation = toCl(softBodyParticle->rotation);
       softBodyParticle->index = (unsigned short)i;
       actor->springCount = 0;
     }
@@ -133,18 +134,19 @@ namespace alcube::physics {
       actor->radiusForAlterEgo = 1.0f;
       actor->alterEgoIndex = -1;
       actor->type = 3;
-      glm::quat quatIdent = glm::quat();
-      assignClFloat3(currentStates->linearMomentum, vec3Zero);
-      assignClFloat3(currentStates->angularMomentum, vec3Zero);
-      assignClFloat3(currentStates->position, fluidParticle->position);
-      assignClFloat4(currentStates->rotation, quatIdent);
+
+      cl_float3 clFloat3Zero = {0.0f, 0.0f, 0.0f};
+      currentStates->linearMomentum = clFloat3Zero;
+      currentStates->angularMomentum = clFloat3Zero;
+      currentStates->position = toCl(fluidParticle->position);
+      currentStates->rotation = {0.0f, 0.0f, 0.0f, 1.0f};
       actor->springCount = 0;
 
       auto fluidState = gpu.memories.inputFluidStates.at(i);
       fluidState->density = 0.0f;
-      assignClFloat3(fluidState->force, vec3Zero);
+      fluidState->force = clFloat3Zero;
       fluidState->pressure = 0.0f;
-      assignClFloat3(fluidState->velocity, vec3Zero);
+      fluidState->velocity = clFloat3Zero;
     }
     for (unsigned int i = 0; i < springCount; i++) {
       gpu.memories.springs.at(i)->k = springs[i]->k;
@@ -165,16 +167,16 @@ namespace alcube::physics {
     for (int i = 0; i < softBodyParticleCount; i++) {
       SoftBodyParticle* softBodyParticle = softBodyParticles[i];
       auto nextState = gpu.memories.nextStates.at(i);
-      assignGlmVec3(softBodyParticle->linearMomentum, nextState->linearMomentum);
-      assignGlmVec3(softBodyParticle->angularMomentum, nextState->angularMomentum);
-      assignGlmVec3(softBodyParticle->position, nextState->position);
-      assignGlmQuat(softBodyParticle->rotation, nextState->rotation);
+      softBodyParticle->linearMomentum = toGlm(nextState->linearMomentum);
+      softBodyParticle->angularMomentum = toGlm(nextState->angularMomentum);
+      softBodyParticle->position = toGlm(nextState->position);
+      softBodyParticle->rotation = toGlmQuat(nextState->rotation);
     }
 
     for (int i = 0; i < fluidParticleCount; i++) {
       int globalIndex = i + softBodyParticleCount;
       FluidParticle* particle = fluidParticles[i];
-      assignGlmVec3(particle->position, gpu.memories.nextStates.at(globalIndex)->position);
+      particle->position = toGlm(gpu.memories.nextStates.at(globalIndex)->position);
     }
   }
 
@@ -326,7 +328,7 @@ namespace alcube::physics {
     );
   }
 
-  void Simulator::updateFluid(float deltaTime) {
+  void Simulator::updateFluid() {
     gpu.kernels.updateDensityAndPressure(
       fluidParticleCount,
       gpu.memories.actorStates,
@@ -362,7 +364,7 @@ namespace alcube::physics {
     computeNarrowPhase();
     resolveConstraints(deltaTime);
     motion(deltaTime);
-    updateFluid(deltaTime);
+    updateFluid();
     read(gpu.memories.nextStates.memory, gpu.memories.nextStates.dto);
     output();
   }

@@ -1,30 +1,20 @@
-#include <iostream>
 #include "conversions.h"
 
 namespace alcube::utils::opencl::conversions {
-  void assignClFloat3(cl_float3 &clv, glm::vec3 &glmv) {
-    clv.s[0] = glmv.x;
-    clv.s[1] = glmv.y;
-    clv.s[2] = glmv.z;
+
+  cl_float3 toCl(glm::vec3& v) {
+    return {v.x, v.y, v.z};
   }
 
-  void assignClFloat4(cl_float4 &clv, glm::quat &glmv) {
-    clv.s[0] = glmv.x;
-    clv.s[1] = glmv.y;
-    clv.s[2] = glmv.z;
-    clv.s[3] = glmv.w;
+  cl_float4 toCl(glm::quat& v) {
+    return {v.x, v.y, v.z, v.w};
   }
 
-  void assignGlmVec3(glm::vec3 &glmv, cl_float3 &clv) {
-    glmv.x = clv.s[0];
-    glmv.y = clv.s[1];
-    glmv.z = clv.s[2];
+  glm::vec3 toGlm(cl_float3& v) {
+    return glm::vec3(v.s[0], v.s[1], v.s[2]);
   }
 
-  void assignGlmQuat(glm::quat &glmv, cl_float3 &clv) {
-    glmv.x = clv.s[0];
-    glmv.y = clv.s[1];
-    glmv.z = clv.s[2];
-    glmv.w = clv.s[3];
+  glm::quat toGlmQuat(cl_float4& v) {
+    return glm::quat(v.s[3], v.s[0], v.s[1], v.s[2]);
   }
 }

@@ -7,10 +7,10 @@
 #include <CL/cl.h>
 
 namespace alcube::utils::opencl::conversions {
-  void assignClFloat3(cl_float3& clv, glm::vec3& glmv);
-  void assignClFloat4(cl_float4& clv, glm::quat& glmv);
-  void assignGlmVec3(glm::vec3& glmv, cl_float3& clv);
-  void assignGlmQuat(glm::quat& glmv, cl_float4& clv);
+  cl_float3 toCl(glm::vec3& v);
+  cl_float4 toCl(glm::quat& v);
+  glm::vec3 toGlm(cl_float3& v);
+  glm::quat toGlmQuat(cl_float4& v);
 }
 
 #endif //ALCUBE_UTIL_OPENCL_CONVERSIONS_H
