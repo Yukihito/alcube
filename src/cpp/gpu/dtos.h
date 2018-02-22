@@ -139,8 +139,6 @@ namespace alcube::gpu::dtos {
       float sphericalShellRadius;
       unsigned short rigidBodyParticleCount;
       char _padding0[2];
-      unsigned short fluidParticleCount;
-      char _padding1[2];
   };
 #pragma pack(pop)
 }

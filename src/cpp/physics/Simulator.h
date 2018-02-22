@@ -21,7 +21,7 @@
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
 
-  class Simulator {
+  class Simulator: gpu::GPU {
     public:
       explicit Simulator(
         utils::opencl::ResourcesProvider* resourcesProvider,
@@ -40,7 +40,6 @@ namespace alcube::physics {
       float gravity;
       float sphericalShellRadius;
     private:
-      gpu::GPU gpu;
       std::vector<SoftBodyParticle*> softBodyParticles;
       std::vector<FluidParticle*> fluidParticles;
       std::vector<Spring*> springs;
@@ -52,6 +51,7 @@ namespace alcube::physics {
       unsigned int actorCountForBitonicSort;
       unsigned int springCount;
       unsigned int fluidParticleCount;
+      unsigned int splitCount;
 
       bool initialized;
       void setUpComputingSize();

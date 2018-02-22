@@ -351,7 +351,7 @@ namespace alcube::gpu {
     public:
       utils::opencl::CommandQueue* queue;
       RawKernels rawKernels;
-      void inputConstants(unsigned int workSize, memories::Constants& constants, memories::Grid& grid, memories::FluidSettings& fluidSettings, float gravityAcceleration, float deltaTime, float splitDeltaTime, float sphericalShellRadius, unsigned short rigidBodyParticleCount, unsigned short fluidParticleCount);
+      void inputConstants(unsigned int workSize, memories::Constants& constants, memories::Grid& grid, memories::FluidSettings& fluidSettings, float gravityAcceleration, float deltaTime, float splitDeltaTime, float sphericalShellRadius, unsigned short rigidBodyParticleCount);
       void initGridAndActorRelations(unsigned int workSize, memories::GridAndActorRelation& relations, unsigned int gridIndex, unsigned short actorIndex);
       void fillGridIndex(unsigned int workSize, memories::Grid& grid, memories::Actor& actors, memories::ActorState& actorStates, memories::RigidBodyState& currentStates, memories::RigidBodyState& nextStates, memories::GridAndActorRelation& relations);
       void merge(unsigned int workSize, memories::GridAndActorRelation& relations, unsigned int distance);

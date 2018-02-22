@@ -102,8 +102,6 @@ typedef struct __attribute__ ((packed)) ConstantsStruct {
   float sphericalShellRadius;
   ushort rigidBodyParticleCount;
   char _padding0[2];
-  ushort fluidParticleCount;
-  char _padding1[2];
 } Constants;
 
 float4 mulQuat(float4 q, float4 r);
@@ -152,8 +150,7 @@ __kernel void inputConstants(
   const float deltaTime,
   const float splitDeltaTime,
   const float sphericalShellRadius,
-  const ushort rigidBodyParticleCount,
-  const ushort fluidParticleCount
+  const ushort rigidBodyParticleCount
 ) {
   constants->grid = grid[0];
   constants->fluidSettings = fluidSettings[0];
@@ -162,7 +159,6 @@ __kernel void inputConstants(
   constants->splitDeltaTime = splitDeltaTime;
   constants->sphericalShellRadius = sphericalShellRadius;
   constants->rigidBodyParticleCount = rigidBodyParticleCount;
-  constants->fluidParticleCount = fluidParticleCount;
 }
 
 __kernel void initGridAndActorRelations(

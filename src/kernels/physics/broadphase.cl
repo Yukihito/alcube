@@ -6,8 +6,7 @@ __kernel void inputConstants(
   const float deltaTime,
   const float splitDeltaTime,
   const float sphericalShellRadius,
-  const ushort rigidBodyParticleCount,
-  const ushort fluidParticleCount
+  const ushort rigidBodyParticleCount
 ) {
   constants->grid = grid[0];
   constants->fluidSettings = fluidSettings[0];
@@ -16,7 +15,6 @@ __kernel void inputConstants(
   constants->splitDeltaTime = splitDeltaTime;
   constants->sphericalShellRadius = sphericalShellRadius;
   constants->rigidBodyParticleCount = rigidBodyParticleCount;
-  constants->fluidParticleCount = fluidParticleCount;
 }
 
 __kernel void initGridAndActorRelations(

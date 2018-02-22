@@ -473,8 +473,7 @@ namespace alcube::gpu {
     float deltaTime,
     float splitDeltaTime,
     float sphericalShellRadius,
-    unsigned short rigidBodyParticleCount,
-    unsigned short fluidParticleCount
+    unsigned short rigidBodyParticleCount
   ) {
     queue->push(rawKernels.inputConstants, {workSize}, {
       memArg(constants.memory),
@@ -484,8 +483,7 @@ namespace alcube::gpu {
       floatArg(deltaTime),
       floatArg(splitDeltaTime),
       floatArg(sphericalShellRadius),
-      ushortArg(rigidBodyParticleCount),
-      ushortArg(fluidParticleCount)
+      ushortArg(rigidBodyParticleCount)
     });
   }
 

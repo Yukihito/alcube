@@ -97,7 +97,6 @@ dto-structs:
     - float splitDeltaTime
     - float sphericalShellRadius
     - ushort rigidBodyParticleCount
-    - ushort fluidParticleCount
 
 dto-instances:
   - name: grid

@@ -102,6 +102,4 @@ typedef struct __attribute__ ((packed)) ConstantsStruct {
   float sphericalShellRadius;
   ushort rigidBodyParticleCount;
   char _padding0[2];
-  ushort fluidParticleCount;
-  char _padding1[2];
 } Constants;
