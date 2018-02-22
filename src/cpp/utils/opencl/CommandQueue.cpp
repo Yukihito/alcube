@@ -31,10 +31,10 @@ namespace alcube::utils::opencl {
 
   CommandQueue::CommandQueue(Resources *resources) {
     this->resources = resources;
-    this->queue = clCreateCommandQueue(
+    this->queue = clCreateCommandQueueWithProperties(
       this->resources->context,
       this->resources->deviceId,
-      0,
+      nullptr,
       nullptr
     );
     resources->queues.push_back(this->queue);

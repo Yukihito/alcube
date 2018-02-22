@@ -4,6 +4,7 @@
 #include <CL/cl.h>
 #include <iostream>
 #include <vector>
+#include "MemoryManager.h"
 
 namespace alcube::utils::opencl {
   class Resources {
@@ -16,7 +17,7 @@ namespace alcube::utils::opencl {
       std::vector<cl_kernel> kernels = {};
       std::vector<cl_command_queue> queues = {};
       std::vector<cl_program> programs = {};
-
+      MemoryManager* memoryManager;
 
       explicit Resources();
       void release();

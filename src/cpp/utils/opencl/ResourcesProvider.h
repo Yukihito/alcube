@@ -12,7 +12,6 @@ namespace alcube::utils::opencl {
       CommandQueue* queue;
       KernelFactory* kernelFactory;
       ProgramFactory* programFactory;
-      MemoryManager* memoryManager;
       explicit ResourcesProvider(FileUtil *fileUtil, Resources* resources);
       Resources* resources;
   };

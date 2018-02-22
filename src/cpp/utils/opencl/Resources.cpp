@@ -22,9 +22,13 @@ namespace alcube::utils::opencl {
     clGetDeviceInfo(deviceId, CL_DEVICE_ADDRESS_BITS, size, &addressBits, nullptr);
     // std::cout << "address bits: " << addressBits << std::endl;
     context = clCreateContext(nullptr, 1, &deviceId, nullptr, nullptr, nullptr);
+
+    memoryManager = new utils::opencl::MemoryManager();
+    memoryManager->context = context;
   }
 
   void Resources::release() {
+    memoryManager->release();
     for (cl_kernel kernel : kernels) {
       clReleaseKernel(kernel);
     }

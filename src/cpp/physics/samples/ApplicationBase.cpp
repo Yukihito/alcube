@@ -68,7 +68,6 @@ namespace alcube::physics::samples {
   }
 
   void ApplicationBase::onClose() {
-    physicsSimulator->tearDownMemories();
     resourcesProvider->resources->release();
   }
 

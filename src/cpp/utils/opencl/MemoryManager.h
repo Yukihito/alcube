@@ -2,7 +2,6 @@
 #define ALCUBE_OPENCL_MEMORYMANAGER_H
 
 #include "Memory.h"
-#include "Resources.h"
 #include <vector>
 #include <CL/cl.h>
 
@@ -16,12 +15,10 @@ namespace alcube::utils::opencl {
         cl_mem_flags memFlags,
         size_t allocationCount
       );
-
+      cl_context context;
       void allocate();
       void release();
-      explicit MemoryManager(Resources* resources);
     private:
-      Resources* resources;
       std::vector<Memory*> memories = {};
   };
 }

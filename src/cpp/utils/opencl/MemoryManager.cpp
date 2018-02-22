@@ -1,10 +1,6 @@
 #include "MemoryManager.h"
 
 namespace alcube::utils::opencl {
-  MemoryManager::MemoryManager(Resources *resources) {
-    this->resources = resources;
-  }
-
   Memory* MemoryManager::define(
     const std::string &name,
     size_t size,
@@ -15,7 +11,7 @@ namespace alcube::utils::opencl {
     auto mem = new Memory(
       name,
       size,
-      resources->context,
+      context,
       hostPtr,
       memFlags,
       allocationCount

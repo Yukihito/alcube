@@ -818,7 +818,7 @@ namespace alcube::gpu {
     memories.fluidStates.resourcesProvider = resourcesProvider;
     memories.constants.resourcesProvider = resourcesProvider;;
 
-    resourcesProvider->memoryManager->allocate();
+    resourcesProvider->resources->memoryManager->allocate();
   }
 
   utils::opencl::Memory* GPU::defineHostMemory(
@@ -827,7 +827,7 @@ namespace alcube::gpu {
     void *hostPtr,
     size_t allocationCount
   ) {
-    return resourcesProvider->memoryManager->define(name, size, hostPtr, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, allocationCount);
+    return resourcesProvider->resources->memoryManager->define(name, size, hostPtr, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, allocationCount);
   }
 
   utils::opencl::Memory* GPU::defineGPUMemory(
@@ -835,6 +835,6 @@ namespace alcube::gpu {
     size_t size,
     size_t allocationCount
   ) {
-    return resourcesProvider->memoryManager->define(name, size, nullptr, CL_MEM_READ_WRITE, allocationCount);
+    return resourcesProvider->resources->memoryManager->define(name, size, nullptr, CL_MEM_READ_WRITE, allocationCount);
   }
 }
