@@ -11,7 +11,7 @@ namespace alcube::physics {
     unsigned int xGridCount,
     unsigned int yGridCount,
     unsigned int zGridCount
-  ) : utils::opencl::Simulator(resourcesProvider), gpu(
+  ): gpu(
     resourcesProvider,
     maxActorCount,
     utils::math::powerOf2(maxActorCount),

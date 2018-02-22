@@ -1,7 +1,12 @@
 #ifndef ALCUBE_GPU_H
 #define ALCUBE_GPU_H
 
-#include "../utils/opencl/Simulator.h"
+#include "../utils/FileUtil.h"
+#include "../utils/opencl/ProgramFactory.h"
+#include "../utils/opencl/MemoryManager.h"
+#include "../utils/opencl/KernelFactory.h"
+#include "../utils/opencl/CommandQueue.h"
+#include "../utils/opencl/ResourcesProvider.h"
 #include "../utils/opencl/Memory.h"
 #include "dtos.h"
 

@@ -13,16 +13,15 @@
 #include "../utils/opencl/conversions.h"
 #include "SoftBodyParticle.h"
 #include "Spring.h"
-#include "../utils/opencl/Simulator.h"
 #include "FluidParticle.h"
 #include "../utils/alcubemath.h"
 #include "../gpu/GPU.h"
+#include "../utils/opencl/ResourcesProvider.h"
 
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
 
-
-  class Simulator: public utils::opencl::Simulator {
+  class Simulator {
     public:
       explicit Simulator(
         utils::opencl::ResourcesProvider* resourcesProvider,
@@ -37,7 +36,7 @@ namespace alcube::physics {
       void add(Spring* spring);
       void add(FluidParticle* fluidParticle);
       SoftBodyParticle* getSoftBodyParticle(unsigned long i);
-      void update(float deltaTime) override;
+      void update(float deltaTime);
       float gravity;
       float sphericalShellRadius;
     private:

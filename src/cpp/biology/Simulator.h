@@ -1,10 +1,11 @@
 #ifndef ALCUBE_BIOLOGY_SIMULATOR_H
 #define ALCUBE_BIOLOGY_SIMULATOR_H
 
-#include "../physics/Simulator.h"
+
+#include "../utils/opencl/ResourcesProvider.h"
 
 namespace alcube::biology {
-  class Simulator : utils::opencl::Simulator {
+  class Simulator {
     public:
       explicit Simulator(utils::opencl::ResourcesProvider *resourcesProvider);
   };
