@@ -13,7 +13,9 @@ namespace alcube::gpu {
         dtos::Actor* dto;
         dtos::Actor* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -23,7 +25,9 @@ namespace alcube::gpu {
         dtos::ActorState* dto;
         dtos::ActorState* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -33,7 +37,9 @@ namespace alcube::gpu {
         dtos::Constants* dto;
         dtos::Constants* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -43,7 +49,9 @@ namespace alcube::gpu {
         dtos::FluidSettings* dto;
         dtos::FluidSettings* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -53,7 +61,9 @@ namespace alcube::gpu {
         dtos::FluidState* dto;
         dtos::FluidState* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -63,7 +73,9 @@ namespace alcube::gpu {
         dtos::Grid* dto;
         dtos::Grid* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -73,7 +85,9 @@ namespace alcube::gpu {
         dtos::GridAndActorRelation* dto;
         dtos::GridAndActorRelation* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -83,7 +97,9 @@ namespace alcube::gpu {
         dtos::Intersection* dto;
         dtos::Intersection* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -93,7 +109,9 @@ namespace alcube::gpu {
         dtos::RigidBodyState* dto;
         dtos::RigidBodyState* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -103,7 +121,9 @@ namespace alcube::gpu {
         dtos::Spring* dto;
         dtos::Spring* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -113,7 +133,9 @@ namespace alcube::gpu {
         dtos::SpringVar* dto;
         dtos::SpringVar* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -123,7 +145,9 @@ namespace alcube::gpu {
         char* dto;
         char* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -133,7 +157,9 @@ namespace alcube::gpu {
         double* dto;
         double* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -143,7 +169,9 @@ namespace alcube::gpu {
         float* dto;
         float* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -153,7 +181,9 @@ namespace alcube::gpu {
         cl_float3* dto;
         cl_float3* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -163,7 +193,9 @@ namespace alcube::gpu {
         cl_float4* dto;
         cl_float4* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -173,7 +205,9 @@ namespace alcube::gpu {
         int* dto;
         int* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -183,7 +217,9 @@ namespace alcube::gpu {
         long* dto;
         long* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -193,7 +229,9 @@ namespace alcube::gpu {
         short* dto;
         short* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -203,7 +241,9 @@ namespace alcube::gpu {
         unsigned char* dto;
         unsigned char* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -213,7 +253,9 @@ namespace alcube::gpu {
         unsigned int* dto;
         unsigned int* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -223,7 +265,9 @@ namespace alcube::gpu {
         unsigned long* dto;
         unsigned long* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
@@ -233,7 +277,9 @@ namespace alcube::gpu {
         unsigned short* dto;
         unsigned short* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
   }

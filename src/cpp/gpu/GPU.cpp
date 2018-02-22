@@ -15,6 +15,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void Actor::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Actor::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     dtos::ActorState* ActorState::at(int i) {
       return &dto[i];
     }
@@ -25,6 +33,14 @@ namespace alcube::gpu {
 
     void ActorState::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void ActorState::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void ActorState::setCount(size_t count) {
+      this->memory->count = count;
     }
 
     dtos::Constants* Constants::at(int i) {
@@ -39,6 +55,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void Constants::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Constants::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     dtos::FluidSettings* FluidSettings::at(int i) {
       return &dto[i];
     }
@@ -49,6 +73,14 @@ namespace alcube::gpu {
 
     void FluidSettings::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void FluidSettings::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void FluidSettings::setCount(size_t count) {
+      this->memory->count = count;
     }
 
     dtos::FluidState* FluidState::at(int i) {
@@ -63,6 +95,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void FluidState::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void FluidState::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     dtos::Grid* Grid::at(int i) {
       return &dto[i];
     }
@@ -73,6 +113,14 @@ namespace alcube::gpu {
 
     void Grid::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void Grid::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Grid::setCount(size_t count) {
+      this->memory->count = count;
     }
 
     dtos::GridAndActorRelation* GridAndActorRelation::at(int i) {
@@ -87,6 +135,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void GridAndActorRelation::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void GridAndActorRelation::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     dtos::Intersection* Intersection::at(int i) {
       return &dto[i];
     }
@@ -97,6 +153,14 @@ namespace alcube::gpu {
 
     void Intersection::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void Intersection::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Intersection::setCount(size_t count) {
+      this->memory->count = count;
     }
 
     dtos::RigidBodyState* RigidBodyState::at(int i) {
@@ -111,6 +175,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void RigidBodyState::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void RigidBodyState::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     dtos::Spring* Spring::at(int i) {
       return &dto[i];
     }
@@ -121,6 +193,14 @@ namespace alcube::gpu {
 
     void Spring::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void Spring::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Spring::setCount(size_t count) {
+      this->memory->count = count;
     }
 
     dtos::SpringVar* SpringVar::at(int i) {
@@ -135,6 +215,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void SpringVar::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void SpringVar::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     char* CharMemory::at(int i) {
       return &dto[i];
     }
@@ -145,6 +233,14 @@ namespace alcube::gpu {
 
     void CharMemory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void CharMemory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void CharMemory::setCount(size_t count) {
+      this->memory->count = count;
     }
 
     double* DoubleMemory::at(int i) {
@@ -159,6 +255,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void DoubleMemory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void DoubleMemory::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     float* FloatMemory::at(int i) {
       return &dto[i];
     }
@@ -169,6 +273,14 @@ namespace alcube::gpu {
 
     void FloatMemory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void FloatMemory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void FloatMemory::setCount(size_t count) {
+      this->memory->count = count;
     }
 
     cl_float3* Float3Memory::at(int i) {
@@ -183,6 +295,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void Float3Memory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Float3Memory::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     cl_float4* Float4Memory::at(int i) {
       return &dto[i];
     }
@@ -193,6 +313,14 @@ namespace alcube::gpu {
 
     void Float4Memory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void Float4Memory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Float4Memory::setCount(size_t count) {
+      this->memory->count = count;
     }
 
     int* IntMemory::at(int i) {
@@ -207,6 +335,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void IntMemory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void IntMemory::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     long* LongMemory::at(int i) {
       return &dto[i];
     }
@@ -217,6 +353,14 @@ namespace alcube::gpu {
 
     void LongMemory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void LongMemory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void LongMemory::setCount(size_t count) {
+      this->memory->count = count;
     }
 
     short* ShortMemory::at(int i) {
@@ -231,6 +375,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void ShortMemory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void ShortMemory::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     unsigned char* UcharMemory::at(int i) {
       return &dto[i];
     }
@@ -241,6 +393,14 @@ namespace alcube::gpu {
 
     void UcharMemory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void UcharMemory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void UcharMemory::setCount(size_t count) {
+      this->memory->count = count;
     }
 
     unsigned int* UintMemory::at(int i) {
@@ -255,6 +415,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void UintMemory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void UintMemory::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     unsigned long* UlongMemory::at(int i) {
       return &dto[i];
     }
@@ -267,6 +435,14 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
+    void UlongMemory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void UlongMemory::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     unsigned short* UshortMemory::at(int i) {
       return &dto[i];
     }
@@ -277,6 +453,14 @@ namespace alcube::gpu {
 
     void UshortMemory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void UshortMemory::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void UshortMemory::setCount(size_t count) {
+      this->memory->count = count;
     }
   }
 

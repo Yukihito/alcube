@@ -9,3 +9,11 @@
     void ${memory_type_name}::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
+
+    void ${memory_type_name}::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void ${memory_type_name}::setCount(size_t count) {
+      this->memory->count = count;
+    }

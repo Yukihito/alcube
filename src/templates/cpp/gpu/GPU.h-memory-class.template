@@ -4,6 +4,8 @@
         ${dto_type_name}* dto;
         ${dto_type_name}* at(int i);
         void write();
+        void read();
         void zeroFill();
+        void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
     };

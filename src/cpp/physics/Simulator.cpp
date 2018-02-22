@@ -179,15 +179,15 @@ namespace alcube::physics {
   }
 
   void Simulator::setUpMemories() {
-    gpu.memories.actors.memory->count = actorCount;
-    gpu.memories.actorStates.memory->count = actorCount;
-    gpu.memories.currentStates.memory->count = actorCount;
-    gpu.memories.nextStates.memory->count = actorCount;
-    gpu.memories.gridAndActorRelations.memory->count = actorCountForBitonicSort;
-    gpu.memories.springs.memory->count = springCount;
-    gpu.memories.springVars.memory->count = springCount;
-    gpu.memories.fluidStates.memory->count = fluidParticleCount;
-    gpu.memories.inputFluidStates.memory->count = fluidParticleCount;
+    gpu.memories.actors.setCount(actorCount);
+    gpu.memories.actorStates.setCount(actorCount);
+    gpu.memories.currentStates.setCount(actorCount);
+    gpu.memories.nextStates.setCount(actorCount);
+    gpu.memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
+    gpu.memories.springs.setCount(springCount);
+    gpu.memories.springVars.setCount(springCount);
+    gpu.memories.fluidStates.setCount(fluidParticleCount);
+    gpu.memories.inputFluidStates.setCount(fluidParticleCount);
     gpu.memories.actors.write();
     gpu.memories.currentStates.write();
     gpu.memories.springs.write();
@@ -363,7 +363,7 @@ namespace alcube::physics {
     resolveConstraints(deltaTime);
     motion(deltaTime);
     updateFluid();
-    read(gpu.memories.nextStates.memory, gpu.memories.nextStates.dto);
+    gpu.memories.nextStates.read();
     output();
   }
 
