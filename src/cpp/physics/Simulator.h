@@ -29,14 +29,15 @@ namespace alcube::physics {
         unsigned int gridEdgeLength,
         unsigned int xGridCount,
         unsigned int yGridCount,
-        unsigned int zGridCount
+        unsigned int zGridCount,
+        float deltaTime
       );
 
       void add(SoftBodyParticle* softBodyParticle);
       void add(Spring* spring);
       void add(FluidParticle* fluidParticle);
       SoftBodyParticle* getSoftBodyParticle(unsigned long i);
-      void update(float deltaTime);
+      void update();
       float gravity;
       float sphericalShellRadius;
     private:
@@ -52,17 +53,17 @@ namespace alcube::physics {
       unsigned int springCount;
       unsigned int fluidParticleCount;
       unsigned int splitCount;
+      float deltaTime;
 
       bool initialized;
       void setUpComputingSize();
       void setUpMemories();
-      void initGPUMemory(float deltaTime);
       void input();
       void output();
       void computeBroadPhase();
       void computeNarrowPhase();
-      void resolveConstraints(float deltaTime);
-      void motion(float deltaTime);
+      void resolveConstraints();
+      void motion();
       void updateFluid();
 
       void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);

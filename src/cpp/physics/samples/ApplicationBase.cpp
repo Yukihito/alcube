@@ -39,7 +39,8 @@ namespace alcube::physics::samples {
       gridEdgeLength,
       xGridCount,
       yGridCount,
-      zGridCount
+      zGridCount,
+      deltaTime
     );
     physicsSimulator->gravity = gravity;
     profiler = new utils::Profiler();
@@ -59,7 +60,7 @@ namespace alcube::physics::samples {
 
   void ApplicationBase::onUpdate() {
     profiler->start(profilers.update);
-    physicsSimulator->update(deltaTime);
+    physicsSimulator->update();
     drawer->updateDrawableBuffers();
     profiler->stop(profilers.update);
     profiler->stop(profilers.all);

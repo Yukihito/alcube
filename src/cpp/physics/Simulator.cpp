@@ -10,7 +10,8 @@ namespace alcube::physics {
     unsigned int gridEdgeLength,
     unsigned int xGridCount,
     unsigned int yGridCount,
-    unsigned int zGridCount
+    unsigned int zGridCount,
+    float deltaTime
   ): gpu::GPU(
     resourcesProvider,
     maxActorCount,
@@ -18,6 +19,7 @@ namespace alcube::physics {
     maxActorCount * 16,
     xGridCount * yGridCount * zGridCount
   ) {
+    this->deltaTime = deltaTime;
     this->maxActorCount = maxActorCount;
     this->allGridCount = xGridCount * yGridCount * zGridCount;
     softBodyParticles = {};
@@ -67,35 +69,6 @@ namespace alcube::physics {
     actorCount = softBodyParticleCount + fluidParticleCount;
     springCount = (unsigned int)springs.size();
     actorCountForBitonicSort = utils::math::powerOf2(actorCount);
-  }
-
-  void Simulator::initGPUMemory(float deltaTime) {
-    float splitDeltaTime = deltaTime / splitCount;
-    kernels.inputConstants(
-      1,
-      memories.constants,
-      memories.grid,
-      memories.fluidSettings,
-      gravity,
-      deltaTime,
-      splitDeltaTime,
-      sphericalShellRadius
-    );
-
-    kernels.inputActors(
-      actorCount,
-      memories.actors,
-      memories.actorStates,
-      memories.hostPhysicalQuantities,
-      memories.physicalQuantities
-    );
-
-    memories.hostFluidStates.write();
-    kernels.inputFluid(
-      (unsigned short)fluidParticleCount,
-      memories.hostFluidStates,
-      memories.fluidStates
-    );
   }
 
   void Simulator::setUpSpring(unsigned int springIndex, unsigned char nodeIndex) {
@@ -191,17 +164,46 @@ namespace alcube::physics {
 
   void Simulator::setUpMemories() {
     memories.actors.setCount(actorCount);
-    memories.actorStates.setCount(actorCount);
     memories.hostPhysicalQuantities.setCount(actorCount);
+    memories.springs.setCount(springCount);
+    memories.hostFluidStates.setCount(fluidParticleCount);
+
+    memories.actorStates.setCount(actorCount);
     memories.physicalQuantities.setCount(actorCount);
     memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
-    memories.springs.setCount(springCount);
     memories.springVars.setCount(springCount);
     memories.fluidStates.setCount(fluidParticleCount);
-    memories.hostFluidStates.setCount(fluidParticleCount);
+
     memories.actors.write();
     memories.hostPhysicalQuantities.write();
     memories.springs.write();
+    memories.hostFluidStates.write();
+
+    float splitDeltaTime = deltaTime / splitCount;
+    kernels.inputConstants(
+      1,
+      memories.constants,
+      memories.grid,
+      memories.fluidSettings,
+      gravity,
+      deltaTime,
+      splitDeltaTime,
+      sphericalShellRadius
+    );
+
+    kernels.inputActors(
+      actorCount,
+      memories.actors,
+      memories.actorStates,
+      memories.hostPhysicalQuantities,
+      memories.physicalQuantities
+    );
+
+    kernels.inputFluid(
+      (unsigned short)fluidParticleCount,
+      memories.hostFluidStates,
+      memories.fluidStates
+    );
   }
 
   void Simulator::computeBroadPhase() {
@@ -273,7 +275,7 @@ namespace alcube::physics {
     );
   }
 
-  void Simulator::resolveConstraints(float deltaTime) {
+  void Simulator::resolveConstraints() {
     kernels.updateByPenaltyImpulse(
       softBodyParticleCount,
       memories.actors,
@@ -301,7 +303,7 @@ namespace alcube::physics {
     );
   }
 
-  void Simulator::motion(float deltaTime) {
+  void Simulator::motion() {
     float splitDeltaTime = deltaTime / splitCount;
     for (int i = 0; i < splitCount; i++) {
       if (springCount > 0) {
@@ -356,19 +358,18 @@ namespace alcube::physics {
     );
   }
 
-  void Simulator::update(float deltaTime) {
+  void Simulator::update() {
     if (!initialized) {
       setUpComputingSize();
       input();
       setUpMemories();
-      initGPUMemory(deltaTime);
       initialized = true;
     }
 
     computeBroadPhase();
     computeNarrowPhase();
-    resolveConstraints(deltaTime);
-    motion(deltaTime);
+    resolveConstraints();
+    motion();
     updateFluid();
     memories.physicalQuantities.read();
     output();

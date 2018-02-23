@@ -12,7 +12,8 @@ namespace alcube::physics::samples {
       8,
       64,
       64,
-      64
+      64,
+      deltaTime
     );
     auto profiler = new utils::Profiler();
     profiler->enabled = true;
@@ -40,7 +41,7 @@ namespace alcube::physics::samples {
 
     for (int i = 0; i < 1000; i++) {
       profiler->start(timerId);
-      simulator->update(deltaTime);
+      simulator->update();
       profiler->stop(timerId);
     }
 
