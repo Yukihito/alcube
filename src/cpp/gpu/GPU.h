@@ -295,7 +295,7 @@ namespace alcube::gpu {
       memories::Actor actors;
       memories::RigidBodyState currentStates;
       memories::Spring springs;
-      memories::FluidState inputFluidStates;
+      memories::FluidState hostFluidStates;
       memories::FluidSettings fluidSettings;
       memories::ActorState actorStates;
       memories::RigidBodyState nextStates;
@@ -313,7 +313,7 @@ namespace alcube::gpu {
       dtos::Actor* actors;
       dtos::RigidBodyState* currentStates;
       dtos::Spring* springs;
-      dtos::FluidState* inputFluidStates;
+      dtos::FluidState* hostFluidStates;
       dtos::FluidSettings* fluidSettings;
       dtos::ActorState* actorStates;
       dtos::RigidBodyState* nextStates;
@@ -361,7 +361,7 @@ namespace alcube::gpu {
       void updateByFrictionalImpulse(unsigned int workSize, memories::Actor& actors, memories::ActorState& actorStates);
       void collectCollisions(unsigned int workSize, memories::Actor& actors, memories::ActorState& actorStates);
       void updateByConstraintImpulse(unsigned int workSize, memories::Actor& actors, memories::ActorState& actorStates);
-      void inputFluid(unsigned int workSize, memories::FluidState& inputFluidStates, memories::FluidState& fluidStates);
+      void inputFluid(unsigned int workSize, memories::FluidState& hostFluidStates, memories::FluidState& fluidStates);
       void updateDensityAndPressure(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
       void updateFluidForce(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
       void moveFluid(unsigned int workSize, memories::FluidState& fluidStates, memories::RigidBodyState& nextStates, memories::Constants& constants);

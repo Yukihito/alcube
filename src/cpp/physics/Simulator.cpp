@@ -83,10 +83,10 @@ namespace alcube::physics {
       (unsigned short)softBodyParticleCount
     );
 
-    memories.inputFluidStates.write();
+    memories.hostFluidStates.write();
     kernels.inputFluid(
       (unsigned short)fluidParticleCount,
-      memories.inputFluidStates,
+      memories.hostFluidStates,
       memories.fluidStates
     );
   }
@@ -142,7 +142,7 @@ namespace alcube::physics {
       currentStates->rotation = {0.0f, 0.0f, 0.0f, 1.0f};
       actor->springCount = 0;
 
-      auto fluidState = memories.inputFluidStates.at(i);
+      auto fluidState = memories.hostFluidStates.at(i);
       fluidState->density = 0.0f;
       fluidState->force = clFloat3Zero;
       fluidState->pressure = 0.0f;
@@ -189,7 +189,7 @@ namespace alcube::physics {
     memories.springs.setCount(springCount);
     memories.springVars.setCount(springCount);
     memories.fluidStates.setCount(fluidParticleCount);
-    memories.inputFluidStates.setCount(fluidParticleCount);
+    memories.hostFluidStates.setCount(fluidParticleCount);
     memories.actors.write();
     memories.currentStates.write();
     memories.springs.write();

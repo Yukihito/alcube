@@ -118,7 +118,7 @@ dto-instances:
     length: maxSpringCount
     host-ptr: true
 
-  - name: inputFluidStates
+  - name: hostFluidStates
     type: FluidState
     length: maxActorCount
     host-ptr: true

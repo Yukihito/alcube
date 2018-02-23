@@ -606,11 +606,11 @@ namespace alcube::gpu {
 
   void Kernels::inputFluid(
     unsigned int workSize,
-    memories::FluidState& inputFluidStates,
+    memories::FluidState& hostFluidStates,
     memories::FluidState& fluidStates
   ) {
     queue->push(rawKernels.inputFluid, {workSize}, {
-      memArg(inputFluidStates.memory),
+      memArg(hostFluidStates.memory),
       memArg(fluidStates.memory)
     });
   }
@@ -760,7 +760,7 @@ namespace alcube::gpu {
     dtos.actors = new dtos::Actor[maxActorCount];
     dtos.currentStates = new dtos::RigidBodyState[maxActorCount];
     dtos.springs = new dtos::Spring[maxSpringCount];
-    dtos.inputFluidStates = new dtos::FluidState[maxActorCount];
+    dtos.hostFluidStates = new dtos::FluidState[maxActorCount];
     dtos.fluidSettings = new dtos::FluidSettings();
     dtos.actorStates = new dtos::ActorState[maxActorCount];
     dtos.nextStates = new dtos::RigidBodyState[maxActorCount];
@@ -775,7 +775,7 @@ namespace alcube::gpu {
     memories.actors.memory = defineHostMemory("actors", sizeof(dtos::Actor), dtos.actors, maxActorCount);
     memories.currentStates.memory = defineHostMemory("currentStates", sizeof(dtos::RigidBodyState), dtos.currentStates, maxActorCount);
     memories.springs.memory = defineHostMemory("springs", sizeof(dtos::Spring), dtos.springs, maxSpringCount);
-    memories.inputFluidStates.memory = defineHostMemory("inputFluidStates", sizeof(dtos::FluidState), dtos.inputFluidStates, maxActorCount);
+    memories.hostFluidStates.memory = defineHostMemory("hostFluidStates", sizeof(dtos::FluidState), dtos.hostFluidStates, maxActorCount);
     memories.fluidSettings.memory = defineHostMemory("fluidSettings", sizeof(dtos::FluidSettings), dtos.fluidSettings, 1);
     memories.actorStates.memory = defineGPUMemory("actorStates", sizeof(dtos::ActorState), maxActorCount);
     memories.nextStates.memory = defineGPUMemory("nextStates", sizeof(dtos::RigidBodyState), maxActorCount);
@@ -790,7 +790,7 @@ namespace alcube::gpu {
     memories.actors.dto = dtos.actors;
     memories.currentStates.dto = dtos.currentStates;
     memories.springs.dto = dtos.springs;
-    memories.inputFluidStates.dto = dtos.inputFluidStates;
+    memories.hostFluidStates.dto = dtos.hostFluidStates;
     memories.fluidSettings.dto = dtos.fluidSettings;
     memories.actorStates.dto = dtos.actorStates;
     memories.nextStates.dto = dtos.nextStates;
@@ -805,7 +805,7 @@ namespace alcube::gpu {
     memories.actors.resourcesProvider = resourcesProvider;
     memories.currentStates.resourcesProvider = resourcesProvider;
     memories.springs.resourcesProvider = resourcesProvider;
-    memories.inputFluidStates.resourcesProvider = resourcesProvider;
+    memories.hostFluidStates.resourcesProvider = resourcesProvider;
     memories.fluidSettings.resourcesProvider = resourcesProvider;
     memories.actorStates.resourcesProvider = resourcesProvider;
     memories.nextStates.resourcesProvider = resourcesProvider;

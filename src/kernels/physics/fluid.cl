@@ -1,9 +1,9 @@
 __kernel void inputFluid(
-  __global FluidState* inputFluidStates,
+  __global FluidState* hostFluidStates,
   __global FluidState* fluidStates
 ) {
   size_t i = get_global_id(0);
-  fluidStates[i] = inputFluidStates[i];
+  fluidStates[i] = hostFluidStates[i];
 }
 
 __kernel void updateDensityAndPressure(
