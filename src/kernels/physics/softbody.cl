@@ -2,19 +2,19 @@ __kernel void calcSpringImpulses(
   __global ActorState* actorStates,
   __global const Spring* springs,
   __global SpringVar* springVars,
-  __global RigidBodyState* nextStates,
+  __global PhysicalQuantity* physicalQuantities,
   const float deltaTime
 ) {
   size_t i = get_global_id(0);
   __global const Spring* spring = &springs[i];
   __global SpringVar* springVar = &springVars[i];
   float3 pm0 = spring->nodePositionsModelSpace[0];
-  float4 rot0 = nextStates[spring->actorIndices[0]].rotation;
+  float4 rot0 = physicalQuantities[spring->actorIndices[0]].rotation;
   float3 pm1 = spring->nodePositionsModelSpace[1];
-  float4 rot1 = nextStates[spring->actorIndices[1]].rotation;
+  float4 rot1 = physicalQuantities[spring->actorIndices[1]].rotation;
   float3 p0 = rotateByQuat(pm0, rot0);
   float3 p1 = rotateByQuat(pm1, rot1);
-  float3 impulse = ((p1 + nextStates[spring->actorIndices[1]].position) - (p0 + nextStates[spring->actorIndices[0]].position));
+  float3 impulse = ((p1 + physicalQuantities[spring->actorIndices[1]].position) - (p0 + physicalQuantities[spring->actorIndices[0]].position));
   float3 direction = normalize(impulse);
   float len = length(impulse);
   springVar->linearImpulses[0] = log2(1.0f + len) * deltaTime * spring->k * direction;
@@ -26,7 +26,7 @@ __kernel void calcSpringImpulses(
 __kernel void updateBySpringImpulse(
   __global const Actor* actors,
   __global ActorState* actorStates,
-  __global RigidBodyState* nextStates,
+  __global PhysicalQuantity* physicalQuantities,
   __global SpringVar* springVars,
   const float deltaTime
 ) {
@@ -44,6 +44,6 @@ __kernel void updateBySpringImpulse(
 
   actorState->linearVelocity += linearImpulse / actor->mass;
   actorState->angularVelocity += angularImpulse / actorState->momentOfInertia;
-  nextStates[actorIndex].position += actorState->linearVelocity * deltaTime;
-  nextStates[actorIndex].rotation = mulQuat(createQuatFromDisplacement(actorState->angularVelocity * deltaTime), nextStates[actorIndex].rotation);
+  physicalQuantities[actorIndex].position += actorState->linearVelocity * deltaTime;
+  physicalQuantities[actorIndex].rotation = mulQuat(createQuatFromDisplacement(actorState->angularVelocity * deltaTime), physicalQuantities[actorIndex].rotation);
 }

@@ -108,11 +108,11 @@ namespace alcube::gpu {
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
-    class RigidBodyState {
+    class PhysicalQuantity {
       public:
         utils::opencl::Memory* memory;
-        dtos::RigidBodyState* dto;
-        dtos::RigidBodyState* at(int i);
+        dtos::PhysicalQuantity* dto;
+        dtos::PhysicalQuantity* at(int i);
         void write();
         void read();
         void zeroFill();
@@ -293,12 +293,12 @@ namespace alcube::gpu {
     public:
       memories::Grid grid;
       memories::Actor actors;
-      memories::RigidBodyState currentStates;
+      memories::PhysicalQuantity hostPhysicalQuantities;
       memories::Spring springs;
       memories::FluidState hostFluidStates;
       memories::FluidSettings fluidSettings;
       memories::ActorState actorStates;
-      memories::RigidBodyState nextStates;
+      memories::PhysicalQuantity physicalQuantities;
       memories::GridAndActorRelation gridAndActorRelations;
       memories::UintMemory gridStartIndices;
       memories::UintMemory gridEndIndices;
@@ -311,12 +311,12 @@ namespace alcube::gpu {
     public:
       dtos::Grid* grid;
       dtos::Actor* actors;
-      dtos::RigidBodyState* currentStates;
+      dtos::PhysicalQuantity* hostPhysicalQuantities;
       dtos::Spring* springs;
       dtos::FluidState* hostFluidStates;
       dtos::FluidSettings* fluidSettings;
       dtos::ActorState* actorStates;
-      dtos::RigidBodyState* nextStates;
+      dtos::PhysicalQuantity* physicalQuantities;
       dtos::GridAndActorRelation* gridAndActorRelations;
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
@@ -353,7 +353,7 @@ namespace alcube::gpu {
       RawKernels rawKernels;
       void inputConstants(unsigned int workSize, memories::Constants& constants, memories::Grid& grid, memories::FluidSettings& fluidSettings, float gravityAcceleration, float deltaTime, float splitDeltaTime, float sphericalShellRadius, unsigned short rigidBodyParticleCount);
       void initGridAndActorRelations(unsigned int workSize, memories::GridAndActorRelation& relations, unsigned int gridIndex, unsigned short actorIndex);
-      void fillGridIndex(unsigned int workSize, memories::Grid& grid, memories::Actor& actors, memories::ActorState& actorStates, memories::RigidBodyState& currentStates, memories::RigidBodyState& nextStates, memories::GridAndActorRelation& relations);
+      void fillGridIndex(unsigned int workSize, memories::Grid& grid, memories::Actor& actors, memories::ActorState& actorStates, memories::PhysicalQuantity& hostPhysicalQuantities, memories::PhysicalQuantity& physicalQuantities, memories::GridAndActorRelation& relations);
       void merge(unsigned int workSize, memories::GridAndActorRelation& relations, unsigned int distance);
       void bitonic(unsigned int workSize, memories::GridAndActorRelation& relations, unsigned int distance, unsigned int stageDistance);
       void setGridRelationIndexRange(unsigned int workSize, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, unsigned int actorCount);
@@ -364,11 +364,11 @@ namespace alcube::gpu {
       void inputFluid(unsigned int workSize, memories::FluidState& hostFluidStates, memories::FluidState& fluidStates);
       void updateDensityAndPressure(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
       void updateFluidForce(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
-      void moveFluid(unsigned int workSize, memories::FluidState& fluidStates, memories::RigidBodyState& nextStates, memories::Constants& constants);
-      void postProcessing(unsigned int workSize, memories::Grid& grid, memories::Actor& actors, memories::ActorState& actorStates, memories::RigidBodyState& nextStates, float deltaTime);
-      void collectIntersections(unsigned int workSize, memories::ActorState& actorStates, memories::Spring& springs, memories::RigidBodyState& nextStates, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, memories::Constants& constants);
-      void calcSpringImpulses(unsigned int workSize, memories::ActorState& actorStates, memories::Spring& springs, memories::SpringVar& springVars, memories::RigidBodyState& nextStates, float deltaTime);
-      void updateBySpringImpulse(unsigned int workSize, memories::Actor& actors, memories::ActorState& actorStates, memories::RigidBodyState& nextStates, memories::SpringVar& springVars, float deltaTime);
+      void moveFluid(unsigned int workSize, memories::FluidState& fluidStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
+      void postProcessing(unsigned int workSize, memories::Grid& grid, memories::Actor& actors, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, float deltaTime);
+      void collectIntersections(unsigned int workSize, memories::ActorState& actorStates, memories::Spring& springs, memories::PhysicalQuantity& physicalQuantities, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, memories::Constants& constants);
+      void calcSpringImpulses(unsigned int workSize, memories::ActorState& actorStates, memories::Spring& springs, memories::SpringVar& springVars, memories::PhysicalQuantity& physicalQuantities, float deltaTime);
+      void updateBySpringImpulse(unsigned int workSize, memories::Actor& actors, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::SpringVar& springVars, float deltaTime);
   };
 
   class GPU {

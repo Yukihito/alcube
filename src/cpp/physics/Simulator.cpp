@@ -105,7 +105,7 @@ namespace alcube::physics {
     for (int i = 0; i < softBodyParticleCount; i++) {
       SoftBodyParticle* softBodyParticle = softBodyParticles[i];
       auto actor = memories.actors.at(i);
-      auto currentState = memories.currentStates.at(i);
+      auto hostPhysicalQuantity = memories.hostPhysicalQuantities.at(i);
       actor->radius = softBodyParticle->radius;
       actor->mass = softBodyParticle->mass;
       actor->elasticity = softBodyParticle->elasticity;
@@ -114,10 +114,10 @@ namespace alcube::physics {
       actor->radiusForAlterEgo = softBodyParticle->radiusForAlterEgo;
       actor->type = 0;
 
-      currentState->linearMomentum = toCl(softBodyParticle->linearMomentum);
-      currentState->angularMomentum = toCl(softBodyParticle->angularMomentum);
-      currentState->position = toCl(softBodyParticle->position);
-      currentState->rotation = toCl(softBodyParticle->rotation);
+      hostPhysicalQuantity->linearMomentum = toCl(softBodyParticle->linearMomentum);
+      hostPhysicalQuantity->angularMomentum = toCl(softBodyParticle->angularMomentum);
+      hostPhysicalQuantity->position = toCl(softBodyParticle->position);
+      hostPhysicalQuantity->rotation = toCl(softBodyParticle->rotation);
       softBodyParticle->index = (unsigned short)i;
       actor->springCount = 0;
     }
@@ -125,7 +125,7 @@ namespace alcube::physics {
       int globalIndex = i + softBodyParticleCount;
       FluidParticle* fluidParticle = fluidParticles[i];
       auto actor = memories.actors.at(globalIndex);
-      auto currentStates = memories.currentStates.at(globalIndex);
+      auto hostPhysicalQuantity = memories.hostPhysicalQuantities.at(globalIndex);
       actor->radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
       actor->mass = memories.fluidSettings.at(0)->particleMass;
       actor->elasticity = 0.0f;
@@ -136,10 +136,10 @@ namespace alcube::physics {
       actor->type = 3;
 
       cl_float3 clFloat3Zero = {0.0f, 0.0f, 0.0f};
-      currentStates->linearMomentum = clFloat3Zero;
-      currentStates->angularMomentum = clFloat3Zero;
-      currentStates->position = toCl(fluidParticle->position);
-      currentStates->rotation = {0.0f, 0.0f, 0.0f, 1.0f};
+      hostPhysicalQuantity->linearMomentum = clFloat3Zero;
+      hostPhysicalQuantity->angularMomentum = clFloat3Zero;
+      hostPhysicalQuantity->position = toCl(fluidParticle->position);
+      hostPhysicalQuantity->rotation = {0.0f, 0.0f, 0.0f, 1.0f};
       actor->springCount = 0;
 
       auto fluidState = memories.hostFluidStates.at(i);
@@ -166,32 +166,32 @@ namespace alcube::physics {
   void Simulator::output() {
     for (int i = 0; i < softBodyParticleCount; i++) {
       SoftBodyParticle* softBodyParticle = softBodyParticles[i];
-      auto nextState = memories.nextStates.at(i);
-      softBodyParticle->linearMomentum = toGlm(nextState->linearMomentum);
-      softBodyParticle->angularMomentum = toGlm(nextState->angularMomentum);
-      softBodyParticle->position = toGlm(nextState->position);
-      softBodyParticle->rotation = toGlmQuat(nextState->rotation);
+      auto physicalQuantity = memories.physicalQuantities.at(i);
+      softBodyParticle->linearMomentum = toGlm(physicalQuantity->linearMomentum);
+      softBodyParticle->angularMomentum = toGlm(physicalQuantity->angularMomentum);
+      softBodyParticle->position = toGlm(physicalQuantity->position);
+      softBodyParticle->rotation = toGlmQuat(physicalQuantity->rotation);
     }
 
     for (int i = 0; i < fluidParticleCount; i++) {
       int globalIndex = i + softBodyParticleCount;
       FluidParticle* particle = fluidParticles[i];
-      particle->position = toGlm(memories.nextStates.at(globalIndex)->position);
+      particle->position = toGlm(memories.physicalQuantities.at(globalIndex)->position);
     }
   }
 
   void Simulator::setUpMemories() {
     memories.actors.setCount(actorCount);
     memories.actorStates.setCount(actorCount);
-    memories.currentStates.setCount(actorCount);
-    memories.nextStates.setCount(actorCount);
+    memories.hostPhysicalQuantities.setCount(actorCount);
+    memories.physicalQuantities.setCount(actorCount);
     memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
     memories.springs.setCount(springCount);
     memories.springVars.setCount(springCount);
     memories.fluidStates.setCount(fluidParticleCount);
     memories.hostFluidStates.setCount(fluidParticleCount);
     memories.actors.write();
-    memories.currentStates.write();
+    memories.hostPhysicalQuantities.write();
     memories.springs.write();
   }
 
@@ -211,8 +211,8 @@ namespace alcube::physics {
       memories.grid,
       memories.actors,
       memories.actorStates,
-      memories.currentStates,
-      memories.nextStates,
+      memories.hostPhysicalQuantities,
+      memories.physicalQuantities,
       memories.gridAndActorRelations
     );
 
@@ -259,7 +259,7 @@ namespace alcube::physics {
       actorCount,
       memories.actorStates,
       memories.springs,
-      memories.nextStates,
+      memories.physicalQuantities,
       memories.gridAndActorRelations,
       memories.gridStartIndices,
       memories.gridEndIndices,
@@ -304,7 +304,7 @@ namespace alcube::physics {
           memories.actorStates,
           memories.springs,
           memories.springVars,
-          memories.nextStates,
+          memories.physicalQuantities,
           splitDeltaTime
         );
       }
@@ -312,7 +312,7 @@ namespace alcube::physics {
         softBodyParticleCount,
         memories.actors,
         memories.actorStates,
-        memories.nextStates,
+        memories.physicalQuantities,
         memories.springVars,
         splitDeltaTime
       );
@@ -322,7 +322,7 @@ namespace alcube::physics {
       memories.grid,
       memories.actors,
       memories.actorStates,
-      memories.nextStates,
+      memories.physicalQuantities,
       deltaTime
     );
   }
@@ -345,7 +345,7 @@ namespace alcube::physics {
     kernels.moveFluid(
       fluidParticleCount,
       memories.fluidStates,
-      memories.nextStates,
+      memories.physicalQuantities,
       memories.constants
     );
   }
@@ -364,7 +364,7 @@ namespace alcube::physics {
     resolveConstraints(deltaTime);
     motion(deltaTime);
     updateFluid();
-    memories.nextStates.read();
+    memories.physicalQuantities.read();
     output();
   }
 

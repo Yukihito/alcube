@@ -59,12 +59,12 @@ typedef struct __attribute__ ((packed)) IntersectionStruct {
   float distance;
 } Intersection;
 
-typedef struct __attribute__ ((packed)) RigidBodyStateStruct {
+typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
   float3 position;
   float4 rotation;
   float3 linearMomentum;
   float3 angularMomentum;
-} RigidBodyState;
+} PhysicalQuantity;
 
 typedef struct __attribute__ ((packed)) SpringStruct {
   float k;

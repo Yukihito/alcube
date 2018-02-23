@@ -70,18 +70,18 @@ __kernel void updateFluidForce(
 
 __kernel void moveFluid(
   __global FluidState* fluidStates,
-  __global RigidBodyState* nextStates,
+  __global PhysicalQuantity* physicalQuantities,
   __global Constants* constants
 ) {
   __global Grid* grid = &constants->grid;
   size_t fluidParticleIndex = get_global_id(0);
   ushort particleIndex = fluidParticleIndex + constants->rigidBodyParticleCount;
   __global FluidState* fluidState = &fluidStates[fluidParticleIndex];
-  __global RigidBodyState* nextState = &nextStates[particleIndex];
+  __global PhysicalQuantity* physicalQuantity = &physicalQuantities[particleIndex];
   fluidState->velocity += (fluidState->force * constants->deltaTime) / fluidState->density;
-  nextState->position += constants->deltaTime * fluidState->velocity;
+  physicalQuantity->position += constants->deltaTime * fluidState->velocity;
   float3 corner = grid->origin + (float3)(0.0001f);
-  nextState->position = clamp(nextState->position, corner, -corner);
-  nextState->linearMomentum = fluidState->velocity * constants->fluidSettings.particleMass;
-  nextState->angularMomentum = (float3)(0.0f);
+  physicalQuantity->position = clamp(physicalQuantity->position, corner, -corner);
+  physicalQuantity->linearMomentum = fluidState->velocity * constants->fluidSettings.particleMass;
+  physicalQuantity->angularMomentum = (float3)(0.0f);
 }

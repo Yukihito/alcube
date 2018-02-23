@@ -31,13 +31,13 @@ __kernel void fillGridIndex(
   __global const Grid* grid,
   __global const Actor* actors,
   __global ActorState* actorStates,
-  __global const RigidBodyState* currentStates,
-  __global RigidBodyState* nextStates,
+  __global const PhysicalQuantity* hostPhysicalQuantities,
+  __global PhysicalQuantity* physicalQuantities,
   __global GridAndActorRelation* relations
 ) {
   size_t actorIndex = get_global_id(0);
   float edgeLength = grid->edgeLength;
-  float3 position = currentStates[actorIndex].position;
+  float3 position = hostPhysicalQuantities[actorIndex].position;
   float3 positionGridSpace = position - grid->origin;
   uint3 gridCorner0 = (uint3)(0);
   uint3 gridCorner1 = (uint3)(grid->xCount - 1, grid->yCount - 1, grid->zCount - 1);
@@ -45,7 +45,7 @@ __kernel void fillGridIndex(
   uint gridIndex = (uint)p.x + (uint)p.y * grid->xCount + (uint)p.z * grid->xCount * grid->yCount;
   relations[actorIndex].actorIndex = actorIndex;
   relations[actorIndex].gridIndex = gridIndex;
-  nextStates[actorIndex] = currentStates[actorIndex];
+  physicalQuantities[actorIndex] = hostPhysicalQuantities[actorIndex];
   actorStates[actorIndex].constants = actors[actorIndex];
 }
 

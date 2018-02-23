@@ -83,7 +83,7 @@ namespace alcube::gpu::dtos {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-  class RigidBodyState {
+  class PhysicalQuantity {
     public:
       cl_float3 position;
       cl_float4 rotation;

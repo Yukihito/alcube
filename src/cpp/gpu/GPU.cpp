@@ -163,23 +163,23 @@ namespace alcube::gpu {
       this->memory->count = count;
     }
 
-    dtos::RigidBodyState* RigidBodyState::at(int i) {
+    dtos::PhysicalQuantity* PhysicalQuantity::at(int i) {
       return &dto[i];
     }
 
-    void RigidBodyState::write() {
+    void PhysicalQuantity::write() {
       resourcesProvider->queue->write(this->memory);
     }
 
-    void RigidBodyState::zeroFill() {
+    void PhysicalQuantity::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void RigidBodyState::read() {
+    void PhysicalQuantity::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
-    void RigidBodyState::setCount(size_t count) {
+    void PhysicalQuantity::setCount(size_t count) {
       this->memory->count = count;
     }
 
@@ -505,16 +505,16 @@ namespace alcube::gpu {
     memories::Grid& grid,
     memories::Actor& actors,
     memories::ActorState& actorStates,
-    memories::RigidBodyState& currentStates,
-    memories::RigidBodyState& nextStates,
+    memories::PhysicalQuantity& hostPhysicalQuantities,
+    memories::PhysicalQuantity& physicalQuantities,
     memories::GridAndActorRelation& relations
   ) {
     queue->push(rawKernels.fillGridIndex, {workSize}, {
       memArg(grid.memory),
       memArg(actors.memory),
       memArg(actorStates.memory),
-      memArg(currentStates.memory),
-      memArg(nextStates.memory),
+      memArg(hostPhysicalQuantities.memory),
+      memArg(physicalQuantities.memory),
       memArg(relations.memory)
     });
   }
@@ -644,12 +644,12 @@ namespace alcube::gpu {
   void Kernels::moveFluid(
     unsigned int workSize,
     memories::FluidState& fluidStates,
-    memories::RigidBodyState& nextStates,
+    memories::PhysicalQuantity& physicalQuantities,
     memories::Constants& constants
   ) {
     queue->push(rawKernels.moveFluid, {workSize}, {
       memArg(fluidStates.memory),
-      memArg(nextStates.memory),
+      memArg(physicalQuantities.memory),
       memArg(constants.memory)
     });
   }
@@ -659,14 +659,14 @@ namespace alcube::gpu {
     memories::Grid& grid,
     memories::Actor& actors,
     memories::ActorState& actorStates,
-    memories::RigidBodyState& nextStates,
+    memories::PhysicalQuantity& physicalQuantities,
     float deltaTime
   ) {
     queue->push(rawKernels.postProcessing, {workSize}, {
       memArg(grid.memory),
       memArg(actors.memory),
       memArg(actorStates.memory),
-      memArg(nextStates.memory),
+      memArg(physicalQuantities.memory),
       floatArg(deltaTime)
     });
   }
@@ -675,7 +675,7 @@ namespace alcube::gpu {
     unsigned int workSize,
     memories::ActorState& actorStates,
     memories::Spring& springs,
-    memories::RigidBodyState& nextStates,
+    memories::PhysicalQuantity& physicalQuantities,
     memories::GridAndActorRelation& relations,
     memories::UintMemory& gridStartIndices,
     memories::UintMemory& gridEndIndices,
@@ -684,7 +684,7 @@ namespace alcube::gpu {
     queue->push(rawKernels.collectIntersections, {workSize}, {
       memArg(actorStates.memory),
       memArg(springs.memory),
-      memArg(nextStates.memory),
+      memArg(physicalQuantities.memory),
       memArg(relations.memory),
       memArg(gridStartIndices.memory),
       memArg(gridEndIndices.memory),
@@ -697,14 +697,14 @@ namespace alcube::gpu {
     memories::ActorState& actorStates,
     memories::Spring& springs,
     memories::SpringVar& springVars,
-    memories::RigidBodyState& nextStates,
+    memories::PhysicalQuantity& physicalQuantities,
     float deltaTime
   ) {
     queue->push(rawKernels.calcSpringImpulses, {workSize}, {
       memArg(actorStates.memory),
       memArg(springs.memory),
       memArg(springVars.memory),
-      memArg(nextStates.memory),
+      memArg(physicalQuantities.memory),
       floatArg(deltaTime)
     });
   }
@@ -713,14 +713,14 @@ namespace alcube::gpu {
     unsigned int workSize,
     memories::Actor& actors,
     memories::ActorState& actorStates,
-    memories::RigidBodyState& nextStates,
+    memories::PhysicalQuantity& physicalQuantities,
     memories::SpringVar& springVars,
     float deltaTime
   ) {
     queue->push(rawKernels.updateBySpringImpulse, {workSize}, {
       memArg(actors.memory),
       memArg(actorStates.memory),
-      memArg(nextStates.memory),
+      memArg(physicalQuantities.memory),
       memArg(springVars.memory),
       floatArg(deltaTime)
     });
@@ -758,12 +758,12 @@ namespace alcube::gpu {
 
     dtos.grid = new dtos::Grid();
     dtos.actors = new dtos::Actor[maxActorCount];
-    dtos.currentStates = new dtos::RigidBodyState[maxActorCount];
+    dtos.hostPhysicalQuantities = new dtos::PhysicalQuantity[maxActorCount];
     dtos.springs = new dtos::Spring[maxSpringCount];
     dtos.hostFluidStates = new dtos::FluidState[maxActorCount];
     dtos.fluidSettings = new dtos::FluidSettings();
     dtos.actorStates = new dtos::ActorState[maxActorCount];
-    dtos.nextStates = new dtos::RigidBodyState[maxActorCount];
+    dtos.physicalQuantities = new dtos::PhysicalQuantity[maxActorCount];
     dtos.gridAndActorRelations = new dtos::GridAndActorRelation[maxActorCountForBitonicSort];
     dtos.gridStartIndices = new unsigned int[allGridCount];
     dtos.gridEndIndices = new unsigned int[allGridCount];
@@ -773,12 +773,12 @@ namespace alcube::gpu {
 
     memories.grid.memory = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);
     memories.actors.memory = defineHostMemory("actors", sizeof(dtos::Actor), dtos.actors, maxActorCount);
-    memories.currentStates.memory = defineHostMemory("currentStates", sizeof(dtos::RigidBodyState), dtos.currentStates, maxActorCount);
+    memories.hostPhysicalQuantities.memory = defineHostMemory("hostPhysicalQuantities", sizeof(dtos::PhysicalQuantity), dtos.hostPhysicalQuantities, maxActorCount);
     memories.springs.memory = defineHostMemory("springs", sizeof(dtos::Spring), dtos.springs, maxSpringCount);
     memories.hostFluidStates.memory = defineHostMemory("hostFluidStates", sizeof(dtos::FluidState), dtos.hostFluidStates, maxActorCount);
     memories.fluidSettings.memory = defineHostMemory("fluidSettings", sizeof(dtos::FluidSettings), dtos.fluidSettings, 1);
     memories.actorStates.memory = defineGPUMemory("actorStates", sizeof(dtos::ActorState), maxActorCount);
-    memories.nextStates.memory = defineGPUMemory("nextStates", sizeof(dtos::RigidBodyState), maxActorCount);
+    memories.physicalQuantities.memory = defineGPUMemory("physicalQuantities", sizeof(dtos::PhysicalQuantity), maxActorCount);
     memories.gridAndActorRelations.memory = defineGPUMemory("gridAndActorRelations", sizeof(dtos::GridAndActorRelation), maxActorCountForBitonicSort);
     memories.gridStartIndices.memory = defineGPUMemory("gridStartIndices", sizeof(unsigned int), allGridCount);
     memories.gridEndIndices.memory = defineGPUMemory("gridEndIndices", sizeof(unsigned int), allGridCount);
@@ -788,12 +788,12 @@ namespace alcube::gpu {
 
     memories.grid.dto = dtos.grid;
     memories.actors.dto = dtos.actors;
-    memories.currentStates.dto = dtos.currentStates;
+    memories.hostPhysicalQuantities.dto = dtos.hostPhysicalQuantities;
     memories.springs.dto = dtos.springs;
     memories.hostFluidStates.dto = dtos.hostFluidStates;
     memories.fluidSettings.dto = dtos.fluidSettings;
     memories.actorStates.dto = dtos.actorStates;
-    memories.nextStates.dto = dtos.nextStates;
+    memories.physicalQuantities.dto = dtos.physicalQuantities;
     memories.gridAndActorRelations.dto = dtos.gridAndActorRelations;
     memories.gridStartIndices.dto = dtos.gridStartIndices;
     memories.gridEndIndices.dto = dtos.gridEndIndices;
@@ -803,12 +803,12 @@ namespace alcube::gpu {
 
     memories.grid.resourcesProvider = resourcesProvider;
     memories.actors.resourcesProvider = resourcesProvider;
-    memories.currentStates.resourcesProvider = resourcesProvider;
+    memories.hostPhysicalQuantities.resourcesProvider = resourcesProvider;
     memories.springs.resourcesProvider = resourcesProvider;
     memories.hostFluidStates.resourcesProvider = resourcesProvider;
     memories.fluidSettings.resourcesProvider = resourcesProvider;
     memories.actorStates.resourcesProvider = resourcesProvider;
-    memories.nextStates.resourcesProvider = resourcesProvider;
+    memories.physicalQuantities.resourcesProvider = resourcesProvider;
     memories.gridAndActorRelations.resourcesProvider = resourcesProvider;
     memories.gridStartIndices.resourcesProvider = resourcesProvider;
     memories.gridEndIndices.resourcesProvider = resourcesProvider;

@@ -20,7 +20,7 @@ dto-structs:
     - uint   gridIndex
     - ushort actorIndex
 
-  RigidBodyState:
+  PhysicalQuantity:
     - float3 position
     - float4 rotation
     - float3 linearMomentum
@@ -108,8 +108,8 @@ dto-instances:
     length: maxActorCount
     host-ptr: true
 
-  - name: currentStates
-    type: RigidBodyState
+  - name: hostPhysicalQuantities
+    type: PhysicalQuantity
     length: maxActorCount
     host-ptr: true
 
@@ -131,8 +131,8 @@ dto-instances:
     type: ActorState
     length: maxActorCount
 
-  - name: nextStates
-    type: RigidBodyState
+  - name: physicalQuantities
+    type: PhysicalQuantity
     length: maxActorCount
 
   - name: gridAndActorRelations

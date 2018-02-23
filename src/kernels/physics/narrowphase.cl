@@ -19,7 +19,7 @@ void setIntersection(
 __kernel void collectIntersections(
   __global ActorState* actorStates,
   __global const Spring* springs,
-  __global RigidBodyState* nextStates,
+  __global PhysicalQuantity* physicalQuantities,
   __global GridAndActorRelation* relations,
   __global uint* gridStartIndices,
   __global uint* gridEndIndices,
@@ -31,10 +31,10 @@ __kernel void collectIntersections(
   __global Grid* grid = &constants->grid;
   size_t actorIndex = get_global_id(0);
   float edgeLength = (float)grid->edgeLength;
-  __global RigidBodyState* nextState = &nextStates[actorIndex];
+  __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
   __global ActorState* actorState = &actorStates[actorIndex];
   __global Actor* actor = &(actorStates[actorIndex].constants);
-  float3 position = nextState->position;
+  float3 position = physicalQuantity->position;
   float* positionPtr = (float*)&position;
   float radius = actor->radius;
   int alterEgoIndex = actor->alterEgoIndex;
@@ -62,7 +62,7 @@ __kernel void collectIntersections(
 	    continue;
 	  }
 	  __global Actor* otherActor = &(actorStates[otherActorIndex].constants);
-	  float3 w = nextStates[otherActorIndex].position - position;
+	  float3 w = physicalQuantities[otherActorIndex].position - position;
 	  float r = alterEgoIndex == -1 || alterEgoIndex != otherActorIndex ? radius + otherActor->radius : radiusForAlterEgo + otherActor->radiusForAlterEgo;
 	  float rr = r * r;
 	  float ww = dot(w, w);
@@ -109,12 +109,12 @@ __kernel void collectIntersections(
   actorState->momentOfInertia = momentOfInertia;
   float gravityTranslation = gravityAcceleration * deltaTime;
   float gravity = isFloating ? -gravityTranslation : 0.0f;
-  actorState->linearVelocity = nextState->linearMomentum / mass + (float3)(0.0f, gravity, 0.0f);
+  actorState->linearVelocity = physicalQuantity->linearMomentum / mass + (float3)(0.0f, gravity, 0.0f);
   float ySpeed = actorState->linearVelocity.y;
   if (!isFloating && ySpeed * ySpeed < gravityTranslation * gravityTranslation * 16.0f) {
     actorState->linearVelocity.y = 0.0f;
   }
-  actorState->angularVelocity = nextState->angularMomentum / momentOfInertia;
+  actorState->angularVelocity = physicalQuantity->angularMomentum / momentOfInertia;
   actorState->isFloating = isFloating ? 1 : 0;
 
   actorState->intersectionCount = intersectionCount;
