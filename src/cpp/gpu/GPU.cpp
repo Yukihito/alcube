@@ -472,8 +472,7 @@ namespace alcube::gpu {
     float gravityAcceleration,
     float deltaTime,
     float splitDeltaTime,
-    float sphericalShellRadius,
-    unsigned short rigidBodyParticleCount
+    float sphericalShellRadius
   ) {
     queue->push(rawKernels.inputConstants, {workSize}, {
       memArg(constants.memory),
@@ -482,8 +481,22 @@ namespace alcube::gpu {
       floatArg(gravityAcceleration),
       floatArg(deltaTime),
       floatArg(splitDeltaTime),
-      floatArg(sphericalShellRadius),
-      ushortArg(rigidBodyParticleCount)
+      floatArg(sphericalShellRadius)
+    });
+  }
+
+  void Kernels::inputActors(
+    unsigned int workSize,
+    memories::Actor& actors,
+    memories::ActorState& actorStates,
+    memories::PhysicalQuantity& hostPhysicalQuantities,
+    memories::PhysicalQuantity& physicalQuantities
+  ) {
+    queue->push(rawKernels.inputActors, {workSize}, {
+      memArg(actors.memory),
+      memArg(actorStates.memory),
+      memArg(hostPhysicalQuantities.memory),
+      memArg(physicalQuantities.memory)
     });
   }
 
@@ -502,18 +515,12 @@ namespace alcube::gpu {
 
   void Kernels::fillGridIndex(
     unsigned int workSize,
-    memories::Grid& grid,
-    memories::Actor& actors,
-    memories::ActorState& actorStates,
-    memories::PhysicalQuantity& hostPhysicalQuantities,
+    memories::Constants& constants,
     memories::PhysicalQuantity& physicalQuantities,
     memories::GridAndActorRelation& relations
   ) {
     queue->push(rawKernels.fillGridIndex, {workSize}, {
-      memArg(grid.memory),
-      memArg(actors.memory),
-      memArg(actorStates.memory),
-      memArg(hostPhysicalQuantities.memory),
+      memArg(constants.memory),
       memArg(physicalQuantities.memory),
       memArg(relations.memory)
     });
@@ -738,6 +745,7 @@ namespace alcube::gpu {
     kernels.queue = resourcesProvider->queue;
 
     kernels.rawKernels.inputConstants = resourcesProvider->kernelFactory->create(program, "inputConstants");
+    kernels.rawKernels.inputActors = resourcesProvider->kernelFactory->create(program, "inputActors");
     kernels.rawKernels.initGridAndActorRelations = resourcesProvider->kernelFactory->create(program, "initGridAndActorRelations");
     kernels.rawKernels.fillGridIndex = resourcesProvider->kernelFactory->create(program, "fillGridIndex");
     kernels.rawKernels.merge = resourcesProvider->kernelFactory->create(program, "merge");

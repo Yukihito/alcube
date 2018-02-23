@@ -79,8 +79,15 @@ namespace alcube::physics {
       gravity,
       deltaTime,
       splitDeltaTime,
-      sphericalShellRadius,
-      (unsigned short)softBodyParticleCount
+      sphericalShellRadius
+    );
+
+    kernels.inputActors(
+      actorCount,
+      memories.actors,
+      memories.actorStates,
+      memories.hostPhysicalQuantities,
+      memories.physicalQuantities
     );
 
     memories.hostFluidStates.write();
@@ -121,11 +128,11 @@ namespace alcube::physics {
       softBodyParticle->index = (unsigned short)i;
       actor->springCount = 0;
     }
-    for (int i = 0; i < fluidParticleCount; i++) {
-      int globalIndex = i + softBodyParticleCount;
+    for (unsigned short i = 0; i < fluidParticleCount; i++) {
+      auto actorIndex = (unsigned short)(i + softBodyParticleCount);
       FluidParticle* fluidParticle = fluidParticles[i];
-      auto actor = memories.actors.at(globalIndex);
-      auto hostPhysicalQuantity = memories.hostPhysicalQuantities.at(globalIndex);
+      auto actor = memories.actors.at(actorIndex);
+      auto hostPhysicalQuantity = memories.hostPhysicalQuantities.at(actorIndex);
       actor->radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
       actor->mass = memories.fluidSettings.at(0)->particleMass;
       actor->elasticity = 0.0f;
@@ -134,6 +141,7 @@ namespace alcube::physics {
       actor->radiusForAlterEgo = 1.0f;
       actor->alterEgoIndex = -1;
       actor->type = 3;
+      actor->subPhysicalQuantityIndex = i;
 
       cl_float3 clFloat3Zero = {0.0f, 0.0f, 0.0f};
       hostPhysicalQuantity->linearMomentum = clFloat3Zero;
@@ -147,6 +155,7 @@ namespace alcube::physics {
       fluidState->force = clFloat3Zero;
       fluidState->pressure = 0.0f;
       fluidState->velocity = clFloat3Zero;
+      fluidState->actorIndex = actorIndex;
     }
     for (unsigned int i = 0; i < springCount; i++) {
       memories.springs.at(i)->k = springs[i]->k;
@@ -208,10 +217,7 @@ namespace alcube::physics {
     // Set grid index to rigid body state, and register grid and particle relations.
     kernels.fillGridIndex(
       actorCount,
-      memories.grid,
-      memories.actors,
-      memories.actorStates,
-      memories.hostPhysicalQuantities,
+      memories.constants,
       memories.physicalQuantities,
       memories.gridAndActorRelations
     );
@@ -351,10 +357,10 @@ namespace alcube::physics {
   }
 
   void Simulator::update(float deltaTime) {
-    setUpComputingSize();
-    input();
-    setUpMemories();
     if (!initialized) {
+      setUpComputingSize();
+      input();
+      setUpMemories();
       initGPUMemory(deltaTime);
       initialized = true;
     }

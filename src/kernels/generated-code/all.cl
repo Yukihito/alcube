@@ -4,6 +4,8 @@ typedef struct __attribute__ ((packed)) ActorStruct {
   float mass;
   ushort type;
   char _padding0[2];
+  ushort subPhysicalQuantityIndex;
+  char _padding1[2];
   float elasticity;
   float dynamicFrictionCoefficient;
   float staticFrictionCoefficient;
@@ -30,6 +32,8 @@ typedef struct __attribute__ ((packed)) FluidStateStruct {
   float pressure;
   float density;
   float3 force;
+  ushort actorIndex;
+  char _padding0[2];
 } FluidState;
 
 typedef struct __attribute__ ((packed)) GridStruct {
@@ -100,8 +104,6 @@ typedef struct __attribute__ ((packed)) ConstantsStruct {
   float deltaTime;
   float splitDeltaTime;
   float sphericalShellRadius;
-  ushort rigidBodyParticleCount;
-  char _padding0[2];
 } Constants;
 
 float4 mulQuat(float4 q, float4 r);
@@ -149,8 +151,7 @@ __kernel void inputConstants(
   const float gravityAcceleration,
   const float deltaTime,
   const float splitDeltaTime,
-  const float sphericalShellRadius,
-  const ushort rigidBodyParticleCount
+  const float sphericalShellRadius
 ) {
   constants->grid = grid[0];
   constants->fluidSettings = fluidSettings[0];
@@ -158,7 +159,17 @@ __kernel void inputConstants(
   constants->deltaTime = deltaTime;
   constants->splitDeltaTime = splitDeltaTime;
   constants->sphericalShellRadius = sphericalShellRadius;
-  constants->rigidBodyParticleCount = rigidBodyParticleCount;
+}
+
+__kernel void inputActors(
+  __global const Actor* actors,
+  __global ActorState* actorStates,
+  __global const PhysicalQuantity* hostPhysicalQuantities,
+  __global PhysicalQuantity* physicalQuantities
+) {
+  size_t actorIndex = get_global_id(0);
+  physicalQuantities[actorIndex] = hostPhysicalQuantities[actorIndex];
+  actorStates[actorIndex].constants = actors[actorIndex];
 }
 
 __kernel void initGridAndActorRelations(
@@ -172,16 +183,14 @@ __kernel void initGridAndActorRelations(
 }
 
 __kernel void fillGridIndex(
-  __global const Grid* grid,
-  __global const Actor* actors,
-  __global ActorState* actorStates,
-  __global const PhysicalQuantity* hostPhysicalQuantities,
+  __global Constants* constants,
   __global PhysicalQuantity* physicalQuantities,
   __global GridAndActorRelation* relations
 ) {
+  __global Grid* grid = &constants->grid;
   size_t actorIndex = get_global_id(0);
   float edgeLength = grid->edgeLength;
-  float3 position = hostPhysicalQuantities[actorIndex].position;
+  float3 position = physicalQuantities[actorIndex].position;
   float3 positionGridSpace = position - grid->origin;
   uint3 gridCorner0 = (uint3)(0);
   uint3 gridCorner1 = (uint3)(grid->xCount - 1, grid->yCount - 1, grid->zCount - 1);
@@ -189,8 +198,6 @@ __kernel void fillGridIndex(
   uint gridIndex = (uint)p.x + (uint)p.y * grid->xCount + (uint)p.z * grid->xCount * grid->yCount;
   relations[actorIndex].actorIndex = actorIndex;
   relations[actorIndex].gridIndex = gridIndex;
-  physicalQuantities[actorIndex] = hostPhysicalQuantities[actorIndex];
-  actorStates[actorIndex].constants = actors[actorIndex];
 }
 
 __kernel void merge(
@@ -534,10 +541,11 @@ __kernel void updateDensityAndPressure(
   __global Constants* constants
 ) {
   size_t fluidParticleIndex = get_global_id(0);
-  ushort particleIndex = fluidParticleIndex + constants->rigidBodyParticleCount;
-  __global FluidSettings* fluidSettings = &constants->fluidSettings;
-  __global ActorState* actorState = &actorStates[particleIndex];
   __global FluidState* fluidState = &fluidStates[fluidParticleIndex];
+  ushort actorIndex = fluidState->actorIndex;
+  __global FluidSettings* fluidSettings = &constants->fluidSettings;
+  __global ActorState* actorState = &actorStates[actorIndex];
+
   uchar count = actorState->intersectionCount;
   __global Intersection* intersections = actorState->intersections;
   float hh = fluidSettings->effectiveRadius * fluidSettings->effectiveRadius;
@@ -560,9 +568,9 @@ __kernel void updateFluidForce(
   __global FluidSettings* fluidSettings = &constants->fluidSettings;
   float gravity = constants->gravityAcceleration;
   size_t fluidParticleIndex = get_global_id(0);
-  ushort particleIndex = fluidParticleIndex + constants->rigidBodyParticleCount;
-  __global ActorState* actorState = &actorStates[particleIndex];
   __global FluidState* fluidState = &fluidStates[fluidParticleIndex];
+  ushort actorIndex = fluidState->actorIndex;
+  __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->intersectionCount;
   __global Intersection* intersections = actorState->intersections;
   float density = fluidState->density;
@@ -574,7 +582,7 @@ __kernel void updateFluidForce(
   for (uchar i = 0; i < count; i++) {
     if (intersections[i].type == 3) {
       float q = intersections[i].length;
-      ushort otherFluidParticleIndex = intersections[i].otherIndex - constants->rigidBodyParticleCount;
+      ushort otherFluidParticleIndex = actorStates[intersections[i].otherIndex].constants.subPhysicalQuantityIndex;
       float otherDensity = fluidStates[otherFluidParticleIndex].density;
       float otherPressure = fluidStates[otherFluidParticleIndex].pressure;
       float3 otherVelocity = fluidStates[otherFluidParticleIndex].velocity;
@@ -597,9 +605,10 @@ __kernel void moveFluid(
 ) {
   __global Grid* grid = &constants->grid;
   size_t fluidParticleIndex = get_global_id(0);
-  ushort particleIndex = fluidParticleIndex + constants->rigidBodyParticleCount;
   __global FluidState* fluidState = &fluidStates[fluidParticleIndex];
-  __global PhysicalQuantity* physicalQuantity = &physicalQuantities[particleIndex];
+  ushort actorIndex = fluidState->actorIndex;
+
+  __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
   fluidState->velocity += (fluidState->force * constants->deltaTime) / fluidState->density;
   physicalQuantity->position += constants->deltaTime * fluidState->velocity;
   float3 corner = grid->origin + (float3)(0.0001f);

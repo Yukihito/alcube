@@ -5,8 +5,7 @@ __kernel void inputConstants(
   const float gravityAcceleration,
   const float deltaTime,
   const float splitDeltaTime,
-  const float sphericalShellRadius,
-  const ushort rigidBodyParticleCount
+  const float sphericalShellRadius
 ) {
   constants->grid = grid[0];
   constants->fluidSettings = fluidSettings[0];
@@ -14,7 +13,17 @@ __kernel void inputConstants(
   constants->deltaTime = deltaTime;
   constants->splitDeltaTime = splitDeltaTime;
   constants->sphericalShellRadius = sphericalShellRadius;
-  constants->rigidBodyParticleCount = rigidBodyParticleCount;
+}
+
+__kernel void inputActors(
+  __global const Actor* actors,
+  __global ActorState* actorStates,
+  __global const PhysicalQuantity* hostPhysicalQuantities,
+  __global PhysicalQuantity* physicalQuantities
+) {
+  size_t actorIndex = get_global_id(0);
+  physicalQuantities[actorIndex] = hostPhysicalQuantities[actorIndex];
+  actorStates[actorIndex].constants = actors[actorIndex];
 }
 
 __kernel void initGridAndActorRelations(
@@ -28,16 +37,14 @@ __kernel void initGridAndActorRelations(
 }
 
 __kernel void fillGridIndex(
-  __global const Grid* grid,
-  __global const Actor* actors,
-  __global ActorState* actorStates,
-  __global const PhysicalQuantity* hostPhysicalQuantities,
+  __global Constants* constants,
   __global PhysicalQuantity* physicalQuantities,
   __global GridAndActorRelation* relations
 ) {
+  __global Grid* grid = &constants->grid;
   size_t actorIndex = get_global_id(0);
   float edgeLength = grid->edgeLength;
-  float3 position = hostPhysicalQuantities[actorIndex].position;
+  float3 position = physicalQuantities[actorIndex].position;
   float3 positionGridSpace = position - grid->origin;
   uint3 gridCorner0 = (uint3)(0);
   uint3 gridCorner1 = (uint3)(grid->xCount - 1, grid->yCount - 1, grid->zCount - 1);
@@ -45,8 +52,6 @@ __kernel void fillGridIndex(
   uint gridIndex = (uint)p.x + (uint)p.y * grid->xCount + (uint)p.z * grid->xCount * grid->yCount;
   relations[actorIndex].actorIndex = actorIndex;
   relations[actorIndex].gridIndex = gridIndex;
-  physicalQuantities[actorIndex] = hostPhysicalQuantities[actorIndex];
-  actorStates[actorIndex].constants = actors[actorIndex];
 }
 
 __kernel void merge(

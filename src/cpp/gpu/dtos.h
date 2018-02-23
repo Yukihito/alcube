@@ -11,6 +11,8 @@ namespace alcube::gpu::dtos {
       float mass;
       unsigned short type;
       char _padding0[2];
+      unsigned short subPhysicalQuantityIndex;
+      char _padding1[2];
       float elasticity;
       float dynamicFrictionCoefficient;
       float staticFrictionCoefficient;
@@ -43,6 +45,8 @@ namespace alcube::gpu::dtos {
       float pressure;
       float density;
       cl_float3 force;
+      unsigned short actorIndex;
+      char _padding0[2];
   };
 #pragma pack(pop)
 
@@ -137,8 +141,6 @@ namespace alcube::gpu::dtos {
       float deltaTime;
       float splitDeltaTime;
       float sphericalShellRadius;
-      unsigned short rigidBodyParticleCount;
-      char _padding0[2];
   };
 #pragma pack(pop)
 }

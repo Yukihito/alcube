@@ -4,6 +4,8 @@ typedef struct __attribute__ ((packed)) ActorStruct {
   float mass;
   ushort type;
   char _padding0[2];
+  ushort subPhysicalQuantityIndex;
+  char _padding1[2];
   float elasticity;
   float dynamicFrictionCoefficient;
   float staticFrictionCoefficient;
@@ -30,6 +32,8 @@ typedef struct __attribute__ ((packed)) FluidStateStruct {
   float pressure;
   float density;
   float3 force;
+  ushort actorIndex;
+  char _padding0[2];
 } FluidState;
 
 typedef struct __attribute__ ((packed)) GridStruct {
@@ -100,6 +104,4 @@ typedef struct __attribute__ ((packed)) ConstantsStruct {
   float deltaTime;
   float splitDeltaTime;
   float sphericalShellRadius;
-  ushort rigidBodyParticleCount;
-  char _padding0[2];
 } Constants;
