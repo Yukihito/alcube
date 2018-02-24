@@ -304,41 +304,41 @@ namespace alcube::gpu {
   class Memories {
     public:
       memories::Grid grid;
-      memories::Actor actors;
-      memories::PhysicalQuantity hostPhysicalQuantities;
-      memories::Spring springs;
-      memories::FluidState hostFluidStates;
       memories::FluidSettings fluidSettings;
+      memories::Constants constants;
+      memories::Actor actors;
       memories::ActorState actorStates;
+      memories::PhysicalQuantity hostPhysicalQuantities;
       memories::PhysicalQuantity physicalQuantities;
+      memories::SoftBodyState hostSoftBodyStates;
+      memories::SoftBodyState softBodyStates;
+      memories::Spring springs;
+      memories::SpringState springStates;
+      memories::FluidState hostFluidStates;
+      memories::FluidState fluidStates;
       memories::GridAndActorRelation gridAndActorRelations;
       memories::UintMemory gridStartIndices;
       memories::UintMemory gridEndIndices;
-      memories::SpringState springStates;
-      memories::FluidState fluidStates;
-      memories::Constants constants;
-      memories::SoftBodyState hostSoftBodyStates;
-      memories::SoftBodyState softBodyStates;
   };
 
   class Dtos {
     public:
       dtos::Grid* grid;
-      dtos::Actor* actors;
-      dtos::PhysicalQuantity* hostPhysicalQuantities;
-      dtos::Spring* springs;
-      dtos::FluidState* hostFluidStates;
       dtos::FluidSettings* fluidSettings;
+      dtos::Constants* constants;
+      dtos::Actor* actors;
       dtos::ActorState* actorStates;
+      dtos::PhysicalQuantity* hostPhysicalQuantities;
       dtos::PhysicalQuantity* physicalQuantities;
+      dtos::SoftBodyState* hostSoftBodyStates;
+      dtos::SoftBodyState* softBodyStates;
+      dtos::Spring* springs;
+      dtos::SpringState* springStates;
+      dtos::FluidState* hostFluidStates;
+      dtos::FluidState* fluidStates;
       dtos::GridAndActorRelation* gridAndActorRelations;
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
-      dtos::SpringState* springStates;
-      dtos::FluidState* fluidStates;
-      dtos::Constants* constants;
-      dtos::SoftBodyState* hostSoftBodyStates;
-      dtos::SoftBodyState* softBodyStates;
   };
 
   class RawKernels {

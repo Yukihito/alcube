@@ -8,6 +8,7 @@ variables:
   - allGridCount
 
 dto-structs:
+  # Constants
   Grid:
     - uint      xCount
     - uint      yCount
@@ -15,70 +16,6 @@ dto-structs:
     - uint      edgeLength
     - float3    origin
     - float3[6] normals
-
-  GridAndActorRelation:
-    - uint   gridIndex
-    - ushort actorIndex
-
-  PhysicalQuantity:
-    - float3 position
-    - float4 rotation
-    - float3 linearMomentum
-    - float3 angularMomentum
-
-  SoftBodyState:
-    - float     elasticity
-    - float     dynamicFrictionCoefficient
-    - float     staticFrictionCoefficient
-    - uint[16]  springIndices
-    - uchar[16] springNodeIndices
-    - uint      springCount
-    - ushort    actorIndex
-
-  Actor:
-    - float     radius
-    - float     mass
-    - ushort    type
-    - ushort    subPhysicalQuantityIndex
-
-  ActorState:
-    - Actor            constants
-    - float3           linearVelocity
-    - float3           angularVelocity
-    - float            momentOfInertia
-    - float            massForIntersection
-    - float            massForCollision
-    - ushort           intersectionCount
-    - ushort           collisionCount
-    - int              isFloating
-    - uchar[32]        collisionIndices
-    - Intersection[32] intersections
-
-  Intersection:
-    - ushort type
-    - ushort otherIndex
-    - float  length
-    - float  speed
-    - float3 normal
-    - float3 relativePosition
-    - float  distance
-
-  Spring:
-    - float     k
-    - float3[2] nodePositionsModelSpace
-    - ushort[2] actorIndices
-
-  SpringState:
-    - Spring    constants
-    - float3[2] linearImpulses
-    - float3[2] angularImpulses
-
-  FluidState:
-    - float3 velocity
-    - float  pressure
-    - float  density
-    - float3 force
-    - ushort actorIndex
 
   FluidSettings:
     - float stiffness
@@ -98,43 +35,136 @@ dto-structs:
     - float splitDeltaTime
     - float sphericalShellRadius
 
+  # Variables for all actors
+  Actor:
+    - float     radius
+    - float     mass
+    - ushort    type
+    - ushort    subPhysicalQuantityIndex
+
+  ActorState:
+    - Actor            constants
+    - float3           linearVelocity
+    - float3           angularVelocity
+    - float            momentOfInertia
+    - float            massForIntersection
+    - float            massForCollision
+    - ushort           intersectionCount
+    - ushort           collisionCount
+    - int              isFloating
+    - uchar[32]        collisionIndices
+    - Intersection[32] intersections
+
+  PhysicalQuantity: # Basic physical quantities
+    - float3 position
+    - float4 rotation
+    - float3 linearMomentum
+    - float3 angularMomentum
+
+  # Variables for soft body actors
+  SoftBodyState: # Physical quantity 0
+    - float     elasticity
+    - float     dynamicFrictionCoefficient
+    - float     staticFrictionCoefficient
+    - uint[16]  springIndices
+    - uchar[16] springNodeIndices
+    - uint      springCount
+    - ushort    actorIndex
+
+  Spring:
+    - float     k
+    - float3[2] nodePositionsModelSpace
+    - ushort[2] actorIndices
+
+  SpringState:
+    - Spring    constants
+    - float3[2] linearImpulses
+    - float3[2] angularImpulses
+
+  # Variables for fluid actors
+  FluidState: # Physical quantity 3
+    - float3 velocity
+    - float  pressure
+    - float  density
+    - float3 force
+    - ushort actorIndex
+
+  # Others
+  Intersection:
+    - ushort type
+    - ushort otherIndex
+    - float  length
+    - float  speed
+    - float3 normal
+    - float3 relativePosition
+    - float  distance
+
+  GridAndActorRelation:
+    - uint   gridIndex
+    - ushort actorIndex
+
 dto-instances:
+  # Constants
   - name: grid
     type: Grid
-    host-ptr: true
-
-  - name: actors
-    type: Actor
-    length: maxActorCount
-    host-ptr: true
-
-  - name: hostPhysicalQuantities
-    type: PhysicalQuantity
-    length: maxActorCount
-    host-ptr: true
-
-  - name: springs
-    type: Spring
-    length: maxSpringCount
-    host-ptr: true
-
-  - name: hostFluidStates
-    type: FluidState
-    length: maxActorCount
     host-ptr: true
 
   - name: fluidSettings
     type: FluidSettings
     host-ptr: true
 
+  - name: constants
+    type: Constants
+
+  # Variables for all actors
+  - name: actors
+    type: Actor
+    length: maxActorCount
+    host-ptr: true
+
   - name: actorStates
     type: ActorState
     length: maxActorCount
+
+  - name: hostPhysicalQuantities
+    type: PhysicalQuantity
+    length: maxActorCount
+    host-ptr: true
 
   - name: physicalQuantities
     type: PhysicalQuantity
     length: maxActorCount
 
+  # Variables for soft body actors
+  - name: hostSoftBodyStates
+    type: SoftBodyState
+    length: maxActorCount
+    host-ptr: true
+
+  - name: softBodyStates
+    type: SoftBodyState
+    length: maxActorCount
+
+  - name: springs
+    type: Spring
+    length: maxSpringCount
+    host-ptr: true
+
+  - name: springStates
+    type: SpringState
+    length: maxSpringCount
+
+  # Variables for fluid actors
+  - name: hostFluidStates
+    type: FluidState
+    length: maxActorCount
+    host-ptr: true
+
+  - name: fluidStates
+    type: FluidState
+    length: maxActorCount
+
+  # Others
   - name: gridAndActorRelations
     type: GridAndActorRelation
     length: maxActorCountForBitonicSort
@@ -147,22 +177,4 @@ dto-instances:
     type: unsigned int
     length: allGridCount
 
-  - name: springStates
-    type: SpringState
-    length: maxSpringCount
 
-  - name: fluidStates
-    type: FluidState
-    length: maxActorCount
-
-  - name: constants
-    type: Constants
-
-  - name: hostSoftBodyStates
-    type: SoftBodyState
-    length: maxActorCount
-    host-ptr: true
-
-  - name: softBodyStates
-    type: SoftBodyState
-    length: maxActorCount
