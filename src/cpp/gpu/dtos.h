@@ -114,6 +114,7 @@ namespace alcube::gpu::dtos {
 #pragma pack(push, 1)
   class SpringState {
     public:
+      Spring constants;
       cl_float3 linearImpulses[2];
       cl_float3 angularImpulses[2];
   };

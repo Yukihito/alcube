@@ -34,6 +34,14 @@ __kernel void inputSoftBodyStates(
   softBodyStates[i] = hostSoftBodyStates[i];
 }
 
+__kernel void inputSprings(
+  __global const Spring* springs,
+  __global SpringState* springStates
+) {
+  size_t i = get_global_id(0);
+  springStates[i].constants = springs[i];
+}
+
 __kernel void initGridAndActorRelations(
   __global GridAndActorRelation* relations,
   const uint gridIndex,

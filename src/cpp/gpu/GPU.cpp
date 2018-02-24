@@ -531,6 +531,17 @@ namespace alcube::gpu {
     });
   }
 
+  void Kernels::inputSprings(
+    unsigned int workSize,
+    memories::Spring& springs,
+    memories::SpringState& springStates
+  ) {
+    queue->push(rawKernels.inputSprings, {workSize}, {
+      memArg(springs.memory),
+      memArg(springStates.memory)
+    });
+  }
+
   void Kernels::initGridAndActorRelations(
     unsigned int workSize,
     memories::GridAndActorRelation& relations,
@@ -598,12 +609,10 @@ namespace alcube::gpu {
 
   void Kernels::updateByPenaltyImpulse(
     unsigned int workSize,
-    memories::Actor& actors,
     memories::ActorState& actorStates,
     float deltaTime
   ) {
     queue->push(rawKernels.updateByPenaltyImpulse, {workSize}, {
-      memArg(actors.memory),
       memArg(actorStates.memory),
       floatArg(deltaTime)
     });
@@ -611,34 +620,28 @@ namespace alcube::gpu {
 
   void Kernels::updateByFrictionalImpulse(
     unsigned int workSize,
-    memories::Actor& actors,
     memories::ActorState& actorStates
   ) {
     queue->push(rawKernels.updateByFrictionalImpulse, {workSize}, {
-      memArg(actors.memory),
       memArg(actorStates.memory)
     });
   }
 
   void Kernels::collectCollisions(
     unsigned int workSize,
-    memories::Actor& actors,
     memories::ActorState& actorStates
   ) {
     queue->push(rawKernels.collectCollisions, {workSize}, {
-      memArg(actors.memory),
       memArg(actorStates.memory)
     });
   }
 
   void Kernels::updateByConstraintImpulse(
     unsigned int workSize,
-    memories::Actor& actors,
     memories::ActorState& actorStates,
     memories::SoftBodyState& softBodyStates
   ) {
     queue->push(rawKernels.updateByConstraintImpulse, {workSize}, {
-      memArg(actors.memory),
       memArg(actorStates.memory),
       memArg(softBodyStates.memory)
     });
@@ -730,13 +733,11 @@ namespace alcube::gpu {
 
   void Kernels::calcSpringImpulses(
     unsigned int workSize,
-    memories::Spring& springs,
     memories::SpringState& springStates,
     memories::PhysicalQuantity& physicalQuantities,
     float deltaTime
   ) {
     queue->push(rawKernels.calcSpringImpulses, {workSize}, {
-      memArg(springs.memory),
       memArg(springStates.memory),
       memArg(physicalQuantities.memory),
       floatArg(deltaTime)
@@ -774,6 +775,7 @@ namespace alcube::gpu {
     kernels.rawKernels.inputConstants = resourcesProvider->kernelFactory->create(program, "inputConstants");
     kernels.rawKernels.inputActors = resourcesProvider->kernelFactory->create(program, "inputActors");
     kernels.rawKernels.inputSoftBodyStates = resourcesProvider->kernelFactory->create(program, "inputSoftBodyStates");
+    kernels.rawKernels.inputSprings = resourcesProvider->kernelFactory->create(program, "inputSprings");
     kernels.rawKernels.initGridAndActorRelations = resourcesProvider->kernelFactory->create(program, "initGridAndActorRelations");
     kernels.rawKernels.fillGridIndex = resourcesProvider->kernelFactory->create(program, "fillGridIndex");
     kernels.rawKernels.merge = resourcesProvider->kernelFactory->create(program, "merge");

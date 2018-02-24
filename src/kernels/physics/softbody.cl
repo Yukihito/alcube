@@ -1,12 +1,11 @@
 __kernel void calcSpringImpulses(
-  __global const Spring* springs,
   __global SpringState* springStates,
   __global PhysicalQuantity* physicalQuantities,
   const float deltaTime
 ) {
   size_t i = get_global_id(0);
-  __global const Spring* spring = &springs[i];
   __global SpringState* springState = &springStates[i];
+  __global Spring* spring = &springState->constants;
   float3 pm0 = spring->nodePositionsModelSpace[0];
   float4 rot0 = physicalQuantities[spring->actorIndices[0]].rotation;
   float3 pm1 = spring->nodePositionsModelSpace[1];

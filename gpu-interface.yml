@@ -69,6 +69,7 @@ dto-structs:
     - ushort[2] actorIndices
 
   SpringState:
+    - Spring    constants
     - float3[2] linearImpulses
     - float3[2] angularImpulses
 

@@ -7,7 +7,6 @@ void accumulatePenaltyImpulse(
 }
 
 __kernel void updateByPenaltyImpulse(
-  __global const Actor* actors,
   __global ActorState* actorStates,
   const float deltaTime
 ) {
@@ -22,13 +21,12 @@ __kernel void updateByPenaltyImpulse(
   for (uchar i = 0; i < count; i++) {
     accumulatePenaltyImpulse(&intersections[i], deltaTime, &impulse);
   }
-  actorState->linearVelocity += impulse / actors[actorIndex].mass;
+  actorState->linearVelocity += impulse / actorState->constants.mass;
 }
 
 void accumulateFrictionalImpulse(
-  __global const Actor* actor,
+  __global Actor* actor,
   __global ActorState* actorState,
-  __global const Actor* actors,
   __global ActorState* actorStates,
   __global Intersection* intersection,
   float3* linearMomentumAcc,
@@ -45,7 +43,7 @@ void accumulateFrictionalImpulse(
   float3 relativeVelocityOnSurface = relativeVelocity - intersectionNormal * dot(relativeVelocity, intersectionNormal);
   float3 workingPoint = actor->radius * intersectionNormal;
   float3 workingPointVelocity = cross(actorState->angularVelocity, workingPoint);
-  float3 otherWorkingPointVelocity = intersectionType == 0 ? cross(actorStates[otherIndex].angularVelocity, -actors[otherIndex].radius * intersectionNormal) : (float3)(0.0f);
+  float3 otherWorkingPointVelocity = intersectionType == 0 ? cross(actorStates[otherIndex].angularVelocity, -actorStates[otherIndex].constants.radius * intersectionNormal) : (float3)(0.0f);
   float3 relativeWorkingPointVelocity = otherWorkingPointVelocity - workingPointVelocity;
   float3 frictionalImpulse = (relativeVelocityOnSurface + relativeWorkingPointVelocity) / t;
   *linearMomentumAcc += frictionalImpulse;
@@ -53,7 +51,6 @@ void accumulateFrictionalImpulse(
 }
 
 __kernel void updateByFrictionalImpulse(
-  __global const Actor* actors,
   __global ActorState* actorStates
 ) {
   size_t actorIndex = get_global_id(0);
@@ -62,7 +59,7 @@ __kernel void updateByFrictionalImpulse(
   if (count == 0) {
     return;
   }
-  __global const Actor* actor = &actors[actorIndex];
+  __global Actor* actor = &actorState->constants;
   __global Intersection* intersections = actorState->intersections;
   float3 impulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
@@ -70,14 +67,13 @@ __kernel void updateByFrictionalImpulse(
     if (intersections[i].type == 3) {
       continue;
     }
-    accumulateFrictionalImpulse(actor, actorState, actors, actorStates, &intersections[i], &impulse, &angularImpulse);
+    accumulateFrictionalImpulse(actor, actorState, actorStates, &intersections[i], &impulse, &angularImpulse);
   }
   actorState->linearVelocity += impulse / actor->mass;
   actorState->angularVelocity += angularImpulse / actorState->momentOfInertia;
 }
 
 __kernel void collectCollisions(
-  __global const Actor* actors,
   __global ActorState* actorStates
 ) {
   size_t actorIndex = get_global_id(0);
@@ -97,13 +93,12 @@ __kernel void collectCollisions(
     }
   }
   actorState->collisionCount = collisionCount;
-  actorState->massForCollision = actors[actorIndex].mass / collisionCount;
+  actorState->massForCollision = actorState->constants.mass / collisionCount;
 }
 
 void accumulateConstraintImpulse(
-  __global const Actor* actor,
+  __global Actor* actor,
   __global ActorState* actorState,
-  __global const Actor* actors,
   __global ActorState* actorStates,
   __global Intersection* intersection,
   __global SoftBodyState* softBodyStates,
@@ -115,7 +110,7 @@ void accumulateConstraintImpulse(
   unsigned int intersectionType = intersection->type;
   ushort otherIndex = intersection->otherIndex;
   float mass = actorState->massForCollision;
-  float elasticity = intersectionType == 0 ? softBodyStates[actor->subPhysicalQuantityIndex].elasticity * softBodyStates[actors[otherIndex].subPhysicalQuantityIndex].elasticity : softBodyStates[actor->subPhysicalQuantityIndex].elasticity;
+  float elasticity = intersectionType == 0 ? softBodyStates[actor->subPhysicalQuantityIndex].elasticity * softBodyStates[actorStates[otherIndex].constants.subPhysicalQuantityIndex].elasticity : softBodyStates[actor->subPhysicalQuantityIndex].elasticity;
   float massRatio = intersectionType == 0 ? mass / actorStates[otherIndex].massForCollision : 0.0f;
   float3 intersectionNormal = intersection->normal;
   float speedOnIntersectionNormal = dot(actorState->linearVelocity, intersectionNormal);
@@ -124,7 +119,6 @@ void accumulateConstraintImpulse(
 }
 
 __kernel void updateByConstraintImpulse(
-  __global const Actor* actors,
   __global ActorState* actorStates,
   __global SoftBodyState* softBodyStates
 ) {
@@ -135,14 +129,14 @@ __kernel void updateByConstraintImpulse(
     return;
   }
   __global Intersection* intersections = actorState->intersections;
-  __global const Actor* actor = &actors[actorIndex];
+  __global Actor* actor = &actorStates[actorIndex].constants;
 
   float3 impulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
     if (intersections[actorState->collisionIndices[i]].type == 3) {
       continue;
     }
-    accumulateConstraintImpulse(actor, actorState, actors, actorStates, &intersections[actorState->collisionIndices[i]], softBodyStates, &impulse);
+    accumulateConstraintImpulse(actor, actorState, actorStates, &intersections[actorState->collisionIndices[i]], softBodyStates, &impulse);
   }
   actorState->linearVelocity = impulse / actor->mass;
 }

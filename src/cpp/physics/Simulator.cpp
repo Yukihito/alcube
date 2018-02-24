@@ -203,6 +203,12 @@ namespace alcube::physics {
       memories.softBodyStates
     );
 
+    kernels.inputSprings(
+      springCount,
+      memories.springs,
+      memories.springStates
+    );
+
     kernels.inputFluid(
       (unsigned short)fluidParticleCount,
       memories.hostFluidStates,
@@ -281,7 +287,6 @@ namespace alcube::physics {
   void Simulator::resolveConstraints() {
     kernels.updateByPenaltyImpulse(
       softBodyParticleCount,
-      memories.actors,
       memories.actorStates,
       deltaTime
     );
@@ -289,20 +294,17 @@ namespace alcube::physics {
     for (int i = 0; i < constraintResolvingIterationCount; i++) {
       kernels.collectCollisions(
         softBodyParticleCount,
-        memories.actors,
         memories.actorStates
       );
 
       kernels.updateByConstraintImpulse(
         softBodyParticleCount,
-        memories.actors,
         memories.actorStates,
         memories.softBodyStates
       );
     }
     kernels.updateByFrictionalImpulse(
       softBodyParticleCount,
-      memories.actors,
       memories.actorStates
     );
   }
@@ -313,7 +315,6 @@ namespace alcube::physics {
       if (springCount > 0) {
         kernels.calcSpringImpulses(
           springCount,
-          memories.springs,
           memories.springStates,
           memories.physicalQuantities,
           splitDeltaTime

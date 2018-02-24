@@ -80,6 +80,7 @@ typedef struct __attribute__ ((packed)) SpringStruct {
 } Spring;
 
 typedef struct __attribute__ ((packed)) SpringStateStruct {
+  Spring constants;
   float3 linearImpulses[2];
   float3 angularImpulses[2];
 } SpringState;
