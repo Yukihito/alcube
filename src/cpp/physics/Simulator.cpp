@@ -367,6 +367,7 @@ namespace alcube::physics {
       input();
       setUpMemories();
       initialized = true;
+      std::cout << "actors count: " << actorCount << std::endl;
     }
 
     computeBroadPhase();
