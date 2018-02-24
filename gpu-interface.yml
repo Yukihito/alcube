@@ -26,6 +26,14 @@ dto-structs:
     - float3 linearMomentum
     - float3 angularMomentum
 
+  SoftBodyState:
+    - float     elasticity
+    - float     dynamicFrictionCoefficient
+    - float     staticFrictionCoefficient
+    - uint[16]  springIndices
+    - uchar[16] springNodeIndices
+    - uint      springCount
+
   Actor:
     # common
     - float     radius
@@ -39,8 +47,6 @@ dto-structs:
     - uint[16]  springIndices
     - uchar[16] springNodeIndices
     - uint      springCount
-    - int       alterEgoIndex
-    - float     radiusForAlterEgo
     # only fluid
 
   ActorState:
@@ -158,3 +164,11 @@ dto-instances:
 
   - name: constants
     type: Constants
+
+  - name: hostSoftBodyStates
+    type: SoftBodyState
+    length: maxActorCount
+
+  - name: softBodyStates
+    type: SoftBodyState
+    length: maxActorCount

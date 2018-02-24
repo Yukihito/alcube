@@ -52,7 +52,8 @@ namespace alcube::physics {
       unsigned int actorCountForBitonicSort;
       unsigned int springCount;
       unsigned int fluidParticleCount;
-      unsigned int splitCount;
+      unsigned int motionIterationCount;
+      unsigned int constraintResolvingIterationCount;
       float deltaTime;
 
       bool initialized;

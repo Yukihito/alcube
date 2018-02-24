@@ -12,8 +12,6 @@ typedef struct __attribute__ ((packed)) ActorStruct {
   uint springIndices[16];
   uchar springNodeIndices[16];
   uint springCount;
-  int alterEgoIndex;
-  float radiusForAlterEgo;
 } Actor;
 
 typedef struct __attribute__ ((packed)) FluidSettingsStruct {
@@ -69,6 +67,15 @@ typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
   float3 linearMomentum;
   float3 angularMomentum;
 } PhysicalQuantity;
+
+typedef struct __attribute__ ((packed)) SoftBodyStateStruct {
+  float elasticity;
+  float dynamicFrictionCoefficient;
+  float staticFrictionCoefficient;
+  uint springIndices[16];
+  uchar springNodeIndices[16];
+  uint springCount;
+} SoftBodyState;
 
 typedef struct __attribute__ ((packed)) SpringStruct {
   float k;
@@ -293,8 +300,6 @@ __kernel void collectIntersections(
   float3 position = physicalQuantity->position;
   float* positionPtr = (float*)&position;
   float radius = actor->radius;
-  int alterEgoIndex = actor->alterEgoIndex;
-  float radiusForAlterEgo = actor->radiusForAlterEgo;
   float mass = actor->mass;
   float smallValue = 0.0001f;
   uchar maxIntersection = 32;
@@ -319,7 +324,7 @@ __kernel void collectIntersections(
 	  }
 	  __global Actor* otherActor = &(actorStates[otherActorIndex].constants);
 	  float3 w = physicalQuantities[otherActorIndex].position - position;
-	  float r = alterEgoIndex == -1 || alterEgoIndex != otherActorIndex ? radius + otherActor->radius : radiusForAlterEgo + otherActor->radiusForAlterEgo;
+	  float r = radius + otherActor->radius;
 	  float rr = r * r;
 	  float ww = dot(w, w);
 	  if (ww > 0.0f && ww <= rr + smallValue) {

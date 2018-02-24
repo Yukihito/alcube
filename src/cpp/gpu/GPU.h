@@ -120,6 +120,18 @@ namespace alcube::gpu {
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
+    class SoftBodyState {
+      public:
+        utils::opencl::Memory* memory;
+        dtos::SoftBodyState* dto;
+        dtos::SoftBodyState* at(int i);
+        void write();
+        void read();
+        void zeroFill();
+        void setCount(size_t count);
+        utils::opencl::ResourcesProvider* resourcesProvider;
+    };
+
     class Spring {
       public:
         utils::opencl::Memory* memory;
@@ -305,6 +317,8 @@ namespace alcube::gpu {
       memories::SpringVar springVars;
       memories::FluidState fluidStates;
       memories::Constants constants;
+      memories::SoftBodyState hostSoftBodyStates;
+      memories::SoftBodyState softBodyStates;
   };
 
   class Dtos {
@@ -323,6 +337,8 @@ namespace alcube::gpu {
       dtos::SpringVar* springVars;
       dtos::FluidState* fluidStates;
       dtos::Constants* constants;
+      dtos::SoftBodyState* hostSoftBodyStates;
+      dtos::SoftBodyState* softBodyStates;
   };
 
   class RawKernels {

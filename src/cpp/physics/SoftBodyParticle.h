@@ -8,8 +8,6 @@ namespace alcube::physics {
     public:
       explicit SoftBodyParticle();
       unsigned short index;
-      SoftBodyParticle* alterEgo;
-      float radiusForAlterEgo;
   };
 }
 

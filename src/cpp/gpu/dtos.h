@@ -19,8 +19,6 @@ namespace alcube::gpu::dtos {
       unsigned int springIndices[16];
       unsigned char springNodeIndices[16];
       unsigned int springCount;
-      int alterEgoIndex;
-      float radiusForAlterEgo;
   };
 #pragma pack(pop)
 
@@ -93,6 +91,18 @@ namespace alcube::gpu::dtos {
       cl_float4 rotation;
       cl_float3 linearMomentum;
       cl_float3 angularMomentum;
+  };
+#pragma pack(pop)
+
+#pragma pack(push, 1)
+  class SoftBodyState {
+    public:
+      float elasticity;
+      float dynamicFrictionCoefficient;
+      float staticFrictionCoefficient;
+      unsigned int springIndices[16];
+      unsigned char springNodeIndices[16];
+      unsigned int springCount;
   };
 #pragma pack(pop)
 

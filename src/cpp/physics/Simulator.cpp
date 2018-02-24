@@ -26,7 +26,8 @@ namespace alcube::physics {
     springs = {};
     fluidParticles = {};
     initialized = false;
-    splitCount = 8;
+    motionIterationCount = 8;
+    constraintResolvingIterationCount = 16;
 
     // Set up constants.
     gravity = 0.0f;
@@ -91,7 +92,6 @@ namespace alcube::physics {
       actor->elasticity = softBodyParticle->elasticity;
       actor->staticFrictionCoefficient = softBodyParticle->staticFrictionCoefficient;
       actor->dynamicFrictionCoefficient = softBodyParticle->dynamicFrictionCoefficient;
-      actor->radiusForAlterEgo = softBodyParticle->radiusForAlterEgo;
       actor->type = 0;
 
       hostPhysicalQuantity->linearMomentum = toCl(softBodyParticle->linearMomentum);
@@ -111,8 +111,6 @@ namespace alcube::physics {
       actor->elasticity = 0.0f;
       actor->staticFrictionCoefficient = 0.0f;
       actor->dynamicFrictionCoefficient = 0.0f;
-      actor->radiusForAlterEgo = 1.0f;
-      actor->alterEgoIndex = -1;
       actor->type = 3;
       actor->subPhysicalQuantityIndex = i;
 
@@ -134,14 +132,6 @@ namespace alcube::physics {
       memories.springs.at(i)->k = springs[i]->k;
       setUpSpring(i, 0);
       setUpSpring(i, 1);
-    }
-    for (int i = 0; i < softBodyParticleCount; i++) {
-      SoftBodyParticle* softBodyParticle = softBodyParticles[i];
-      if (softBodyParticle->alterEgo == nullptr) {
-        memories.actors.at(i)->alterEgoIndex = -1;
-      } else {
-        memories.actors.at(i)->alterEgoIndex = softBodyParticle->alterEgo->index;
-      }
     }
   }
 
@@ -179,7 +169,7 @@ namespace alcube::physics {
     memories.springs.write();
     memories.hostFluidStates.write();
 
-    float splitDeltaTime = deltaTime / splitCount;
+    float splitDeltaTime = deltaTime / motionIterationCount;
     kernels.inputConstants(
       1,
       memories.constants,
@@ -283,7 +273,7 @@ namespace alcube::physics {
       deltaTime
     );
 
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < constraintResolvingIterationCount; i++) {
       kernels.collectCollisions(
         softBodyParticleCount,
         memories.actors,
@@ -304,8 +294,8 @@ namespace alcube::physics {
   }
 
   void Simulator::motion() {
-    float splitDeltaTime = deltaTime / splitCount;
-    for (int i = 0; i < splitCount; i++) {
+    float splitDeltaTime = deltaTime / motionIterationCount;
+    for (int i = 0; i < motionIterationCount; i++) {
       if (springCount > 0) {
         kernels.calcSpringImpulses(
           springCount,

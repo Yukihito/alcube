@@ -183,6 +183,26 @@ namespace alcube::gpu {
       this->memory->count = count;
     }
 
+    dtos::SoftBodyState* SoftBodyState::at(int i) {
+      return &dto[i];
+    }
+
+    void SoftBodyState::write() {
+      resourcesProvider->queue->write(this->memory);
+    }
+
+    void SoftBodyState::zeroFill() {
+      resourcesProvider->queue->pushZeroFill(this->memory);
+    }
+
+    void SoftBodyState::read() {
+      resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void SoftBodyState::setCount(size_t count) {
+      this->memory->count = count;
+    }
+
     dtos::Spring* Spring::at(int i) {
       return &dto[i];
     }
@@ -778,6 +798,8 @@ namespace alcube::gpu {
     dtos.springVars = new dtos::SpringVar[maxSpringCount];
     dtos.fluidStates = new dtos::FluidState[maxActorCount];
     dtos.constants = new dtos::Constants();
+    dtos.hostSoftBodyStates = new dtos::SoftBodyState[maxActorCount];
+    dtos.softBodyStates = new dtos::SoftBodyState[maxActorCount];
 
     memories.grid.memory = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);
     memories.actors.memory = defineHostMemory("actors", sizeof(dtos::Actor), dtos.actors, maxActorCount);
@@ -793,6 +815,8 @@ namespace alcube::gpu {
     memories.springVars.memory = defineGPUMemory("springVars", sizeof(dtos::SpringVar), maxSpringCount);
     memories.fluidStates.memory = defineGPUMemory("fluidStates", sizeof(dtos::FluidState), maxActorCount);
     memories.constants.memory = defineGPUMemory("constants", sizeof(dtos::Constants), 1);
+    memories.hostSoftBodyStates.memory = defineGPUMemory("hostSoftBodyStates", sizeof(dtos::SoftBodyState), maxActorCount);
+    memories.softBodyStates.memory = defineGPUMemory("softBodyStates", sizeof(dtos::SoftBodyState), maxActorCount);
 
     memories.grid.dto = dtos.grid;
     memories.actors.dto = dtos.actors;
@@ -808,6 +832,8 @@ namespace alcube::gpu {
     memories.springVars.dto = dtos.springVars;
     memories.fluidStates.dto = dtos.fluidStates;
     memories.constants.dto = dtos.constants;
+    memories.hostSoftBodyStates.dto = dtos.hostSoftBodyStates;
+    memories.softBodyStates.dto = dtos.softBodyStates;
 
     memories.grid.resourcesProvider = resourcesProvider;
     memories.actors.resourcesProvider = resourcesProvider;
@@ -822,7 +848,9 @@ namespace alcube::gpu {
     memories.gridEndIndices.resourcesProvider = resourcesProvider;
     memories.springVars.resourcesProvider = resourcesProvider;
     memories.fluidStates.resourcesProvider = resourcesProvider;
-    memories.constants.resourcesProvider = resourcesProvider;;
+    memories.constants.resourcesProvider = resourcesProvider;
+    memories.hostSoftBodyStates.resourcesProvider = resourcesProvider;
+    memories.softBodyStates.resourcesProvider = resourcesProvider;;
 
     resourcesProvider->resources->memoryManager->allocate();
   }

@@ -12,6 +12,4 @@ typedef struct __attribute__ ((packed)) BioticState {
   uint springIndices[16];
   uchar springNodeIndices[16];
   uint springCount;
-  int alterEgoIndex;
-  float radiusForAlterEgo;
 } Cell;
