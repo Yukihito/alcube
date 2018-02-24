@@ -18,7 +18,6 @@ void setIntersection(
 
 __kernel void collectIntersections(
   __global ActorState* actorStates,
-  __global const Spring* springs,
   __global PhysicalQuantity* physicalQuantities,
   __global GridAndActorRelation* relations,
   __global uint* gridStartIndices,

@@ -106,6 +106,7 @@ void accumulateConstraintImpulse(
   __global const Actor* actors,
   __global ActorState* actorStates,
   __global Intersection* intersection,
+  __global SoftBodyState* softBodyStates,
   float3* acc
 ) {
   if (intersection->speed >= 0.0f) {
@@ -114,7 +115,7 @@ void accumulateConstraintImpulse(
   unsigned int intersectionType = intersection->type;
   ushort otherIndex = intersection->otherIndex;
   float mass = actorState->massForCollision;
-  float elasticity = intersectionType == 0 ? actor->elasticity * actors[otherIndex].elasticity : actor->elasticity;
+  float elasticity = intersectionType == 0 ? softBodyStates[actor->subPhysicalQuantityIndex].elasticity * softBodyStates[actors[otherIndex].subPhysicalQuantityIndex].elasticity : softBodyStates[actor->subPhysicalQuantityIndex].elasticity;
   float massRatio = intersectionType == 0 ? mass / actorStates[otherIndex].massForCollision : 0.0f;
   float3 intersectionNormal = intersection->normal;
   float speedOnIntersectionNormal = dot(actorState->linearVelocity, intersectionNormal);
@@ -124,7 +125,8 @@ void accumulateConstraintImpulse(
 
 __kernel void updateByConstraintImpulse(
   __global const Actor* actors,
-  __global ActorState* actorStates
+  __global ActorState* actorStates,
+  __global SoftBodyState* softBodyStates
 ) {
   size_t actorIndex = get_global_id(0);
   __global ActorState* actorState = &actorStates[actorIndex];
@@ -140,7 +142,7 @@ __kernel void updateByConstraintImpulse(
     if (intersections[actorState->collisionIndices[i]].type == 3) {
       continue;
     }
-    accumulateConstraintImpulse(actor, actorState, actors, actorStates, &intersections[actorState->collisionIndices[i]], &impulse);
+    accumulateConstraintImpulse(actor, actorState, actors, actorStates, &intersections[actorState->collisionIndices[i]], softBodyStates, &impulse);
   }
   actorState->linearVelocity = impulse / actor->mass;
 }

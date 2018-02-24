@@ -21,9 +21,17 @@ __kernel void inputActors(
   __global const PhysicalQuantity* hostPhysicalQuantities,
   __global PhysicalQuantity* physicalQuantities
 ) {
-  size_t actorIndex = get_global_id(0);
-  physicalQuantities[actorIndex] = hostPhysicalQuantities[actorIndex];
-  actorStates[actorIndex].constants = actors[actorIndex];
+  size_t i = get_global_id(0);
+  physicalQuantities[i] = hostPhysicalQuantities[i];
+  actorStates[i].constants = actors[i];
+}
+
+__kernel void inputSoftBodyStates(
+  __global const SoftBodyState* hostSoftBodyStates,
+  __global SoftBodyState* softBodyStates
+) {
+  size_t i = get_global_id(0);
+  softBodyStates[i] = hostSoftBodyStates[i];
 }
 
 __kernel void initGridAndActorRelations(

@@ -6,12 +6,6 @@ typedef struct __attribute__ ((packed)) ActorStruct {
   char _padding0[2];
   ushort subPhysicalQuantityIndex;
   char _padding1[2];
-  float elasticity;
-  float dynamicFrictionCoefficient;
-  float staticFrictionCoefficient;
-  uint springIndices[16];
-  uchar springNodeIndices[16];
-  uint springCount;
 } Actor;
 
 typedef struct __attribute__ ((packed)) FluidSettingsStruct {
@@ -75,6 +69,8 @@ typedef struct __attribute__ ((packed)) SoftBodyStateStruct {
   uint springIndices[16];
   uchar springNodeIndices[16];
   uint springCount;
+  ushort actorIndex;
+  char _padding0[2];
 } SoftBodyState;
 
 typedef struct __attribute__ ((packed)) SpringStruct {
@@ -83,10 +79,10 @@ typedef struct __attribute__ ((packed)) SpringStruct {
   ushort actorIndices[2];
 } Spring;
 
-typedef struct __attribute__ ((packed)) SpringVarStruct {
+typedef struct __attribute__ ((packed)) SpringStateStruct {
   float3 linearImpulses[2];
   float3 angularImpulses[2];
-} SpringVar;
+} SpringState;
 
 typedef struct __attribute__ ((packed)) ActorStateStruct {
   Actor constants;

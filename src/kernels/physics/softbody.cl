@@ -1,13 +1,12 @@
 __kernel void calcSpringImpulses(
-  __global ActorState* actorStates,
   __global const Spring* springs,
-  __global SpringVar* springVars,
+  __global SpringState* springStates,
   __global PhysicalQuantity* physicalQuantities,
   const float deltaTime
 ) {
   size_t i = get_global_id(0);
   __global const Spring* spring = &springs[i];
-  __global SpringVar* springVar = &springVars[i];
+  __global SpringState* springState = &springStates[i];
   float3 pm0 = spring->nodePositionsModelSpace[0];
   float4 rot0 = physicalQuantities[spring->actorIndices[0]].rotation;
   float3 pm1 = spring->nodePositionsModelSpace[1];
@@ -17,32 +16,33 @@ __kernel void calcSpringImpulses(
   float3 impulse = ((p1 + physicalQuantities[spring->actorIndices[1]].position) - (p0 + physicalQuantities[spring->actorIndices[0]].position));
   float3 direction = normalize(impulse);
   float len = length(impulse);
-  springVar->linearImpulses[0] = log2(1.0f + len) * deltaTime * spring->k * direction;
-  springVar->linearImpulses[1] = -springVar->linearImpulses[0];
-  springVar->angularImpulses[0] = cross(p0, springVar->linearImpulses[0]);
-  springVar->angularImpulses[1] = cross(p1, springVar->linearImpulses[1]);
+  springState->linearImpulses[0] = log2(1.0f + len) * deltaTime * spring->k * direction;
+  springState->linearImpulses[1] = -springState->linearImpulses[0];
+  springState->angularImpulses[0] = cross(p0, springState->linearImpulses[0]);
+  springState->angularImpulses[1] = cross(p1, springState->linearImpulses[1]);
 }
 
 __kernel void updateBySpringImpulse(
-  __global const Actor* actors,
+  __global SoftBodyState* softBodyStates,
   __global ActorState* actorStates,
   __global PhysicalQuantity* physicalQuantities,
-  __global SpringVar* springVars,
+  __global SpringState* springStates,
   const float deltaTime
 ) {
-  size_t actorIndex = get_global_id(0);
-  __global const Actor* actor = &actors[actorIndex];
+  size_t softBodyIndex = get_global_id(0);
+  __global SoftBodyState* softBodyState = &softBodyStates[softBodyIndex];
+  size_t actorIndex = softBodyState->actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
-  uchar count = actor->springCount;
+  uchar count = softBodyState->springCount;
   float3 linearImpulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
 
   for (uchar i = 0; i < count; i++) {
-    linearImpulse += springVars[actor->springIndices[i]].linearImpulses[actor->springNodeIndices[i]];
-    angularImpulse += springVars[actor->springIndices[i]].angularImpulses[actor->springNodeIndices[i]];;
+    linearImpulse += springStates[softBodyState->springIndices[i]].linearImpulses[softBodyState->springNodeIndices[i]];
+    angularImpulse += springStates[softBodyState->springIndices[i]].angularImpulses[softBodyState->springNodeIndices[i]];;
   }
 
-  actorState->linearVelocity += linearImpulse / actor->mass;
+  actorState->linearVelocity += linearImpulse / actorState->constants.mass;
   actorState->angularVelocity += angularImpulse / actorState->momentOfInertia;
   physicalQuantities[actorIndex].position += actorState->linearVelocity * deltaTime;
   physicalQuantities[actorIndex].rotation = mulQuat(createQuatFromDisplacement(actorState->angularVelocity * deltaTime), physicalQuantities[actorIndex].rotation);

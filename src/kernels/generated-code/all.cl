@@ -6,12 +6,6 @@ typedef struct __attribute__ ((packed)) ActorStruct {
   char _padding0[2];
   ushort subPhysicalQuantityIndex;
   char _padding1[2];
-  float elasticity;
-  float dynamicFrictionCoefficient;
-  float staticFrictionCoefficient;
-  uint springIndices[16];
-  uchar springNodeIndices[16];
-  uint springCount;
 } Actor;
 
 typedef struct __attribute__ ((packed)) FluidSettingsStruct {
@@ -75,6 +69,8 @@ typedef struct __attribute__ ((packed)) SoftBodyStateStruct {
   uint springIndices[16];
   uchar springNodeIndices[16];
   uint springCount;
+  ushort actorIndex;
+  char _padding0[2];
 } SoftBodyState;
 
 typedef struct __attribute__ ((packed)) SpringStruct {
@@ -83,10 +79,10 @@ typedef struct __attribute__ ((packed)) SpringStruct {
   ushort actorIndices[2];
 } Spring;
 
-typedef struct __attribute__ ((packed)) SpringVarStruct {
+typedef struct __attribute__ ((packed)) SpringStateStruct {
   float3 linearImpulses[2];
   float3 angularImpulses[2];
-} SpringVar;
+} SpringState;
 
 typedef struct __attribute__ ((packed)) ActorStateStruct {
   Actor constants;
@@ -123,7 +119,7 @@ void accumulatePenaltyImpulse(__global Intersection* intersection, const float d
 
 void accumulateFrictionalImpulse(__global const Actor* actor, __global ActorState* actorState, __global const Actor* actors, __global ActorState* actorStates, __global Intersection* intersection, float3* linearMomentumAcc, float3* angularMomentumAcc);
 
-void accumulateConstraintImpulse(__global const Actor* actor, __global ActorState* actorState, __global const Actor* actors, __global ActorState* actorStates, __global Intersection* intersection, float3* acc);
+void accumulateConstraintImpulse(__global const Actor* actor, __global ActorState* actorState, __global const Actor* actors, __global ActorState* actorStates, __global Intersection* intersection, __global SoftBodyState* softBodyStates, float3* acc);
 
 void setIntersection(__global Intersection* intersection, ushort type, ushort otherIndex, float intersectionLength, float speed, float3 normal, float3 relativePosition);
 
@@ -174,9 +170,17 @@ __kernel void inputActors(
   __global const PhysicalQuantity* hostPhysicalQuantities,
   __global PhysicalQuantity* physicalQuantities
 ) {
-  size_t actorIndex = get_global_id(0);
-  physicalQuantities[actorIndex] = hostPhysicalQuantities[actorIndex];
-  actorStates[actorIndex].constants = actors[actorIndex];
+  size_t i = get_global_id(0);
+  physicalQuantities[i] = hostPhysicalQuantities[i];
+  actorStates[i].constants = actors[i];
+}
+
+__kernel void inputSoftBodyStates(
+  __global const SoftBodyState* hostSoftBodyStates,
+  __global SoftBodyState* softBodyStates
+) {
+  size_t i = get_global_id(0);
+  softBodyStates[i] = hostSoftBodyStates[i];
 }
 
 __kernel void initGridAndActorRelations(
@@ -281,7 +285,6 @@ void setIntersection(
 
 __kernel void collectIntersections(
   __global ActorState* actorStates,
-  __global const Spring* springs,
   __global PhysicalQuantity* physicalQuantities,
   __global GridAndActorRelation* relations,
   __global uint* gridStartIndices,
@@ -493,6 +496,7 @@ void accumulateConstraintImpulse(
   __global const Actor* actors,
   __global ActorState* actorStates,
   __global Intersection* intersection,
+  __global SoftBodyState* softBodyStates,
   float3* acc
 ) {
   if (intersection->speed >= 0.0f) {
@@ -501,7 +505,7 @@ void accumulateConstraintImpulse(
   unsigned int intersectionType = intersection->type;
   ushort otherIndex = intersection->otherIndex;
   float mass = actorState->massForCollision;
-  float elasticity = intersectionType == 0 ? actor->elasticity * actors[otherIndex].elasticity : actor->elasticity;
+  float elasticity = intersectionType == 0 ? softBodyStates[actor->subPhysicalQuantityIndex].elasticity * softBodyStates[actors[otherIndex].subPhysicalQuantityIndex].elasticity : softBodyStates[actor->subPhysicalQuantityIndex].elasticity;
   float massRatio = intersectionType == 0 ? mass / actorStates[otherIndex].massForCollision : 0.0f;
   float3 intersectionNormal = intersection->normal;
   float speedOnIntersectionNormal = dot(actorState->linearVelocity, intersectionNormal);
@@ -511,7 +515,8 @@ void accumulateConstraintImpulse(
 
 __kernel void updateByConstraintImpulse(
   __global const Actor* actors,
-  __global ActorState* actorStates
+  __global ActorState* actorStates,
+  __global SoftBodyState* softBodyStates
 ) {
   size_t actorIndex = get_global_id(0);
   __global ActorState* actorState = &actorStates[actorIndex];
@@ -527,7 +532,7 @@ __kernel void updateByConstraintImpulse(
     if (intersections[actorState->collisionIndices[i]].type == 3) {
       continue;
     }
-    accumulateConstraintImpulse(actor, actorState, actors, actorStates, &intersections[actorState->collisionIndices[i]], &impulse);
+    accumulateConstraintImpulse(actor, actorState, actors, actorStates, &intersections[actorState->collisionIndices[i]], softBodyStates, &impulse);
   }
   actorState->linearVelocity = impulse / actor->mass;
 }
@@ -623,17 +628,16 @@ __kernel void moveFluid(
 }
 
 __kernel void postProcessing(
-  __global const Grid* grid,
-  __global const Actor* actors,
+  __global Constants* constants,
   __global ActorState* actorStates,
   __global PhysicalQuantity* physicalQuantities,
   const float deltaTime
 ) {
   size_t actorIndex = get_global_id(0);
-  float3 maxLinearMomentum = (float3)((2.0f * (1.0f / deltaTime)) * actors[actorIndex].mass);
+  float3 maxLinearMomentum = (float3)((2.0f * (1.0f / deltaTime)) * actorStates[actorIndex].constants.mass);
   __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
   physicalQuantity->angularMomentum = actorStates[actorIndex].angularVelocity * actorStates[actorIndex].momentOfInertia * 0.999f;
-  physicalQuantity->linearMomentum = clamp(actorStates[actorIndex].linearVelocity * actors[actorIndex].mass * 0.999f, -maxLinearMomentum, maxLinearMomentum);
+  physicalQuantity->linearMomentum = clamp(actorStates[actorIndex].linearVelocity * actorStates[actorIndex].constants.mass * 0.999f, -maxLinearMomentum, maxLinearMomentum);
 
   if (length(physicalQuantity->linearMomentum) < 0.01f) {
     physicalQuantity->linearMomentum = (float3)(0.0f);
@@ -643,21 +647,20 @@ __kernel void postProcessing(
     physicalQuantity->angularMomentum = (float3)(0.0f);
   }
 
-  float3 corner = grid->origin + (float3)(0.0001f);
+  float3 corner = constants->grid.origin + (float3)(0.0001f);
 
   physicalQuantity->position = clamp(physicalQuantity->position, corner, -corner);
 }
 
 __kernel void calcSpringImpulses(
-  __global ActorState* actorStates,
   __global const Spring* springs,
-  __global SpringVar* springVars,
+  __global SpringState* springStates,
   __global PhysicalQuantity* physicalQuantities,
   const float deltaTime
 ) {
   size_t i = get_global_id(0);
   __global const Spring* spring = &springs[i];
-  __global SpringVar* springVar = &springVars[i];
+  __global SpringState* springState = &springStates[i];
   float3 pm0 = spring->nodePositionsModelSpace[0];
   float4 rot0 = physicalQuantities[spring->actorIndices[0]].rotation;
   float3 pm1 = spring->nodePositionsModelSpace[1];
@@ -667,32 +670,33 @@ __kernel void calcSpringImpulses(
   float3 impulse = ((p1 + physicalQuantities[spring->actorIndices[1]].position) - (p0 + physicalQuantities[spring->actorIndices[0]].position));
   float3 direction = normalize(impulse);
   float len = length(impulse);
-  springVar->linearImpulses[0] = log2(1.0f + len) * deltaTime * spring->k * direction;
-  springVar->linearImpulses[1] = -springVar->linearImpulses[0];
-  springVar->angularImpulses[0] = cross(p0, springVar->linearImpulses[0]);
-  springVar->angularImpulses[1] = cross(p1, springVar->linearImpulses[1]);
+  springState->linearImpulses[0] = log2(1.0f + len) * deltaTime * spring->k * direction;
+  springState->linearImpulses[1] = -springState->linearImpulses[0];
+  springState->angularImpulses[0] = cross(p0, springState->linearImpulses[0]);
+  springState->angularImpulses[1] = cross(p1, springState->linearImpulses[1]);
 }
 
 __kernel void updateBySpringImpulse(
-  __global const Actor* actors,
+  __global SoftBodyState* softBodyStates,
   __global ActorState* actorStates,
   __global PhysicalQuantity* physicalQuantities,
-  __global SpringVar* springVars,
+  __global SpringState* springStates,
   const float deltaTime
 ) {
-  size_t actorIndex = get_global_id(0);
-  __global const Actor* actor = &actors[actorIndex];
+  size_t softBodyIndex = get_global_id(0);
+  __global SoftBodyState* softBodyState = &softBodyStates[softBodyIndex];
+  size_t actorIndex = softBodyState->actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
-  uchar count = actor->springCount;
+  uchar count = softBodyState->springCount;
   float3 linearImpulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
 
   for (uchar i = 0; i < count; i++) {
-    linearImpulse += springVars[actor->springIndices[i]].linearImpulses[actor->springNodeIndices[i]];
-    angularImpulse += springVars[actor->springIndices[i]].angularImpulses[actor->springNodeIndices[i]];;
+    linearImpulse += springStates[softBodyState->springIndices[i]].linearImpulses[softBodyState->springNodeIndices[i]];
+    angularImpulse += springStates[softBodyState->springIndices[i]].angularImpulses[softBodyState->springNodeIndices[i]];;
   }
 
-  actorState->linearVelocity += linearImpulse / actor->mass;
+  actorState->linearVelocity += linearImpulse / actorState->constants.mass;
   actorState->angularVelocity += angularImpulse / actorState->momentOfInertia;
   physicalQuantities[actorIndex].position += actorState->linearVelocity * deltaTime;
   physicalQuantities[actorIndex].rotation = mulQuat(createQuatFromDisplacement(actorState->angularVelocity * deltaTime), physicalQuantities[actorIndex].rotation);

@@ -1,15 +1,14 @@
 __kernel void postProcessing(
-  __global const Grid* grid,
-  __global const Actor* actors,
+  __global Constants* constants,
   __global ActorState* actorStates,
   __global PhysicalQuantity* physicalQuantities,
   const float deltaTime
 ) {
   size_t actorIndex = get_global_id(0);
-  float3 maxLinearMomentum = (float3)((2.0f * (1.0f / deltaTime)) * actors[actorIndex].mass);
+  float3 maxLinearMomentum = (float3)((2.0f * (1.0f / deltaTime)) * actorStates[actorIndex].constants.mass);
   __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
   physicalQuantity->angularMomentum = actorStates[actorIndex].angularVelocity * actorStates[actorIndex].momentOfInertia * 0.999f;
-  physicalQuantity->linearMomentum = clamp(actorStates[actorIndex].linearVelocity * actors[actorIndex].mass * 0.999f, -maxLinearMomentum, maxLinearMomentum);
+  physicalQuantity->linearMomentum = clamp(actorStates[actorIndex].linearVelocity * actorStates[actorIndex].constants.mass * 0.999f, -maxLinearMomentum, maxLinearMomentum);
 
   if (length(physicalQuantity->linearMomentum) < 0.01f) {
     physicalQuantity->linearMomentum = (float3)(0.0f);
@@ -19,7 +18,7 @@ __kernel void postProcessing(
     physicalQuantity->angularMomentum = (float3)(0.0f);
   }
 
-  float3 corner = grid->origin + (float3)(0.0001f);
+  float3 corner = constants->grid.origin + (float3)(0.0001f);
 
   physicalQuantity->position = clamp(physicalQuantity->position, corner, -corner);
 }

@@ -223,23 +223,23 @@ namespace alcube::gpu {
       this->memory->count = count;
     }
 
-    dtos::SpringVar* SpringVar::at(int i) {
+    dtos::SpringState* SpringState::at(int i) {
       return &dto[i];
     }
 
-    void SpringVar::write() {
+    void SpringState::write() {
       resourcesProvider->queue->write(this->memory);
     }
 
-    void SpringVar::zeroFill() {
+    void SpringState::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void SpringVar::read() {
+    void SpringState::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
-    void SpringVar::setCount(size_t count) {
+    void SpringState::setCount(size_t count) {
       this->memory->count = count;
     }
 
@@ -520,6 +520,17 @@ namespace alcube::gpu {
     });
   }
 
+  void Kernels::inputSoftBodyStates(
+    unsigned int workSize,
+    memories::SoftBodyState& hostSoftBodyStates,
+    memories::SoftBodyState& softBodyStates
+  ) {
+    queue->push(rawKernels.inputSoftBodyStates, {workSize}, {
+      memArg(hostSoftBodyStates.memory),
+      memArg(softBodyStates.memory)
+    });
+  }
+
   void Kernels::initGridAndActorRelations(
     unsigned int workSize,
     memories::GridAndActorRelation& relations,
@@ -623,11 +634,13 @@ namespace alcube::gpu {
   void Kernels::updateByConstraintImpulse(
     unsigned int workSize,
     memories::Actor& actors,
-    memories::ActorState& actorStates
+    memories::ActorState& actorStates,
+    memories::SoftBodyState& softBodyStates
   ) {
     queue->push(rawKernels.updateByConstraintImpulse, {workSize}, {
       memArg(actors.memory),
-      memArg(actorStates.memory)
+      memArg(actorStates.memory),
+      memArg(softBodyStates.memory)
     });
   }
 
@@ -683,15 +696,13 @@ namespace alcube::gpu {
 
   void Kernels::postProcessing(
     unsigned int workSize,
-    memories::Grid& grid,
-    memories::Actor& actors,
+    memories::Constants& constants,
     memories::ActorState& actorStates,
     memories::PhysicalQuantity& physicalQuantities,
     float deltaTime
   ) {
     queue->push(rawKernels.postProcessing, {workSize}, {
-      memArg(grid.memory),
-      memArg(actors.memory),
+      memArg(constants.memory),
       memArg(actorStates.memory),
       memArg(physicalQuantities.memory),
       floatArg(deltaTime)
@@ -701,7 +712,6 @@ namespace alcube::gpu {
   void Kernels::collectIntersections(
     unsigned int workSize,
     memories::ActorState& actorStates,
-    memories::Spring& springs,
     memories::PhysicalQuantity& physicalQuantities,
     memories::GridAndActorRelation& relations,
     memories::UintMemory& gridStartIndices,
@@ -710,7 +720,6 @@ namespace alcube::gpu {
   ) {
     queue->push(rawKernels.collectIntersections, {workSize}, {
       memArg(actorStates.memory),
-      memArg(springs.memory),
       memArg(physicalQuantities.memory),
       memArg(relations.memory),
       memArg(gridStartIndices.memory),
@@ -721,16 +730,14 @@ namespace alcube::gpu {
 
   void Kernels::calcSpringImpulses(
     unsigned int workSize,
-    memories::ActorState& actorStates,
     memories::Spring& springs,
-    memories::SpringVar& springVars,
+    memories::SpringState& springStates,
     memories::PhysicalQuantity& physicalQuantities,
     float deltaTime
   ) {
     queue->push(rawKernels.calcSpringImpulses, {workSize}, {
-      memArg(actorStates.memory),
       memArg(springs.memory),
-      memArg(springVars.memory),
+      memArg(springStates.memory),
       memArg(physicalQuantities.memory),
       floatArg(deltaTime)
     });
@@ -738,17 +745,17 @@ namespace alcube::gpu {
 
   void Kernels::updateBySpringImpulse(
     unsigned int workSize,
-    memories::Actor& actors,
+    memories::SoftBodyState& softBodyStates,
     memories::ActorState& actorStates,
     memories::PhysicalQuantity& physicalQuantities,
-    memories::SpringVar& springVars,
+    memories::SpringState& springStates,
     float deltaTime
   ) {
     queue->push(rawKernels.updateBySpringImpulse, {workSize}, {
-      memArg(actors.memory),
+      memArg(softBodyStates.memory),
       memArg(actorStates.memory),
       memArg(physicalQuantities.memory),
-      memArg(springVars.memory),
+      memArg(springStates.memory),
       floatArg(deltaTime)
     });
   }
@@ -766,6 +773,7 @@ namespace alcube::gpu {
 
     kernels.rawKernels.inputConstants = resourcesProvider->kernelFactory->create(program, "inputConstants");
     kernels.rawKernels.inputActors = resourcesProvider->kernelFactory->create(program, "inputActors");
+    kernels.rawKernels.inputSoftBodyStates = resourcesProvider->kernelFactory->create(program, "inputSoftBodyStates");
     kernels.rawKernels.initGridAndActorRelations = resourcesProvider->kernelFactory->create(program, "initGridAndActorRelations");
     kernels.rawKernels.fillGridIndex = resourcesProvider->kernelFactory->create(program, "fillGridIndex");
     kernels.rawKernels.merge = resourcesProvider->kernelFactory->create(program, "merge");
@@ -795,7 +803,7 @@ namespace alcube::gpu {
     dtos.gridAndActorRelations = new dtos::GridAndActorRelation[maxActorCountForBitonicSort];
     dtos.gridStartIndices = new unsigned int[allGridCount];
     dtos.gridEndIndices = new unsigned int[allGridCount];
-    dtos.springVars = new dtos::SpringVar[maxSpringCount];
+    dtos.springStates = new dtos::SpringState[maxSpringCount];
     dtos.fluidStates = new dtos::FluidState[maxActorCount];
     dtos.constants = new dtos::Constants();
     dtos.hostSoftBodyStates = new dtos::SoftBodyState[maxActorCount];
@@ -812,10 +820,10 @@ namespace alcube::gpu {
     memories.gridAndActorRelations.memory = defineGPUMemory("gridAndActorRelations", sizeof(dtos::GridAndActorRelation), maxActorCountForBitonicSort);
     memories.gridStartIndices.memory = defineGPUMemory("gridStartIndices", sizeof(unsigned int), allGridCount);
     memories.gridEndIndices.memory = defineGPUMemory("gridEndIndices", sizeof(unsigned int), allGridCount);
-    memories.springVars.memory = defineGPUMemory("springVars", sizeof(dtos::SpringVar), maxSpringCount);
+    memories.springStates.memory = defineGPUMemory("springStates", sizeof(dtos::SpringState), maxSpringCount);
     memories.fluidStates.memory = defineGPUMemory("fluidStates", sizeof(dtos::FluidState), maxActorCount);
     memories.constants.memory = defineGPUMemory("constants", sizeof(dtos::Constants), 1);
-    memories.hostSoftBodyStates.memory = defineGPUMemory("hostSoftBodyStates", sizeof(dtos::SoftBodyState), maxActorCount);
+    memories.hostSoftBodyStates.memory = defineHostMemory("hostSoftBodyStates", sizeof(dtos::SoftBodyState), dtos.hostSoftBodyStates, maxActorCount);
     memories.softBodyStates.memory = defineGPUMemory("softBodyStates", sizeof(dtos::SoftBodyState), maxActorCount);
 
     memories.grid.dto = dtos.grid;
@@ -829,7 +837,7 @@ namespace alcube::gpu {
     memories.gridAndActorRelations.dto = dtos.gridAndActorRelations;
     memories.gridStartIndices.dto = dtos.gridStartIndices;
     memories.gridEndIndices.dto = dtos.gridEndIndices;
-    memories.springVars.dto = dtos.springVars;
+    memories.springStates.dto = dtos.springStates;
     memories.fluidStates.dto = dtos.fluidStates;
     memories.constants.dto = dtos.constants;
     memories.hostSoftBodyStates.dto = dtos.hostSoftBodyStates;
@@ -846,7 +854,7 @@ namespace alcube::gpu {
     memories.gridAndActorRelations.resourcesProvider = resourcesProvider;
     memories.gridStartIndices.resourcesProvider = resourcesProvider;
     memories.gridEndIndices.resourcesProvider = resourcesProvider;
-    memories.springVars.resourcesProvider = resourcesProvider;
+    memories.springStates.resourcesProvider = resourcesProvider;
     memories.fluidStates.resourcesProvider = resourcesProvider;
     memories.constants.resourcesProvider = resourcesProvider;
     memories.hostSoftBodyStates.resourcesProvider = resourcesProvider;

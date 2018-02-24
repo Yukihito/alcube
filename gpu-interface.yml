@@ -33,21 +33,13 @@ dto-structs:
     - uint[16]  springIndices
     - uchar[16] springNodeIndices
     - uint      springCount
+    - ushort    actorIndex
 
   Actor:
-    # common
     - float     radius
     - float     mass
     - ushort    type
     - ushort    subPhysicalQuantityIndex
-    # only rigid body
-    - float     elasticity
-    - float     dynamicFrictionCoefficient
-    - float     staticFrictionCoefficient
-    - uint[16]  springIndices
-    - uchar[16] springNodeIndices
-    - uint      springCount
-    # only fluid
 
   ActorState:
     - Actor            constants
@@ -76,7 +68,7 @@ dto-structs:
     - float3[2] nodePositionsModelSpace
     - ushort[2] actorIndices
 
-  SpringVar:
+  SpringState:
     - float3[2] linearImpulses
     - float3[2] angularImpulses
 
@@ -154,8 +146,8 @@ dto-instances:
     type: unsigned int
     length: allGridCount
 
-  - name: springVars
-    type: SpringVar
+  - name: springStates
+    type: SpringState
     length: maxSpringCount
 
   - name: fluidStates
@@ -168,6 +160,7 @@ dto-instances:
   - name: hostSoftBodyStates
     type: SoftBodyState
     length: maxActorCount
+    host-ptr: true
 
   - name: softBodyStates
     type: SoftBodyState

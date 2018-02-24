@@ -13,12 +13,6 @@ namespace alcube::gpu::dtos {
       char _padding0[2];
       unsigned short subPhysicalQuantityIndex;
       char _padding1[2];
-      float elasticity;
-      float dynamicFrictionCoefficient;
-      float staticFrictionCoefficient;
-      unsigned int springIndices[16];
-      unsigned char springNodeIndices[16];
-      unsigned int springCount;
   };
 #pragma pack(pop)
 
@@ -103,6 +97,8 @@ namespace alcube::gpu::dtos {
       unsigned int springIndices[16];
       unsigned char springNodeIndices[16];
       unsigned int springCount;
+      unsigned short actorIndex;
+      char _padding0[2];
   };
 #pragma pack(pop)
 
@@ -116,7 +112,7 @@ namespace alcube::gpu::dtos {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-  class SpringVar {
+  class SpringState {
     public:
       cl_float3 linearImpulses[2];
       cl_float3 angularImpulses[2];
