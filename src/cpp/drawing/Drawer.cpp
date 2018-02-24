@@ -35,7 +35,7 @@ namespace alcube::drawing {
         camera->far
       );
 
-    glm::mat4 view =  glm::inverse(glm::toMat4(camera->rotation)) * glm::translate(-camera->position);
+    glm::mat4 view = glm::toMat4(glm::inverse(camera->rotation)) * glm::translate(-camera->position);
     glm::mat4 vp = projection * view;
     Context context;
     context.v = view;
@@ -80,7 +80,15 @@ namespace alcube::drawing {
     drawablesMutex->unlock();
   }
 
-  Drawer::Drawer(Camera* camera, std::mutex *drawablesMutex) {
+  Drawer::Drawer(
+    Camera* camera,
+    std::mutex *drawablesMutex,
+    gpu::GPU* gpu
+  ) {
+    if (gpu != nullptr) {
+      kernels = gpu->kernels;
+      memories = gpu->memories;
+    }
     this->drawablesMutex = drawablesMutex;
     this->camera = camera;
     drawableBufferIndex[0] = 0;

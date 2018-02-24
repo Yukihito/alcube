@@ -1,9 +1,6 @@
-#define GL_GLEXT_PROTOTYPES
 #ifndef ALCUBE_SHADER_H
 #define ALCUBE_SHADER_H
 #include <GL/glew.h>
-//#include <GL/wglew.h>
-//#include <GL/gl.h>
 #include <iostream>
 #include <vector>
 #include "../utils/FileUtil.h"

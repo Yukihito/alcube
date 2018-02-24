@@ -1,5 +1,4 @@
 #include "drawing/samples/SimpleSphereSample.h"
-#include "physics/samples/BenchmarkSample.h"
 #include "physics/samples/balls/BallsSample.h"
 #include "physics/samples/particles/ParticlesSample.h"
 #include "physics/samples/balls/ManyBallsSample.h"

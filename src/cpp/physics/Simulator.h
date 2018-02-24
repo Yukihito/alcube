@@ -21,26 +21,28 @@
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
 
-  class Simulator: gpu::GPU {
+  class Simulator {
     public:
       explicit Simulator(
-        utils::opencl::ResourcesProvider* resourcesProvider,
         unsigned int maxActorCount,
         unsigned int gridEdgeLength,
         unsigned int xGridCount,
         unsigned int yGridCount,
         unsigned int zGridCount,
-        float deltaTime
+        float deltaTime,
+        gpu::GPU* gpu
       );
-
       void add(SoftBodyParticle* softBodyParticle);
       void add(Spring* spring);
       void add(FluidParticle* fluidParticle);
       SoftBodyParticle* getSoftBodyParticle(unsigned long i);
       void update();
+      void output();
       float gravity;
       float sphericalShellRadius;
     private:
+      gpu::Kernels kernels;
+      gpu::Memories memories;
       std::vector<SoftBodyParticle*> softBodyParticles;
       std::vector<FluidParticle*> fluidParticles;
       std::vector<Spring*> springs;
@@ -60,7 +62,6 @@ namespace alcube::physics {
       void setUpComputingSize();
       void setUpMemories();
       void input();
-      void output();
       void computeBroadPhase();
       void computeNarrowPhase();
       void resolveConstraints();

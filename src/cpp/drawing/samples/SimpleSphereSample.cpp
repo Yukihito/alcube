@@ -35,7 +35,7 @@ namespace alcube::drawing::samples {
       0.1f,
       10000.0f
     );
-    drawer = new Drawer(camera, &drawablesMutex);
+    drawer = new Drawer(camera, &drawablesMutex, nullptr);
     glm::vec3 pos1 = glm::vec3();
     for (int i = 0; i < 100; i++) {
       auto sphere = new SimpleSphere(pos1, shapes, shaders);

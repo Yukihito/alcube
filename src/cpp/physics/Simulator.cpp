@@ -5,20 +5,16 @@ namespace alcube::physics {
   using namespace utils::opencl::kernelargs;
 
   Simulator::Simulator(
-    utils::opencl::ResourcesProvider *resourcesProvider,
     unsigned int maxActorCount,
     unsigned int gridEdgeLength,
     unsigned int xGridCount,
     unsigned int yGridCount,
     unsigned int zGridCount,
-    float deltaTime
-  ): gpu::GPU(
-    resourcesProvider,
-    maxActorCount,
-    utils::math::powerOf2(maxActorCount),
-    maxActorCount * 16,
-    xGridCount * yGridCount * zGridCount
+    float deltaTime,
+    gpu::GPU* gpu
   ) {
+    kernels = gpu->kernels;
+    memories = gpu->memories;
     this->deltaTime = deltaTime;
     this->maxActorCount = maxActorCount;
     this->allGridCount = xGridCount * yGridCount * zGridCount;
@@ -142,6 +138,7 @@ namespace alcube::physics {
   }
 
   void Simulator::output() {
+    memories.physicalQuantities.read();
     for (int i = 0; i < softBodyParticleCount; i++) {
       SoftBodyParticle* softBodyParticle = softBodyParticles[i];
       auto physicalQuantity = memories.physicalQuantities.at(i);
@@ -375,8 +372,6 @@ namespace alcube::physics {
     resolveConstraints();
     motion();
     updateFluid();
-    memories.physicalQuantities.read();
-    output();
   }
 
   void Simulator::add(SoftBodyParticle *softBodyParticle) {

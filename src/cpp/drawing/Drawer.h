@@ -4,6 +4,7 @@
 #include "Camera.h"
 #include "Drawable.h"
 #include "../utils/FileUtil.h"
+#include "../gpu/GPU.h"
 #include <vector>
 #include <unordered_map>
 #include <mutex>
@@ -14,12 +15,15 @@ namespace alcube::drawing {
     public:
       explicit Drawer(
         Camera* camera,
-        std::mutex* drawablesMutex
+        std::mutex* drawablesMutex,
+        gpu::GPU* gpu
       );
       void add(Drawable* drawable);
       void draw();
       void updateDrawableBuffers();
     private:
+      gpu::Kernels kernels;
+      gpu::Memories memories;
       std::mutex* drawablesMutex;
       int drawableBufferIndex[1];
       Camera* camera;

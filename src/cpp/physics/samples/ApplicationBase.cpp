@@ -30,17 +30,24 @@ namespace alcube::physics::samples {
       near,
       far
     );
-    drawer = new drawing::Drawer(camera, &mutex);
     fileUtil = new utils::FileUtil();
     resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
-    physicsSimulator = new Simulator(
+    auto gpu = new gpu::GPU(
       resourcesProvider,
+      maxCellCount,
+      utils::math::powerOf2(maxCellCount),
+      maxCellCount * 16,
+      xGridCount * yGridCount * zGridCount
+    );
+    drawer = new drawing::Drawer(camera, &mutex, gpu);
+    physicsSimulator = new Simulator(
       maxCellCount,
       gridEdgeLength,
       xGridCount,
       yGridCount,
       zGridCount,
-      deltaTime
+      deltaTime,
+      gpu
     );
     physicsSimulator->gravity = gravity;
     profiler = new utils::Profiler();
@@ -61,6 +68,7 @@ namespace alcube::physics::samples {
   void ApplicationBase::onUpdate() {
     profiler->start(profilers.update);
     physicsSimulator->update();
+    physicsSimulator->output();
     drawer->updateDrawableBuffers();
     profiler->stop(profilers.update);
     profiler->stop(profilers.all);
