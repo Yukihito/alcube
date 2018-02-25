@@ -21,7 +21,6 @@ namespace alcube::physics {
     softBodyParticles = {};
     springs = {};
     fluidParticles = {};
-    initialized = false;
     motionIterationCount = 8;
     constraintResolvingIterationCount = 16;
 
@@ -80,7 +79,7 @@ namespace alcube::physics {
     hostSoftBodyState->springCount++;
   }
 
-  void Simulator::input() {
+  void Simulator::writeHostMemories() {
     // Input soft body particles
     for (int i = 0; i < softBodyParticleCount; i++) {
       SoftBodyParticle* softBodyParticle = softBodyParticles[i];
@@ -358,15 +357,13 @@ namespace alcube::physics {
     );
   }
 
-  void Simulator::update() {
-    if (!initialized) {
-      setUpComputingSize();
-      input();
-      setUpMemories();
-      initialized = true;
-      std::cout << "actors count: " << actorCount << std::endl;
-    }
+  void Simulator::input() {
+    setUpComputingSize();
+    writeHostMemories();
+    setUpMemories();
+  }
 
+  void Simulator::update() {
     computeBroadPhase();
     computeNarrowPhase();
     resolveConstraints();

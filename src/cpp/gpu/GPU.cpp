@@ -761,12 +761,40 @@ namespace alcube::gpu {
     });
   }
 
+  void Kernels::inputModelVertices(
+    unsigned int workSize,
+    memories::Float3Memory& hostVertices,
+    memories::Float3Memory& vertices
+  ) {
+    queue->push(rawKernels.inputModelVertices, {workSize}, {
+      memArg(hostVertices.memory),
+      memArg(vertices.memory)
+    });
+  }
+
+  void Kernels::transformModel(
+    unsigned int workSize,
+    memories::Float3Memory& vertices,
+    memories::Float3Memory& modelVertices,
+    unsigned int modelVertexCount,
+    memories::PhysicalQuantity& physicalQuantities
+  ) {
+    queue->push(rawKernels.transformModel, {workSize}, {
+      memArg(vertices.memory),
+      memArg(modelVertices.memory),
+      uintArg(modelVertexCount),
+      memArg(physicalQuantities.memory)
+    });
+  }
+
   GPU::GPU(
     utils::opencl::ResourcesProvider *resourcesProvider,
     unsigned int maxActorCount,
     unsigned int maxActorCountForBitonicSort,
     unsigned int maxSpringCount,
-    unsigned int allGridCount
+    unsigned int allGridCount,
+    unsigned int sphereModelVertexCount,
+    unsigned int maxVertexCount
   ) {
     this->resourcesProvider = resourcesProvider;
     cl_program program = resourcesProvider->programFactory->create("../src/kernels/generated-code/all.cl");
@@ -793,6 +821,8 @@ namespace alcube::gpu {
     kernels.rawKernels.collectIntersections = resourcesProvider->kernelFactory->create(program, "collectIntersections");
     kernels.rawKernels.calcSpringImpulses = resourcesProvider->kernelFactory->create(program, "calcSpringImpulses");
     kernels.rawKernels.updateBySpringImpulse = resourcesProvider->kernelFactory->create(program, "updateBySpringImpulse");
+    kernels.rawKernels.inputModelVertices = resourcesProvider->kernelFactory->create(program, "inputModelVertices");
+    kernels.rawKernels.transformModel = resourcesProvider->kernelFactory->create(program, "transformModel");
 
     dtos.grid = new dtos::Grid();
     dtos.fluidSettings = new dtos::FluidSettings();
@@ -810,6 +840,9 @@ namespace alcube::gpu {
     dtos.gridAndActorRelations = new dtos::GridAndActorRelation[maxActorCountForBitonicSort];
     dtos.gridStartIndices = new unsigned int[allGridCount];
     dtos.gridEndIndices = new unsigned int[allGridCount];
+    dtos.hostSphereModelVertices = new cl_float3[sphereModelVertexCount];
+    dtos.sphereModelVertices = new cl_float3[sphereModelVertexCount];
+    dtos.vertices = new cl_float3[maxVertexCount];
 
     memories.grid.memory = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);
     memories.fluidSettings.memory = defineHostMemory("fluidSettings", sizeof(dtos::FluidSettings), dtos.fluidSettings, 1);
@@ -827,6 +860,9 @@ namespace alcube::gpu {
     memories.gridAndActorRelations.memory = defineGPUMemory("gridAndActorRelations", sizeof(dtos::GridAndActorRelation), maxActorCountForBitonicSort);
     memories.gridStartIndices.memory = defineGPUMemory("gridStartIndices", sizeof(unsigned int), allGridCount);
     memories.gridEndIndices.memory = defineGPUMemory("gridEndIndices", sizeof(unsigned int), allGridCount);
+    memories.hostSphereModelVertices.memory = defineHostMemory("hostSphereModelVertices", sizeof(cl_float3), dtos.hostSphereModelVertices, sphereModelVertexCount);
+    memories.sphereModelVertices.memory = defineGPUMemory("sphereModelVertices", sizeof(cl_float3), sphereModelVertexCount);
+    memories.vertices.memory = defineGPUMemory("vertices", sizeof(cl_float3), maxVertexCount);
 
     memories.grid.dto = dtos.grid;
     memories.fluidSettings.dto = dtos.fluidSettings;
@@ -844,6 +880,9 @@ namespace alcube::gpu {
     memories.gridAndActorRelations.dto = dtos.gridAndActorRelations;
     memories.gridStartIndices.dto = dtos.gridStartIndices;
     memories.gridEndIndices.dto = dtos.gridEndIndices;
+    memories.hostSphereModelVertices.dto = dtos.hostSphereModelVertices;
+    memories.sphereModelVertices.dto = dtos.sphereModelVertices;
+    memories.vertices.dto = dtos.vertices;
 
     memories.grid.resourcesProvider = resourcesProvider;
     memories.fluidSettings.resourcesProvider = resourcesProvider;
@@ -860,7 +899,10 @@ namespace alcube::gpu {
     memories.fluidStates.resourcesProvider = resourcesProvider;
     memories.gridAndActorRelations.resourcesProvider = resourcesProvider;
     memories.gridStartIndices.resourcesProvider = resourcesProvider;
-    memories.gridEndIndices.resourcesProvider = resourcesProvider;;
+    memories.gridEndIndices.resourcesProvider = resourcesProvider;
+    memories.hostSphereModelVertices.resourcesProvider = resourcesProvider;
+    memories.sphereModelVertices.resourcesProvider = resourcesProvider;
+    memories.vertices.resourcesProvider = resourcesProvider;;
 
     resourcesProvider->resources->memoryManager->allocate();
   }

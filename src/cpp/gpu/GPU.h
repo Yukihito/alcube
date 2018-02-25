@@ -319,6 +319,9 @@ namespace alcube::gpu {
       memories::GridAndActorRelation gridAndActorRelations;
       memories::UintMemory gridStartIndices;
       memories::UintMemory gridEndIndices;
+      memories::Float3Memory hostSphereModelVertices;
+      memories::Float3Memory sphereModelVertices;
+      memories::Float3Memory vertices;
   };
 
   class Dtos {
@@ -339,6 +342,9 @@ namespace alcube::gpu {
       dtos::GridAndActorRelation* gridAndActorRelations;
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
+      cl_float3* hostSphereModelVertices;
+      cl_float3* sphereModelVertices;
+      cl_float3* vertices;
   };
 
   class RawKernels {
@@ -364,6 +370,8 @@ namespace alcube::gpu {
       cl_kernel collectIntersections;
       cl_kernel calcSpringImpulses;
       cl_kernel updateBySpringImpulse;
+      cl_kernel inputModelVertices;
+      cl_kernel transformModel;
   };
 
   class Kernels {
@@ -391,6 +399,8 @@ namespace alcube::gpu {
       void collectIntersections(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, memories::Constants& constants);
       void calcSpringImpulses(unsigned int workSize, memories::SpringState& springStates, memories::PhysicalQuantity& physicalQuantities, float deltaTime);
       void updateBySpringImpulse(unsigned int workSize, memories::SoftBodyState& softBodyStates, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::SpringState& springStates, float deltaTime);
+      void inputModelVertices(unsigned int workSize, memories::Float3Memory& hostVertices, memories::Float3Memory& vertices);
+      void transformModel(unsigned int workSize, memories::Float3Memory& vertices, memories::Float3Memory& modelVertices, unsigned int modelVertexCount, memories::PhysicalQuantity& physicalQuantities);
   };
 
   class GPU {
@@ -404,7 +414,9 @@ namespace alcube::gpu {
         unsigned int maxActorCount,
         unsigned int maxActorCountForBitonicSort,
         unsigned int maxSpringCount,
-        unsigned int allGridCount
+        unsigned int allGridCount,
+        unsigned int sphereModelVertexCount,
+        unsigned int maxVertexCount
       );
     private:
       utils::opencl::Memory* defineHostMemory(

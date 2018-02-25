@@ -36,6 +36,7 @@ namespace alcube::physics {
       void add(Spring* spring);
       void add(FluidParticle* fluidParticle);
       SoftBodyParticle* getSoftBodyParticle(unsigned long i);
+      void input();
       void update();
       void output();
       float gravity;
@@ -58,10 +59,9 @@ namespace alcube::physics {
       unsigned int constraintResolvingIterationCount;
       float deltaTime;
 
-      bool initialized;
       void setUpComputingSize();
       void setUpMemories();
-      void input();
+      void writeHostMemories();
       void computeBroadPhase();
       void computeNarrowPhase();
       void resolveConstraints();

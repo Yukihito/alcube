@@ -67,7 +67,7 @@ namespace alcube::physics {
 
       void simulateBroadPhase() {
         simulator->setUpComputingSize();
-        simulator->input();
+        simulator->writeHostMemories();
         simulator->setUpMemories();
         simulator->computeBroadPhase();
         simulator->read(simulator->memories._gridAndActorRelations, simulator->dtos.gridAndActorRelations);
@@ -78,7 +78,7 @@ namespace alcube::physics {
 
       void simulateNarrowPhase(float deltaTime) {
         simulator->setUpComputingSize();
-        simulator->input();
+        simulator->writeHostMemories();
         simulator->setUpMemories();
         simulator->computeBroadPhase();
         simulator->computeNarrowPhase(deltaTime);
@@ -88,7 +88,7 @@ namespace alcube::physics {
 
       void simulateAll(float deltaTime) {
         simulator->setUpComputingSize();
-        simulator->input();
+        simulator->writeHostMemories();
         simulator->setUpMemories();
         simulator->computeBroadPhase();
         simulator->computeNarrowPhase(deltaTime);

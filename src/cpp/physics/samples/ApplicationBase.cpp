@@ -10,6 +10,7 @@ namespace alcube::physics::samples {
 
   void ApplicationBase::initBase(unsigned int worldSize, unsigned int maxCellCount) {
     printSystemInfo();
+    initialized = false;
     this->maxCellCount = maxCellCount;
     deltaTime = 1.0f / (float)fps;
     float gravity = 9.8f;
@@ -32,12 +33,15 @@ namespace alcube::physics::samples {
     );
     fileUtil = new utils::FileUtil();
     resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
+    uint modelVertexCount = shapes->triangles.sphere.buffer->vbos.vertices->allocationSize / sizeof(GLfloat);
     auto gpu = new gpu::GPU(
       resourcesProvider,
       maxCellCount,
       utils::math::powerOf2(maxCellCount),
       maxCellCount * 16,
-      xGridCount * yGridCount * zGridCount
+      xGridCount * yGridCount * zGridCount,
+      modelVertexCount,
+      modelVertexCount * maxCellCount
     );
     drawer = new drawing::Drawer(camera, &mutex, gpu);
     physicsSimulator = new Simulator(
@@ -66,6 +70,10 @@ namespace alcube::physics::samples {
   }
 
   void ApplicationBase::onUpdate() {
+    if (!initialized) {
+      physicsSimulator->input();
+      initialized = true;
+    }
     profiler->start(profilers.update);
     physicsSimulator->update();
     physicsSimulator->output();
