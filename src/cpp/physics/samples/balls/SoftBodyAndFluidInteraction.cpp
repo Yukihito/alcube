@@ -4,12 +4,14 @@ namespace alcube::physics::samples::balls {
   SoftBodyAndFluidInteraction::SoftBodyAndFluidInteraction() : ApplicationBase(1600, 1200, 60, "SoftBodyAndFluidInteraction") {}
 
   void SoftBodyAndFluidInteraction::add(ColorBall *ball) {
-    drawer->add(ball);
+    //drawer->add(ball);
+    actorCount++;
     physicsSimulator->add(ball);
   }
 
   void SoftBodyAndFluidInteraction::add(DrawableFluidParticle *particle) {
-    drawer->add(particle);
+    //drawer->add(particle);
+    actorCount++;
     physicsSimulator->add(particle);
   }
 
@@ -97,6 +99,15 @@ namespace alcube::physics::samples::balls {
         }
       }
     }
-
+    colorBalls = new ColorBalls(
+      shaders,
+      color,
+      maxCellCount,
+      &gpu->memories.hostSphereModelVertices,
+      &gpu->memories.sphereModelVertices,
+      &gpu->memories.vertices
+    );
+    ((drawing::shapes::triangles::Spheres*)colorBalls->shape)->modelCount = actorCount;
+    drawer->add(colorBalls);
   }
 }

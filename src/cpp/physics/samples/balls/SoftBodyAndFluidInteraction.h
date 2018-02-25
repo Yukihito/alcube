@@ -13,6 +13,7 @@
 #include "ColorBall.h"
 #include "../ApplicationBase.h"
 #include "../DrawableFluidParticle.h"
+#include "ColorBalls.h"
 
 namespace alcube::physics::samples::balls {
   class SoftBodyAndFluidInteraction : public ApplicationBase {
@@ -21,6 +22,8 @@ namespace alcube::physics::samples::balls {
     protected:
       void onInit() override;
     private:
+      ColorBalls* colorBalls;
+      unsigned short actorCount;
       void add(ColorBall *ball);
       void add(DrawableFluidParticle *particle);
   };

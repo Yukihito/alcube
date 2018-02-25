@@ -34,7 +34,7 @@ namespace alcube::physics::samples {
     fileUtil = new utils::FileUtil();
     resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
     uint modelVertexCount = shapes->triangles.sphere.buffer->vbos.vertices->allocationSize / sizeof(GLfloat);
-    auto gpu = new gpu::GPU(
+    gpu = new gpu::GPU(
       resourcesProvider,
       maxCellCount,
       utils::math::powerOf2(maxCellCount),
@@ -78,7 +78,7 @@ namespace alcube::physics::samples {
     profiler->start(profilers.update);
     physicsSimulator->update();
     drawer->updateGroupDrawables();
-    physicsSimulator->output(); // TODO: delete
+    //physicsSimulator->output(); // TODO: delete
     drawer->updateDrawableBuffers();
     profiler->stop(profilers.update);
     profiler->stop(profilers.all);
