@@ -3,12 +3,14 @@
 
 #include "Camera.h"
 #include "Drawable.h"
+#include "Drawable.h"
 #include "../utils/FileUtil.h"
 #include "../gpu/GPU.h"
 #include <vector>
 #include <unordered_map>
 #include <mutex>
 #include <GL/glut.h>
+#include "GroupShape.h"
 
 namespace alcube::drawing {
   class Drawer {
@@ -21,6 +23,8 @@ namespace alcube::drawing {
       void add(Drawable* drawable);
       void draw();
       void updateDrawableBuffers();
+      void setUpGroupDrawables();
+      void updateGroupDrawables();
     private:
       gpu::Kernels kernels;
       gpu::Memories memories;
@@ -29,6 +33,7 @@ namespace alcube::drawing {
       Camera* camera;
       std::mutex drawablesQueueMutex;
       std::vector<Drawable*> drawablesQueue;
+      std::vector<Drawable*> groupDrawables;
       std::unordered_map<Shader*, std::unordered_map<Shape*, std::vector<Drawable*>*>*> drawables;
       void addInternal(Drawable* drawable);
   };

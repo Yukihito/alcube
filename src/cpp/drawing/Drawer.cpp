@@ -1,3 +1,4 @@
+#include <CL/cl_platform.h>
 #include "Drawer.h"
 
 namespace alcube::drawing {
@@ -16,6 +17,9 @@ namespace alcube::drawing {
     drawablesQueueMutex.lock();
     drawable->bufferIndex = drawableBufferIndex;
     drawablesQueue.push_back(drawable);
+    if (drawable->isGroup) {
+      groupDrawables.push_back(drawable);
+    }
     drawablesQueueMutex.unlock();
   }
 
@@ -100,6 +104,39 @@ namespace alcube::drawing {
 
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
+  }
+
+  void Drawer::setUpGroupDrawables() {
+    for (auto drawable : groupDrawables) {
+      auto groupShape = (GroupShape*)drawable->shape;
+      groupShape->hostModelVerticesMemory->setCount(groupShape->modelCount); // やばい
+      cl_float3* modelVerticesDto = groupShape->hostModelVerticesMemory->at(0);
+      auto positions = groupShape->modelVertices;
+      for (size_t i = 0; i < groupShape->modelVertexCount; i++) {
+        size_t j = i * 3;
+        modelVerticesDto[i] = {positions[j + 0], positions[j + 1], positions[j + 2]};
+      }
+      groupShape->hostModelVerticesMemory->write();
+      kernels.inputModelVertices(
+        (unsigned int)groupShape->modelVertexCount,
+        *groupShape->hostModelVerticesMemory,
+        *groupShape->modelVerticesMemory
+      );
+    }
+  }
+
+  void Drawer::updateGroupDrawables() {
+    for (auto drawable : groupDrawables) {
+      auto groupShape = (GroupShape*)drawable->shape;
+      groupShape->verticesMemory->read();
+      auto vertices = groupShape->verticesMemory->at(0);
+      size_t vertexCount = groupShape->modelVertexCount * groupShape->modelCount;
+      for (size_t i = 0; i < vertexCount; i++) {
+        groupShape->modelVertices[i * 3 + 0] = vertices[i].x;
+        groupShape->modelVertices[i * 3 + 1] = vertices[i].y;
+        groupShape->modelVertices[i * 3 + 2] = vertices[i].z;
+      }
+    }
   }
 }
 
