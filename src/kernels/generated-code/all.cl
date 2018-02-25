@@ -703,3 +703,4 @@ __kernel void updateBySpringImpulse(
   physicalQuantities[actorIndex].position += actorState->linearVelocity * deltaTime;
   physicalQuantities[actorIndex].rotation = mulQuat(createQuatFromDisplacement(actorState->angularVelocity * deltaTime), physicalQuantities[actorIndex].rotation);
 }
+

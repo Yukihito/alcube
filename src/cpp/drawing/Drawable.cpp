@@ -18,6 +18,9 @@ namespace alcube::drawing {
   void Drawable::updateBuffer() {
     int freeBufferIndex = bufferIndex[0] == 0 ? 1 : 0;
     buffer[freeBufferIndex].matrix = getModelMat();
-    buffer[freeBufferIndex].material = *getMaterial();
+    Material* material = getMaterial();
+    if (material != nullptr) {
+      buffer[freeBufferIndex].material = *material;
+    }
   }
 }

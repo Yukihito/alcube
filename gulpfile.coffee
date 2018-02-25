@@ -53,7 +53,8 @@ gulp.task 'concat-clc', ->
     'src/kernels/physics/constraintresolving.cl',
     'src/kernels/physics/fluid.cl',
     'src/kernels/physics/motion.cl',
-    'src/kernels/physics/softbody.cl'
+    'src/kernels/physics/softbody.cl',
+    'src/kernels/drawing/particle.cl'
   ]
     .pipe(concat('all.cl'))
     .pipe gulp.dest generated_clc_dest
@@ -72,6 +73,6 @@ gulp.task 'build', -> runSequence(
 )
 
 gulp.task 'watch', ->
-  gulp.watch ['gpu-interface.yml', 'src/kernels/physics/*.cl'], ['build']
+  gulp.watch ['gpu-interface.yml', 'src/kernels/physics/*.cl', 'src/kernels/drawing/*.cl'], ['build']
 
 gulp.task 'default', ['build']

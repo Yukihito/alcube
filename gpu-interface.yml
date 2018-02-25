@@ -1,5 +1,6 @@
 kernels-directories:
   - src/kernels/physics
+  - src/kernels/drawing
 
 variables:
   - maxActorCount
