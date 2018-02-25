@@ -142,6 +142,7 @@ namespace alcube::drawing {
         memories.physicalQuantities
       );
       groupShape->verticesMemory->read();
+      //clFinish(kernels.queue->queue);
       auto clVertices = groupShape->verticesMemory->at(0);
       auto vertices = (float*)groupShape->buffer->vbos.vertices->data;
       size_t vertexCount = groupShape->modelVertexCount * groupShape->modelCount / 3;

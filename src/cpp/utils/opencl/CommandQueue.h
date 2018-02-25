@@ -21,6 +21,7 @@ namespace alcube::utils::opencl {
 
   class CommandQueue {
     public:
+      cl_command_queue queue;
       explicit CommandQueue(Resources* resources);
       void push(cl_kernel op, std::vector<size_t> ranges, std::initializer_list<KernelArg> args);
       void pushZeroFill(Memory* mem);
@@ -28,7 +29,6 @@ namespace alcube::utils::opencl {
       void write(Memory* memory);
       void readAt(Memory* memory, void* hostPtr, unsigned int index);
     private:
-      cl_command_queue queue;
       Resources* resources;
   };
 }
