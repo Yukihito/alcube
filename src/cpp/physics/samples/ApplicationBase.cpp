@@ -65,8 +65,10 @@ namespace alcube::physics::samples {
 
   void ApplicationBase::onDraw() {
     profiler->start(profilers.draw);
+    //if (initialized) {
     drawer->updateGroupDrawables();
-    drawer->draw();
+      drawer->draw();
+    //}
     profiler->stop(profilers.draw);
   }
 
@@ -78,7 +80,9 @@ namespace alcube::physics::samples {
     }
     profiler->start(profilers.update);
     physicsSimulator->update();
+    drawer->transformGroupDrawables();
     clFinish(resourcesProvider->queue->queue);
+
     //physicsSimulator->output(); // TODO: delete
     drawer->updateDrawableBuffers();
     profiler->stop(profilers.update);

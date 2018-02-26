@@ -131,7 +131,7 @@ namespace alcube::drawing {
     }
   }
 
-  void Drawer::updateGroupDrawables() {
+  void Drawer::transformGroupDrawables() {
     for (auto drawable : groupDrawables) {
       auto groupShape = (GroupShape*)drawable->shape;
       kernels.transformModel(
@@ -141,6 +141,21 @@ namespace alcube::drawing {
         (unsigned int)groupShape->modelVertexCount / 3,
         memories.physicalQuantities
       );
+    }
+  }
+
+  void Drawer::updateGroupDrawables() {
+    for (auto drawable : groupDrawables) {
+      auto groupShape = (GroupShape*)drawable->shape;
+      /*
+      kernels.transformModel(
+        groupShape->modelCount,
+        *groupShape->verticesMemory,
+        *groupShape->modelVerticesMemory,
+        (unsigned int)groupShape->modelVertexCount / 3,
+        memories.physicalQuantities
+      );
+       */
       groupShape->verticesMemory->read();
       //clFinish(kernels.queue->queue);
       auto clVertices = groupShape->verticesMemory->at(0);

@@ -25,6 +25,7 @@ namespace alcube::drawing {
       void updateDrawableBuffers();
       void setUpGroupDrawables();
       void updateGroupDrawables();
+      void transformGroupDrawables();
     private:
       gpu::Kernels kernels;
       gpu::Memories memories;
