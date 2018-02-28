@@ -22,7 +22,10 @@ namespace alcube::drawing::shaders {
 
   void StandardShader::setupBuffer(Buffer *buffer) {
     setVertexBuffer(buffer->vbos.vertices, 0);
-    setIndexBuffer(buffer->vbos.indices);
-    setVertexBuffer(buffer->vbos.normals, 1);
+    if (!initialized) {
+      setIndexBuffer(buffer->vbos.indices);
+      setVertexBuffer(buffer->vbos.normals, 1);
+      initialized = true;
+    }
   }
 }
