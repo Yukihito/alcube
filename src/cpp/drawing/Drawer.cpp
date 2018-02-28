@@ -53,16 +53,16 @@ namespace alcube::drawing {
       for (auto shapeDrawables : shapesDrawables) {
         Shape* shape = shapeDrawables.first;
         Buffer *buffer = shape->buffer;
-        glBindVertexArray(buffer->arrayId);
+        //glBindVertexArray(buffer->arrayId);
         shader->setupBuffer(buffer);
         auto drawables = *shapeDrawables.second;
         for (Drawable* drawable: drawables) {
           drawable->draw(context);
         }
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glDisableVertexAttribArray(0);
-        glBindVertexArray(0);
+        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
+        //glBindBuffer(GL_ARRAY_BUFFER, 0);
+        //glDisableVertexAttribArray(0);
+        //glBindVertexArray(0);
       }
     }
     drawablesMutex->lock();
@@ -147,6 +147,7 @@ namespace alcube::drawing {
   void Drawer::updateGroupDrawables() {
     for (auto drawable : groupDrawables) {
       auto groupShape = (GroupShape*)drawable->shape;
+      auto spheres = (shapes::triangles::Spheres*)groupShape;
       /*
       kernels.transformModel(
         groupShape->modelCount,
@@ -160,7 +161,14 @@ namespace alcube::drawing {
       //clFinish(kernels.queue->queue);
       auto clVertices = groupShape->verticesMemory->at(0);
       auto vertices = (float*)groupShape->buffer->vbos.vertices->data;
+
       size_t vertexCount = groupShape->modelVertexCount * groupShape->modelCount / 3;
+
+      groupShape->buffer->vbos.vertices->size = sizeof(GLfloat) * vertexCount * 3;
+      groupShape->buffer->vbos.normals->size = sizeof(GLfloat) * vertexCount * 3;
+      groupShape->buffer->vbos.indices->size = sizeof(GLuint) * 7 * 7 * 6 * groupShape->modelCount;
+      spheres->indicesLength = 7 * 7 * 6 * groupShape->modelCount;
+
       for (size_t i = 0; i < vertexCount; i++) {
         vertices[i * 3 + 0] = clVertices[i].x;
         vertices[i * 3 + 1] = clVertices[i].y;

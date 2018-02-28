@@ -60,14 +60,20 @@ namespace alcube::physics::samples {
     profilers.update = profiler->create("update");
     profilers.all = profiler->create("all");
     profilers.draw = profiler->create("draw");
+    profilers.drawActors = profiler->create("drawActors");
+    profilers.updateDrawable = profiler->create("updateDrawable");
     profiler->start(profilers.all);
   }
 
   void ApplicationBase::onDraw() {
     profiler->start(profilers.draw);
     //if (initialized) {
+    profiler->start(profilers.updateDrawable);
     drawer->updateGroupDrawables();
-      drawer->draw();
+    profiler->stop(profilers.updateDrawable);
+    profiler->start(profilers.drawActors);
+    drawer->draw();
+    profiler->stop(profilers.drawActors);
     //}
     profiler->stop(profilers.draw);
   }

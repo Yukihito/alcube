@@ -11,6 +11,7 @@
 #include <mutex>
 #include <GL/glut.h>
 #include "GroupShape.h"
+#include "shapes/triangles/Spheres.h"
 
 namespace alcube::drawing {
   class Drawer {

@@ -16,6 +16,8 @@ namespace alcube::physics::samples {
       int update;
       int draw;
       int all;
+      int updateDrawable;
+      int drawActors;
   };
 
   class ApplicationBase : public utils::app::OpenGLApplication {

@@ -10,6 +10,7 @@
 namespace alcube::drawing::shapes::triangles {
   class Spheres : public GroupShape {
     public:
+      size_t indicesLength = 0;
       void draw() override;
       explicit Spheres(
         size_t splitCount,
@@ -20,7 +21,7 @@ namespace alcube::drawing::shapes::triangles {
       );
 
     protected:
-      size_t indicesLength = 0;
+
       Buffer* createBuffer() override;
 
     private:

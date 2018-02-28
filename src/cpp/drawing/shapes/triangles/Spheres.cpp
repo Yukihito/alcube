@@ -16,7 +16,7 @@ namespace alcube::drawing::shapes::triangles {
     size_t uvsLength = modelUVsLength * maxModelCount;
     modelVertices = new GLfloat[modelVertexCount]();
     auto normals = new GLfloat[verticesLength]();
-    auto uvs = new GLfloat[uvsLength];
+    //auto uvs = new GLfloat[uvsLength];
 
     float pi = 3.1415f;
     for (int i = 0; i < splitCount; i++) {
@@ -54,8 +54,8 @@ namespace alcube::drawing::shapes::triangles {
         indices[indicesIndex + 4] = (uint)((i + 1) * iSplitCount + j + 1);
         indicesIndex += 6;
         size_t l = (i * (splitCount - 1) + j) * 2;
-        uvs[l + 0] = (float)i / (float)(splitCount - 1);
-        uvs[l + 1] = (float)j / (float)(splitCount - 1);
+        //uvs[l + 0] = (float)i / (float)(splitCount - 1);
+        //uvs[l + 1] = (float)j / (float)(splitCount - 1);
       }
     }
 
@@ -65,7 +65,7 @@ namespace alcube::drawing::shapes::triangles {
     }
 
     for (unsigned int i = 0; i < uvsLength; i++) {
-      uvs[i] = uvs[i % modelUVsLength];
+      //uvs[i] = uvs[i % modelUVsLength];
     }
 
     auto buffer = new Buffer(
@@ -78,7 +78,7 @@ namespace alcube::drawing::shapes::triangles {
     buffer->vbos.vertices->data = vertices;
     buffer->vbos.indices->data = indices;
     buffer->vbos.normals->data = normals;
-    buffer->vbos.uvs->data = uvs;
+    buffer->vbos.uvs->data = nullptr;//uvs;
     return buffer;
   }
 
