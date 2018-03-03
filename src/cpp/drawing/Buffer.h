@@ -1,10 +1,7 @@
 #define GL_GLEXT_PROTOTYPES
 #ifndef ALCUBE_BUFFER_H
 #define ALCUBE_BUFFER_H
-//#include <GL/gl.h>
-//#include <GL/glx.h>
 #include <GL/glew.h>
-//#include <GL/wglew.h>
 #include <cstddef>
 
 namespace alcube::drawing {
@@ -26,6 +23,7 @@ namespace alcube::drawing {
       VBO* normals;
       VBO* colors;
       VBO* uvs;
+      VBO* positions;
   };
 
   class Buffer {
@@ -37,7 +35,8 @@ namespace alcube::drawing {
         GLsizeiptr indicesAllocationSize,
         GLsizeiptr normalsAllocationSize,
         GLsizeiptr colorsAllocationSize,
-        GLsizeiptr uvsAllocationSize
+        GLsizeiptr uvsAllocationSize,
+        GLsizeiptr positionsAllocationSize
       );
 
       ~Buffer();

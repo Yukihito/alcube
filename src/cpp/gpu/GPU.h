@@ -322,6 +322,7 @@ namespace alcube::gpu {
       memories::Float3Memory hostSphereModelVertices;
       memories::Float3Memory sphereModelVertices;
       memories::Float3Memory vertices;
+      memories::Float3Memory positions;
   };
 
   class Dtos {
@@ -345,6 +346,7 @@ namespace alcube::gpu {
       cl_float3* hostSphereModelVertices;
       cl_float3* sphereModelVertices;
       cl_float3* vertices;
+      cl_float3* positions;
   };
 
   class RawKernels {
@@ -371,6 +373,7 @@ namespace alcube::gpu {
       cl_kernel calcSpringImpulses;
       cl_kernel updateBySpringImpulse;
       cl_kernel inputModelVertices;
+      cl_kernel outputPositions;
       cl_kernel transformModel;
   };
 
@@ -400,6 +403,7 @@ namespace alcube::gpu {
       void calcSpringImpulses(unsigned int workSize, memories::SpringState& springStates, memories::PhysicalQuantity& physicalQuantities, float deltaTime);
       void updateBySpringImpulse(unsigned int workSize, memories::SoftBodyState& softBodyStates, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::SpringState& springStates, float deltaTime);
       void inputModelVertices(unsigned int workSize, memories::Float3Memory& hostVertices, memories::Float3Memory& vertices);
+      void outputPositions(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
       void transformModel(unsigned int workSize, memories::Float3Memory& vertices, memories::Float3Memory& modelVertices, unsigned int modelVertexCount, memories::PhysicalQuantity& physicalQuantities);
   };
 

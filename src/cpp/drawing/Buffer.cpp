@@ -17,13 +17,15 @@ namespace alcube::drawing {
     GLsizeiptr indicesAllocationSize,
     GLsizeiptr normalsAllocationSize,
     GLsizeiptr colorsAllocationSize,
-    GLsizeiptr uvsAllocationSize
+    GLsizeiptr uvsAllocationSize,
+    GLsizeiptr positionsAllocationSize
   ) {
     vbos.vertices = nullptr;
     vbos.indices = nullptr;
     vbos.normals = nullptr;
     vbos.colors = nullptr;
     vbos.uvs = nullptr;
+    vbos.positions = nullptr;
 
     glGenVertexArrays(1, &this->arrayId);
     glBindVertexArray(this->arrayId);
@@ -48,6 +50,10 @@ namespace alcube::drawing {
       vbos.uvs = new VBO(uvsAllocationSize, GL_ARRAY_BUFFER, 2);
     }
 
+    if (positionsAllocationSize > 0) {
+      vbos.positions = new VBO(positionsAllocationSize, GL_ARRAY_BUFFER, 3);
+    }
+
     glBindVertexArray(0);
   }
 
@@ -57,5 +63,6 @@ namespace alcube::drawing {
     delete vbos.normals;
     delete vbos.colors;
     delete vbos.uvs;
+    delete vbos.positions;
   }
 }

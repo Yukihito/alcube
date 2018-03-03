@@ -194,4 +194,8 @@ dto-instances:
     type: float3
     length: maxVertexCount
 
+  - name: positions
+    type: float3
+    length: maxActorCount
+
 

@@ -69,7 +69,8 @@ namespace alcube::physics::samples {
     profiler->start(profilers.draw);
     //if (initialized) {
     profiler->start(profilers.updateDrawable);
-    drawer->updateGroupDrawables();
+    //drawer->updateGroupDrawables();
+    drawer->updateMultiDrawables();
     profiler->stop(profilers.updateDrawable);
     profiler->start(profilers.drawActors);
     drawer->draw();
@@ -81,12 +82,12 @@ namespace alcube::physics::samples {
   void ApplicationBase::onUpdate() {
     if (!initialized) {
       physicsSimulator->input();
-      drawer->setUpGroupDrawables();
+      drawer->setUpMultiDrawables();
       initialized = true;
     }
     profiler->start(profilers.update);
     physicsSimulator->update();
-    drawer->transformGroupDrawables();
+    drawer->transformMultiDrawables();
     clFinish(resourcesProvider->queue->queue);
 
     //physicsSimulator->output(); // TODO: delete

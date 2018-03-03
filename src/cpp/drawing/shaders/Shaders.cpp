@@ -5,5 +5,6 @@ namespace alcube::drawing::shaders {
     simple(fileUtil),
     standard(fileUtil),
     particle(fileUtil),
-    tile(fileUtil) {}
+    tile(fileUtil),
+    directionalLight(fileUtil){}
 }

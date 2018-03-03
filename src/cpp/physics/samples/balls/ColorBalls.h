@@ -7,7 +7,7 @@
 #include "../../../drawing/Drawable.h"
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtx/transform.hpp>
-#include "../../../drawing/shapes/triangles/Spheres.h"
+#include "../../../drawing/shapes/triangles/MultiSphere.h"
 
 namespace alcube::physics::samples::balls {
   class ColorBalls : public drawing::Drawable {
@@ -15,10 +15,8 @@ namespace alcube::physics::samples::balls {
       ColorBalls(
         drawing::shaders::Shaders *shaders,
         glm::vec3 diffuse,
-        unsigned int maxModelCount,
-        gpu::memories::Float3Memory* hostModelVerticesMemory,
-        gpu::memories::Float3Memory* modelVerticesMemory,
-        gpu::memories::Float3Memory* verticesMemory
+        unsigned int maxInstanceCount,
+        gpu::memories::Float3Memory* positionsMemory
       );
     protected:
       glm::mat4 getModelMat() override;

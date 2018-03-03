@@ -20,7 +20,7 @@ namespace alcube::drawing {
       DrawableBuffer buffer[2];
       int* bufferIndex = nullptr;
       void updateBuffer();
-      bool isGroup = false;
+      bool isMulti = false;
     protected:
       virtual glm::mat4 getModelMat() = 0;
       virtual Material* getMaterial();

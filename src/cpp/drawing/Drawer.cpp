@@ -1,4 +1,3 @@
-#include <CL/cl_platform.h>
 #include "Drawer.h"
 
 namespace alcube::drawing {
@@ -17,8 +16,8 @@ namespace alcube::drawing {
     drawablesQueueMutex.lock();
     drawable->bufferIndex = drawableBufferIndex;
     drawablesQueue.push_back(drawable);
-    if (drawable->isGroup) {
-      groupDrawables.push_back(drawable);
+    if (drawable->isMulti) {
+      multiDrawables.push_back(drawable);
     }
     drawablesQueueMutex.unlock();
   }
@@ -106,75 +105,37 @@ namespace alcube::drawing {
     glCullFace(GL_BACK);
   }
 
-  void Drawer::setUpGroupDrawables() {
-    for (auto drawable : groupDrawables) {
-      auto groupShape = (GroupShape*)drawable->shape;
-      drawable->shape->buffer->vbos.vertices->size = groupShape->modelCount * sizeof(GLfloat) * 3 * (8 * 8);
-      drawable->shape->buffer->vbos.normals->size = groupShape->modelCount * sizeof(GLfloat) * 3 * (8 * 8);
-      drawable->shape->buffer->vbos.indices->size = groupShape->modelCount * sizeof(GLuint) * 6 * (7 * 7);
-      drawable->shape->buffer->vbos.uvs->size = groupShape->modelCount * sizeof(GLfloat) * 2 * (8 * 8);
-      groupShape->hostModelVerticesMemory->setCount(groupShape->modelVertexCount / 3);
-      groupShape->modelVerticesMemory->setCount(groupShape->modelVertexCount / 3);
-      groupShape->verticesMemory->setCount(groupShape->modelCount * groupShape->modelVertexCount / 3);
-      cl_float3* modelVerticesDto = groupShape->hostModelVerticesMemory->at(0);
-      auto positions = groupShape->modelVertices;
-      for (size_t i = 0; i < groupShape->modelVertexCount / 3; i++) {
-        size_t j = i * 3;
-        modelVerticesDto[i] = {positions[j + 0], positions[j + 1], positions[j + 2]};
-      }
-      groupShape->hostModelVerticesMemory->write();
-      kernels.inputModelVertices(
-        (unsigned int)groupShape->modelVertexCount / 3,
-        *groupShape->hostModelVerticesMemory,
-        *groupShape->modelVerticesMemory
-      );
+  void Drawer::setUpMultiDrawables() {
+    for (auto drawable : multiDrawables) {
+      auto multiShape = (MultiShape*)drawable->shape;
+      multiShape->buffer->vbos.positions->size = multiShape->instanceCount * sizeof(GLfloat);
+      multiShape->positionsMemory->setCount(multiShape->instanceCount);
     }
   }
 
-  void Drawer::transformGroupDrawables() {
-    for (auto drawable : groupDrawables) {
-      auto groupShape = (GroupShape*)drawable->shape;
-      kernels.transformModel(
-        groupShape->modelCount,
-        *groupShape->verticesMemory,
-        *groupShape->modelVerticesMemory,
-        (unsigned int)groupShape->modelVertexCount / 3,
+  void Drawer::transformMultiDrawables() {
+    for (auto drawable : multiDrawables) {
+      auto multiShape = (MultiShape*)drawable->shape;
+      kernels.outputPositions(
+        multiShape->instanceCount,
+        *multiShape->positionsMemory,
         memories.physicalQuantities
       );
     }
   }
 
-  void Drawer::updateGroupDrawables() {
-    for (auto drawable : groupDrawables) {
-      auto groupShape = (GroupShape*)drawable->shape;
-      auto spheres = (shapes::triangles::Spheres*)groupShape;
-      /*
-      kernels.transformModel(
-        groupShape->modelCount,
-        *groupShape->verticesMemory,
-        *groupShape->modelVerticesMemory,
-        (unsigned int)groupShape->modelVertexCount / 3,
-        memories.physicalQuantities
-      );
-       */
-      groupShape->verticesMemory->read();
-      //clFinish(kernels.queue->queue);
-      auto clVertices = groupShape->verticesMemory->at(0);
-      auto vertices = (float*)groupShape->buffer->vbos.vertices->data;
-
-      size_t vertexCount = groupShape->modelVertexCount * groupShape->modelCount / 3;
-
-      groupShape->buffer->vbos.vertices->size = sizeof(GLfloat) * vertexCount * 3;
-      groupShape->buffer->vbos.normals->size = sizeof(GLfloat) * vertexCount * 3;
-      groupShape->buffer->vbos.indices->size = sizeof(GLuint) * 7 * 7 * 6 * groupShape->modelCount;
-      spheres->indicesLength = 7 * 7 * 6 * groupShape->modelCount;
-
-      for (size_t i = 0; i < vertexCount; i++) {
-        vertices[i * 3 + 0] = clVertices[i].x;
-        vertices[i * 3 + 1] = clVertices[i].y;
-        vertices[i * 3 + 2] = clVertices[i].z;
+  void Drawer::updateMultiDrawables() {
+    for (auto drawable : multiDrawables) {
+      auto multiShape = (MultiShape*)drawable->shape;
+      multiShape->positionsMemory->read();
+      auto clPositions = multiShape->positionsMemory->at(0);
+      auto positions = (float*)multiShape->buffer->vbos.positions->data;
+      multiShape->buffer->vbos.positions->size = sizeof(GLfloat) * multiShape->instanceCount * 3;
+      for (size_t i = 0; i < multiShape->instanceCount; i++) {
+        positions[i * 3 + 0] = clPositions[i].x;
+        positions[i * 3 + 1] = clPositions[i].y;
+        positions[i * 3 + 2] = clPositions[i].z;
       }
     }
   }
 }
-

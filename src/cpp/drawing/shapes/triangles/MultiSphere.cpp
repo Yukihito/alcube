@@ -1,11 +1,11 @@
-#include "Sphere.h"
+#include "MultiSphere.h"
 
 namespace alcube::drawing::shapes::triangles {
-  void Sphere::draw() {
-    glDrawElements(GL_TRIANGLES, (int)this->indicesLength, GL_UNSIGNED_INT, nullptr);
-  };
+  void MultiSphere::draw() {
+    glDrawElementsInstanced(GL_TRIANGLES, (int)this->indicesLength, GL_UNSIGNED_INT, nullptr, instanceCount);
+  }
 
-  Buffer* Sphere::createBuffer() {
+  Buffer* MultiSphere::createBuffer() {
     auto iSplitCount = (int)splitCount;
     size_t verticesLength = splitCount * splitCount * 3;
     size_t uvsLength = splitCount * splitCount * 2;
@@ -50,17 +50,25 @@ namespace alcube::drawing::shapes::triangles {
       verticesLength * sizeof(GLfloat),
       0,
       uvsLength * sizeof(GLfloat),
-      0
+      maxInstanceCount * sizeof(GLfloat) * 3
     );
     buffer->vbos.vertices->data = vertices;
     buffer->vbos.indices->data = indices;
     buffer->vbos.normals->data = normals;
     buffer->vbos.uvs->data = uvs;
+    buffer->vbos.positions->data = new GLfloat[maxInstanceCount * 3];
     return buffer;
   }
 
-  Sphere::Sphere(size_t splitCount) {
+  MultiSphere::MultiSphere(
+    size_t splitCount,
+    unsigned int maxInstanceCount,
+    gpu::memories::Float3Memory* positionsMemory
+  ) {
     this->splitCount = splitCount;
+    this->instanceCount = 0;
+    this->maxInstanceCount = maxInstanceCount;
+    this->positionsMemory = positionsMemory;
     initialize();
   }
 }

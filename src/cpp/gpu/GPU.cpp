@@ -772,6 +772,17 @@ namespace alcube::gpu {
     });
   }
 
+  void Kernels::outputPositions(
+    unsigned int workSize,
+    memories::Float3Memory& positions,
+    memories::PhysicalQuantity& physicalQuantities
+  ) {
+    queue->push(rawKernels.outputPositions, {workSize}, {
+      memArg(positions.memory),
+      memArg(physicalQuantities.memory)
+    });
+  }
+
   void Kernels::transformModel(
     unsigned int workSize,
     memories::Float3Memory& vertices,
@@ -822,6 +833,7 @@ namespace alcube::gpu {
     kernels.rawKernels.calcSpringImpulses = resourcesProvider->kernelFactory->create(program, "calcSpringImpulses");
     kernels.rawKernels.updateBySpringImpulse = resourcesProvider->kernelFactory->create(program, "updateBySpringImpulse");
     kernels.rawKernels.inputModelVertices = resourcesProvider->kernelFactory->create(program, "inputModelVertices");
+    kernels.rawKernels.outputPositions = resourcesProvider->kernelFactory->create(program, "outputPositions");
     kernels.rawKernels.transformModel = resourcesProvider->kernelFactory->create(program, "transformModel");
 
     dtos.grid = new dtos::Grid();
@@ -843,6 +855,7 @@ namespace alcube::gpu {
     dtos.hostSphereModelVertices = new cl_float3[sphereModelVertexCount];
     dtos.sphereModelVertices = new cl_float3[sphereModelVertexCount];
     dtos.vertices = new cl_float3[maxVertexCount];
+    dtos.positions = new cl_float3[maxActorCount];
 
     memories.grid.memory = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);
     memories.fluidSettings.memory = defineHostMemory("fluidSettings", sizeof(dtos::FluidSettings), dtos.fluidSettings, 1);
@@ -863,6 +876,7 @@ namespace alcube::gpu {
     memories.hostSphereModelVertices.memory = defineHostMemory("hostSphereModelVertices", sizeof(cl_float3), dtos.hostSphereModelVertices, sphereModelVertexCount);
     memories.sphereModelVertices.memory = defineGPUMemory("sphereModelVertices", sizeof(cl_float3), sphereModelVertexCount);
     memories.vertices.memory = defineGPUMemory("vertices", sizeof(cl_float3), maxVertexCount);
+    memories.positions.memory = defineGPUMemory("positions", sizeof(cl_float3), maxActorCount);
 
     memories.grid.dto = dtos.grid;
     memories.fluidSettings.dto = dtos.fluidSettings;
@@ -883,6 +897,7 @@ namespace alcube::gpu {
     memories.hostSphereModelVertices.dto = dtos.hostSphereModelVertices;
     memories.sphereModelVertices.dto = dtos.sphereModelVertices;
     memories.vertices.dto = dtos.vertices;
+    memories.positions.dto = dtos.positions;
 
     memories.grid.resourcesProvider = resourcesProvider;
     memories.fluidSettings.resourcesProvider = resourcesProvider;
@@ -902,7 +917,8 @@ namespace alcube::gpu {
     memories.gridEndIndices.resourcesProvider = resourcesProvider;
     memories.hostSphereModelVertices.resourcesProvider = resourcesProvider;
     memories.sphereModelVertices.resourcesProvider = resourcesProvider;
-    memories.vertices.resourcesProvider = resourcesProvider;;
+    memories.vertices.resourcesProvider = resourcesProvider;
+    memories.positions.resourcesProvider = resourcesProvider;;
 
     resourcesProvider->resources->memoryManager->allocate();
   }

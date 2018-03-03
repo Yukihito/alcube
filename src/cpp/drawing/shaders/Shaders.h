@@ -5,6 +5,7 @@
 #include "StandardShader.h"
 #include "ParticleShader.h"
 #include "TileShader.h"
+#include "DirectionalLightShader.h"
 
 namespace alcube::drawing::shaders {
   class Shaders {
@@ -13,6 +14,7 @@ namespace alcube::drawing::shaders {
       StandardShader standard;
       ParticleShader particle;
       TileShader tile;
+      DirectionalLightShader directionalLight;
       explicit Shaders(utils::FileUtil* fileUtil);
   };
 }

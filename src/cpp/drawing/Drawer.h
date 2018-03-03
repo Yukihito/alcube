@@ -10,8 +10,8 @@
 #include <unordered_map>
 #include <mutex>
 #include <GL/glut.h>
-#include "GroupShape.h"
-#include "shapes/triangles/Spheres.h"
+#include <CL/cl_platform.h>
+#include "MultiShape.h"
 
 namespace alcube::drawing {
   class Drawer {
@@ -24,9 +24,9 @@ namespace alcube::drawing {
       void add(Drawable* drawable);
       void draw();
       void updateDrawableBuffers();
-      void setUpGroupDrawables();
-      void updateGroupDrawables();
-      void transformGroupDrawables();
+      void setUpMultiDrawables();
+      void updateMultiDrawables();
+      void transformMultiDrawables();
     private:
       gpu::Kernels kernels;
       gpu::Memories memories;
@@ -35,7 +35,7 @@ namespace alcube::drawing {
       Camera* camera;
       std::mutex drawablesQueueMutex;
       std::vector<Drawable*> drawablesQueue;
-      std::vector<Drawable*> groupDrawables;
+      std::vector<Drawable*> multiDrawables;
       std::unordered_map<Shader*, std::unordered_map<Shape*, std::vector<Drawable*>*>*> drawables;
       void addInternal(Drawable* drawable);
   };
