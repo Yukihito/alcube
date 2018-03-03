@@ -52,10 +52,10 @@ namespace alcube::drawing::shapes::triangles {
       uvsLength * sizeof(GLfloat),
       0
     );
-    buffer->vbos.vertices->data = vertices;
-    buffer->vbos.indices->data = indices;
-    buffer->vbos.normals->data = normals;
-    buffer->vbos.uvs->data = uvs;
+    buffer->vertices->data = vertices;
+    buffer->indices->data = indices;
+    buffer->normals->data = normals;
+    buffer->uvs->data = uvs;
     return buffer;
   }
 

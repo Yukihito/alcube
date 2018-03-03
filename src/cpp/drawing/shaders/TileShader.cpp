@@ -21,9 +21,9 @@ namespace alcube::drawing::shaders {
   }
 
   void TileShader::setupBuffer(Buffer *buffer) {
-    setVertexBuffer(buffer->vbos.vertices, 0);
-    setIndexBuffer(buffer->vbos.indices);
-    setVertexBuffer(buffer->vbos.uvs, 1);
-    setVertexBuffer(buffer->vbos.normals, 2);
+    setVertexBuffer(buffer->vertices, 0);
+    setIndexBuffer(buffer->indices);
+    setVertexBuffer(buffer->uvs, 1);
+    setVertexBuffer(buffer->normals, 2);
   }
 }

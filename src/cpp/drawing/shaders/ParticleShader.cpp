@@ -15,8 +15,8 @@ namespace alcube::drawing::shaders {
   }
 
   void ParticleShader::setupBuffer(Buffer *buffer) {
-    setVertexBuffer(buffer->vbos.vertices, 0);
-    setIndexBuffer(buffer->vbos.indices);
-    setVertexBuffer(buffer->vbos.colors, 1);
+    setVertexBuffer(buffer->vertices, 0);
+    setIndexBuffer(buffer->indices);
+    setVertexBuffer(buffer->colors, 1);
   }
 }

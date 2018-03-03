@@ -52,11 +52,11 @@ namespace alcube::drawing::shapes::triangles {
       uvsLength * sizeof(GLfloat),
       maxInstanceCount * sizeof(GLfloat) * 3
     );
-    buffer->vbos.vertices->data = vertices;
-    buffer->vbos.indices->data = indices;
-    buffer->vbos.normals->data = normals;
-    buffer->vbos.uvs->data = uvs;
-    buffer->vbos.positions->data = new GLfloat[maxInstanceCount * 3];
+    buffer->vertices->data = vertices;
+    buffer->indices->data = indices;
+    buffer->normals->data = normals;
+    buffer->uvs->data = uvs;
+    buffer->positions->data = new GLfloat[maxInstanceCount * 3];
     return buffer;
   }
 

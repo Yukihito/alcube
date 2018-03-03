@@ -88,12 +88,12 @@ namespace alcube::drawing {
     glBindBuffer(GL_ARRAY_BUFFER, vbo->bufferId);
     glBufferSubData(GL_ARRAY_BUFFER, 0, vbo->size, vbo->data);
     glVertexAttribPointer(
-      location, // 属性：シェーダ内のlayoutと合わせる必要がある
-      vbo->vertexSize,        // 頂点1つのサイズ。vec3のため3を指定
-      GL_FLOAT, // 頂点の要素の型
-      GL_FALSE, // 正規化
-      0,        // ストライド
-      nullptr   // 配列バッファオフセット
+      location,
+      vbo->vertexSize,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      nullptr
     );
   }
 }

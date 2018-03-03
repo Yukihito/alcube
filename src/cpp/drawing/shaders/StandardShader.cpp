@@ -21,10 +21,10 @@ namespace alcube::drawing::shaders {
   }
 
   void StandardShader::setupBuffer(Buffer *buffer) {
-    setVertexBuffer(buffer->vbos.vertices, 0);
+    setVertexBuffer(buffer->vertices, 0);
     if (!initialized) {
-      setIndexBuffer(buffer->vbos.indices);
-      setVertexBuffer(buffer->vbos.normals, 1);
+      setIndexBuffer(buffer->indices);
+      setVertexBuffer(buffer->normals, 1);
       initialized = true;
     }
   }

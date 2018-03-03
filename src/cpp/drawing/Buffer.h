@@ -13,7 +13,7 @@ namespace alcube::drawing {
       GLsizeiptr size;
       GLenum target;
       GLint vertexSize;
-      explicit VBO(GLsizeiptr allocationSize, GLenum target, GLint vertexSize);
+      explicit VBO(GLsizeiptr allocationSize, GLenum target, GLint vertexSize, GLenum usage);
   };
 
   class VBOs {
@@ -28,8 +28,13 @@ namespace alcube::drawing {
 
   class Buffer {
     public:
-      VBOs vbos;
-      GLuint arrayId;
+      //VBOs vbos;
+      VBO* vertices;
+      VBO* indices;
+      VBO* normals;
+      VBO* colors;
+      VBO* uvs;
+      VBO* positions;
       explicit Buffer(
         GLsizeiptr verticesAllocationSize,
         GLsizeiptr indicesAllocationSize,

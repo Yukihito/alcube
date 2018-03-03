@@ -91,7 +91,7 @@ namespace alcube::drawing {
   void Drawer::setUpMultiDrawables() {
     for (auto drawable : multiDrawables) {
       auto multiShape = (MultiShape*)drawable->shape;
-      multiShape->buffer->vbos.positions->size = multiShape->instanceCount * sizeof(GLfloat);
+      multiShape->buffer->positions->size = multiShape->instanceCount * sizeof(GLfloat);
       multiShape->positionsMemory->setCount(multiShape->instanceCount);
     }
   }
@@ -112,8 +112,8 @@ namespace alcube::drawing {
       auto multiShape = (MultiShape*)drawable->shape;
       multiShape->positionsMemory->read();
       auto clPositions = multiShape->positionsMemory->at(0);
-      auto positions = (float*)multiShape->buffer->vbos.positions->data;
-      multiShape->buffer->vbos.positions->size = sizeof(GLfloat) * multiShape->instanceCount * 3;
+      auto positions = (float*)multiShape->buffer->positions->data;
+      multiShape->buffer->positions->size = sizeof(GLfloat) * multiShape->instanceCount * 3;
       for (size_t i = 0; i < multiShape->instanceCount; i++) {
         positions[i * 3 + 0] = clPositions[i].x;
         positions[i * 3 + 1] = clPositions[i].y;

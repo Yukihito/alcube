@@ -15,7 +15,7 @@ namespace alcube::drawing::shaders {
   }
 
   void SimpleShader::setupBuffer(Buffer *buffer) {
-    setVertexBuffer(buffer->vbos.vertices, 0);
-    setIndexBuffer(buffer->vbos.indices);
+    setVertexBuffer(buffer->vertices, 0);
+    setIndexBuffer(buffer->indices);
   }
 }

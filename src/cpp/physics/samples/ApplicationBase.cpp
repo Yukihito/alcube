@@ -33,7 +33,7 @@ namespace alcube::physics::samples {
     );
     fileUtil = new utils::FileUtil();
     resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
-    uint modelVertexCount = shapes->triangles.sphere.buffer->vbos.vertices->allocationSize / sizeof(GLfloat);
+    uint modelVertexCount = shapes->triangles.sphere.buffer->vertices->allocationSize / sizeof(GLfloat);
     gpu = new gpu::GPU(
       resourcesProvider,
       maxCellCount,

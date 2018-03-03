@@ -21,11 +21,11 @@ namespace alcube::drawing::shaders {
 
   void DirectionalLightShader::setupBuffer(Buffer *buffer) {
     glVertexAttribDivisor(1, 1);
-    setVertexBuffer(buffer->vbos.positions, 1); // DYNAMIC
+    setVertexBuffer(buffer->positions, 1); // DYNAMIC
     if (!initialized) {
-      setVertexBuffer(buffer->vbos.vertices, 0); // STATIC
-      setIndexBuffer(buffer->vbos.indices); // STATIC
-      setVertexBuffer(buffer->vbos.normals, 2); // STATIC
+      setVertexBuffer(buffer->vertices, 0); // STATIC
+      setIndexBuffer(buffer->indices); // STATIC
+      setVertexBuffer(buffer->normals, 2); // STATIC
       initialized = true;
     }
   }

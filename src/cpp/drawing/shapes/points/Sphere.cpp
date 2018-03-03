@@ -26,7 +26,7 @@ namespace alcube::drawing::shapes::points {
     }
 
     auto buffer = new Buffer(verticesLength * sizeof(GLfloat), 0, 0, 0, 0, 0);
-    buffer->vbos.vertices->data = vertices;
+    buffer->vertices->data = vertices;
     return buffer;
   }
 
