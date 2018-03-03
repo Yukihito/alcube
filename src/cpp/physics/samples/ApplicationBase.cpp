@@ -66,16 +66,14 @@ namespace alcube::physics::samples {
   }
 
   void ApplicationBase::onDraw() {
+    drawer->waitVSync();
     profiler->start(profilers.draw);
-    //if (initialized) {
     profiler->start(profilers.updateDrawable);
-    //drawer->updateGroupDrawables();
     drawer->updateMultiDrawables();
     profiler->stop(profilers.updateDrawable);
     profiler->start(profilers.drawActors);
     drawer->draw();
     profiler->stop(profilers.drawActors);
-    //}
     profiler->stop(profilers.draw);
   }
 

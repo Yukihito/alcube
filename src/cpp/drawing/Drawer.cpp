@@ -22,6 +22,10 @@ namespace alcube::drawing {
     drawablesQueueMutex.unlock();
   }
 
+  void Drawer::waitVSync() {
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  }
+
   void Drawer::draw() {
     for (Drawable* drawable: drawablesQueue) {
       addInternal(drawable);
@@ -44,7 +48,6 @@ namespace alcube::drawing {
     context.v = view;
     context.vp = vp;
 
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     for (auto shaderShapesDrawables : drawables) {
       Shader* shader = shaderShapesDrawables.first;
       auto shapesDrawables = *shaderShapesDrawables.second;
@@ -64,9 +67,10 @@ namespace alcube::drawing {
         //glBindVertexArray(0);
       }
     }
-    drawablesMutex->lock();
+
+    //drawablesMutex->lock();
     drawableBufferIndex[0] = drawableBufferIndex[0] == 0 ? 1 : 0;
-    drawablesMutex->unlock();
+    //drawablesMutex->unlock();
   }
 
   void Drawer::updateDrawableBuffers() {

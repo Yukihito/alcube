@@ -22,6 +22,7 @@ namespace alcube::drawing {
         gpu::GPU* gpu
       );
       void add(Drawable* drawable);
+      void waitVSync();
       void draw();
       void updateDrawableBuffers();
       void setUpMultiDrawables();
