@@ -14,21 +14,13 @@ namespace alcube::drawing {
       GLenum target;
       GLint vertexSize;
       explicit VBO(GLsizeiptr allocationSize, GLenum target, GLint vertexSize, GLenum usage);
-  };
-
-  class VBOs {
-    public:
-      VBO* vertices;
-      VBO* indices;
-      VBO* normals;
-      VBO* colors;
-      VBO* uvs;
-      VBO* positions;
+      void update();
+      void enable();
+      void enable(GLuint location);
   };
 
   class Buffer {
     public:
-      //VBOs vbos;
       VBO* vertices;
       VBO* indices;
       VBO* normals;

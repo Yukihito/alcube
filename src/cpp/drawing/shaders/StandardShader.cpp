@@ -20,11 +20,11 @@ namespace alcube::drawing::shaders {
     glUniform3fv(uniformIds[6], 1, &context.material.specular[0]);
   }
 
-  void StandardShader::setupBuffer(Buffer *buffer) {
-    setVertexBuffer(buffer->vertices, 0);
+  void StandardShader::bindBuffer(Buffer *buffer) {
+    enableVertexBuffer(buffer->vertices, 0);
     if (!initialized) {
-      setIndexBuffer(buffer->indices);
-      setVertexBuffer(buffer->normals, 1);
+      enableIndexBuffer(buffer->indices);
+      enableVertexBuffer(buffer->normals, 1);
       initialized = true;
     }
   }

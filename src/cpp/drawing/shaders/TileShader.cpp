@@ -20,10 +20,10 @@ namespace alcube::drawing::shaders {
     glUniform3fv(uniformIds[6], 1, &context.material.specular[0]);
   }
 
-  void TileShader::setupBuffer(Buffer *buffer) {
-    setVertexBuffer(buffer->vertices, 0);
-    setIndexBuffer(buffer->indices);
-    setVertexBuffer(buffer->uvs, 1);
-    setVertexBuffer(buffer->normals, 2);
+  void TileShader::bindBuffer(Buffer *buffer) {
+    enableVertexBuffer(buffer->vertices, 0);
+    enableIndexBuffer(buffer->indices);
+    enableVertexBuffer(buffer->uvs, 1);
+    enableVertexBuffer(buffer->normals, 2);
   }
 }

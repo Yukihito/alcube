@@ -54,17 +54,13 @@ namespace alcube::drawing {
       for (auto shapeDrawables : shapesDrawables) {
         Shape* shape = shapeDrawables.first;
         Buffer *buffer = shape->buffer;
-        //glBindVertexArray(buffer->arrayId);
-        shader->setupBuffer(buffer);
+        shader->bindBuffer(buffer);
         auto drawables = *shapeDrawables.second;
         for (Drawable* drawable: drawables) {
           drawable->draw(context);
         }
-        //glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,0);
-        //glBindBuffer(GL_ARRAY_BUFFER, 0);
-        //glDisableVertexAttribArray(0);
-        //glBindVertexArray(0);
       }
+      shader->unbindBuffer();
     }
     glFinish(); // TODO: Enable if profiler enabled.
   }

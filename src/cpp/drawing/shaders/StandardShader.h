@@ -8,7 +8,7 @@ namespace alcube::drawing::shaders {
     public:
       explicit StandardShader(utils::FileUtil* fileUtil);
       void shade(Context& context) override;
-      void setupBuffer(Buffer* buffer) override;
+      void bindBuffer(Buffer *buffer) override;
       bool initialized = false;
   };
 }

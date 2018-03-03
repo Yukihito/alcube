@@ -11,7 +11,9 @@ namespace alcube::drawing {
   class Shader {
     public:
       GLuint programId = 0;
-      virtual void setupBuffer(Buffer* buffer) = 0;
+      //virtual void initializeBuffer(Buffer* buffer) {}; // TODO: Delete default implementation.
+      virtual void bindBuffer(Buffer *buffer) = 0;
+      virtual void unbindBuffer() {}; // TODO: Delete default implementation.
       virtual void shade(Context& context) = 0;
     protected:
       GLint* uniformIds = nullptr;
@@ -22,8 +24,8 @@ namespace alcube::drawing {
         unsigned int uniformsCount
       );
 
-      void setIndexBuffer(VBO* vbo);
-      void setVertexBuffer(VBO* vbo, GLuint location);
+      void enableIndexBuffer(VBO *vbo); // TODO: Delete
+      void enableVertexBuffer(VBO *vbo, GLuint location); // TODO Delete
   };
 }
 

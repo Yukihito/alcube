@@ -72,7 +72,7 @@ namespace alcube::drawing {
     }
   }
 
-  void Shader::setIndexBuffer(VBO *vbo) {
+  void Shader::enableIndexBuffer(VBO *vbo) {
     if (vbo == nullptr) {
       return;
     }
@@ -80,13 +80,13 @@ namespace alcube::drawing {
     glBufferSubData(vbo->target, 0, vbo->size, vbo->data);
   }
 
-  void Shader::setVertexBuffer(VBO *vbo, GLuint location) {
+  void Shader::enableVertexBuffer(VBO *vbo, GLuint location) {
     if (vbo == nullptr) {
       return;
     }
     glEnableVertexAttribArray(location);
-    glBindBuffer(GL_ARRAY_BUFFER, vbo->bufferId);
-    glBufferSubData(GL_ARRAY_BUFFER, 0, vbo->size, vbo->data);
+    glBindBuffer(vbo->target, vbo->bufferId);
+    glBufferSubData(vbo->target, 0, vbo->size, vbo->data);
     glVertexAttribPointer(
       location,
       vbo->vertexSize,

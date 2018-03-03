@@ -14,8 +14,8 @@ namespace alcube::drawing::shaders {
     glUniformMatrix4fv(uniformIds[0], 1, GL_FALSE, &context.mvp[0][0]);
   }
 
-  void SimpleShader::setupBuffer(Buffer *buffer) {
-    setVertexBuffer(buffer->vertices, 0);
-    setIndexBuffer(buffer->indices);
+  void SimpleShader::bindBuffer(Buffer *buffer) {
+    enableVertexBuffer(buffer->vertices, 0);
+    enableIndexBuffer(buffer->indices);
   }
 }

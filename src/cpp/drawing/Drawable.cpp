@@ -6,6 +6,7 @@ namespace alcube::drawing {
     glm::mat4 mvp = context.vp * matrix;
     context.mvp = mvp;
     context.m = matrix;
+    context.mv = context.v * matrix;
     context.material = *getMaterial();
     shader->shade(context);
     shape->draw();

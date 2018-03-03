@@ -8,8 +8,9 @@ namespace alcube::drawing::shaders {
     public:
       explicit DirectionalLightShader(utils::FileUtil* fileUtil);
       void shade(Context& context) override;
-      void setupBuffer(Buffer* buffer) override;
-      bool initialized = false;
+      //void initializeBuffer(Buffer* buffer) override;
+      void bindBuffer(Buffer *buffer) override;
+      void unbindBuffer() override;
   };
 }
 

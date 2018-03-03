@@ -12,6 +12,28 @@ namespace alcube::drawing {
     glBufferData(target, allocationSize, nullptr, usage);
   }
 
+  void VBO::update() {
+    glBindBuffer(target, bufferId);
+    glBufferSubData(target, 0, size, data);
+  }
+
+  void VBO::enable() {
+    glBindBuffer(target, bufferId);
+  }
+
+  void VBO::enable(GLuint location) {
+    glEnableVertexAttribArray(location);
+    glBindBuffer(target, bufferId);
+    glVertexAttribPointer(
+      location,
+      vertexSize,
+      GL_FLOAT,
+      GL_FALSE,
+      0,
+      nullptr
+    );
+  }
+
   Buffer::Buffer(
     GLsizeiptr verticesAllocationSize,
     GLsizeiptr indicesAllocationSize,

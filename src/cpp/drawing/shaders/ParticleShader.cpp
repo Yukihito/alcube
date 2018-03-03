@@ -14,9 +14,9 @@ namespace alcube::drawing::shaders {
     glUniformMatrix4fv(uniformIds[0], 1, GL_FALSE, &context.mvp[0][0]);
   }
 
-  void ParticleShader::setupBuffer(Buffer *buffer) {
-    setVertexBuffer(buffer->vertices, 0);
-    setIndexBuffer(buffer->indices);
-    setVertexBuffer(buffer->colors, 1);
+  void ParticleShader::bindBuffer(Buffer *buffer) {
+    enableVertexBuffer(buffer->vertices, 0);
+    enableIndexBuffer(buffer->indices);
+    enableVertexBuffer(buffer->colors, 1);
   }
 }
