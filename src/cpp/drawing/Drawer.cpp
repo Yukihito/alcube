@@ -14,7 +14,6 @@ namespace alcube::drawing {
 
   void Drawer::add(Drawable* drawable) {
     drawablesQueueMutex.lock();
-    drawable->bufferIndex = drawableBufferIndex;
     drawablesQueue.push_back(drawable);
     if (drawable->isMulti) {
       multiDrawables.push_back(drawable);
@@ -67,38 +66,18 @@ namespace alcube::drawing {
         //glBindVertexArray(0);
       }
     }
-
-    //drawablesMutex->lock();
-    drawableBufferIndex[0] = drawableBufferIndex[0] == 0 ? 1 : 0;
-    //drawablesMutex->unlock();
-  }
-
-  void Drawer::updateDrawableBuffers() {
-    drawablesMutex->lock();
-    for (auto shaderShapesDrawables : drawables) {
-      auto shapesDrawables = *shaderShapesDrawables.second;
-      for (auto shapeDrawables : shapesDrawables) {
-        auto drawables = *shapeDrawables.second;
-        for (Drawable *drawable: drawables) {
-          drawable->updateBuffer();
-        }
-      }
-    }
-    drawablesMutex->unlock();
+    glFinish(); // TODO: Enable if profiler enabled.
   }
 
   Drawer::Drawer(
     Camera* camera,
-    std::mutex *drawablesMutex,
     gpu::GPU* gpu
   ) {
     if (gpu != nullptr) {
       kernels = gpu->kernels;
       memories = gpu->memories;
     }
-    this->drawablesMutex = drawablesMutex;
     this->camera = camera;
-    drawableBufferIndex[0] = 0;
 
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

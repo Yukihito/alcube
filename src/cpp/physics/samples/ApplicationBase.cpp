@@ -43,7 +43,7 @@ namespace alcube::physics::samples {
       modelVertexCount,
       modelVertexCount * maxCellCount
     );
-    drawer = new drawing::Drawer(camera, &mutex, gpu);
+    drawer = new drawing::Drawer(camera, gpu);
     physicsSimulator = new Simulator(
       maxCellCount,
       gridEdgeLength,
@@ -89,7 +89,7 @@ namespace alcube::physics::samples {
     clFinish(resourcesProvider->queue->queue);
 
     //physicsSimulator->output(); // TODO: delete
-    drawer->updateDrawableBuffers();
+    //drawer->updateDrawableBuffers();
     profiler->stop(profilers.update);
     profiler->stop(profilers.all);
     profiler->update();

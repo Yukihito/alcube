@@ -44,7 +44,6 @@ namespace alcube::physics::samples {
       utils::FileUtil *fileUtil;
       utils::Profiler *profiler;
       Simulator *physicsSimulator;
-      std::mutex mutex;
       Profilers profilers;
       unsigned int maxCellCount;
       float deltaTime;

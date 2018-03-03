@@ -7,19 +7,11 @@
 #include "Context.h"
 
 namespace alcube::drawing {
-  class DrawableBuffer {
-    public:
-      glm::mat4 matrix;
-      Material material;
-  };
   class Drawable {
     public:
       void draw(Context& context);
       Shape* shape = nullptr;
       Shader* shader = nullptr;
-      DrawableBuffer buffer[2];
-      int* bufferIndex = nullptr;
-      void updateBuffer();
       bool isMulti = false;
     protected:
       virtual glm::mat4 getModelMat() = 0;

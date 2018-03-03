@@ -9,30 +9,31 @@
 #include <vector>
 #include <unordered_map>
 #include <mutex>
-#include <GL/glut.h>
 #include <CL/cl_platform.h>
 #include "MultiShape.h"
 
 namespace alcube::drawing {
+  class Profilers {
+    public:
+      int draw;
+
+  };
+
   class Drawer {
     public:
       explicit Drawer(
         Camera* camera,
-        std::mutex* drawablesMutex,
         gpu::GPU* gpu
       );
       void add(Drawable* drawable);
       void waitVSync();
       void draw();
-      void updateDrawableBuffers();
       void setUpMultiDrawables();
       void updateMultiDrawables();
       void transformMultiDrawables();
     private:
       gpu::Kernels kernels;
       gpu::Memories memories;
-      std::mutex* drawablesMutex;
-      int drawableBufferIndex[1];
       Camera* camera;
       std::mutex drawablesQueueMutex;
       std::vector<Drawable*> drawablesQueue;
