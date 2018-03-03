@@ -181,19 +181,6 @@ dto-instances:
     length: allGridCount
 
   # Variables for drawing
-  - name: hostSphereModelVertices
-    type: float3
-    length: sphereModelVertexCount
-    host-ptr: true
-
-  - name: sphereModelVertices
-    type: float3
-    length: sphereModelVertexCount
-
-  - name: vertices
-    type: float3
-    length: maxVertexCount
-
   - name: positions
     type: float3
     length: maxActorCount
