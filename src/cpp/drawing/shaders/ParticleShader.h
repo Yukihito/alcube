@@ -8,7 +8,7 @@ namespace alcube::drawing::shaders {
     public:
       explicit ParticleShader(utils::FileUtil* fileUtil);
       void shade(Context& context) override;
-      void bindBuffer(Buffer *buffer) override;
+      //void bindBuffer(Buffer *buffer) override;
   };
 }
 

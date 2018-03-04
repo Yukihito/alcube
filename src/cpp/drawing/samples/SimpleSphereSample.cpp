@@ -4,7 +4,7 @@
 namespace alcube::drawing::samples {
   SimpleSphere::SimpleSphere(glm::vec3& position, shapes::Shapes* shapes, shaders::Shaders* shaders) {
     shape = &shapes->triangles.sphere;
-    shader = &shaders->standard;
+    shader = &shaders->directionalLight;
     this->position = position;
     this->material = new Material();
     this->material->diffuse = glm::vec3(0.5f, 1.0f, 1.0f);

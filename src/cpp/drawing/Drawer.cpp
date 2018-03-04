@@ -25,14 +25,16 @@ namespace alcube::drawing {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
-  void Drawer::draw() {
+  void Drawer::addWaitingDrawables() {
+    drawablesQueueMutex.lock();
     for (Drawable* drawable: drawablesQueue) {
       addInternal(drawable);
     }
-    drawablesQueueMutex.lock();
     drawablesQueue.clear();
     drawablesQueueMutex.unlock();
+  }
 
+  void Drawer::initContext() {
     glm::mat4 projection =
       glm::perspective(
         camera->angleOfView,
@@ -43,43 +45,48 @@ namespace alcube::drawing {
 
     glm::mat4 view = glm::toMat4(glm::inverse(camera->rotation)) * glm::translate(-camera->position);
     glm::mat4 vp = projection * view;
-    Context context;
+
     context.v = view;
     context.vp = vp;
+  }
 
+  void Drawer::drawAllDrawables() {
     for (auto shaderShapesDrawables : drawables) {
       Shader* shader = shaderShapesDrawables.first;
       auto shapesDrawables = *shaderShapesDrawables.second;
       glUseProgram(shader->programId);
       for (auto shapeDrawables : shapesDrawables) {
         Shape* shape = shapeDrawables.first;
-        Buffer *buffer = shape->buffer;
-        shader->bindBuffer(buffer);
+        //Buffer *buffer = shape->buffer;
+        //shader->bindBuffer(buffer);
+        shader->bindShape(shape);
         auto drawables = *shapeDrawables.second;
         for (Drawable* drawable: drawables) {
           drawable->draw(context);
         }
+        //buffer->unbind();
+        shader->unbindShape(shape);
       }
-      shader->unbindBuffer();
     }
-    glFinish(); // TODO: Enable if profiler enabled.
+    glFinish(); // TODO: Use only if profiler enabled.
+  }
+
+  void Drawer::draw() {
+    addWaitingDrawables();
+    initContext();
+    drawAllDrawables();
   }
 
   Drawer::Drawer(
     Camera* camera,
     gpu::GPU* gpu
   ) {
-    if (gpu != nullptr) {
-      kernels = gpu->kernels;
-      memories = gpu->memories;
-    }
+    kernels = gpu->kernels;
+    memories = gpu->memories;
     this->camera = camera;
-
-
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
   }
@@ -87,7 +94,7 @@ namespace alcube::drawing {
   void Drawer::setUpMultiDrawables() {
     for (auto drawable : multiDrawables) {
       auto multiShape = (MultiShape*)drawable->shape;
-      multiShape->buffer->positions->size = multiShape->instanceCount * sizeof(GLfloat);
+      multiShape->instanceBuffers[POSITIONS]->length = multiShape->instanceCount;
       multiShape->positionsMemory->setCount(multiShape->instanceCount);
     }
   }
@@ -108,8 +115,8 @@ namespace alcube::drawing {
       auto multiShape = (MultiShape*)drawable->shape;
       multiShape->positionsMemory->read();
       auto clPositions = multiShape->positionsMemory->at(0);
-      auto positions = (float*)multiShape->buffer->positions->data;
-      multiShape->buffer->positions->size = sizeof(GLfloat) * multiShape->instanceCount * 3;
+      auto positions = (float*)multiShape->instanceBuffers[POSITIONS]->data;
+      multiShape->instanceBuffers[POSITIONS]->length = multiShape->instanceCount;
       for (size_t i = 0; i < multiShape->instanceCount; i++) {
         positions[i * 3 + 0] = clPositions[i].x;
         positions[i * 3 + 1] = clPositions[i].y;

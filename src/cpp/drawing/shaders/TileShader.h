@@ -10,7 +10,7 @@ namespace alcube::drawing::shaders {
 
       void shade(Context &context) override;
 
-      void bindBuffer(Buffer *buffer) override;
+      //void bindBuffer(Buffer *buffer) override;
   };
 }
 

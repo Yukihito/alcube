@@ -63,11 +63,11 @@ namespace alcube::drawing {
     glDeleteShader(vertexShaderId);
     glDeleteShader(fragmentShaderId);
 
-    uniformIds = nullptr;
+    uniformLocations = nullptr;
     if (uniformsCount > 0) {
-      uniformIds = new GLint[uniformsCount];
+      uniformLocations = new GLint[uniformsCount];
       for (int i = 0; i < uniformsCount; i++) {
-        uniformIds[i] = glGetUniformLocation(programId, uniformNames[i]);
+        uniformLocations[i] = glGetUniformLocation(programId, uniformNames[i]);
       }
     }
   }

@@ -10,10 +10,10 @@
 namespace alcube::drawing::shaders {
   class Shaders {
     public:
-      SimpleShader simple;
-      StandardShader standard;
-      ParticleShader particle;
-      TileShader tile;
+      //SimpleShader simple;
+      //StandardShader standard;
+      //ParticleShader particle;
+      //TileShader tile;
       DirectionalLightShader directionalLight;
       explicit Shaders(utils::FileUtil* fileUtil);
   };

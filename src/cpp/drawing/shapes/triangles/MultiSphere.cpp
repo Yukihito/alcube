@@ -6,11 +6,26 @@ namespace alcube::drawing::shapes::triangles {
   }
 
   Buffer* MultiSphere::createBuffer() {
+
+    return buffer;
+  }
+
+  MultiSphere::MultiSphere(
+    size_t splitCount,
+    unsigned int maxInstanceCount,
+    gpu::memories::Float3Memory* positionsMemory
+  ) : MultiShape() {
+    this->splitCount = splitCount;
+    this->instanceCount = 0;
+    this->maxInstanceCount = maxInstanceCount;
+    this->positionsMemory = positionsMemory;
+
     auto iSplitCount = (int)splitCount;
-    size_t verticesLength = splitCount * splitCount * 3;
-    size_t uvsLength = splitCount * splitCount * 2;
-    auto vertices = new GLfloat[verticesLength]();
-    auto normals = new GLfloat[verticesLength]();
+    auto verticesLength = (unsigned int)(splitCount * splitCount);
+    size_t vertexElementsLength = verticesLength * 3;
+    size_t uvsLength = verticesLength * 2;
+    auto vertices = new GLfloat[vertexElementsLength]();
+    auto normals = new GLfloat[vertexElementsLength]();
     auto uvs = new GLfloat[uvsLength];
     float pi = 3.1415f;
     for (int i = 0; i < splitCount; i++) {
@@ -44,6 +59,18 @@ namespace alcube::drawing::shapes::triangles {
         uvs[l + 1] = (float)j / (float)(splitCount - 1);
       }
     }
+
+    indexBuffer = new IndexBuffer(1, (unsigned int)indicesLength, indices);
+    vertexBuffers[VERTICES] = new VertexBuffer(3, verticesLength, vertices);
+    vertexBuffers[NORMALS] = new VertexBuffer(3, verticesLength, normals);
+    vertexBuffers[UVS] = new VertexBuffer(2, verticesLength, uvs);
+    instanceBuffers[POSITIONS] = new InstanceBuffer(3, maxInstanceCount, new GLfloat[maxInstanceCount * 3]);
+
+    indexBuffer->update();
+    vertexBuffers[VERTICES]->update();
+    vertexBuffers[NORMALS]->update();
+    vertexBuffers[UVS]->update();
+    /*
     auto buffer = new Buffer(
       verticesLength * sizeof(GLfloat),
       indicesLength * sizeof(GLuint),
@@ -61,18 +88,7 @@ namespace alcube::drawing::shapes::triangles {
     buffer->indices->update();
     buffer->normals->update();
     buffer->uvs->update();
-    return buffer;
-  }
-
-  MultiSphere::MultiSphere(
-    size_t splitCount,
-    unsigned int maxInstanceCount,
-    gpu::memories::Float3Memory* positionsMemory
-  ) {
-    this->splitCount = splitCount;
-    this->instanceCount = 0;
-    this->maxInstanceCount = maxInstanceCount;
-    this->positionsMemory = positionsMemory;
-    initialize();
+     */
+    //initialize();
   }
 }

@@ -8,7 +8,7 @@ namespace alcube::physics::samples::particles {
   ) {
     particlesShape = shapes->points.createParticles(maxParticleCount);
     shape = particlesShape;
-    shader = &shaders->particle;
+    shader = &shaders->directionalLight;
     positions = new GLfloat[maxParticleCount * 3]();
     colors = new GLfloat[maxParticleCount * 3]();
     shape->buffer->vertices->size = 0;

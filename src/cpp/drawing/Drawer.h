@@ -32,6 +32,7 @@ namespace alcube::drawing {
       void updateMultiDrawables();
       void transformMultiDrawables();
     private:
+      Context context;
       gpu::Kernels kernels;
       gpu::Memories memories;
       Camera* camera;
@@ -40,6 +41,9 @@ namespace alcube::drawing {
       std::vector<Drawable*> multiDrawables;
       std::unordered_map<Shader*, std::unordered_map<Shape*, std::vector<Drawable*>*>*> drawables;
       void addInternal(Drawable* drawable);
+      void addWaitingDrawables();
+      void initContext();
+      void drawAllDrawables();
   };
 }
 

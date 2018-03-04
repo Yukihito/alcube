@@ -13,10 +13,75 @@ namespace alcube::drawing {
       GLsizeiptr size;
       GLenum target;
       GLint vertexSize;
+      GLuint location;
+      bool isAttribute;
+      bool enabled;
       explicit VBO(GLsizeiptr allocationSize, GLenum target, GLint vertexSize, GLenum usage);
       void update();
       void enable();
       void enable(GLuint location);
+      void disable();
+  };
+
+  class Buf {
+    public:
+      explicit Buf(
+        GLenum target,
+        GLenum usage,
+        size_t elementSize,
+        unsigned int maxLength,
+        unsigned int elementCountParVertex,
+        void* data
+      );
+      GLuint bufferId;
+      void* data;
+      unsigned int length;
+      unsigned int elementCountParVertex;
+      virtual void disable();
+      void update();
+
+    protected:
+      size_t elementSize;
+    protected:
+      GLenum target;
+  };
+
+
+  class VertexBuffer : public Buf {
+    public:
+      explicit VertexBuffer(
+        unsigned int elementCountParVertex,
+        unsigned int maxLength,
+        void* data
+      );
+      virtual void enable(GLuint location);
+      void disable() override;
+
+    protected:
+      GLenum type;
+
+    private:
+      GLuint location;
+  };
+
+  class InstanceBuffer : public VertexBuffer {
+    public:
+      explicit InstanceBuffer(
+        unsigned int elementCountParVertex,
+        unsigned int maxLength,
+        void* data
+      );
+      void enable(GLuint location) override;
+  };
+
+  class IndexBuffer : public Buf {
+    public:
+      explicit IndexBuffer(
+        unsigned int elementCountParVertex,
+        unsigned int maxLength,
+        unsigned int* data
+      );
+      void enable();
   };
 
   class Buffer {
@@ -37,6 +102,11 @@ namespace alcube::drawing {
       );
 
       ~Buffer();
+
+      void unbind();
+
+    private:
+      VBO* all[6];
   };
 }
 

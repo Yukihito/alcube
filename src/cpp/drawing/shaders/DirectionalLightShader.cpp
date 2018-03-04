@@ -8,29 +8,49 @@ namespace alcube::drawing::shaders {
     static const char* fragmentShaderCode = fragmentShaderCodeStr.c_str();
     const char* uniformNames[] = { "MVP", "MV", "diffuse", "ambient", "specular" };
     compile(vertexShaderCode, fragmentShaderCode, uniformNames, 5);
+    uniforms.MVP = 0;
+    uniforms.MV = 1;
+    uniforms.diffuse = 2;
+    uniforms.ambient = 3;
+    uniforms.specular = 4;
+
+    attributes.vertices = 0;
+    attributes.positions = 1;
+    attributes.normals = 2;
   }
 
   void DirectionalLightShader::shade(Context &context) {
-    glUniformMatrix4fv(uniformIds[0], 1, GL_FALSE, &context.mvp[0][0]);
-    glUniformMatrix4fv(uniformIds[1], 1, GL_FALSE, &context.mv[0][0]);
-    glUniform3fv(uniformIds[2], 1, &context.material.diffuse[0]);
-    glUniform3fv(uniformIds[3], 1, &context.material.ambient[0]);
-    glUniform3fv(uniformIds[4], 1, &context.material.specular[0]);
+    glUniformMatrix4fv(uniformLocations[uniforms.MVP], 1, GL_FALSE, &context.mvp[0][0]);
+    glUniformMatrix4fv(uniformLocations[uniforms.MV], 1, GL_FALSE, &context.mv[0][0]);
+    glUniform3fv(uniformLocations[uniforms.diffuse], 1, &context.material.diffuse[0]);
+    glUniform3fv(uniformLocations[uniforms.ambient], 1, &context.material.ambient[0]);
+    glUniform3fv(uniformLocations[uniforms.specular], 1, &context.material.specular[0]);
   }
 
+  void DirectionalLightShader::bindShape(Shape *shape) {
+    shape->indexBuffer->enable();
+    shape->instanceBuffers[POSITIONS]->update();
+    shape->instanceBuffers[POSITIONS]->enable(attributes.positions);
+    shape->vertexBuffers[VERTICES]->enable(attributes.vertices);
+    shape->vertexBuffers[NORMALS]->enable(attributes.normals);
+  }
+
+  void DirectionalLightShader::unbindShape(Shape *shape) {
+    shape->indexBuffer->disable();
+    shape->instanceBuffers[POSITIONS]->disable();
+    shape->vertexBuffers[VERTICES]->disable();
+    shape->vertexBuffers[NORMALS]->disable();
+  }
+
+  /*
   void DirectionalLightShader::bindBuffer(Buffer *buffer) {
-    glVertexAttribDivisor(1, 1);
+    glVertexAttribDivisor(attributes.positions, 1);
     buffer->positions->update();
     buffer->indices->enable();
-    buffer->vertices->enable(0);
-    buffer->positions->enable(1);
-    buffer->normals->enable(2);
-  }
 
-  void DirectionalLightShader::unbindBuffer() {
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-    glDisableVertexAttribArray(2);
+    buffer->vertices->enable(attributes.vertices);
+    buffer->positions->enable(attributes.positions);
+    buffer->normals->enable(attributes.normals);
   }
+   */
 }

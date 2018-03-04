@@ -3,7 +3,7 @@
 namespace alcube::physics::samples::balls {
   Ball::Ball(drawing::shapes::Shapes *shapes, drawing::shaders::Shaders *shaders) {
     shape = &shapes->points.sphere;
-    shader = &shaders->simple;
+    shader = &shaders->directionalLight;
   }
 
   glm::mat4 Ball::getModelMat() {
