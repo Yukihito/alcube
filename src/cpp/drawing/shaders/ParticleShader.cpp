@@ -10,7 +10,7 @@ namespace alcube::drawing::shaders {
     compile(vertexShaderCode, fragmentShaderCode, uniformNames, 1);
   }
 
-  void ParticleShader::shade(Context &context) {
+  void ParticleShader::bindUniforms(Context &context) {
     glUniformMatrix4fv(uniformLocations[0], 1, GL_FALSE, &context.mvp[0][0]);
   }
 

@@ -3,6 +3,16 @@
 namespace alcube::drawing {
   using namespace std;
 
+  VertexAttribute::VertexAttribute(VertexBufferType type, GLuint location) {
+    this->type = type;
+    this->location = location;
+  }
+
+  InstanceAttribute::InstanceAttribute(InstanceBufferType type, GLuint location) {
+    this->type = type;
+    this->location = location;
+  }
+
   void Shader::compile(
     const char *vertexShaderCode,
     const char *fragmentShaderCode,
@@ -72,28 +82,23 @@ namespace alcube::drawing {
     }
   }
 
-  void Shader::enableIndexBuffer(VBO *vbo) {
-    if (vbo == nullptr) {
-      return;
+  void Shader::bindShape(Shape *shape) {
+    shape->indexBuffer->enable();
+    for (auto attr : vertexAttributes) {
+      shape->vertexBuffers[attr->type]->enable(attr->location);
     }
-    glBindBuffer(vbo->target, vbo->bufferId);
-    glBufferSubData(vbo->target, 0, vbo->size, vbo->data);
+    for (auto attr : instanceAttributes) {
+      shape->instanceBuffers[attr->type]->enable(attr->location);
+    }
   }
 
-  void Shader::enableVertexBuffer(VBO *vbo, GLuint location) {
-    if (vbo == nullptr) {
-      return;
+  void Shader::unbindShape(Shape *shape) {
+    shape->indexBuffer->disable();
+    for (auto attr : vertexAttributes) {
+      shape->vertexBuffers[attr->type]->disable();
     }
-    glEnableVertexAttribArray(location);
-    glBindBuffer(vbo->target, vbo->bufferId);
-    glBufferSubData(vbo->target, 0, vbo->size, vbo->data);
-    glVertexAttribPointer(
-      location,
-      vbo->vertexSize,
-      GL_FLOAT,
-      GL_FALSE,
-      0,
-      nullptr
-    );
+    for (auto attr : instanceAttributes) {
+      shape->instanceBuffers[attr->type]->disable();
+    }
   }
 }

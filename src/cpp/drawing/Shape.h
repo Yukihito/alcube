@@ -3,7 +3,6 @@
 
 #include <glm/mat4x4.hpp>
 #include "Buffer.h"
-//#include "Shader.h"
 
 namespace alcube::drawing {
   enum VertexBufferType {
@@ -25,10 +24,11 @@ namespace alcube::drawing {
       IndexBuffer* indexBuffer;
       VertexBuffer* vertexBuffers[4];
       InstanceBuffer* instanceBuffers[1];
+      void update();
 
     protected:
       virtual Buffer* createBuffer() = 0; // TODO: Delete
-      void initialize();
+      void initialize(); // TODO: Delete
   };
 }
 

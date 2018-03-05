@@ -57,14 +57,12 @@ namespace alcube::drawing {
       glUseProgram(shader->programId);
       for (auto shapeDrawables : shapesDrawables) {
         Shape* shape = shapeDrawables.first;
-        //Buffer *buffer = shape->buffer;
-        //shader->bindBuffer(buffer);
+        shape->update();
         shader->bindShape(shape);
         auto drawables = *shapeDrawables.second;
         for (Drawable* drawable: drawables) {
           drawable->draw(context);
         }
-        //buffer->unbind();
         shader->unbindShape(shape);
       }
     }

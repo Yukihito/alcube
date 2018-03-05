@@ -8,7 +8,7 @@ namespace alcube::drawing {
     context.m = matrix;
     context.mv = context.v * matrix;
     context.material = *getMaterial();
-    shader->shade(context);
+    shader->bindUniforms(context);
     shape->draw();
   }
 

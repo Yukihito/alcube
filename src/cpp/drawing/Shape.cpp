@@ -14,4 +14,21 @@ namespace alcube::drawing {
   void Shape::initialize() {
     this->buffer = createBuffer();
   }
+
+  void Shape::update() {
+    if (indexBuffer != nullptr && indexBuffer->isDynamic) {
+      indexBuffer->update();
+    }
+
+    for (auto &vertexBuffer : vertexBuffers) {
+      if (vertexBuffer != nullptr && vertexBuffer->isDynamic) {
+        vertexBuffer->update();
+      }
+    }
+    for (auto &instanceBuffer : instanceBuffers) {
+      if (instanceBuffer != nullptr && instanceBuffer->isDynamic) {
+        instanceBuffer->update();
+      }
+    }
+  }
 }

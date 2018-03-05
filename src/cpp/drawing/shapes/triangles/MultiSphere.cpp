@@ -60,35 +60,15 @@ namespace alcube::drawing::shapes::triangles {
       }
     }
 
-    indexBuffer = new IndexBuffer(1, (unsigned int)indicesLength, indices);
-    vertexBuffers[VERTICES] = new VertexBuffer(3, verticesLength, vertices);
-    vertexBuffers[NORMALS] = new VertexBuffer(3, verticesLength, normals);
-    vertexBuffers[UVS] = new VertexBuffer(2, verticesLength, uvs);
-    instanceBuffers[POSITIONS] = new InstanceBuffer(3, maxInstanceCount, new GLfloat[maxInstanceCount * 3]);
+    indexBuffer = new IndexBuffer(1, (unsigned int)indicesLength, indices, false);
+    vertexBuffers[VERTICES] = new VertexBuffer(3, verticesLength, vertices, false);
+    vertexBuffers[NORMALS] = new VertexBuffer(3, verticesLength, normals, false);
+    vertexBuffers[UVS] = new VertexBuffer(2, verticesLength, uvs, false);
+    instanceBuffers[POSITIONS] = new InstanceBuffer(3, maxInstanceCount, new GLfloat[maxInstanceCount * 3], true);
 
     indexBuffer->update();
     vertexBuffers[VERTICES]->update();
     vertexBuffers[NORMALS]->update();
     vertexBuffers[UVS]->update();
-    /*
-    auto buffer = new Buffer(
-      verticesLength * sizeof(GLfloat),
-      indicesLength * sizeof(GLuint),
-      verticesLength * sizeof(GLfloat),
-      0,
-      uvsLength * sizeof(GLfloat),
-      maxInstanceCount * sizeof(GLfloat) * 3
-    );
-    buffer->vertices->data = vertices;
-    buffer->indices->data = indices;
-    buffer->normals->data = normals;
-    buffer->uvs->data = uvs;
-    buffer->positions->data = new GLfloat[maxInstanceCount * 3];
-    buffer->vertices->update();
-    buffer->indices->update();
-    buffer->normals->update();
-    buffer->uvs->update();
-     */
-    //initialize();
   }
 }

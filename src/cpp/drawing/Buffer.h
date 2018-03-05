@@ -27,7 +27,7 @@ namespace alcube::drawing {
     public:
       explicit Buf(
         GLenum target,
-        GLenum usage,
+        bool isDynamic,
         size_t elementSize,
         unsigned int maxLength,
         unsigned int elementCountParVertex,
@@ -38,6 +38,7 @@ namespace alcube::drawing {
       unsigned int length;
       unsigned int elementCountParVertex;
       virtual void disable();
+      bool isDynamic;
       void update();
 
     protected:
@@ -52,7 +53,8 @@ namespace alcube::drawing {
       explicit VertexBuffer(
         unsigned int elementCountParVertex,
         unsigned int maxLength,
-        void* data
+        void* data,
+        bool isDynamic
       );
       virtual void enable(GLuint location);
       void disable() override;
@@ -69,7 +71,8 @@ namespace alcube::drawing {
       explicit InstanceBuffer(
         unsigned int elementCountParVertex,
         unsigned int maxLength,
-        void* data
+        void* data,
+        bool isDynamic
       );
       void enable(GLuint location) override;
   };
@@ -79,7 +82,8 @@ namespace alcube::drawing {
       explicit IndexBuffer(
         unsigned int elementCountParVertex,
         unsigned int maxLength,
-        unsigned int* data
+        unsigned int* data,
+        bool isDynamic
       );
       void enable();
   };

@@ -14,43 +14,16 @@ namespace alcube::drawing::shaders {
     uniforms.ambient = 3;
     uniforms.specular = 4;
 
-    attributes.vertices = 0;
-    attributes.positions = 1;
-    attributes.normals = 2;
+    vertexAttributes.push_back(new VertexAttribute(VERTICES, 0));
+    vertexAttributes.push_back(new VertexAttribute(NORMALS, 2));
+    instanceAttributes.push_back(new InstanceAttribute(POSITIONS, 1));
   }
 
-  void DirectionalLightShader::shade(Context &context) {
+  void DirectionalLightShader::bindUniforms(Context &context) {
     glUniformMatrix4fv(uniformLocations[uniforms.MVP], 1, GL_FALSE, &context.mvp[0][0]);
     glUniformMatrix4fv(uniformLocations[uniforms.MV], 1, GL_FALSE, &context.mv[0][0]);
     glUniform3fv(uniformLocations[uniforms.diffuse], 1, &context.material.diffuse[0]);
     glUniform3fv(uniformLocations[uniforms.ambient], 1, &context.material.ambient[0]);
     glUniform3fv(uniformLocations[uniforms.specular], 1, &context.material.specular[0]);
   }
-
-  void DirectionalLightShader::bindShape(Shape *shape) {
-    shape->indexBuffer->enable();
-    shape->instanceBuffers[POSITIONS]->update();
-    shape->instanceBuffers[POSITIONS]->enable(attributes.positions);
-    shape->vertexBuffers[VERTICES]->enable(attributes.vertices);
-    shape->vertexBuffers[NORMALS]->enable(attributes.normals);
-  }
-
-  void DirectionalLightShader::unbindShape(Shape *shape) {
-    shape->indexBuffer->disable();
-    shape->instanceBuffers[POSITIONS]->disable();
-    shape->vertexBuffers[VERTICES]->disable();
-    shape->vertexBuffers[NORMALS]->disable();
-  }
-
-  /*
-  void DirectionalLightShader::bindBuffer(Buffer *buffer) {
-    glVertexAttribDivisor(attributes.positions, 1);
-    buffer->positions->update();
-    buffer->indices->enable();
-
-    buffer->vertices->enable(attributes.vertices);
-    buffer->positions->enable(attributes.positions);
-    buffer->normals->enable(attributes.normals);
-  }
-   */
 }

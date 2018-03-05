@@ -8,7 +8,7 @@ namespace alcube::drawing::shaders {
     public:
       explicit TileShader(utils::FileUtil *fileUtil);
 
-      void shade(Context &context) override;
+      void bindUniforms(Context &context) override;
 
       //void bindBuffer(Buffer *buffer) override;
   };

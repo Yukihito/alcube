@@ -10,7 +10,7 @@ namespace alcube::drawing::shaders {
     compile(vertexShaderCode, fragmentShaderCode, uniformNames, 7);
   }
 
-  void TileShader::shade(Context& context) {
+  void TileShader::bindUniforms(Context &context) {
     glUniformMatrix4fv(uniformLocations[0], 1, GL_FALSE, &context.mvp[0][0]);
     glUniformMatrix4fv(uniformLocations[1], 1, GL_FALSE, &context.v[0][0]);
     glUniformMatrix4fv(uniformLocations[2], 1, GL_FALSE, &context.m[0][0]);

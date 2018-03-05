@@ -9,30 +9,18 @@
 #include "Shape.h"
 
 namespace alcube::drawing {
-
-  /*
-     class ShaderAttribute {
+  class VertexAttribute {
+    public:
+      VertexBufferType type;
       GLuint location;
-      bool isInstanceAttr;
-      explicit ShaderAttribute(GLuint location, bool isInstanceAttr);
+      explicit VertexAttribute(VertexBufferType type, GLuint location);
   };
-  class ShaderAttributes {
-    public:
-      ShaderAttribute* vertices;
-      ShaderAttribute* normals;
-      ShaderAttribute* colors;
-      ShaderAttribute* uvs;
-      ShaderAttribute* positions;
-  };
-   */
 
-  class ShaderAttributes {
+  class InstanceAttribute {
     public:
-      GLuint vertices;
-      GLuint normals;
-      GLuint colors;
-      GLuint uvs;
-      GLuint positions;
+      InstanceBufferType type;
+      GLuint location;
+      explicit InstanceAttribute(InstanceBufferType type, GLuint location);
   };
 
   class ShaderUniforms {
@@ -47,12 +35,12 @@ namespace alcube::drawing {
   class Shader {
     public:
       GLuint programId = 0;
-      //virtual void bindBuffer(Buffer *buffer) = 0; // TODO: Delete
-      virtual void shade(Context& context) = 0;
-      virtual void bindShape(Shape* shape) = 0;
-      virtual void unbindShape(Shape* shape) = 0;
+      virtual void bindUniforms(Context &context) = 0;
+      virtual void bindShape(Shape* shape);
+      virtual void unbindShape(Shape* shape);
     protected:
-      ShaderAttributes attributes;
+      std::vector<VertexAttribute*> vertexAttributes;
+      std::vector<InstanceAttribute*> instanceAttributes;
       ShaderUniforms uniforms;
       GLint* uniformLocations = nullptr;
       void compile(
@@ -61,9 +49,6 @@ namespace alcube::drawing {
         const char **uniformNames,
         unsigned int uniformsCount
       );
-
-      void enableIndexBuffer(VBO *vbo); // TODO: Delete
-      void enableVertexBuffer(VBO *vbo, GLuint location); // TODO Delete
   };
 }
 
