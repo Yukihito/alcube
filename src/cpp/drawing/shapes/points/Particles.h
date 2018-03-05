@@ -10,9 +10,6 @@ namespace alcube::drawing::shapes::points {
       explicit Particles(unsigned int maxParticleCount);
       unsigned int particleCount;
 
-    protected:
-      Buffer* createBuffer() override;
-
     private:
       unsigned int maxParticleCount;
   };

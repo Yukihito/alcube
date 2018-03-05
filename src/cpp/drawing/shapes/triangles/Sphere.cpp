@@ -5,6 +5,7 @@ namespace alcube::drawing::shapes::triangles {
     glDrawElements(GL_TRIANGLES, (int)this->indicesLength, GL_UNSIGNED_INT, nullptr);
   };
 
+  /*
   Buffer* Sphere::createBuffer() {
     auto iSplitCount = (int)splitCount;
     size_t verticesLength = splitCount * splitCount * 3;
@@ -44,6 +45,7 @@ namespace alcube::drawing::shapes::triangles {
         uvs[l + 1] = (float)j / (float)(splitCount - 1);
       }
     }
+
     auto buffer = new Buffer(
       verticesLength * sizeof(GLfloat),
       indicesLength * sizeof(GLuint),
@@ -58,9 +60,9 @@ namespace alcube::drawing::shapes::triangles {
     buffer->uvs->data = uvs;
     return buffer;
   }
-
+*/
   Sphere::Sphere(size_t splitCount) {
     this->splitCount = splitCount;
-    initialize();
+    //initialize();
   }
 }

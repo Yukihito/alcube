@@ -11,10 +11,6 @@ namespace alcube::drawing {
     }
   }
 
-  void Shape::initialize() {
-    this->buffer = createBuffer();
-  }
-
   void Shape::update() {
     if (indexBuffer != nullptr && indexBuffer->isDynamic) {
       indexBuffer->update();

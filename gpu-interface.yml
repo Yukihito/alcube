@@ -7,8 +7,6 @@ variables:
   - maxActorCountForBitonicSort
   - maxSpringCount
   - allGridCount
-  - sphereModelVertexCount
-  - maxVertexCount
 
 dto-structs:
   # Constants

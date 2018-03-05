@@ -13,7 +13,6 @@ namespace alcube::drawing::shapes::triangles {
 
     protected:
       size_t indicesLength = 0;
-      Buffer* createBuffer() override;
 
     private:
       size_t splitCount;

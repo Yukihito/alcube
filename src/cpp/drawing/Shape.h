@@ -20,15 +20,10 @@ namespace alcube::drawing {
     public:
       explicit Shape();
       virtual void draw() = 0;
-      Buffer* buffer = nullptr; // TODO: Delete
       IndexBuffer* indexBuffer;
       VertexBuffer* vertexBuffers[4];
       InstanceBuffer* instanceBuffers[1];
       void update();
-
-    protected:
-      virtual Buffer* createBuffer() = 0; // TODO: Delete
-      void initialize(); // TODO: Delete
   };
 }
 

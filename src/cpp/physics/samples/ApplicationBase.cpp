@@ -32,15 +32,12 @@ namespace alcube::physics::samples {
     );
     fileUtil = new utils::FileUtil();
     resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
-    uint modelVertexCount = shapes->triangles.sphere.buffer->vertices->allocationSize / sizeof(GLfloat);
     gpu = new gpu::GPU(
       resourcesProvider,
       maxCellCount,
       utils::math::powerOf2(maxCellCount),
       maxCellCount * 16,
-      xGridCount * yGridCount * zGridCount,
-      modelVertexCount,
-      modelVertexCount * maxCellCount
+      xGridCount * yGridCount * zGridCount
     );
     drawer = new drawing::Drawer(camera, gpu);
     shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);

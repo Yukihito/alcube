@@ -777,9 +777,7 @@ namespace alcube::gpu {
     unsigned int maxActorCount,
     unsigned int maxActorCountForBitonicSort,
     unsigned int maxSpringCount,
-    unsigned int allGridCount,
-    unsigned int sphereModelVertexCount,
-    unsigned int maxVertexCount
+    unsigned int allGridCount
   ) {
     this->resourcesProvider = resourcesProvider;
     cl_program program = resourcesProvider->programFactory->create("../src/kernels/generated-code/all.cl");

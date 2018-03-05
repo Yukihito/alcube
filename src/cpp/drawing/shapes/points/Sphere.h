@@ -10,10 +10,6 @@ namespace alcube::drawing::shapes::points {
     public:
       void draw() override;
       explicit Sphere(size_t splitCount);
-
-    protected:
-      Buffer* createBuffer() override;
-
     private:
       size_t splitCount;
   };

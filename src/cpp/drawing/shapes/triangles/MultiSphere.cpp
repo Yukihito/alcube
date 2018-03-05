@@ -5,11 +5,6 @@ namespace alcube::drawing::shapes::triangles {
     glDrawElementsInstanced(GL_TRIANGLES, (int)this->indicesLength, GL_UNSIGNED_INT, nullptr, instanceCount);
   }
 
-  Buffer* MultiSphere::createBuffer() {
-
-    return buffer;
-  }
-
   MultiSphere::MultiSphere(
     size_t splitCount,
     unsigned int maxInstanceCount,

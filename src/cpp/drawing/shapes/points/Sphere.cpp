@@ -5,6 +5,7 @@ namespace alcube::drawing::shapes::points {
     glDrawArrays(GL_POINTS, 0, (int)splitCount * (int)splitCount);
   };
 
+  /*
   Buffer* Sphere::createBuffer() {
     size_t verticesLength = splitCount * splitCount * 3;
     auto vertices = new GLfloat[verticesLength]();
@@ -29,9 +30,9 @@ namespace alcube::drawing::shapes::points {
     buffer->vertices->data = vertices;
     return buffer;
   }
-
+*/
   Sphere::Sphere(size_t splitCount) {
     this->splitCount = splitCount;
-    initialize();
+    //initialize();
   }
 }

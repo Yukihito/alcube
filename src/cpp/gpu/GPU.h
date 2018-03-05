@@ -408,9 +408,7 @@ namespace alcube::gpu {
         unsigned int maxActorCount,
         unsigned int maxActorCountForBitonicSort,
         unsigned int maxSpringCount,
-        unsigned int allGridCount,
-        unsigned int sphereModelVertexCount,
-        unsigned int maxVertexCount
+        unsigned int allGridCount
       );
     private:
       utils::opencl::Memory* defineHostMemory(
