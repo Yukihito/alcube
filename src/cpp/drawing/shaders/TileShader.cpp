@@ -6,10 +6,11 @@ namespace alcube::drawing::shaders {
     std::string fragmentShaderCodeStr = fileUtil->readFile("../src/shaders/tile.fragmentshader");
     static const char* vertexShaderCode = vertexShaderCodeStr.c_str();
     static const char* fragmentShaderCode = fragmentShaderCodeStr.c_str();
-    const char* uniformNames[] = { "MVP", "V", "M", "LightPosition_worldspace", "diffuse", "ambient", "specular"};
-    compile(vertexShaderCode, fragmentShaderCode, uniformNames, 7);
+    //const char* uniformNames[] = { "MVP", "V", "M", "LightPosition_worldspace", "diffuse", "ambient", "specular"};
+    //compile(vertexShaderCode, fragmentShaderCode, uniformNames, 7);
   }
 
+  /*
   void TileShader::bindUniforms(Context &context) {
     glUniformMatrix4fv(uniformLocations[0], 1, GL_FALSE, &context.mvp[0][0]);
     glUniformMatrix4fv(uniformLocations[1], 1, GL_FALSE, &context.v[0][0]);

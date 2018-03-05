@@ -7,12 +7,14 @@ namespace alcube::drawing::shaders {
     static const char* vertexShaderCode = vertexShaderCodeStr.c_str();
     static const char* fragmentShaderCode = fragmentShaderCodeStr.c_str();
     const char* uniformNames[] = { "MVP" };
-    compile(vertexShaderCode, fragmentShaderCode, uniformNames, 1);
+    compile(vertexShaderCode, fragmentShaderCode);
   }
 
+  /*
   void SimpleShader::bindUniforms(Context &context) {
     glUniformMatrix4fv(uniformLocations[0], 1, GL_FALSE, &context.mvp[0][0]);
   }
+   */
 
   /*
   void SimpleShader::bindBuffer(Buffer *buffer) {

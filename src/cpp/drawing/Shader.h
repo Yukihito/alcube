@@ -23,31 +23,40 @@ namespace alcube::drawing {
       explicit InstanceAttribute(InstanceBufferType type, GLuint location);
   };
 
-  class ShaderUniforms {
+  class Uniform {
     public:
-      int MVP;
-      int MV;
-      int diffuse;
-      int ambient;
-      int specular;
+      explicit Uniform(std::string name, GLfloat* data);
+      std::string name;
+      GLint location;
+      GLfloat* data;
+      virtual void bind() = 0;
+  };
+
+  class MatrixUniform : public Uniform {
+    public:
+      explicit MatrixUniform(std::string name, GLfloat* data);
+      void bind() override;
+  };
+
+  class Float3Uniform : public Uniform {
+    public:
+      explicit Float3Uniform(std::string name, GLfloat* data);
+      void bind() override;
   };
 
   class Shader {
     public:
       GLuint programId = 0;
-      virtual void bindUniforms(Context &context) = 0;
+      virtual void bindUniforms();
       virtual void bindShape(Shape* shape);
       virtual void unbindShape(Shape* shape);
     protected:
       std::vector<VertexAttribute*> vertexAttributes;
       std::vector<InstanceAttribute*> instanceAttributes;
-      ShaderUniforms uniforms;
-      GLint* uniformLocations = nullptr;
+      std::vector<Uniform*> uniforms;
       void compile(
         const char *vertexShaderCode,
-        const char *fragmentShaderCode,
-        const char **uniformNames,
-        unsigned int uniformsCount
+        const char *fragmentShaderCode
       );
   };
 }

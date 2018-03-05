@@ -31,8 +31,8 @@ namespace alcube::drawing {
       void setUpMultiDrawables();
       void updateMultiDrawables();
       void transformMultiDrawables();
-    private:
       Context context;
+    private:
       gpu::Kernels kernels;
       gpu::Memories memories;
       Camera* camera;

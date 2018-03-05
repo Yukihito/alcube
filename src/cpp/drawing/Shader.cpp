@@ -1,5 +1,7 @@
 #include "Shader.h"
 
+#include <utility>
+
 namespace alcube::drawing {
   using namespace std;
 
@@ -13,11 +15,28 @@ namespace alcube::drawing {
     this->location = location;
   }
 
+  Uniform::Uniform(std::string name, GLfloat *data) {
+    this->name = std::move(name);
+    this->data = data;
+  }
+
+  MatrixUniform::MatrixUniform(std::string name, GLfloat *data) : Uniform(std::move(name), data) {}
+
+  void MatrixUniform::bind() {
+    glUniformMatrix4fv(location, 1, GL_FALSE, data);
+  }
+
+  Float3Uniform::Float3Uniform(std::string name, GLfloat *data) : Uniform(std::move(name), data) {}
+
+  void Float3Uniform::bind() {
+    glUniform3fv(location, 1, data);
+  }
+
   void Shader::compile(
     const char *vertexShaderCode,
-    const char *fragmentShaderCode,
-    const char **uniformNames,
-    unsigned int uniformsCount
+    const char *fragmentShaderCode
+    //const char **uniformNames,
+    //unsigned int uniformsCount
   ) {
     // シェーダを作ります。
     GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
@@ -72,7 +91,10 @@ namespace alcube::drawing {
 
     glDeleteShader(vertexShaderId);
     glDeleteShader(fragmentShaderId);
-
+    for (auto uniform : uniforms) {
+      uniform->location = glGetUniformLocation(programId, uniform->name.c_str());
+    }
+    /*
     uniformLocations = nullptr;
     if (uniformsCount > 0) {
       uniformLocations = new GLint[uniformsCount];
@@ -80,6 +102,7 @@ namespace alcube::drawing {
         uniformLocations[i] = glGetUniformLocation(programId, uniformNames[i]);
       }
     }
+     */
   }
 
   void Shader::bindShape(Shape *shape) {
@@ -99,6 +122,12 @@ namespace alcube::drawing {
     }
     for (auto attr : instanceAttributes) {
       shape->instanceBuffers[attr->type]->disable();
+    }
+  }
+
+  void Shader::bindUniforms() {
+    for (auto uniform : uniforms) {
+      uniform->bind();
     }
   }
 }

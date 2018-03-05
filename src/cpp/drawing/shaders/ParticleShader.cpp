@@ -6,13 +6,15 @@ namespace alcube::drawing::shaders {
     std::string fragmentShaderCodeStr = fileUtil->readFile("../src/shaders/particle.fragmentshader");
     static const char* vertexShaderCode = vertexShaderCodeStr.c_str();
     static const char* fragmentShaderCode = fragmentShaderCodeStr.c_str();
-    const char* uniformNames[] = { "MVP" };
-    compile(vertexShaderCode, fragmentShaderCode, uniformNames, 1);
+    //const char* uniformNames[] = { "MVP" };
+    //compile(vertexShaderCode, fragmentShaderCode, uniformNames, 1);
   }
 
+  /*
   void ParticleShader::bindUniforms(Context &context) {
     glUniformMatrix4fv(uniformLocations[0], 1, GL_FALSE, &context.mvp[0][0]);
   }
+   */
 
   /*
   void ParticleShader::bindBuffer(Buffer *buffer) {

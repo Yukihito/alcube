@@ -6,8 +6,7 @@
 namespace alcube::drawing::shaders {
   class DirectionalLightShader : public Shader {
     public:
-      explicit DirectionalLightShader(utils::FileUtil* fileUtil);
-      void bindUniforms(Context &context) override;
+      explicit DirectionalLightShader(utils::FileUtil* fileUtil, Context& context);
   };
 }
 

@@ -24,8 +24,6 @@ namespace alcube::drawing::samples {
 
   void SimpleSphereSample::onInit() {
     printSystemInfo();
-    auto shaders = new shaders::Shaders(new utils::FileUtil());
-    auto shapes = new shapes::Shapes();
     camera = new Camera(
       glm::vec3(0.0f, 0.0f, 200.0f),
       glm::quat(),
@@ -36,6 +34,9 @@ namespace alcube::drawing::samples {
       10000.0f
     );
     drawer = new Drawer(camera, nullptr);
+    auto shaders = new shaders::Shaders(new utils::FileUtil(), drawer->context);
+    auto shapes = new shapes::Shapes();
+
     glm::vec3 pos1 = glm::vec3();
     for (int i = 0; i < 100; i++) {
       auto sphere = new SimpleSphere(pos1, shapes, shaders);

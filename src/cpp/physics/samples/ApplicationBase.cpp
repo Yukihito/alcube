@@ -20,7 +20,6 @@ namespace alcube::physics::samples {
     unsigned int zGridCount = worldSize / gridEdgeLength;
     float near = 0.1f;
     float far = gridEdgeLength * xGridCount * 4.0f;
-    shaders = new drawing::shaders::Shaders(new utils::FileUtil());
     shapes = new drawing::shapes::Shapes();
     camera = new drawing::Camera(
       glm::vec3(0.0f, 0.0f, far / 2.0f),
@@ -44,6 +43,7 @@ namespace alcube::physics::samples {
       modelVertexCount * maxCellCount
     );
     drawer = new drawing::Drawer(camera, gpu);
+    shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);
     physicsSimulator = new Simulator(
       maxCellCount,
       gridEdgeLength,

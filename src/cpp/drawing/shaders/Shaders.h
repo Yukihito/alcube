@@ -15,7 +15,7 @@ namespace alcube::drawing::shaders {
       //ParticleShader particle;
       //TileShader tile;
       DirectionalLightShader directionalLight;
-      explicit Shaders(utils::FileUtil* fileUtil);
+      explicit Shaders(utils::FileUtil* fileUtil, Context& context);
   };
 }
 
