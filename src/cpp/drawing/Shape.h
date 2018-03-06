@@ -13,7 +13,8 @@ namespace alcube::drawing {
   };
 
   enum InstanceBufferType {
-    POSITIONS = 0
+    POSITIONS = 0,
+    MODEL_MATRICES
   };
 
   class Shape {
@@ -22,7 +23,7 @@ namespace alcube::drawing {
       virtual void draw() = 0;
       IndexBuffer* indexBuffer;
       VertexBuffer* vertexBuffers[4];
-      InstanceBuffer* instanceBuffers[1];
+      InstanceBuffer* instanceBuffers[2];
       void update();
   };
 }

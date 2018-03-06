@@ -16,7 +16,7 @@ namespace alcube::drawing::shapes::triangles {
       );
 
     protected:
-      size_t indicesLength = 0;
+      size_t indicesLength;
   };
 }
 

@@ -5,9 +5,9 @@
 #include <cstddef>
 
 namespace alcube::drawing {
-  class Buf {
+  class Buffer {
     public:
-      explicit Buf(
+      explicit Buffer(
         GLenum target,
         bool isDynamic,
         size_t elementSize,
@@ -30,7 +30,7 @@ namespace alcube::drawing {
   };
 
 
-  class VertexBuffer : public Buf {
+  class VertexBuffer : public Buffer {
     public:
       explicit VertexBuffer(
         unsigned int elementCountParVertex,
@@ -59,7 +59,7 @@ namespace alcube::drawing {
       void enable(GLuint location) override;
   };
 
-  class IndexBuffer : public Buf {
+  class IndexBuffer : public Buffer {
     public:
       explicit IndexBuffer(
         unsigned int elementCountParVertex,

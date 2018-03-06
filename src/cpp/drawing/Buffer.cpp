@@ -1,7 +1,7 @@
 #include "Buffer.h"
 
 namespace alcube::drawing {
-  Buf::Buf(
+  Buffer::Buffer(
     GLenum target,
     bool isDynamic,
     size_t elementSize,
@@ -22,14 +22,14 @@ namespace alcube::drawing {
     glBufferData(target, allocationSize, nullptr, usage);
   }
 
-  void Buf::update() {
+  void Buffer::update() {
     size_t size = length * elementSize * elementCountParVertex;
     glBindBuffer(target, bufferId);
     glBufferSubData(target, 0, size, data);
     glBindBuffer(target, 0);
   }
 
-  void Buf::disable() {
+  void Buffer::disable() {
     glBindBuffer(target, 0);
   }
 
@@ -38,7 +38,7 @@ namespace alcube::drawing {
     unsigned int maxLength,
     void* data,
     bool isDynamic
-  ): Buf(GL_ARRAY_BUFFER, isDynamic, sizeof(GLfloat), maxLength, elementCountParVertex, data) {
+  ): Buffer(GL_ARRAY_BUFFER, isDynamic, sizeof(GLfloat), maxLength, elementCountParVertex, data) {
     this->type = GL_FLOAT;
     location = 0;
   }
@@ -58,7 +58,7 @@ namespace alcube::drawing {
   }
 
   void VertexBuffer::disable() {
-    Buf::disable();
+    Buffer::disable();
     glDisableVertexAttribArray(location);
   }
 
@@ -79,7 +79,7 @@ namespace alcube::drawing {
     unsigned int maxLength,
     unsigned int *data,
     bool isDynamic
-  ) : Buf(
+  ) : Buffer(
     GL_ELEMENT_ARRAY_BUFFER,
     isDynamic,
     sizeof(unsigned int),
