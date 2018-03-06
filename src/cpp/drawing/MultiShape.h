@@ -7,7 +7,6 @@
 namespace alcube::drawing {
   class MultiShape : public Shape {
     public:
-      unsigned int maxInstanceCount = 0;
       unsigned int instanceCount = 0;
       gpu::memories::Float3Memory* positionsMemory = nullptr;
   };

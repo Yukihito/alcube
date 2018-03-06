@@ -10,9 +10,7 @@ namespace alcube::drawing::shapes::triangles {
     unsigned int maxInstanceCount,
     gpu::memories::Float3Memory* positionsMemory
   ) : MultiShape() {
-    this->splitCount = splitCount;
     this->instanceCount = 0;
-    this->maxInstanceCount = maxInstanceCount;
     this->positionsMemory = positionsMemory;
 
     auto iSplitCount = (int)splitCount;

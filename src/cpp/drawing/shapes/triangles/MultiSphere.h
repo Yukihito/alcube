@@ -17,9 +17,6 @@ namespace alcube::drawing::shapes::triangles {
 
     protected:
       size_t indicesLength = 0;
-
-    private:
-      size_t splitCount;
   };
 }
 
