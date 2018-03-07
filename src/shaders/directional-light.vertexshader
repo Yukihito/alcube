@@ -1,8 +1,8 @@
 #version 330 core
 
 layout(location = 0) in vec3 vertexPosition_instance;
-layout(location = 1) in vec3 instancePosition_model;
-layout(location = 2) in vec3 vertexNormal_model;
+layout(location = 1) in vec3 vertexNormal_model;
+layout(location = 2) in vec4 instancePosition_model;
 
 out vec3 eyeDirection_camera;
 out vec3 normal_camera;
@@ -11,7 +11,7 @@ uniform mat4 MVP;
 uniform mat4 MV;
 
 void main() {
-  vec3 vertexPosition_model = vertexPosition_instance + instancePosition_model;
+  vec3 vertexPosition_model = vertexPosition_instance + instancePosition_model.xyz;
   gl_Position = MVP * vec4(vertexPosition_model, 1.0f);
   vec3 vertexPosition_camera = (MV * vec4(vertexPosition_model, 1.0f)).xyz;
   eyeDirection_camera = -vertexPosition_camera;

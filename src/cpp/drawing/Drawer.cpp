@@ -1,3 +1,4 @@
+#include <CL/cl_platform.h>
 #include "Drawer.h"
 
 namespace alcube::drawing {
@@ -93,6 +94,7 @@ namespace alcube::drawing {
     for (auto drawable : multiDrawables) {
       auto multiShape = (MultiShape*)drawable->shape;
       multiShape->instanceBuffers[POSITIONS]->length = multiShape->instanceCount;
+      multiShape->positionsMemory->dto = (cl_float3*)multiShape->instanceBuffers[POSITIONS]->data;
       multiShape->positionsMemory->setCount(multiShape->instanceCount);
     }
   }
@@ -111,15 +113,9 @@ namespace alcube::drawing {
   void Drawer::updateMultiDrawables() {
     for (auto drawable : multiDrawables) {
       auto multiShape = (MultiShape*)drawable->shape;
-      multiShape->positionsMemory->read();
-      auto clPositions = multiShape->positionsMemory->at(0);
-      auto positions = (float*)multiShape->instanceBuffers[POSITIONS]->data;
+      multiShape->positionsMemory->setCount(multiShape->instanceCount);
       multiShape->instanceBuffers[POSITIONS]->length = multiShape->instanceCount;
-      for (size_t i = 0; i < multiShape->instanceCount; i++) {
-        positions[i * 3 + 0] = clPositions[i].x;
-        positions[i * 3 + 1] = clPositions[i].y;
-        positions[i * 3 + 2] = clPositions[i].z;
-      }
+      multiShape->positionsMemory->read();
     }
   }
 }

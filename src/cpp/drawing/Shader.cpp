@@ -35,8 +35,6 @@ namespace alcube::drawing {
   void Shader::compile(
     const char *vertexShaderCode,
     const char *fragmentShaderCode
-    //const char **uniformNames,
-    //unsigned int uniformsCount
   ) {
     // シェーダを作ります。
     GLuint vertexShaderId = glCreateShader(GL_VERTEX_SHADER);
@@ -94,15 +92,6 @@ namespace alcube::drawing {
     for (auto uniform : uniforms) {
       uniform->location = glGetUniformLocation(programId, uniform->name.c_str());
     }
-    /*
-    uniformLocations = nullptr;
-    if (uniformsCount > 0) {
-      uniformLocations = new GLint[uniformsCount];
-      for (int i = 0; i < uniformsCount; i++) {
-        uniformLocations[i] = glGetUniformLocation(programId, uniformNames[i]);
-      }
-    }
-     */
   }
 
   void Shader::bindShape(Shape *shape) {

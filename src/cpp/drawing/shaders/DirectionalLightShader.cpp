@@ -13,7 +13,7 @@ namespace alcube::drawing::shaders {
     uniforms.push_back(new Float3Uniform("specular", &context.material.specular[0]));
     compile(vertexShaderCode, fragmentShaderCode);
     vertexAttributes.push_back(new VertexAttribute(VERTICES, 0));
-    vertexAttributes.push_back(new VertexAttribute(NORMALS, 2));
-    instanceAttributes.push_back(new InstanceAttribute(POSITIONS, 1));
+    vertexAttributes.push_back(new VertexAttribute(NORMALS, 1));
+    instanceAttributes.push_back(new InstanceAttribute(POSITIONS, 2));
   }
 }
