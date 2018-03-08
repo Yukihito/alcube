@@ -4,7 +4,6 @@
 #include "../../utils/app/OpenGLApplication.h"
 #include "../Simulator.h"
 #include "../../utils/Profiler.h"
-#include "../../drawing/shapes/Shapes.h"
 #include "../../drawing/shaders/Shaders.h"
 #include "../../drawing/Camera.h"
 #include "../../drawing/Drawer.h"
@@ -39,7 +38,6 @@ namespace alcube::physics::samples {
       drawing::Drawer *drawer;
       drawing::Camera *camera;
       drawing::shaders::Shaders *shaders;
-      drawing::shapes::Shapes *shapes;
       utils::opencl::ResourcesProvider *resourcesProvider;
       utils::FileUtil *fileUtil;
       utils::Profiler *profiler;

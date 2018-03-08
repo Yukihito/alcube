@@ -1,5 +1,5 @@
-#ifndef ALCUBE_TRIANGLES_SPHERE_H
-#define ALCUBE_TRIANGLES_SPHERE_H
+#ifndef ALCUBE_SHAPES_TRIANGLES_SPHERE_H
+#define ALCUBE_SHAPES_TRIANGLES_SPHERE_H
 
 #include "../../Shape.h"
 #include <cstddef>
@@ -9,14 +9,15 @@ namespace alcube::drawing::shapes::triangles {
   class Sphere : public Shape {
     public:
       void draw() override;
-      explicit Sphere(size_t splitCount);
+      explicit Sphere(
+        size_t splitCount,
+        unsigned int maxInstanceCount,
+        GLfloat* positions
+      );
 
     protected:
-      size_t indicesLength = 0;
-
-    private:
-      size_t splitCount;
+      size_t indicesLength;
   };
 }
 
-#endif //ALCUBE_TRIANGLES_SPHERE_H
+#endif //ALCUBE_SHAPES_TRIANGLES_SPHERE_H

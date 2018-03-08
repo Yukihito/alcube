@@ -7,7 +7,7 @@ namespace alcube::physics::samples::balls {
     unsigned int maxInstanceCount,
     gpu::memories::Float3Memory* positionsMemory
   ) {
-    shape = new drawing::shapes::triangles::MultiSphere(
+    shape = new drawing::shapes::triangles::Sphere(
       8,
       maxInstanceCount,
       (GLfloat*)positionsMemory->dto

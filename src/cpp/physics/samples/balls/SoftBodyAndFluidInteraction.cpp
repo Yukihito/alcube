@@ -101,7 +101,7 @@ namespace alcube::physics::samples::balls {
       maxCellCount,
       &gpu->memories.positions
     );
-    ((drawing::shapes::triangles::MultiSphere*)colorBalls->shape)->instanceCount = actorCount;
+    ((drawing::shapes::triangles::Sphere*)colorBalls->shape)->instanceCount = actorCount;
     drawer->add(colorBalls);
   }
 }

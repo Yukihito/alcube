@@ -20,7 +20,7 @@ namespace alcube::drawing::shaders {
     glUniform3fv(uniformLocations[5], 1, &context.material.ambient[0]);
     glUniform3fv(uniformLocations[6], 1, &context.material.specular[0]);
   }
-  /*
+
 
   void TileShader::bindBuffer(Buffer *buffer) {
     enableVertexBuffer(buffer->vertices, 0);

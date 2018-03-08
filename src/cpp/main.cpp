@@ -1,9 +1,3 @@
-#include "drawing/samples/SimpleSphereSample.h"
-#include "physics/samples/balls/BallsSample.h"
-#include "physics/samples/particles/ParticlesSample.h"
-#include "physics/samples/balls/ManyBallsSample.h"
-#include "physics/samples/balls/SoftBodySample.h"
-#include "physics/samples/particles/FluidSample.h"
 #include "physics/samples/balls/SoftBodyAndFluidInteraction.h"
 #include <iostream>
 
