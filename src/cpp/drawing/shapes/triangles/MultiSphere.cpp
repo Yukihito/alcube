@@ -8,10 +8,9 @@ namespace alcube::drawing::shapes::triangles {
   MultiSphere::MultiSphere(
     size_t splitCount,
     unsigned int maxInstanceCount,
-    gpu::memories::Float3Memory* positionsMemory
+    GLfloat* positions
   ) : MultiShape() {
     this->instanceCount = 0;
-    this->positionsMemory = positionsMemory;
 
     auto iSplitCount = (int)splitCount;
     auto verticesLength = (unsigned int)(splitCount * splitCount);
@@ -57,8 +56,7 @@ namespace alcube::drawing::shapes::triangles {
     vertexBuffers[VERTICES] = new VertexBuffer(3, verticesLength, vertices, false);
     vertexBuffers[NORMALS] = new VertexBuffer(3, verticesLength, normals, false);
     vertexBuffers[UVS] = new VertexBuffer(2, verticesLength, uvs, false);
-    instanceBuffers[POSITIONS] = new InstanceBuffer(4, maxInstanceCount, new GLfloat[maxInstanceCount * 4], true);
-    //instanceBuffers[MODEL_MATRICES] = new InstanceBuffer(4 * 4, maxInstanceCount, new GLfloat[maxInstanceCount * 4 * 4], true);
+    instanceBuffers[POSITIONS] = new InstanceBuffer(4, maxInstanceCount, /*new GLfloat[maxInstanceCount * 4]*/positions, true);
 
     indexBuffer->update();
     vertexBuffers[VERTICES]->update();

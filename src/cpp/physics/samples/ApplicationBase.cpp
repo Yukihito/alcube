@@ -66,7 +66,8 @@ namespace alcube::physics::samples {
     drawer->waitVSync();
     profiler->start(profilers.draw);
     profiler->start(profilers.updateDrawable);
-    drawer->updateMultiDrawables();
+    gpu->memories.positions.setCount(physicsSimulator->actorCount);
+    gpu->memories.positions.read();
     profiler->stop(profilers.updateDrawable);
     profiler->start(profilers.drawActors);
     drawer->draw();
@@ -77,16 +78,19 @@ namespace alcube::physics::samples {
   void ApplicationBase::onUpdate() {
     if (!initialized) {
       physicsSimulator->input();
-      drawer->setUpMultiDrawables();
+      gpu->memories.positions.setCount(physicsSimulator->actorCount);
       initialized = true;
     }
     profiler->start(profilers.update);
     physicsSimulator->update();
-    drawer->transformMultiDrawables();
+    gpu->kernels.outputPositions(
+      physicsSimulator->actorCount,
+      gpu->memories.positions,
+      gpu->memories.physicalQuantities
+    );
     clFinish(resourcesProvider->queue->queue);
 
     //physicsSimulator->output(); // TODO: delete
-    //drawer->updateDrawableBuffers();
     profiler->stop(profilers.update);
     profiler->stop(profilers.all);
     profiler->update();

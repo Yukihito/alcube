@@ -89,33 +89,4 @@ namespace alcube::drawing {
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
   }
-
-  void Drawer::setUpMultiDrawables() {
-    for (auto drawable : multiDrawables) {
-      auto multiShape = (MultiShape*)drawable->shape;
-      multiShape->instanceBuffers[POSITIONS]->length = multiShape->instanceCount;
-      multiShape->positionsMemory->dto = (cl_float3*)multiShape->instanceBuffers[POSITIONS]->data;
-      multiShape->positionsMemory->setCount(multiShape->instanceCount);
-    }
-  }
-
-  void Drawer::transformMultiDrawables() {
-    for (auto drawable : multiDrawables) {
-      auto multiShape = (MultiShape*)drawable->shape;
-      kernels.outputPositions(
-        multiShape->instanceCount,
-        *multiShape->positionsMemory,
-        memories.physicalQuantities
-      );
-    }
-  }
-
-  void Drawer::updateMultiDrawables() {
-    for (auto drawable : multiDrawables) {
-      auto multiShape = (MultiShape*)drawable->shape;
-      multiShape->positionsMemory->setCount(multiShape->instanceCount);
-      multiShape->instanceBuffers[POSITIONS]->length = multiShape->instanceCount;
-      multiShape->positionsMemory->read();
-    }
-  }
 }

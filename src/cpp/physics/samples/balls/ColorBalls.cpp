@@ -10,7 +10,7 @@ namespace alcube::physics::samples::balls {
     shape = new drawing::shapes::triangles::MultiSphere(
       8,
       maxInstanceCount,
-      positionsMemory
+      (GLfloat*)positionsMemory->dto
     );
     shader = &shaders->directionalLight;
     material = new drawing::Material();

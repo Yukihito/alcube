@@ -5,11 +5,7 @@
 #include "../gpu/GPU.h"
 
 namespace alcube::drawing {
-  class MultiShape : public Shape {
-    public:
-      unsigned int instanceCount = 0;
-      gpu::memories::Float3Memory* positionsMemory = nullptr;
-  };
+  class MultiShape : public Shape {};
 }
 
 #endif //ALCUBE_MULTISHAPE_H

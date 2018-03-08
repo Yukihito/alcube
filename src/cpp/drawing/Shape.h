@@ -21,6 +21,7 @@ namespace alcube::drawing {
     public:
       explicit Shape();
       virtual void draw() = 0;
+      unsigned int instanceCount = 0;
       IndexBuffer* indexBuffer;
       VertexBuffer* vertexBuffers[4];
       InstanceBuffer* instanceBuffers[2];

@@ -12,7 +12,7 @@ namespace alcube::drawing::shapes::triangles {
       explicit MultiSphere(
         size_t splitCount,
         unsigned int maxInstanceCount,
-        gpu::memories::Float3Memory* positionsMemory
+        GLfloat* positions
       );
 
     protected:

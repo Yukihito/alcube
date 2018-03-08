@@ -28,9 +28,6 @@ namespace alcube::drawing {
       void add(Drawable* drawable);
       void waitVSync();
       void draw();
-      void setUpMultiDrawables();
-      void updateMultiDrawables();
-      void transformMultiDrawables();
       Context context;
     private:
       gpu::Kernels kernels;

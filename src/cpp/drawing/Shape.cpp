@@ -23,6 +23,7 @@ namespace alcube::drawing {
     }
     for (auto &instanceBuffer : instanceBuffers) {
       if (instanceBuffer != nullptr && instanceBuffer->isDynamic) {
+        instanceBuffer->length = instanceCount;
         instanceBuffer->update();
       }
     }

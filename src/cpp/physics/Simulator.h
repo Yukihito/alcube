@@ -41,6 +41,7 @@ namespace alcube::physics {
       void output();
       float gravity;
       float sphericalShellRadius;
+      unsigned int actorCount;
     private:
       gpu::Kernels kernels;
       gpu::Memories memories;
@@ -51,7 +52,6 @@ namespace alcube::physics {
       unsigned int allGridCount;
       unsigned int softBodyParticleCount;
       unsigned int maxActorCount;
-      unsigned int actorCount;
       unsigned int actorCountForBitonicSort;
       unsigned int springCount;
       unsigned int fluidParticleCount;
