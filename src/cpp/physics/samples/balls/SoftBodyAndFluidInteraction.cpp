@@ -3,14 +3,12 @@
 namespace alcube::physics::samples::balls {
   SoftBodyAndFluidInteraction::SoftBodyAndFluidInteraction() : ApplicationBase(1600, 1200, 60, "SoftBodyAndFluidInteraction") {}
 
-  void SoftBodyAndFluidInteraction::add(ColorBall *ball) {
-    //drawer->add(ball);
+  void SoftBodyAndFluidInteraction::add(SoftBodyParticle *ball) {
     actorCount++;
     physicsSimulator->add(ball);
   }
 
-  void SoftBodyAndFluidInteraction::add(DrawableFluidParticle *particle) {
-    //drawer->add(particle);
+  void SoftBodyAndFluidInteraction::add(FluidParticle *particle) {
     actorCount++;
     physicsSimulator->add(particle);
   }
@@ -26,11 +24,10 @@ namespace alcube::physics::samples::balls {
     std::uniform_real_distribution<float> randReal3(0, 1);
 
     // fluid
-    glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
     for (int i = 0; i < 32; i++) {
       for (int j = 0; j < i ; j++) {
         for (int k = 0; k < i; k++) {
-          auto particle = new DrawableFluidParticle(shapes, shaders, color);
+          auto particle = new FluidParticle();
           particle->position = glm::vec3((float)i * 2.0f, (float)j * 2.0f, (float)k * 2.0f) - glm::vec3(w/2 - 1.0f, w/2 - 1.0f, w/2 - 1.0f) + 0.01f * glm::vec3(randReal3(mt), randReal3(mt), randReal3(mt));
           add(particle);
         }
@@ -43,9 +40,7 @@ namespace alcube::physics::samples::balls {
     for (int z = 0; z < softBodySize; z++) {
       for (int y = 0; y < softBodySize; y++) {
         for (int x = 0; x < softBodySize; x++) {
-          //glm::vec3 ballColor = glm::vec3(randReal3(mt), randReal3(mt), randReal3(mt));
-          glm::vec3 ballColor = glm::vec3(1.0f, 0.5f, 0.5f);
-          auto ball = new ColorBall(shapes, shaders, ballColor);
+          auto ball = new SoftBodyParticle();
           ball->mass = 0.2f;
           glm::vec3 offset = glm::vec3(-w / 4, w / 4, 0.0f);
           ball->position = glm::vec3(
@@ -98,6 +93,8 @@ namespace alcube::physics::samples::balls {
         }
       }
     }
+
+    glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
     colorBalls = new ColorBalls(
       shaders,
       color,

@@ -24,8 +24,8 @@ namespace alcube::physics::samples::balls {
     private:
       ColorBalls* colorBalls;
       unsigned short actorCount;
-      void add(ColorBall *ball);
-      void add(DrawableFluidParticle *particle);
+      void add(SoftBodyParticle *ball);
+      void add(FluidParticle *particle);
   };
 }
 
