@@ -40,13 +40,12 @@ namespace alcube::physics::samples::balls {
     // soft body
     int softBodySize = 12;
     float softBodyEdgeLength = softBodySize * 2.0f;
-    bool showsLinearMomentum = false;
     for (int z = 0; z < softBodySize; z++) {
       for (int y = 0; y < softBodySize; y++) {
         for (int x = 0; x < softBodySize; x++) {
           //glm::vec3 ballColor = glm::vec3(randReal3(mt), randReal3(mt), randReal3(mt));
           glm::vec3 ballColor = glm::vec3(1.0f, 0.5f, 0.5f);
-          auto ball = new ColorBall(shapes, shaders, ballColor, showsLinearMomentum);
+          auto ball = new ColorBall(shapes, shaders, ballColor);
           ball->mass = 0.2f;
           glm::vec3 offset = glm::vec3(-w / 4, w / 4, 0.0f);
           ball->position = glm::vec3(

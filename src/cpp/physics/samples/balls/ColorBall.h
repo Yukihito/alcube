@@ -13,14 +13,9 @@ namespace alcube::physics::samples::balls {
 
   class ColorBall : public drawing::Drawable, public SoftBodyParticle {
     public:
-      ColorBall(drawing::shapes::Shapes *shapes, drawing::shaders::Shaders *shaders, glm::vec3 diffuse, bool showsLinearMomentum);
-
-    protected:
-      //glm::mat4 getModelMat() override;
-      //drawing::Material* getMaterial() override;
+      ColorBall(drawing::shapes::Shapes *shapes, drawing::shaders::Shaders *shaders, glm::vec3 diffuse);
     private:
       drawing::Material* material;
-      bool showsLinearMomentum;
   };
 }
 

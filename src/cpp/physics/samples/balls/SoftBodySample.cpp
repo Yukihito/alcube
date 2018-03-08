@@ -16,11 +16,10 @@ namespace alcube::physics::samples::balls {
     std::uniform_real_distribution<float> randReal3(0, 1);
     std::uniform_real_distribution<float> randReal(0, 0.5);
     float softBodyEdgeLength = softBodySize * 2.0f;
-    bool showsLinearMomentum = false;
     for (int z = 0; z < softBodySize; z++) {
       for (int y = 0; y < softBodySize; y++) {
         for (int x = 0; x < softBodySize; x++) {
-          auto ball = new ColorBall(shapes, shaders, glm::vec3(randReal3(mt), randReal3(mt), randReal3(mt)), showsLinearMomentum);
+          auto ball = new ColorBall(shapes, shaders, glm::vec3(randReal3(mt), randReal3(mt), randReal3(mt)));
           ball->mass = 0.2f;
           ball->position = glm::vec3(
             x * 2.0f - (softBodyEdgeLength / 2.0f),
