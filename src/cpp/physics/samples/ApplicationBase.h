@@ -7,16 +7,14 @@
 #include "../../drawing/shaders/Shaders.h"
 #include "../../drawing/Camera.h"
 #include "../../drawing/Drawer.h"
-
+#include "../../drawing/DrawerWithProfiler.h"
 
 namespace alcube::physics::samples {
   class Profilers {
     public:
       int update;
-      int draw;
       int all;
       int updateDrawable;
-      int drawActors;
   };
 
   class ApplicationBase : public utils::app::OpenGLApplication {

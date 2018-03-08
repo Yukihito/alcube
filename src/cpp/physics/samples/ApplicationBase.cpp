@@ -38,7 +38,8 @@ namespace alcube::physics::samples {
       maxCellCount * 16,
       xGridCount * yGridCount * zGridCount
     );
-    drawer = new drawing::Drawer(camera);
+    profiler = new utils::Profiler();
+    drawer = new drawing::DrawerWithProfiler(camera, profiler);
     shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);
     physicsSimulator = new Simulator(
       maxCellCount,
@@ -50,28 +51,21 @@ namespace alcube::physics::samples {
       gpu
     );
     physicsSimulator->gravity = gravity;
-    profiler = new utils::Profiler();
+
     profiler->setShowInterval(1000);
     profiler->enabled = true;
     profilers.update = profiler->create("update");
     profilers.all = profiler->create("all");
-    profilers.draw = profiler->create("draw");
-    profilers.drawActors = profiler->create("drawActors");
     profilers.updateDrawable = profiler->create("updateDrawable");
     profiler->start(profilers.all);
   }
 
   void ApplicationBase::onDraw() {
-    drawer->waitVSync();
-    profiler->start(profilers.draw);
     profiler->start(profilers.updateDrawable);
     gpu->memories.positions.setCount(physicsSimulator->actorCount);
     gpu->memories.positions.read();
     profiler->stop(profilers.updateDrawable);
-    profiler->start(profilers.drawActors);
     drawer->draw();
-    profiler->stop(profilers.drawActors);
-    profiler->stop(profilers.draw);
   }
 
   void ApplicationBase::onUpdate() {

@@ -52,10 +52,10 @@ namespace alcube::drawing {
         drawable->draw(context);
       }
     }
-    glFinish(); // TODO: Use only if profiler enabled.
   }
 
   void Drawer::draw() {
+    waitVSync();
     addWaitingDrawables();
     initContext();
     drawAllDrawables();

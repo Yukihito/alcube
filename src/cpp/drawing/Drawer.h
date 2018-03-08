@@ -16,9 +16,11 @@ namespace alcube::drawing {
     public:
       explicit Drawer(Camera* camera);
       void add(Drawable* drawable);
-      void waitVSync();
-      void draw();
+      virtual void waitVSync();
+      virtual void draw();
       Context context;
+    protected:
+      virtual void drawAllDrawables();
     private:
       Camera* camera;
       std::mutex drawablesQueueMutex;
@@ -27,7 +29,6 @@ namespace alcube::drawing {
       void addInternal(Drawable* drawable);
       void addWaitingDrawables();
       void initContext();
-      void drawAllDrawables();
   };
 }
 
