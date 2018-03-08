@@ -39,7 +39,7 @@ namespace alcube::physics::samples {
       maxCellCount * 16,
       xGridCount * yGridCount * zGridCount
     );
-    drawer = new drawing::Drawer(camera, gpu);
+    drawer = new drawing::Drawer(camera);
     shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);
     physicsSimulator = new Simulator(
       maxCellCount,

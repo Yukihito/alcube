@@ -20,17 +20,12 @@ namespace alcube::drawing {
 
   class Drawer {
     public:
-      explicit Drawer(
-        Camera* camera,
-        gpu::GPU* gpu
-      );
+      explicit Drawer(Camera* camera);
       void add(Drawable* drawable);
       void waitVSync();
       void draw();
       Context context;
     private:
-      gpu::Kernels kernels;
-      gpu::Memories memories;
       Camera* camera;
       std::mutex drawablesQueueMutex;
       std::vector<Drawable*> drawablesQueue;

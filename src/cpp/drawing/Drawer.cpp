@@ -72,12 +72,7 @@ namespace alcube::drawing {
     drawAllDrawables();
   }
 
-  Drawer::Drawer(
-    Camera* camera,
-    gpu::GPU* gpu
-  ) {
-    kernels = gpu->kernels;
-    memories = gpu->memories;
+  Drawer::Drawer(Camera* camera) {
     this->camera = camera;
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);

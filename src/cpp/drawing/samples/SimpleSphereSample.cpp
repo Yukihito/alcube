@@ -33,7 +33,7 @@ namespace alcube::drawing::samples {
       0.1f,
       10000.0f
     );
-    drawer = new Drawer(camera, nullptr);
+    drawer = new Drawer(camera);
     auto shaders = new shaders::Shaders(new utils::FileUtil(), drawer->context);
     auto shapes = new shapes::Shapes();
 
