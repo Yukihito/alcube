@@ -10,7 +10,6 @@
 #include <unordered_map>
 #include <mutex>
 #include <CL/cl_platform.h>
-#include "MultiShape.h"
 
 namespace alcube::drawing {
   class Profilers {
@@ -35,7 +34,6 @@ namespace alcube::drawing {
       Camera* camera;
       std::mutex drawablesQueueMutex;
       std::vector<Drawable*> drawablesQueue;
-      std::vector<Drawable*> multiDrawables;
       std::unordered_map<Shader*, std::unordered_map<Shape*, std::vector<Drawable*>*>*> drawables;
       void addInternal(Drawable* drawable);
       void addWaitingDrawables();

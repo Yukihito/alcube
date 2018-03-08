@@ -9,7 +9,7 @@ namespace alcube::drawing::shapes::triangles {
     size_t splitCount,
     unsigned int maxInstanceCount,
     GLfloat* positions
-  ) : MultiShape() {
+  ) : Shape() {
     this->instanceCount = 0;
 
     auto iSplitCount = (int)splitCount;

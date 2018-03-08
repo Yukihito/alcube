@@ -1,4 +1,3 @@
-#include <CL/cl_platform.h>
 #include "Drawer.h"
 
 namespace alcube::drawing {
@@ -16,9 +15,6 @@ namespace alcube::drawing {
   void Drawer::add(Drawable* drawable) {
     drawablesQueueMutex.lock();
     drawablesQueue.push_back(drawable);
-    if (drawable->isMulti) {
-      multiDrawables.push_back(drawable);
-    }
     drawablesQueueMutex.unlock();
   }
 

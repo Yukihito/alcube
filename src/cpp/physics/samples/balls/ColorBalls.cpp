@@ -17,7 +17,6 @@ namespace alcube::physics::samples::balls {
     material->diffuse = diffuse;
     material->ambient = diffuse / 2.0f;
     material->specular = glm::vec3(0.3f, 0.3f, 0.3f);
-    isMulti = true;
   }
 
   glm::mat4 ColorBalls::getModelMat() {

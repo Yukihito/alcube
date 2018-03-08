@@ -12,7 +12,6 @@ namespace alcube::drawing {
       void draw(Context& context);
       Shape* shape = nullptr;
       Shader* shader = nullptr;
-      bool isMulti = false;
     protected:
       virtual glm::mat4 getModelMat() = 0;
       virtual Material* getMaterial();
