@@ -16,10 +16,10 @@ namespace alcube::drawing {
     public:
       explicit Drawer(Camera* camera);
       void add(Drawable* drawable);
-      virtual void waitVSync();
       virtual void draw();
       Context context;
     protected:
+      virtual void waitVSync();
       virtual void drawAllDrawables();
     private:
       Camera* camera;
