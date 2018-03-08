@@ -6,12 +6,12 @@ namespace alcube::drawing::samples {
     shape = &shapes->triangles.sphere;
     shader = &shaders->directionalLight;
     this->position = position;
-    this->material = new Material();
-    this->material->diffuse = glm::vec3(0.5f, 1.0f, 1.0f);
-    this->material->ambient = glm::vec3(0.25f, 0.5f, 0.5f);
-    this->material->specular = glm::vec3(0.3f, 0.3f, 0.3f);
+    this->material.diffuse = glm::vec3(0.5f, 1.0f, 1.0f);
+    this->material.ambient = glm::vec3(0.25f, 0.5f, 0.5f);
+    this->material.specular = glm::vec3(0.3f, 0.3f, 0.3f);
   }
 
+  /*
   glm::mat4 SimpleSphere::getModelMat() {
     return glm::translate(position);
   }
@@ -19,6 +19,7 @@ namespace alcube::drawing::samples {
   Material* SimpleSphere::getMaterial() {
     return this->material;
   }
+   */
 
   SimpleSphereSample::SimpleSphereSample() : OpenGLApplication(800, 600, 30, "SimpleSphereSample") {}
 

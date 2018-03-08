@@ -6,8 +6,8 @@ namespace alcube::drawing::shaders {
     std::string fragmentShaderCodeStr = fileUtil->readFile("../src/shaders/directional-light.fragmentshader");
     static const char* vertexShaderCode = vertexShaderCodeStr.c_str();
     static const char* fragmentShaderCode = fragmentShaderCodeStr.c_str();
-    uniforms.push_back(new MatrixUniform("MVP", &context.mvp[0][0]));
-    uniforms.push_back(new MatrixUniform("MV", &context.mv[0][0]));
+    uniforms.push_back(new MatrixUniform("VP", &context.vp[0][0]));
+    uniforms.push_back(new MatrixUniform("V", &context.v[0][0]));
     uniforms.push_back(new Float3Uniform("diffuse", &context.material.diffuse[0]));
     uniforms.push_back(new Float3Uniform("ambient", &context.material.ambient[0]));
     uniforms.push_back(new Float3Uniform("specular", &context.material.specular[0]));

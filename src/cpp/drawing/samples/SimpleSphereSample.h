@@ -12,9 +12,9 @@ namespace alcube::drawing::samples {
       explicit SimpleSphere(glm::vec3& position, shapes::Shapes* shapes, shaders::Shaders* shaders);
       glm::vec3 position;
     protected:
-      glm::mat4 getModelMat() override;
-      Material* getMaterial() override;
-      Material* material;
+      //glm::mat4 getModelMat() override;
+      //Material* getMaterial() override;
+      //Material* material;
   };
 
   class SimpleSphereSample : public utils::app::OpenGLApplication {

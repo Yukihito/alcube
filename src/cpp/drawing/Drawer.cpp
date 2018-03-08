@@ -2,14 +2,10 @@
 
 namespace alcube::drawing {
   void Drawer::addInternal(Drawable* drawable) {
-    if (drawables[drawable->shader] == nullptr) {
-      drawables[drawable->shader] = new std::unordered_map<Shape*, std::vector<Drawable*>*>();
-      (*drawables[drawable->shader])[drawable->shape] = new std::vector<Drawable*> {drawable};
-    } else if ((*drawables[drawable->shader])[drawable->shape] == nullptr) {
-      (*drawables[drawable->shader])[drawable->shape] = new std::vector<Drawable*> {drawable};
-    } else {
-      (*drawables[drawable->shader])[drawable->shape]->push_back(drawable);
+    if (shaderToDrawables[drawable->shader] == nullptr) {
+      shaderToDrawables[drawable->shader] = new std::vector<Drawable*>();
     }
+    shaderToDrawables[drawable->shader]->push_back(drawable);
   }
 
   void Drawer::add(Drawable* drawable) {
@@ -48,19 +44,12 @@ namespace alcube::drawing {
   }
 
   void Drawer::drawAllDrawables() {
-    for (auto shaderShapesDrawables : drawables) {
-      Shader* shader = shaderShapesDrawables.first;
-      auto shapesDrawables = *shaderShapesDrawables.second;
+    for (auto kv : shaderToDrawables) {
+      auto shader = kv.first;
+      auto drawables = *kv.second;
       glUseProgram(shader->programId);
-      for (auto shapeDrawables : shapesDrawables) {
-        Shape* shape = shapeDrawables.first;
-        shape->update();
-        shader->bindShape(shape);
-        auto drawables = *shapeDrawables.second;
-        for (Drawable* drawable: drawables) {
-          drawable->draw(context);
-        }
-        shader->unbindShape(shape);
+      for (auto drawable : drawables) {
+        drawable->draw(context);
       }
     }
     glFinish(); // TODO: Use only if profiler enabled.

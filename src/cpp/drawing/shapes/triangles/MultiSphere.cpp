@@ -56,7 +56,7 @@ namespace alcube::drawing::shapes::triangles {
     vertexBuffers[VERTICES] = new VertexBuffer(3, verticesLength, vertices, false);
     vertexBuffers[NORMALS] = new VertexBuffer(3, verticesLength, normals, false);
     vertexBuffers[UVS] = new VertexBuffer(2, verticesLength, uvs, false);
-    instanceBuffers[POSITIONS] = new InstanceBuffer(4, maxInstanceCount, /*new GLfloat[maxInstanceCount * 4]*/positions, true);
+    instanceBuffers[POSITIONS] = new InstanceBuffer(4, maxInstanceCount, positions, true);
 
     indexBuffer->update();
     vertexBuffers[VERTICES]->update();

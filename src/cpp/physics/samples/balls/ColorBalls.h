@@ -20,10 +20,10 @@ namespace alcube::physics::samples::balls {
         gpu::memories::Float3Memory* positionsMemory
       );
     protected:
-      glm::mat4 getModelMat() override;
-      drawing::Material* getMaterial() override;
-    private:
-      drawing::Material* material;
+      //glm::mat4 getModelMat() override;
+      //drawing::Material* getMaterial() override;
+    //private:
+   //   drawing::Material* material;
   };
 }
 

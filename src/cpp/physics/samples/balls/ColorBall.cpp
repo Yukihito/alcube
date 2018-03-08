@@ -16,6 +16,7 @@ namespace alcube::physics::samples::balls {
     this->showsLinearMomentum = showsLinearMomentum;
   }
 
+  /*
   glm::mat4 ColorBall::getModelMat() {
     return glm::translate(position) * glm::toMat4(rotation) * glm::scale(glm::vec3(radius, radius, radius));
   }
@@ -31,4 +32,5 @@ namespace alcube::physics::samples::balls {
     }
     return this->material;
   }
+   */
 }

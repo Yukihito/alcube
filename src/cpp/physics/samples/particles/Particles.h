@@ -25,8 +25,8 @@ namespace alcube::physics::samples::particles {
 
       void update(std::vector<SoftBodyParticle *> &cells);
 
-    protected:
-      glm::mat4 getModelMat() override;
+    //protected:
+//      glm::mat4 getModelMat() override;
 
     private:
       drawing::shapes::points::Particles *particlesShape;

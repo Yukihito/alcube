@@ -7,13 +7,13 @@ layout(location = 2) in vec4 instancePosition_model;
 out vec3 eyeDirection_camera;
 out vec3 normal_camera;
 
-uniform mat4 MVP;
-uniform mat4 MV;
+uniform mat4 VP;
+uniform mat4 V;
 
 void main() {
   vec3 vertexPosition_model = vertexPosition_instance + instancePosition_model.xyz;
-  gl_Position = MVP * vec4(vertexPosition_model, 1.0f);
-  vec3 vertexPosition_camera = (MV * vec4(vertexPosition_model, 1.0f)).xyz;
+  gl_Position = VP * vec4(vertexPosition_model, 1.0f);
+  vec3 vertexPosition_camera = (V * vec4(vertexPosition_model, 1.0f)).xyz;
   eyeDirection_camera = -vertexPosition_camera;
-  normal_camera = (MV * vec4(vertexNormal_model, 0)).xyz;
+  normal_camera = (V * vec4(vertexNormal_model, 0)).xyz;
 }

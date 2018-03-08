@@ -6,9 +6,11 @@ namespace alcube::physics::samples::balls {
     shader = &shaders->directionalLight;
   }
 
+  /*
   glm::mat4 Ball::getModelMat() {
-    return glm::translate(position) * glm::toMat4(rotation) * glm::scale(glm::vec3(radius, radius, radius));
+   return glm::translate(position) * glm::toMat4(rotation) * glm::scale(glm::vec3(radius, radius, radius));
   }
+   */
 
   BallsSample::BallsSample() : ApplicationBase(1600, 1200, 60, "BallsSample") {}
 

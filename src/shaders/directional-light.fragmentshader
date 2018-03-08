@@ -5,7 +5,7 @@ in vec3 normal_camera;
 
 out vec3 color;
 
-uniform mat4 MV;
+uniform mat4 V;
 uniform vec3 diffuse;
 uniform vec3 ambient;
 uniform vec3 specular;
@@ -13,7 +13,7 @@ uniform vec3 specular;
 void main() {
   float shininess = 2.0f;
   vec3 lightDirection_world = vec3(1.0f, 1.0f, 0.0f);
-  vec3 lightDirection_camera = normalize((MV * vec4(lightDirection_world, 0.0f)).xyz);
+  vec3 lightDirection_camera = normalize((V * vec4(lightDirection_world, 0.0f)).xyz);
   vec3 e = normalize(eyeDirection_camera);
   vec3 n = normalize(normal_camera);
   float intensity = max(dot(n,lightDirection_camera), 0.0);

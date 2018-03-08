@@ -17,8 +17,8 @@ namespace alcube::physics::samples::balls {
   class Ball : public drawing::Drawable, public SoftBodyParticle {
     public:
       Ball(drawing::shapes::Shapes* shapes, drawing::shaders::Shaders* shaders);
-    protected:
-      glm::mat4 getModelMat() override;
+//    protected:
+//      glm::mat4 getModelMat() override;
   };
 
   class BallsSample : public ApplicationBase {

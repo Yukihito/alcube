@@ -12,12 +12,6 @@
 #include <CL/cl_platform.h>
 
 namespace alcube::drawing {
-  class Profilers {
-    public:
-      int draw;
-
-  };
-
   class Drawer {
     public:
       explicit Drawer(Camera* camera);
@@ -29,7 +23,7 @@ namespace alcube::drawing {
       Camera* camera;
       std::mutex drawablesQueueMutex;
       std::vector<Drawable*> drawablesQueue;
-      std::unordered_map<Shader*, std::unordered_map<Shape*, std::vector<Drawable*>*>*> drawables;
+      std::unordered_map<Shader*, std::vector<Drawable*>*> shaderToDrawables;
       void addInternal(Drawable* drawable);
       void addWaitingDrawables();
       void initContext();

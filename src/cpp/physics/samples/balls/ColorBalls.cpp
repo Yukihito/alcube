@@ -13,12 +13,12 @@ namespace alcube::physics::samples::balls {
       (GLfloat*)positionsMemory->dto
     );
     shader = &shaders->directionalLight;
-    material = new drawing::Material();
-    material->diffuse = diffuse;
-    material->ambient = diffuse / 2.0f;
-    material->specular = glm::vec3(0.3f, 0.3f, 0.3f);
+    material.diffuse = diffuse;
+    material.ambient = diffuse / 2.0f;
+    material.specular = glm::vec3(0.3f, 0.3f, 0.3f);
   }
 
+  /*
   glm::mat4 ColorBalls::getModelMat() {
     return glm::mat4();
   }
@@ -26,4 +26,5 @@ namespace alcube::physics::samples::balls {
   drawing::Material* ColorBalls::getMaterial() {
     return this->material;
   }
+   */
 }

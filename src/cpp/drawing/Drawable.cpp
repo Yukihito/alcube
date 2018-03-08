@@ -2,17 +2,11 @@
 
 namespace alcube::drawing {
   void Drawable::draw(Context& context) {
-    glm::mat4 matrix = getModelMat();
-    glm::mat4 mvp = context.vp * matrix;
-    context.mvp = mvp;
-    context.m = matrix;
-    context.mv = context.v * matrix;
-    context.material = *getMaterial();
+    shape->update();
+    context.material = material;
     shader->bindUniforms();
+    shader->bindShape(shape);
     shape->draw();
-  }
-
-  Material* Drawable::getMaterial() {
-    return nullptr;
+    shader->unbindShape(shape);
   }
 }

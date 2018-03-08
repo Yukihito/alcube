@@ -13,8 +13,7 @@ namespace alcube::drawing {
       Shape* shape = nullptr;
       Shader* shader = nullptr;
     protected:
-      virtual glm::mat4 getModelMat() = 0;
-      virtual Material* getMaterial();
+      Material material;
   };
 }
 

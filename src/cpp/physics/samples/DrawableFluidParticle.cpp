@@ -8,12 +8,12 @@ namespace alcube::physics::samples {
   ) {
     shape = &shapes->triangles.sphere;
     shader = & shaders->directionalLight;
-    material = new drawing::Material();
-    material->diffuse = diffuse;
-    material->ambient = diffuse / 2.0f;
-    material->specular = glm::vec3(0.3f, 0.3f, 0.3f);
+    material.diffuse = diffuse;
+    material.ambient = diffuse / 2.0f;
+    material.specular = glm::vec3(0.3f, 0.3f, 0.3f);
   }
 
+  /*
   glm::mat4 DrawableFluidParticle::getModelMat() {
     return glm::translate(position);
   }
@@ -21,4 +21,5 @@ namespace alcube::physics::samples {
   drawing::Material *DrawableFluidParticle::getMaterial() {
     return this->material;
   }
+   */
 }

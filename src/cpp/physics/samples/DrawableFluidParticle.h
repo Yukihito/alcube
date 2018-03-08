@@ -13,10 +13,8 @@ namespace alcube::physics::samples {
     public:
       DrawableFluidParticle(drawing::shapes::Shapes *shapes, drawing::shaders::Shaders *shaders, glm::vec3 diffuse);
     protected:
-      glm::mat4 getModelMat() override;
-      drawing::Material* getMaterial() override;
-    private:
-      drawing::Material* material;
+      //glm::mat4 getModelMat() override;
+      //drawing::Material* getMaterial() override;
   };
 }
 
