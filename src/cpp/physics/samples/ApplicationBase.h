@@ -43,12 +43,13 @@ namespace alcube::physics::samples {
       Profilers profilers;
       unsigned int maxCellCount;
       float deltaTime;
-      bool initialized;
 
-      void initBase(
+      void beforeSetup(
         unsigned int worldSize,
         unsigned int maxCellCount
       );
+
+      void afterSetup();
   };
 }
 

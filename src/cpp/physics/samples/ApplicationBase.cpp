@@ -8,9 +8,8 @@ namespace alcube::physics::samples {
     const std::string& appName
   ) : OpenGLApplication(windowWidth, windowHeight, fps, appName) {}
 
-  void ApplicationBase::initBase(unsigned int worldSize, unsigned int maxCellCount) {
+  void ApplicationBase::beforeSetup(unsigned int worldSize, unsigned int maxCellCount) {
     printSystemInfo();
-    initialized = false;
     this->maxCellCount = maxCellCount;
     deltaTime = 1.0f / (float)fps;
     float gravity = 9.8f;
@@ -60,6 +59,11 @@ namespace alcube::physics::samples {
     profiler->start(profilers.all);
   }
 
+  void ApplicationBase::afterSetup() {
+    physicsSimulator->input();
+    gpu->memories.positions.setCount(physicsSimulator->actorCount);
+  }
+
   void ApplicationBase::onDraw() {
     profiler->start(profilers.updateDrawable);
     gpu->memories.positions.setCount(physicsSimulator->actorCount);
@@ -69,11 +73,6 @@ namespace alcube::physics::samples {
   }
 
   void ApplicationBase::onUpdate() {
-    if (!initialized) {
-      physicsSimulator->input();
-      gpu->memories.positions.setCount(physicsSimulator->actorCount);
-      initialized = true;
-    }
     profiler->start(profilers.update);
     physicsSimulator->update();
     gpu->kernels.outputPositions(

@@ -14,7 +14,7 @@ namespace alcube::physics::samples::balls {
   }
 
   void SoftBodyAndFluidInteraction::onInit() {
-    initBase(64, 65536);
+    beforeSetup(64, 65536);
     float w = 64;
     deltaTime *= 1.0f;
     physicsSimulator->gravity *= 2.0f;
@@ -103,5 +103,6 @@ namespace alcube::physics::samples::balls {
     );
     ((drawing::shapes::triangles::Sphere*)colorBalls->shape)->instanceCount = actorCount;
     drawer->add(colorBalls);
+    afterSetup();
   }
 }

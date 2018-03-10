@@ -9,7 +9,6 @@
 #include <vector>
 #include <unordered_map>
 #include <mutex>
-#include <CL/cl_platform.h>
 
 namespace alcube::drawing {
   class Drawer {
