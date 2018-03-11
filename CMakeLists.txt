@@ -73,6 +73,21 @@ target_link_libraries(alcube_physics_lib
         alcube_drawing_lib # TODO: Remove
         )
 
+### Samples
+set(ALCUBE_SAMPLES_SOURCE_FILES
+        src/cpp/samples/SphereDrawable.cpp src/cpp/samples/SphereDrawable.h
+        src/cpp/samples/ApplicationBase.cpp src/cpp/samples/ApplicationBase.h
+        src/cpp/samples/SampleApplication.cpp src/cpp/samples/SampleApplication.h
+        )
+
+add_library(alcube_samples_lib STATIC ${ALCUBE_SAMPLES_SOURCE_FILES})
+target_link_libraries(alcube_samples_lib
+        alcube_physics_lib
+        alcube_utils_lib
+        alcube_gpu_accessor_lib
+        alcube_drawing_lib
+        )
+
 
 ### Extra libs
 find_package(OpenGL REQUIRED)
@@ -100,6 +115,13 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wno-deprecated-declarations 
 ### Main executable
 add_executable(alcube src/cpp/main.cpp)
 target_link_libraries(alcube alcube_lib)
+
+### Sample executable
+add_executable(alcube_samples src/cpp/samples/main.cpp)
+target_link_libraries(alcube_samples
+        alcube_lib
+        alcube_samples_lib
+        )
 
 ### Kernel compiler executable
 target_link_libraries(kernel_compiler alcube_lib)

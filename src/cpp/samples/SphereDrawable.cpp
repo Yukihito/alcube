@@ -1,18 +1,18 @@
-#include "ColorBalls.h"
+#include "SphereDrawable.h"
 
-namespace alcube::physics::samples::balls {
-  ColorBalls::ColorBalls(
-    drawing::shaders::Shaders *shaders,
+namespace alcube::samples {
+  SphereDrawable::SphereDrawable(
+    drawing::Shader &shader,
     glm::vec3 diffuse,
     unsigned int maxInstanceCount,
-    gpu::memories::Float3Memory* positionsMemory
+    GLfloat* positions
   ) {
     shape = new drawing::shapes::triangles::Sphere(
       8,
       maxInstanceCount,
-      (GLfloat*)positionsMemory->dto
+      positions
     );
-    shader = &shaders->directionalLight;
+    this->shader = &shader;
     material.diffuse = diffuse;
     material.ambient = diffuse / 2.0f;
     material.specular = glm::vec3(0.3f, 0.3f, 0.3f);
