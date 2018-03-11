@@ -37,17 +37,13 @@ set(ALCUBE_DRAWING_SOURCE_FILES
         src/cpp/drawing/Camera.cpp src/cpp/drawing/Camera.h
         src/cpp/drawing/Shape.cpp src/cpp/drawing/Shape.h
         src/cpp/drawing/Drawable.cpp src/cpp/drawing/Drawable.h
+        src/cpp/drawing/DrawerWithProfiler.cpp src/cpp/drawing/DrawerWithProfiler.h
         src/cpp/drawing/Drawer.cpp src/cpp/drawing/Drawer.h
         src/cpp/drawing/Context.cpp src/cpp/drawing/Context.h
-        src/cpp/drawing/shaders/SimpleShader.cpp src/cpp/drawing/shaders/SimpleShader.h
-        src/cpp/drawing/shaders/StandardShader.cpp src/cpp/drawing/shaders/StandardShader.h
-        src/cpp/drawing/shaders/Shaders.cpp src/cpp/drawing/shaders/Shaders.h
-        src/cpp/drawing/shaders/ParticleShader.cpp src/cpp/drawing/shaders/ParticleShader.h
         src/cpp/drawing/Material.cpp src/cpp/drawing/Material.h
-        src/cpp/drawing/shaders/TileShader.cpp src/cpp/drawing/shaders/TileShader.h
+        src/cpp/drawing/shaders/Shaders.cpp src/cpp/drawing/shaders/Shaders.h
         src/cpp/drawing/shaders/DirectionalLightShader.cpp src/cpp/drawing/shaders/DirectionalLightShader.h
         src/cpp/drawing/shapes/triangles/Sphere.cpp src/cpp/drawing/shapes/triangles/Sphere.h
-        src/cpp/drawing/DrawerWithProfiler.cpp src/cpp/drawing/DrawerWithProfiler.h
         )
 add_library(alcube_drawing_lib STATIC ${ALCUBE_DRAWING_SOURCE_FILES})
 target_link_libraries(alcube_drawing_lib
