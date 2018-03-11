@@ -1,4 +1,4 @@
-#include "GPU.h"
+#include "GPUAccessor.h"
 
 namespace alcube::gpu {
   using namespace utils::opencl::kernelargs;
@@ -772,7 +772,7 @@ namespace alcube::gpu {
     });
   }
 
-  GPU::GPU(
+  GPUAccessor::GPUAccessor(
     utils::opencl::ResourcesProvider *resourcesProvider,
     unsigned int maxActorCount,
     unsigned int maxActorCountForBitonicSort,
@@ -881,7 +881,7 @@ namespace alcube::gpu {
     resourcesProvider->resources->memoryManager->allocate();
   }
 
-  utils::opencl::Memory* GPU::defineHostMemory(
+  utils::opencl::Memory* GPUAccessor::defineHostMemory(
     const std::string &name,
     size_t size,
     void *hostPtr,
@@ -890,7 +890,7 @@ namespace alcube::gpu {
     return resourcesProvider->resources->memoryManager->define(name, size, hostPtr, CL_MEM_READ_ONLY | CL_MEM_USE_HOST_PTR, allocationCount);
   }
 
-  utils::opencl::Memory* GPU::defineGPUMemory(
+  utils::opencl::Memory* GPUAccessor::defineGPUMemory(
     const std::string &name,
     size_t size,
     size_t allocationCount

@@ -17,13 +17,13 @@ $dtos
 
 $kernels
 
-  class GPU {
+  class GPUAccessor {
     public:
       Kernels kernels;
       Memories memories;
       Dtos dtos;
       utils::opencl::ResourcesProvider* resourcesProvider;
-      explicit GPU(
+      explicit GPUAccessor(
         utils::opencl::ResourcesProvider* resourcesProvider,
 $variables
       );

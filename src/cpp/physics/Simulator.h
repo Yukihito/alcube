@@ -15,7 +15,7 @@
 #include "Spring.h"
 #include "FluidParticle.h"
 #include "../utils/alcubemath.h"
-#include "../gpu/GPU.h"
+#include "../gpu/GPUAccessor.h"
 #include "../utils/opencl/ResourcesProvider.h"
 
 namespace alcube::physics {
@@ -30,7 +30,7 @@ namespace alcube::physics {
         unsigned int yGridCount,
         unsigned int zGridCount,
         float deltaTime,
-        gpu::GPU* gpu
+        gpu::GPUAccessor* gpu
       );
       void add(SoftBodyParticle* softBodyParticle);
       void add(Spring* spring);

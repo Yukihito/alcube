@@ -30,7 +30,7 @@ namespace alcube::physics::samples {
     );
     fileUtil = new utils::FileUtil();
     resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
-    gpu = new gpu::GPU(
+    gpuAccessor = new gpu::GPUAccessor(
       resourcesProvider,
       maxCellCount,
       utils::math::powerOf2(maxCellCount),
@@ -47,7 +47,7 @@ namespace alcube::physics::samples {
       yGridCount,
       zGridCount,
       deltaTime,
-      gpu
+      gpuAccessor
     );
     physicsSimulator->gravity = gravity;
 
@@ -61,13 +61,13 @@ namespace alcube::physics::samples {
 
   void ApplicationBase::afterSetup() {
     physicsSimulator->input();
-    gpu->memories.positions.setCount(physicsSimulator->actorCount);
+    gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
   }
 
   void ApplicationBase::onDraw() {
     profiler->start(profilers.updateDrawable);
-    gpu->memories.positions.setCount(physicsSimulator->actorCount);
-    gpu->memories.positions.read();
+    gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
+    gpuAccessor->memories.positions.read();
     profiler->stop(profilers.updateDrawable);
     drawer->draw();
   }
@@ -75,10 +75,10 @@ namespace alcube::physics::samples {
   void ApplicationBase::onUpdate() {
     profiler->start(profilers.update);
     physicsSimulator->update();
-    gpu->kernels.outputPositions(
+    gpuAccessor->kernels.outputPositions(
       physicsSimulator->actorCount,
-      gpu->memories.positions,
-      gpu->memories.physicalQuantities
+      gpuAccessor->memories.positions,
+      gpuAccessor->memories.physicalQuantities
     );
     clFinish(resourcesProvider->queue->queue);
 

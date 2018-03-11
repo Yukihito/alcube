@@ -11,7 +11,7 @@ namespace alcube::physics {
     unsigned int yGridCount,
     unsigned int zGridCount,
     float deltaTime,
-    gpu::GPU* gpu
+    gpu::GPUAccessor* gpu
   ) {
     kernels = gpu->kernels;
     memories = gpu->memories;

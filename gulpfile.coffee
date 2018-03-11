@@ -30,13 +30,13 @@ gulp.task 'generate-function-prototypes', ->
 gulp.task 'generate-gpu-interface-header', ->
   gulp.src [definition_file]
     .pipe CodeGenerator.generateGPUInterfaceHeader()
-    .pipe rename 'GPU.h'
+    .pipe rename 'GPUAccessor.h'
     .pipe gulp.dest 'src/cpp/gpu'
 
 gulp.task 'generate-gpu-interface-cpp', ->
   gulp.src [definition_file]
     .pipe CodeGenerator.generateGPUInterfaceCpp()
-    .pipe rename 'GPU.cpp'
+    .pipe rename 'GPUAccessor.cpp'
     .pipe gulp.dest 'src/cpp/gpu'
 
 gulp.task 'compile-kernel', ->

@@ -397,13 +397,13 @@ namespace alcube::gpu {
       void outputPositions(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
   };
 
-  class GPU {
+  class GPUAccessor {
     public:
       Kernels kernels;
       Memories memories;
       Dtos dtos;
       utils::opencl::ResourcesProvider* resourcesProvider;
-      explicit GPU(
+      explicit GPUAccessor(
         utils::opencl::ResourcesProvider* resourcesProvider,
         unsigned int maxActorCount,
         unsigned int maxActorCountForBitonicSort,

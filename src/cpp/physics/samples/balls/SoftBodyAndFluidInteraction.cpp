@@ -99,7 +99,7 @@ namespace alcube::physics::samples::balls {
       shaders,
       color,
       maxCellCount,
-      &gpu->memories.positions
+      &gpuAccessor->memories.positions
     );
     ((drawing::shapes::triangles::Sphere*)colorBalls->shape)->instanceCount = actorCount;
     drawer->add(colorBalls);

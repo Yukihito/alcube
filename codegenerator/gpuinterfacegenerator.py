@@ -32,7 +32,7 @@ def generate_cpp_header_file():
     function_prototypes = clcinspector.create_function_prototypes(aggregated_text)
     kernel_function_prototypes = list(filter(lambda f: f.is_kernel, function_prototypes))
 
-    template = TemplateProvider('cpp/gpu/GPU.h')
+    template = TemplateProvider('cpp/gpu/GPUAccessor.h')
 
     variables_text = ',\n'.join(map(lambda s: '        unsigned int {}'.format(s), definition.variables))
 
@@ -109,7 +109,7 @@ def generate_cpp_file():
     aggregated_text = create_aggregated_kernel_text(definition.kernels_directory_paths)
     function_prototypes = clcinspector.create_function_prototypes(aggregated_text)
     kernel_function_prototypes = list(filter(lambda f: f.is_kernel, function_prototypes))
-    template = TemplateProvider('cpp/gpu/GPU.cpp')
+    template = TemplateProvider('cpp/gpu/GPUAccessor.cpp')
     variables_text = ',\n'.join(map(lambda s: '    unsigned int {}'.format(s), definition.variables))
 
     dto_initialization_texts = []

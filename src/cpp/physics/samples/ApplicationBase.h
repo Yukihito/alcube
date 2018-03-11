@@ -32,7 +32,7 @@ namespace alcube::physics::samples {
       void onUpdate() override;
 
       void onClose() override;
-      gpu::GPU* gpu;
+      gpu::GPUAccessor* gpuAccessor;
       drawing::Drawer *drawer;
       drawing::Camera *camera;
       drawing::shaders::Shaders *shaders;

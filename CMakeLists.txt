@@ -26,7 +26,7 @@ add_library(alcube_utils_lib STATIC ${ALCUBE_UTILS_SOURCE_FILES})
 
 ### GPU Accessor
 set(ALCUBE_GPU_ACCESSOR_SOURCE_FILES
-        src/cpp/gpu/dtos.h src/cpp/gpu/GPU.cpp src/cpp/gpu/GPU.h
+        src/cpp/gpu/dtos.h src/cpp/gpu/GPUAccessor.cpp src/cpp/gpu/GPUAccessor.h
         )
 add_library(alcube_gpu_accessor_lib STATIC ${ALCUBE_GPU_ACCESSOR_SOURCE_FILES})
 

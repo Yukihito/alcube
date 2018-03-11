@@ -5,7 +5,7 @@
 #include "Drawable.h"
 #include "Drawable.h"
 #include "../utils/FileUtil.h"
-#include "../gpu/GPU.h"
+#include "../gpu/GPUAccessor.h"
 #include <vector>
 #include <unordered_map>
 #include <mutex>
