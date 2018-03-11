@@ -61,16 +61,12 @@ set(ALCUBE_PHYSICS_SOURCE_FILES
         src/cpp/physics/rigidbody/Sphere.cpp src/cpp/physics/rigidbody/Sphere.h
         src/cpp/physics/Simulator.cpp src/cpp/physics/Simulator.h
         src/cpp/physics/Spring.cpp src/cpp/physics/Spring.h
-        src/cpp/physics/samples/ApplicationBase.cpp src/cpp/physics/samples/ApplicationBase.h
         src/cpp/physics/FluidParticle.cpp src/cpp/physics/FluidParticle.h
-        src/cpp/physics/samples/balls/SoftBodyAndFluidInteraction.cpp src/cpp/physics/samples/balls/SoftBodyAndFluidInteraction.h
-        src/cpp/physics/samples/balls/ColorBalls.cpp src/cpp/physics/samples/balls/ColorBalls.h
         )
 add_library(alcube_physics_lib STATIC ${ALCUBE_PHYSICS_SOURCE_FILES})
 target_link_libraries(alcube_physics_lib
         alcube_utils_lib
         alcube_gpu_accessor_lib
-        alcube_drawing_lib # TODO: Remove
         )
 
 ### Samples
@@ -113,8 +109,8 @@ target_link_libraries(alcube_lib
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wno-deprecated-declarations -pthread -Wc++1z-extensions")
 
 ### Main executable
-add_executable(alcube src/cpp/main.cpp)
-target_link_libraries(alcube alcube_lib)
+# add_executable(alcube src/cpp/main.cpp)
+# target_link_libraries(alcube alcube_lib)
 
 ### Sample executable
 add_executable(alcube_samples src/cpp/samples/main.cpp)
