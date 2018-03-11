@@ -12,8 +12,6 @@
 #include "../Keyboard.h"
 #include <GLFW/glfw3.h>
 
-
-
 namespace alcube::utils::app {
   class OpenGLApplication : public Application {
     public:
