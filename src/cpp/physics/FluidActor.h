@@ -6,9 +6,9 @@
 #include <glm/gtx/quaternion.hpp>
 
 namespace alcube::physics {
-  class FluidParticle {
+  class FluidActor {
     public:
-      explicit FluidParticle();
+      explicit FluidActor();
       glm::vec3 position;
   };
 }

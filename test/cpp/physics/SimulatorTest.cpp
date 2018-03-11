@@ -12,7 +12,7 @@ namespace alcube::physics {
       Simulator *simulator;
       utils::opencl::Resources *resources;
       std::mutex mutex;
-      std::vector<alcube::physics::SoftBodyParticle *> cells;
+      std::vector<alcube::physics::SoftBodyActor *> cells;
       unsigned short maxCellCount = 16384; // 2^14
       unsigned int gridEdgeLength = 8;
       unsigned int xGridCount = 64;
@@ -38,7 +38,7 @@ namespace alcube::physics {
 
       virtual void TearDown() { // NOLINT
         resources->release();
-        for (SoftBodyParticle *cell: cells) {
+        for (SoftBodyActor *cell: cells) {
           delete cell;
         }
         cells.clear();
@@ -50,7 +50,7 @@ namespace alcube::physics {
         std::uniform_real_distribution<float> randReal(-50, 50);
 
         for (int i = 0; i < count; i++) {
-          auto cell = new SoftBodyParticle();
+          auto cell = new SoftBodyActor();
           cell->position = glm::vec3(
             randReal(mt),
             randReal(mt),
@@ -60,7 +60,7 @@ namespace alcube::physics {
         }
       }
 
-      void addCell(SoftBodyParticle* cell) {
+      void addCell(SoftBodyActor* cell) {
         simulator->add(cell);
         cells.push_back(cell);
       }
@@ -217,10 +217,10 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -241,10 +241,10 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -263,12 +263,12 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f + movingDistance + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -287,12 +287,12 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -315,12 +315,12 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(-1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f + movingDistance + smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -339,12 +339,12 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(-1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -365,13 +365,13 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.5f, 0.0f);
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f + smallDistance, 0.0f, 0.0f);
-    auto cell2 = new SoftBodyParticle();
+    auto cell2 = new SoftBodyActor();
     cell1->position = glm::vec3(0.0f, 2.0f + smallDistance, 0.0f);
 
     addCell(cell0);
@@ -400,12 +400,12 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -421,13 +421,13 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     cell0->elasticity = 0.5f;
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -443,13 +443,13 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.0f, 0.0f);
     cell0->elasticity = 0.0f;
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
 
     addCell(cell0);
@@ -466,7 +466,7 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
     glm::vec3 corner = -glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
-    auto cell = new SoftBodyParticle();
+    auto cell = new SoftBodyActor();
     cell->position = glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
     cell->linearMomentum = glm::vec3(-0.5f, -1.0f, -0.5f);
     addCell(cell);
@@ -487,7 +487,7 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
     glm::vec3 corner = -glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
-    auto cell = new SoftBodyParticle();
+    auto cell = new SoftBodyActor();
     cell->position = glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
     addCell(cell);
     simulateAll(deltaTime);
@@ -503,7 +503,7 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
     glm::vec3 corner = glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
-    auto cell = new SoftBodyParticle();
+    auto cell = new SoftBodyActor();
     cell->position = -glm::vec3(cell->radius, cell->radius, cell->radius) - smallMove + corner;
     cell->linearMomentum = glm::vec3(0.5f, 1.0f, 0.5f);
     addCell(cell);
@@ -525,7 +525,7 @@ namespace alcube::physics {
     float smallDistance = 0.001f;
     glm::vec3 corner = glm::vec3(xGridCount * gridEdgeLength, yGridCount * gridEdgeLength, zGridCount * gridEdgeLength) / 2.0f;
     glm::vec3 smallMove = glm::vec3(smallDistance, smallDistance, smallDistance);
-    auto cell = new SoftBodyParticle();
+    auto cell = new SoftBodyActor();
     cell->position = -glm::vec3(cell->radius, cell->radius, cell->radius) + smallMove + corner;
     addCell(cell);
     simulateAll(deltaTime);
@@ -540,12 +540,12 @@ namespace alcube::physics {
     float deltaTime = 1.0f / 30.0f;
     float smallDistance = 0.001f;
 
-    auto cell0 = new SoftBodyParticle();
+    auto cell0 = new SoftBodyActor();
     cell0->position = glm::vec3(0.0f, 0.0f, 0.0f);
     cell0->linearMomentum = glm::vec3(1.0f, 0.5f, 0.0f);
     float movingDistance = (cell0->linearMomentum.x / cell0->mass) * deltaTime;
 
-    auto cell1 = new SoftBodyParticle();
+    auto cell1 = new SoftBodyActor();
     cell1->position = glm::vec3(2.0f + movingDistance - smallDistance, 0.0f, 0.0f);
     cell1->linearMomentum = glm::vec3(-1.0f, -0.5f, 0.0f);
 

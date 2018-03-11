@@ -2,7 +2,7 @@
 #define ALCUBE_COLORBALL_H
 
 #include "../../../drawing/Material.h"
-#include "../../SoftBodyParticle.h"
+#include "../../SoftBodyActor.h"
 #include "../../../drawing/shapes/Shapes.h"
 #include "../../../drawing/shaders/Shaders.h"
 #include "../../../drawing/Drawable.h"

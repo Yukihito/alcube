@@ -2,7 +2,7 @@
 #define ALCUBE_BALLSSAMPLE_H
 
 #include "../../../drawing/Drawable.h"
-#include "../../SoftBodyParticle.h"
+#include "../../SoftBodyActor.h"
 #include "../../Simulator.h"
 #include "../../../drawing/Drawer.h"
 #include "../../../drawing/shapes/Shapes.h"

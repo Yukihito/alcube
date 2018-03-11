@@ -4,9 +4,9 @@
 #include "rigidbody/Sphere.h"
 
 namespace alcube::physics {
-  class SoftBodyParticle : public rigidbody::Sphere {
+  class SoftBodyActor : public rigidbody::Sphere {
     public:
-      explicit SoftBodyParticle();
+      explicit SoftBodyActor();
       unsigned short index;
   };
 }

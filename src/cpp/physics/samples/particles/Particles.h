@@ -5,7 +5,7 @@
 #include "../../../drawing/Drawable.h"
 #include "../../../drawing/shapes/Shapes.h"
 #include "../../../drawing/shaders/Shaders.h"
-#include "../../SoftBodyParticle.h"
+#include "../../SoftBodyActor.h"
 #include "../../../drawing/Drawer.h"
 #include "../../../utils/opencl/Resources.h"
 #include "../../../utils/Profiler.h"

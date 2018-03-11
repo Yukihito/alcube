@@ -1,7 +1,7 @@
-#include "FluidParticle.h"
+#include "FluidActor.h"
 
 namespace alcube::physics {
-  FluidParticle::FluidParticle() {
+  FluidActor::FluidActor() {
     this->position = glm::vec3();
   }
 }

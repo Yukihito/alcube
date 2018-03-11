@@ -1,12 +1,12 @@
 #ifndef ALCUBE_SPRING_H
 #define ALCUBE_SPRING_H
 
-#include "SoftBodyParticle.h"
+#include "SoftBodyActor.h"
 
 namespace alcube::physics {
   class SpringNode {
     public:
-      SoftBodyParticle* particle;
+      SoftBodyActor* particle;
       glm::vec3 position;
   };
 

@@ -52,12 +52,12 @@ target_link_libraries(alcube_drawing_lib
 
 ### Physics
 set(ALCUBE_PHYSICS_SOURCE_FILES
-        src/cpp/physics/SoftBodyParticle.cpp src/cpp/physics/SoftBodyParticle.h
+        src/cpp/physics/SoftBodyActor.cpp src/cpp/physics/SoftBodyActor.h
         src/cpp/physics/rigidbody/RigidBody.cpp src/cpp/physics/rigidbody/RigidBody.h
         src/cpp/physics/rigidbody/Sphere.cpp src/cpp/physics/rigidbody/Sphere.h
         src/cpp/physics/Simulator.cpp src/cpp/physics/Simulator.h
         src/cpp/physics/Spring.cpp src/cpp/physics/Spring.h
-        src/cpp/physics/FluidParticle.cpp src/cpp/physics/FluidParticle.h
+        src/cpp/physics/FluidActor.cpp src/cpp/physics/FluidActor.h
         )
 add_library(alcube_physics_lib STATIC ${ALCUBE_PHYSICS_SOURCE_FILES})
 target_link_libraries(alcube_physics_lib

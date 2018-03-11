@@ -11,9 +11,9 @@
 #include "../utils/opencl/ProgramFactory.h"
 #include "../utils/opencl/Resources.h"
 #include "../utils/opencl/conversions.h"
-#include "SoftBodyParticle.h"
+#include "SoftBodyActor.h"
 #include "Spring.h"
-#include "FluidParticle.h"
+#include "FluidActor.h"
 #include "../utils/alcubemath.h"
 #include "../gpu/GPUAccessor.h"
 #include "../utils/opencl/ResourcesProvider.h"
@@ -32,10 +32,10 @@ namespace alcube::physics {
         float deltaTime,
         gpu::GPUAccessor* gpu
       );
-      void add(SoftBodyParticle* softBodyParticle);
+      void add(SoftBodyActor* actor);
       void add(Spring* spring);
-      void add(FluidParticle* fluidParticle);
-      SoftBodyParticle* getSoftBodyParticle(unsigned long i);
+      void add(FluidActor* actor);
+      SoftBodyActor* getSoftBodyActor(unsigned long i);
       void input();
       void update();
       void output();
@@ -45,16 +45,16 @@ namespace alcube::physics {
     private:
       gpu::Kernels kernels;
       gpu::Memories memories;
-      std::vector<SoftBodyParticle*> softBodyParticles;
-      std::vector<FluidParticle*> fluidParticles;
+      std::vector<SoftBodyActor*> softBodyActors;
+      std::vector<FluidActor*> fluidActors;
       std::vector<Spring*> springs;
 
       unsigned int allGridCount;
-      unsigned int softBodyParticleCount;
+      unsigned int softBodyActorCount;
       unsigned int maxActorCount;
       unsigned int actorCountForBitonicSort;
       unsigned int springCount;
-      unsigned int fluidParticleCount;
+      unsigned int fluidActorCount;
       unsigned int motionIterationCount;
       unsigned int constraintResolvingIterationCount;
       float deltaTime;
