@@ -86,9 +86,11 @@ find_package(OpenGL REQUIRED)
 find_package(OpenCL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
+set(V8_INCLUDE_DIR ext/v8/v8/include)
+link_directories(ext/v8/v8/out/native/lib.target)
 
-include_directories(${OpenGL_gl_INCLUDE_DIR} ${OpenCL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS})
-set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${GLEW_LIBRARIES} glfw)
+include_directories(${OpenGL_gl_INCLUDE_DIR} ${OpenCL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${V8_INCLUDE_DIR})
+set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${GLEW_LIBRARIES} glfw v8 icuuc icui18n v8_libbase v8_libplatform)
 
 ### Aggregated libs
 add_library(alcube_lib STATIC)
@@ -117,6 +119,10 @@ target_link_libraries(alcube_samples
 
 ### Kernel compiler executable
 target_link_libraries(kernel_compiler alcube_lib)
+
+### Simple v8 sample
+add_executable(v8_sample src/cpp/samples/v8/main.cpp)
+target_link_libraries(v8_sample alcube_lib)
 
 ### Tests executable
 # gtest

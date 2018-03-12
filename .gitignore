@@ -6,3 +6,4 @@ node_modules/*
 venv/*
 dist/*
 codegenerator/__pycache__/*
+ext/*
