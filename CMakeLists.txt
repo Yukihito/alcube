@@ -87,10 +87,57 @@ find_package(OpenCL REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 REQUIRED)
 set(V8_INCLUDE_DIR ext/v8/v8/include)
-link_directories(ext/v8/v8/out/native/lib.target)
+link_directories(ext/v8/v8/out.gn/x64.release/obj)
+link_directories(ext/v8/v8/out.gn/x64.release/obj/third_party)
+link_directories(ext/v8/v8/out.gn/x64.release/obj/third_party/icu)
+link_directories(ext/v8/v8/out.gn/x64.release/obj/src/inspector)
 
 include_directories(${OpenGL_gl_INCLUDE_DIR} ${OpenCL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${V8_INCLUDE_DIR})
-set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${GLEW_LIBRARIES} glfw v8 icuuc icui18n v8_libbase v8_libplatform)
+set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${GLEW_LIBRARIES} glfw
+        _wasm_fuzzer_common
+        fuzzer_support
+        json_fuzzer
+        multi_return_fuzzer
+        parser_fuzzer
+        regexp_builtins_fuzzer
+        regexp_fuzzer
+        v8_libplatform
+        v8_base
+        v8_external_snapshot
+        v8_init
+        v8_initializers
+        v8_libbase
+        v8_libsampler
+        v8_nosnapshot
+        v8_snapshot
+        wasm_async_fuzzer
+        wasm_code_fuzzer
+        wasm_compile_fuzzer
+        wasm_data_section_fuzzer
+        wasm_function_sigs_section_fuzzer
+        wasm_fuzzer
+        wasm_globals_section_fuzzer
+        wasm_imports_section_fuzzer
+        wasm_memory_section_fuzzer
+        wasm_module_runner
+        wasm_names_section_fuzzer
+        wasm_types_section_fuzzer
+
+        # v8_base
+        # v8_init
+        # v8_initializers
+        # v8_nosnapshot
+        # v8_snapshot
+        # v8_libbase
+        # v8_external_snapshot
+        # v8_libplatform
+        # v8_libsampler
+        icui18n
+        icuuc
+        inspector
+        pthread
+        #icuuc icui18n v8_libbase v8_libplatform
+        )
 
 ### Aggregated libs
 add_library(alcube_lib STATIC)
@@ -104,7 +151,7 @@ target_link_libraries(alcube_lib
         )
 
 #### Executables
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wno-deprecated-declarations -pthread -Wc++1z-extensions")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wno-deprecated-declarations -Wc++1z-extensions -stdlib=libc++")
 
 ### Main executable
 # add_executable(alcube src/cpp/main.cpp)

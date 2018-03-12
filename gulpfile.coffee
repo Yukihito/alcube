@@ -5,6 +5,7 @@ del = require 'del'
 through = require 'through2'
 concat = require 'gulp-concat'
 runSequence = require 'run-sequence'
+coffee = require 'gulp-coffee'
 
 definition_file = 'gpu-interface.yml'
 generated_clc_dest = 'src/kernels/generated-code'
@@ -62,6 +63,12 @@ gulp.task 'concat-clc', ->
 gulp.task 'clean', (callback) ->
   del ['dist'], callback
 
+gulp.task 'compile-coffee', () ->
+  gulp.src 'src/coffee/*.coffee'
+    .pipe coffee
+      bare: true
+    .pipe gulp.dest 'src/js'
+
 gulp.task 'build', -> runSequence(
   'generate-dtos-clc',
   'generate-function-prototypes',
@@ -74,5 +81,8 @@ gulp.task 'build', -> runSequence(
 
 gulp.task 'watch', ->
   gulp.watch ['gpu-interface.yml', 'src/kernels/physics/*.cl', 'src/kernels/drawing/*.cl'], ['build']
+
+gulp.task 'watch-coffee', ->
+  gulp.watch ['src/coffee/*.coffee'], ['compile-coffee']
 
 gulp.task 'default', ['build']
