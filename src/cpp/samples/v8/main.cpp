@@ -7,6 +7,29 @@ v8::Local<v8::Value> v8str(v8::Isolate* isolate, const char* str) {
   return v8::Local<v8::Value>::Cast(v8::String::NewFromUtf8(isolate, str, v8::NewStringType::kNormal).ToLocalChecked());
 }
 
+
+void add(const v8::FunctionCallbackInfo<v8::Value>& args) {
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope scope(isolate);
+	if (args.Length() < 2) {
+		args.GetReturnValue().Set(v8::Undefined(isolate));
+	}
+
+  int32_t a = args[0]->Int32Value();
+  int32_t b = args[1]->Int32Value();
+	int32_t sum = a + b;
+
+	args.GetReturnValue().Set(v8::Int32::New(isolate, sum));
+}
+
+void newObj(const v8::FunctionCallbackInfo<v8::Value>& args) {
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope scope(isolate);
+  v8::Local<v8::Object> obj = v8::Object::New(isolate);
+  obj->Set(v8str(isolate, "hoge"), v8::Number::New(isolate, 5));
+  args.GetReturnValue().Set(obj);
+}
+
 int main(int argc, char * argv[]) {
   auto fileUtil = new alcube::utils::FileUtil();
   // Initialize V8.
@@ -25,8 +48,11 @@ int main(int argc, char * argv[]) {
     v8::Isolate::Scope isolate_scope(isolate);
     // Create a stack-allocated handle scope.
     v8::HandleScope handle_scope(isolate);
+    v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
+    global->Set(v8::String::NewFromUtf8(isolate, "add"), v8::FunctionTemplate::New(isolate, add));
+    global->Set(v8::String::NewFromUtf8(isolate, "newObj"), v8::FunctionTemplate::New(isolate, newObj));
     // Create a new context.
-    v8::Local<v8::Context> context = v8::Context::New(isolate);
+    v8::Local<v8::Context> context = v8::Context::New(isolate, nullptr, global);
     // Enter the context for compiling and running the hello world script.
     v8::Context::Scope context_scope(context);
     // Create a string containing the JavaScript source code.

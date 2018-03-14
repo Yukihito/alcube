@@ -25,6 +25,6 @@ vec3 = function(x, y, z) {
 actor = new Actor(1, [0, 1.2, 3.14], new Material([1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 3.0]));
 
 // actor
-vec = vec3(3.14, 2.0, 3.0);
+vec = vec3(newObj()['hoge'], 2.0, 3.0);
 
 vec;
