@@ -1,7 +1,5 @@
 
 typedef struct __attribute__ ((packed)) ActorStruct {
-  float radius;
-  float mass;
   ushort type;
   char _padding0[2];
   ushort subPhysicalQuantityIndex;
@@ -56,6 +54,8 @@ typedef struct __attribute__ ((packed)) IntersectionStruct {
 } Intersection;
 
 typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
+  float radius;
+  float mass;
   float3 position;
   float4 rotation;
   float3 linearMomentum;
@@ -87,6 +87,8 @@ typedef struct __attribute__ ((packed)) SpringStateStruct {
 
 typedef struct __attribute__ ((packed)) ActorStateStruct {
   Actor constants;
+  float radius;
+  float mass;
   float3 linearVelocity;
   float3 angularVelocity;
   float momentOfInertia;

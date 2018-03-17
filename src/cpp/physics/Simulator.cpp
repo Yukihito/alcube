@@ -85,8 +85,8 @@ namespace alcube::physics {
       SoftBodyActor* softBodyActor = softBodyActors[i];
       auto actor = memories.actors.at(i);
       auto hostPhysicalQuantity = memories.hostPhysicalQuantities.at(i);
-      actor->radius = softBodyActor->radius;
-      actor->mass = softBodyActor->mass;
+      hostPhysicalQuantity->radius = softBodyActor->radius;
+      hostPhysicalQuantity->mass = softBodyActor->mass;
       actor->type = 0;
       actor->subPhysicalQuantityIndex = (unsigned short)i;
       hostPhysicalQuantity->linearMomentum = toCl(softBodyActor->linearMomentum);
@@ -116,8 +116,8 @@ namespace alcube::physics {
       FluidActor* fluidActor = fluidActors[i];
       auto actor = memories.actors.at(actorIndex);
       auto hostPhysicalQuantity = memories.hostPhysicalQuantities.at(actorIndex);
-      actor->radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
-      actor->mass = memories.fluidSettings.at(0)->particleMass;
+      hostPhysicalQuantity->radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
+      hostPhysicalQuantity->mass = memories.fluidSettings.at(0)->particleMass;
       actor->type = 3;
       actor->subPhysicalQuantityIndex = i;
 

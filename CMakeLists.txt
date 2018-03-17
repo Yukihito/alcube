@@ -58,11 +58,22 @@ set(ALCUBE_PHYSICS_SOURCE_FILES
         src/cpp/physics/Simulator.cpp src/cpp/physics/Simulator.h
         src/cpp/physics/Spring.cpp src/cpp/physics/Spring.h
         src/cpp/physics/FluidActor.cpp src/cpp/physics/FluidActor.h
-        )
+        src/cpp/physics/Actor.cpp src/cpp/physics/Actor.h)
 add_library(alcube_physics_lib STATIC ${ALCUBE_PHYSICS_SOURCE_FILES})
 target_link_libraries(alcube_physics_lib
         alcube_utils_lib
         alcube_gpu_accessor_lib
+        )
+
+### Scripting
+set(ALCUBE_SCRIPTING_SOURCE_FILES
+        src/cpp/scripting/Evaluator.cpp src/cpp/scripting/Evaluator.h
+        )
+add_library(alcube_scripting_lib STATIC ${ALCUBE_SCRIPTING_SOURCE_FILES})
+target_link_libraries(alcube_scripting_lib
+        alcube_utils_lib
+        alcube_drawing_lib
+        alcube_physics_lib
         )
 
 ### Samples
@@ -122,16 +133,6 @@ set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${G
         wasm_module_runner
         wasm_names_section_fuzzer
         wasm_types_section_fuzzer
-
-        # v8_base
-        # v8_init
-        # v8_initializers
-        # v8_nosnapshot
-        # v8_snapshot
-        # v8_libbase
-        # v8_external_snapshot
-        # v8_libplatform
-        # v8_libsampler
         icui18n
         icuuc
         inspector

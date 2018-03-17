@@ -7,8 +7,6 @@ namespace alcube::gpu::dtos {
 #pragma pack(push, 1)
   class Actor {
     public:
-      float radius;
-      float mass;
       unsigned short type;
       char _padding0[2];
       unsigned short subPhysicalQuantityIndex;
@@ -81,6 +79,8 @@ namespace alcube::gpu::dtos {
 #pragma pack(push, 1)
   class PhysicalQuantity {
     public:
+      float radius;
+      float mass;
       cl_float3 position;
       cl_float4 rotation;
       cl_float3 linearMomentum;
@@ -124,6 +124,8 @@ namespace alcube::gpu::dtos {
   class ActorState {
     public:
       Actor constants;
+      float radius;
+      float mass;
       cl_float3 linearVelocity;
       cl_float3 angularVelocity;
       float momentOfInertia;

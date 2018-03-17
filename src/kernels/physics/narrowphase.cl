@@ -35,8 +35,8 @@ __kernel void collectIntersections(
   __global Actor* actor = &(actorStates[actorIndex].constants);
   float3 position = physicalQuantity->position;
   float* positionPtr = (float*)&position;
-  float radius = actor->radius;
-  float mass = actor->mass;
+  float radius = actorState->radius;
+  float mass = actorState->mass;
   float smallValue = 0.0001f;
   uchar maxIntersection = 32;
   bool isFullOfIntersection = false;
@@ -58,9 +58,10 @@ __kernel void collectIntersections(
 	  if (otherActorIndex == actorIndex) {
 	    continue;
 	  }
-	  __global Actor* otherActor = &(actorStates[otherActorIndex].constants);
+	  __global ActorState* otherActorState = &actorStates[otherActorIndex];
+	  __global Actor* otherActor = &(otherActorState->constants);
 	  float3 w = physicalQuantities[otherActorIndex].position - position;
-	  float r = radius + otherActor->radius;
+	  float r = radius + otherActorState->radius;
 	  float rr = r * r;
 	  float ww = dot(w, w);
 	  if (ww > 0.0f && ww <= rr + smallValue) {

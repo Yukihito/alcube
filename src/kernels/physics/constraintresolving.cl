@@ -21,11 +21,10 @@ __kernel void updateByPenaltyImpulse(
   for (uchar i = 0; i < count; i++) {
     accumulatePenaltyImpulse(&intersections[i], deltaTime, &impulse);
   }
-  actorState->linearVelocity += impulse / actorState->constants.mass;
+  actorState->linearVelocity += impulse / actorState->mass;
 }
 
 void accumulateFrictionalImpulse(
-  __global Actor* actor,
   __global ActorState* actorState,
   __global ActorState* actorStates,
   __global Intersection* intersection,
@@ -41,9 +40,9 @@ void accumulateFrictionalImpulse(
   float3 otherLinearVelocity = intersectionType == 0 ? actorStates[otherIndex].linearVelocity : (float3)(0.0f);
   float3 relativeVelocity = otherLinearVelocity - actorState->linearVelocity;
   float3 relativeVelocityOnSurface = relativeVelocity - intersectionNormal * dot(relativeVelocity, intersectionNormal);
-  float3 workingPoint = actor->radius * intersectionNormal;
+  float3 workingPoint = actorState->radius * intersectionNormal;
   float3 workingPointVelocity = cross(actorState->angularVelocity, workingPoint);
-  float3 otherWorkingPointVelocity = intersectionType == 0 ? cross(actorStates[otherIndex].angularVelocity, -actorStates[otherIndex].constants.radius * intersectionNormal) : (float3)(0.0f);
+  float3 otherWorkingPointVelocity = intersectionType == 0 ? cross(actorStates[otherIndex].angularVelocity, -actorStates[otherIndex].radius * intersectionNormal) : (float3)(0.0f);
   float3 relativeWorkingPointVelocity = otherWorkingPointVelocity - workingPointVelocity;
   float3 frictionalImpulse = (relativeVelocityOnSurface + relativeWorkingPointVelocity) / t;
   *linearMomentumAcc += frictionalImpulse;
@@ -59,7 +58,6 @@ __kernel void updateByFrictionalImpulse(
   if (count == 0) {
     return;
   }
-  __global Actor* actor = &actorState->constants;
   __global Intersection* intersections = actorState->intersections;
   float3 impulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
@@ -67,9 +65,9 @@ __kernel void updateByFrictionalImpulse(
     if (intersections[i].type == 3) {
       continue;
     }
-    accumulateFrictionalImpulse(actor, actorState, actorStates, &intersections[i], &impulse, &angularImpulse);
+    accumulateFrictionalImpulse(actorState, actorStates, &intersections[i], &impulse, &angularImpulse);
   }
-  actorState->linearVelocity += impulse / actor->mass;
+  actorState->linearVelocity += impulse / actorState->mass;
   actorState->angularVelocity += angularImpulse / actorState->momentOfInertia;
 }
 
@@ -93,7 +91,7 @@ __kernel void collectCollisions(
     }
   }
   actorState->collisionCount = collisionCount;
-  actorState->massForCollision = actorState->constants.mass / collisionCount;
+  actorState->massForCollision = actorState->mass / collisionCount;
 }
 
 void accumulateConstraintImpulse(
@@ -138,5 +136,5 @@ __kernel void updateByConstraintImpulse(
     }
     accumulateConstraintImpulse(actor, actorState, actorStates, &intersections[actorState->collisionIndices[i]], softBodyStates, &impulse);
   }
-  actorState->linearVelocity = impulse / actor->mass;
+  actorState->linearVelocity = impulse / actorState->mass;
 }

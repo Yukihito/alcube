@@ -24,6 +24,8 @@ __kernel void inputActors(
   size_t i = get_global_id(0);
   physicalQuantities[i] = hostPhysicalQuantities[i];
   actorStates[i].constants = actors[i];
+  actorStates[i].radius = physicalQuantities[i].radius;
+  actorStates[i].mass = physicalQuantities[i].mass;
 }
 
 __kernel void inputSoftBodyStates(

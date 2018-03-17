@@ -1,7 +1,5 @@
 
 typedef struct __attribute__ ((packed)) ActorStruct {
-  float radius;
-  float mass;
   ushort type;
   char _padding0[2];
   ushort subPhysicalQuantityIndex;
@@ -56,6 +54,8 @@ typedef struct __attribute__ ((packed)) IntersectionStruct {
 } Intersection;
 
 typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
+  float radius;
+  float mass;
   float3 position;
   float4 rotation;
   float3 linearMomentum;
@@ -87,6 +87,8 @@ typedef struct __attribute__ ((packed)) SpringStateStruct {
 
 typedef struct __attribute__ ((packed)) ActorStateStruct {
   Actor constants;
+  float radius;
+  float mass;
   float3 linearVelocity;
   float3 angularVelocity;
   float momentOfInertia;
@@ -118,7 +120,7 @@ float4 createQuatFromDisplacement(float3 angularDisplacement);
 
 void accumulatePenaltyImpulse(__global Intersection* intersection, const float deltaTime, float3* acc);
 
-void accumulateFrictionalImpulse(__global Actor* actor, __global ActorState* actorState, __global ActorState* actorStates, __global Intersection* intersection, float3* linearMomentumAcc, float3* angularMomentumAcc);
+void accumulateFrictionalImpulse(__global ActorState* actorState, __global ActorState* actorStates, __global Intersection* intersection, float3* linearMomentumAcc, float3* angularMomentumAcc);
 
 void accumulateConstraintImpulse(__global Actor* actor, __global ActorState* actorState, __global ActorState* actorStates, __global Intersection* intersection, __global SoftBodyState* softBodyStates, float3* acc);
 
@@ -174,6 +176,8 @@ __kernel void inputActors(
   size_t i = get_global_id(0);
   physicalQuantities[i] = hostPhysicalQuantities[i];
   actorStates[i].constants = actors[i];
+  actorStates[i].radius = physicalQuantities[i].radius;
+  actorStates[i].mass = physicalQuantities[i].mass;
 }
 
 __kernel void inputSoftBodyStates(
@@ -311,8 +315,8 @@ __kernel void collectIntersections(
   __global Actor* actor = &(actorStates[actorIndex].constants);
   float3 position = physicalQuantity->position;
   float* positionPtr = (float*)&position;
-  float radius = actor->radius;
-  float mass = actor->mass;
+  float radius = actorState->radius;
+  float mass = actorState->mass;
   float smallValue = 0.0001f;
   uchar maxIntersection = 32;
   bool isFullOfIntersection = false;
@@ -334,9 +338,10 @@ __kernel void collectIntersections(
 	  if (otherActorIndex == actorIndex) {
 	    continue;
 	  }
-	  __global Actor* otherActor = &(actorStates[otherActorIndex].constants);
+	  __global ActorState* otherActorState = &actorStates[otherActorIndex];
+	  __global Actor* otherActor = &(otherActorState->constants);
 	  float3 w = physicalQuantities[otherActorIndex].position - position;
-	  float r = radius + otherActor->radius;
+	  float r = radius + otherActorState->radius;
 	  float rr = r * r;
 	  float ww = dot(w, w);
 	  if (ww > 0.0f && ww <= rr + smallValue) {
@@ -420,11 +425,10 @@ __kernel void updateByPenaltyImpulse(
   for (uchar i = 0; i < count; i++) {
     accumulatePenaltyImpulse(&intersections[i], deltaTime, &impulse);
   }
-  actorState->linearVelocity += impulse / actorState->constants.mass;
+  actorState->linearVelocity += impulse / actorState->mass;
 }
 
 void accumulateFrictionalImpulse(
-  __global Actor* actor,
   __global ActorState* actorState,
   __global ActorState* actorStates,
   __global Intersection* intersection,
@@ -440,9 +444,9 @@ void accumulateFrictionalImpulse(
   float3 otherLinearVelocity = intersectionType == 0 ? actorStates[otherIndex].linearVelocity : (float3)(0.0f);
   float3 relativeVelocity = otherLinearVelocity - actorState->linearVelocity;
   float3 relativeVelocityOnSurface = relativeVelocity - intersectionNormal * dot(relativeVelocity, intersectionNormal);
-  float3 workingPoint = actor->radius * intersectionNormal;
+  float3 workingPoint = actorState->radius * intersectionNormal;
   float3 workingPointVelocity = cross(actorState->angularVelocity, workingPoint);
-  float3 otherWorkingPointVelocity = intersectionType == 0 ? cross(actorStates[otherIndex].angularVelocity, -actorStates[otherIndex].constants.radius * intersectionNormal) : (float3)(0.0f);
+  float3 otherWorkingPointVelocity = intersectionType == 0 ? cross(actorStates[otherIndex].angularVelocity, -actorStates[otherIndex].radius * intersectionNormal) : (float3)(0.0f);
   float3 relativeWorkingPointVelocity = otherWorkingPointVelocity - workingPointVelocity;
   float3 frictionalImpulse = (relativeVelocityOnSurface + relativeWorkingPointVelocity) / t;
   *linearMomentumAcc += frictionalImpulse;
@@ -458,7 +462,6 @@ __kernel void updateByFrictionalImpulse(
   if (count == 0) {
     return;
   }
-  __global Actor* actor = &actorState->constants;
   __global Intersection* intersections = actorState->intersections;
   float3 impulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
@@ -466,9 +469,9 @@ __kernel void updateByFrictionalImpulse(
     if (intersections[i].type == 3) {
       continue;
     }
-    accumulateFrictionalImpulse(actor, actorState, actorStates, &intersections[i], &impulse, &angularImpulse);
+    accumulateFrictionalImpulse(actorState, actorStates, &intersections[i], &impulse, &angularImpulse);
   }
-  actorState->linearVelocity += impulse / actor->mass;
+  actorState->linearVelocity += impulse / actorState->mass;
   actorState->angularVelocity += angularImpulse / actorState->momentOfInertia;
 }
 
@@ -492,7 +495,7 @@ __kernel void collectCollisions(
     }
   }
   actorState->collisionCount = collisionCount;
-  actorState->massForCollision = actorState->constants.mass / collisionCount;
+  actorState->massForCollision = actorState->mass / collisionCount;
 }
 
 void accumulateConstraintImpulse(
@@ -537,7 +540,7 @@ __kernel void updateByConstraintImpulse(
     }
     accumulateConstraintImpulse(actor, actorState, actorStates, &intersections[actorState->collisionIndices[i]], softBodyStates, &impulse);
   }
-  actorState->linearVelocity = impulse / actor->mass;
+  actorState->linearVelocity = impulse / actorState->mass;
 }
 
 __kernel void inputFluid(
@@ -637,10 +640,10 @@ __kernel void postProcessing(
   const float deltaTime
 ) {
   size_t actorIndex = get_global_id(0);
-  float3 maxLinearMomentum = (float3)((2.0f * (1.0f / deltaTime)) * actorStates[actorIndex].constants.mass);
+  float3 maxLinearMomentum = (float3)((2.0f * (1.0f / deltaTime)) * actorStates[actorIndex].mass);
   __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
   physicalQuantity->angularMomentum = actorStates[actorIndex].angularVelocity * actorStates[actorIndex].momentOfInertia * 0.999f;
-  physicalQuantity->linearMomentum = clamp(actorStates[actorIndex].linearVelocity * actorStates[actorIndex].constants.mass * 0.999f, -maxLinearMomentum, maxLinearMomentum);
+  physicalQuantity->linearMomentum = clamp(actorStates[actorIndex].linearVelocity * actorStates[actorIndex].mass * 0.999f, -maxLinearMomentum, maxLinearMomentum);
 
   if (length(physicalQuantity->linearMomentum) < 0.01f) {
     physicalQuantity->linearMomentum = (float3)(0.0f);
@@ -698,7 +701,7 @@ __kernel void updateBySpringImpulse(
     angularImpulse += springStates[softBodyState->springIndices[i]].angularImpulses[softBodyState->springNodeIndices[i]];;
   }
 
-  actorState->linearVelocity += linearImpulse / actorState->constants.mass;
+  actorState->linearVelocity += linearImpulse / actorState->mass;
   actorState->angularVelocity += angularImpulse / actorState->momentOfInertia;
   physicalQuantities[actorIndex].position += actorState->linearVelocity * deltaTime;
   physicalQuantities[actorIndex].rotation = mulQuat(createQuatFromDisplacement(actorState->angularVelocity * deltaTime), physicalQuantities[actorIndex].rotation);

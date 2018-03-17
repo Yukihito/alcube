@@ -41,7 +41,7 @@ __kernel void updateBySpringImpulse(
     angularImpulse += springStates[softBodyState->springIndices[i]].angularImpulses[softBodyState->springNodeIndices[i]];;
   }
 
-  actorState->linearVelocity += linearImpulse / actorState->constants.mass;
+  actorState->linearVelocity += linearImpulse / actorState->mass;
   actorState->angularVelocity += angularImpulse / actorState->momentOfInertia;
   physicalQuantities[actorIndex].position += actorState->linearVelocity * deltaTime;
   physicalQuantities[actorIndex].rotation = mulQuat(createQuatFromDisplacement(actorState->angularVelocity * deltaTime), physicalQuantities[actorIndex].rotation);
