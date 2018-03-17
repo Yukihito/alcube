@@ -84,6 +84,6 @@ __kernel void moveFluid(
   physicalQuantity->position += constants->deltaTime * fluidState->velocity;
   float3 corner = grid->origin + (float3)(0.0001f);
   physicalQuantity->position = clamp(physicalQuantity->position, corner, -corner);
-  physicalQuantity->linearMomentum = fluidState->velocity * constants->fluidSettings.particleMass;
+  physicalQuantity->linearMomentum = fluidState->velocity * /*constants->fluidSettings.particleMass*/fluidState->density;
   physicalQuantity->angularMomentum = (float3)(0.0f);
 }
