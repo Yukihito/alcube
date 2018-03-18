@@ -12,7 +12,7 @@ __kernel void collectCollisions(
   __global Intersection* intersections = actorState->intersections;
   uchar collisionCount = 0;
   for (uchar i = 0; i < count; i++) {
-    float3 relativeSpeed = intersections[i].type == ACTOR_TYPE_RIGID_BODY || intersections[i].type == ACTOR_TYPE_FLUID ? actorStates[intersections[i].otherIndex].linearVelocity - actorState->linearVelocity : - actorState->linearVelocity;
+    float3 relativeSpeed = intersections[i].type == ACTOR_TYPE_SOFT_BODY || intersections[i].type == ACTOR_TYPE_FLUID ? actorStates[intersections[i].otherIndex].linearVelocity - actorState->linearVelocity : - actorState->linearVelocity;
     intersections[i].speed = dot(intersections[i].normal, relativeSpeed);
     if (intersections[i].speed < 0.0f) {
       actorState->collisionIndices[collisionCount] = i;
@@ -37,8 +37,8 @@ void accumulateConstraintImpulse(
   unsigned int intersectionType = intersection->type;
   ushort otherIndex = intersection->otherIndex;
   float mass = actorState->massForCollision;
-  float elasticity = intersectionType == ACTOR_TYPE_RIGID_BODY ? softBodys[actor->subPhysicalQuantityIndex].elasticity * softBodys[actorStates[otherIndex].constants.subPhysicalQuantityIndex].elasticity : softBodys[actor->subPhysicalQuantityIndex].elasticity;
-  float massRatio = intersectionType == ACTOR_TYPE_RIGID_BODY || intersectionType == ACTOR_TYPE_FLUID ? mass / actorStates[otherIndex].massForCollision : 0.0f;
+  float elasticity = intersectionType == ACTOR_TYPE_SOFT_BODY ? softBodys[actor->subPhysicalQuantityIndex].elasticity * softBodys[actorStates[otherIndex].constants.subPhysicalQuantityIndex].elasticity : softBodys[actor->subPhysicalQuantityIndex].elasticity;
+  float massRatio = intersectionType == ACTOR_TYPE_SOFT_BODY || intersectionType == ACTOR_TYPE_FLUID ? mass / actorStates[otherIndex].massForCollision : 0.0f;
   float3 intersectionNormal = intersection->normal;
   float speedOnIntersectionNormal = dot(actorState->linearVelocity, intersectionNormal);
   float affectedSpeed = (intersection->speed * (1.0f + elasticity) / (1.0f + massRatio)) + speedOnIntersectionNormal;

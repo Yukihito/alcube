@@ -123,7 +123,7 @@ void accumulateFrictionalImpulse(__global ActorState* actorState, __global Actor
 
 void accumulatePenaltyImpulse(__global Intersection* intersection, const float deltaTime, float penaltyFactor, float3* acc);
 
-#define ACTOR_TYPE_RIGID_BODY      0
+#define ACTOR_TYPE_SOFT_BODY       0
 #define ACTOR_TYPE_FACE            1
 #define ACTOR_TYPE_SPHERICAL_SHELL 2
 #define ACTOR_TYPE_FLUID           3
@@ -516,7 +516,7 @@ __kernel void collectCollisions(
   __global Intersection* intersections = actorState->intersections;
   uchar collisionCount = 0;
   for (uchar i = 0; i < count; i++) {
-    float3 relativeSpeed = intersections[i].type == ACTOR_TYPE_RIGID_BODY || intersections[i].type == ACTOR_TYPE_FLUID ? actorStates[intersections[i].otherIndex].linearVelocity - actorState->linearVelocity : - actorState->linearVelocity;
+    float3 relativeSpeed = intersections[i].type == ACTOR_TYPE_SOFT_BODY || intersections[i].type == ACTOR_TYPE_FLUID ? actorStates[intersections[i].otherIndex].linearVelocity - actorState->linearVelocity : - actorState->linearVelocity;
     intersections[i].speed = dot(intersections[i].normal, relativeSpeed);
     if (intersections[i].speed < 0.0f) {
       actorState->collisionIndices[collisionCount] = i;
@@ -541,8 +541,8 @@ void accumulateConstraintImpulse(
   unsigned int intersectionType = intersection->type;
   ushort otherIndex = intersection->otherIndex;
   float mass = actorState->massForCollision;
-  float elasticity = intersectionType == ACTOR_TYPE_RIGID_BODY ? softBodys[actor->subPhysicalQuantityIndex].elasticity * softBodys[actorStates[otherIndex].constants.subPhysicalQuantityIndex].elasticity : softBodys[actor->subPhysicalQuantityIndex].elasticity;
-  float massRatio = intersectionType == ACTOR_TYPE_RIGID_BODY || intersectionType == ACTOR_TYPE_FLUID ? mass / actorStates[otherIndex].massForCollision : 0.0f;
+  float elasticity = intersectionType == ACTOR_TYPE_SOFT_BODY ? softBodys[actor->subPhysicalQuantityIndex].elasticity * softBodys[actorStates[otherIndex].constants.subPhysicalQuantityIndex].elasticity : softBodys[actor->subPhysicalQuantityIndex].elasticity;
+  float massRatio = intersectionType == ACTOR_TYPE_SOFT_BODY || intersectionType == ACTOR_TYPE_FLUID ? mass / actorStates[otherIndex].massForCollision : 0.0f;
   float3 intersectionNormal = intersection->normal;
   float speedOnIntersectionNormal = dot(actorState->linearVelocity, intersectionNormal);
   float affectedSpeed = (intersection->speed * (1.0f + elasticity) / (1.0f + massRatio)) + speedOnIntersectionNormal;
@@ -610,7 +610,7 @@ __kernel void updateFluidForce(
   float pressurePart2 = (actorState->pressure / (density * density));
   float viscosityPart1 = fluidSettings->viscosity * fluidSettings->particleMass;
   for (uchar i = 0; i < count; i++) {
-    bool isOtherDynamic = intersections[i].type == ACTOR_TYPE_FLUID || intersections[i].type == ACTOR_TYPE_RIGID_BODY;
+    bool isOtherDynamic = intersections[i].type == ACTOR_TYPE_FLUID || intersections[i].type == ACTOR_TYPE_SOFT_BODY;
     float q = intersections[i].length;
     ushort otherIndex = intersections[i].otherIndex;
     float otherDensity = intersections[i].type == ACTOR_TYPE_FLUID ? actorStates[otherIndex].density : density;

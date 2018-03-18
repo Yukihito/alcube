@@ -38,7 +38,7 @@ __kernel void updateFluidForce(
   float pressurePart2 = (actorState->pressure / (density * density));
   float viscosityPart1 = fluidSettings->viscosity * fluidSettings->particleMass;
   for (uchar i = 0; i < count; i++) {
-    bool isOtherDynamic = intersections[i].type == ACTOR_TYPE_FLUID || intersections[i].type == ACTOR_TYPE_RIGID_BODY;
+    bool isOtherDynamic = intersections[i].type == ACTOR_TYPE_FLUID || intersections[i].type == ACTOR_TYPE_SOFT_BODY;
     float q = intersections[i].length;
     ushort otherIndex = intersections[i].otherIndex;
     float otherDensity = intersections[i].type == ACTOR_TYPE_FLUID ? actorStates[otherIndex].density : density;

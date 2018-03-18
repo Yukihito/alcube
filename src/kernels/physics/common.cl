@@ -1,4 +1,4 @@
-#define ACTOR_TYPE_RIGID_BODY      0
+#define ACTOR_TYPE_SOFT_BODY       0
 #define ACTOR_TYPE_FACE            1
 #define ACTOR_TYPE_SPHERICAL_SHELL 2
 #define ACTOR_TYPE_FLUID           3
