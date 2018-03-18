@@ -6,6 +6,11 @@ typedef struct __attribute__ ((packed)) ActorStruct {
   char _padding1[2];
 } Actor;
 
+typedef struct __attribute__ ((packed)) FluidStruct {
+  ushort actorIndex;
+  char _padding0[2];
+} Fluid;
+
 typedef struct __attribute__ ((packed)) FluidSettingsStruct {
   float stiffness;
   float density;
@@ -16,14 +21,6 @@ typedef struct __attribute__ ((packed)) FluidSettingsStruct {
   float spikyGradientConstant;
   float viscosityLaplacianConstant;
 } FluidSettings;
-
-typedef struct __attribute__ ((packed)) FluidStateStruct {
-  float pressure;
-  float density;
-  float3 force;
-  ushort actorIndex;
-  char _padding0[2];
-} FluidState;
 
 typedef struct __attribute__ ((packed)) GridStruct {
   uint xCount;
@@ -61,16 +58,14 @@ typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
   float3 angularMomentum;
 } PhysicalQuantity;
 
-typedef struct __attribute__ ((packed)) SoftBodyStateStruct {
+typedef struct __attribute__ ((packed)) SoftBodyStruct {
   float elasticity;
-  float dynamicFrictionCoefficient;
-  float staticFrictionCoefficient;
   uint springIndices[16];
   uchar springNodeIndices[16];
   uint springCount;
   ushort actorIndex;
   char _padding0[2];
-} SoftBodyState;
+} SoftBody;
 
 typedef struct __attribute__ ((packed)) SpringStruct {
   float k;
@@ -100,6 +95,9 @@ typedef struct __attribute__ ((packed)) ActorStateStruct {
   int isFloating;
   uchar collisionIndices[32];
   Intersection intersections[32];
+  float pressure;
+  float density;
+  float3 fluidForce;
 } ActorState;
 
 typedef struct __attribute__ ((packed)) ConstantsStruct {

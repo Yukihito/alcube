@@ -1,16 +1,14 @@
 __kernel void moveFluid(
-  __global FluidState* fluidStates,
+  __global Fluid* fluids,
   __global ActorState* actorStates,
   __global PhysicalQuantity* physicalQuantities,
   __global Constants* constants
 ) {
   __global Grid* grid = &constants->grid;
-  size_t fluidParticleIndex = get_global_id(0);
-  __global FluidState* fluidState = &fluidStates[fluidParticleIndex];
-  ushort actorIndex = fluidState->actorIndex;
+  ushort actorIndex = fluids[get_global_id(0)].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
-  actorState->linearVelocity += (fluidState->force * constants->deltaTime) / constants->fluidSettings.particleMass;
+  actorState->linearVelocity += (actorState->fluidForce * constants->deltaTime) / constants->fluidSettings.particleMass;
   physicalQuantity->position += constants->deltaTime * actorState->linearVelocity;
   float3 corner = grid->origin + (float3)(0.0001f);
   physicalQuantity->position = clamp(physicalQuantity->position, corner, -corner);
@@ -43,22 +41,22 @@ __kernel void calcSpringImpulses(
 
 __kernel void updateBySpringImpulse(
   __global Constants* constants,
-  __global SoftBodyState* softBodyStates,
+  __global SoftBody* softBodys,
   __global ActorState* actorStates,
   __global PhysicalQuantity* physicalQuantities,
   __global SpringState* springStates
 ) {
   size_t softBodyIndex = get_global_id(0);
-  __global SoftBodyState* softBodyState = &softBodyStates[softBodyIndex];
-  size_t actorIndex = softBodyState->actorIndex;
+  __global SoftBody* softBody = &softBodys[softBodyIndex];
+  size_t actorIndex = softBody->actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
-  uchar count = softBodyState->springCount;
+  uchar count = softBody->springCount;
   float3 linearImpulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
 
   for (uchar i = 0; i < count; i++) {
-    linearImpulse += springStates[softBodyState->springIndices[i]].linearImpulses[softBodyState->springNodeIndices[i]];
-    angularImpulse += springStates[softBodyState->springIndices[i]].angularImpulses[softBodyState->springNodeIndices[i]];;
+    linearImpulse += springStates[softBody->springIndices[i]].linearImpulses[softBody->springNodeIndices[i]];
+    angularImpulse += springStates[softBody->springIndices[i]].angularImpulses[softBody->springNodeIndices[i]];;
   }
 
   actorState->linearVelocity += linearImpulse / actorState->mass;

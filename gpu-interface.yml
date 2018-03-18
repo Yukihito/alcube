@@ -56,6 +56,9 @@ dto-structs:
     - int              isFloating
     - uchar[32]        collisionIndices
     - Intersection[32] intersections
+    - float            pressure
+    - float            density
+    - float3           fluidForce
 
   PhysicalQuantity: # Basic physical quantities
     - float  radius
@@ -66,10 +69,8 @@ dto-structs:
     - float3 angularMomentum
 
   # Variables for soft body actors
-  SoftBodyState: # Physical quantity 0
+  SoftBody: # Physical quantity 0
     - float     elasticity
-    - float     dynamicFrictionCoefficient
-    - float     staticFrictionCoefficient
     - uint[16]  springIndices
     - uchar[16] springNodeIndices
     - uint      springCount
@@ -86,10 +87,7 @@ dto-structs:
     - float3[2] angularImpulses
 
   # Variables for fluid actors
-  FluidState: # Physical quantity 3
-    - float  pressure
-    - float  density
-    - float3 force
+  Fluid: # Physical quantity 3
     - ushort actorIndex
 
   # Others
@@ -139,13 +137,13 @@ dto-instances:
     length: maxActorCount
 
   # Variables for soft body actors
-  - name: hostSoftBodyStates
-    type: SoftBodyState
+  - name: hostSoftBodys
+    type: SoftBody
     length: maxActorCount
     host-ptr: true
 
-  - name: softBodyStates
-    type: SoftBodyState
+  - name: softBodys
+    type: SoftBody
     length: maxActorCount
 
   - name: springs
@@ -158,13 +156,13 @@ dto-instances:
     length: maxSpringCount
 
   # Variables for fluid actors
-  - name: hostFluidStates
-    type: FluidState
+  - name: hostFluids
+    type: Fluid
     length: maxActorCount
     host-ptr: true
 
-  - name: fluidStates
-    type: FluidState
+  - name: fluids
+    type: Fluid
     length: maxActorCount
 
   # Other variables for physics simulation

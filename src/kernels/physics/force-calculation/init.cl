@@ -23,4 +23,7 @@ __kernel void initStepVariables(
   actorState->angularVelocity = physicalQuantity->angularMomentum / momentOfInertia;
   actorState->massForIntersection = mass / actorState->intersectionCount;
   actorState->massForCollision = mass;
+  actorState->fluidForce = (float3)(0.0f);
+  actorState->pressure = 0.0f;
+  actorState->density = 0.0f;
 }

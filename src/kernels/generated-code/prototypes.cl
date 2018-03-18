@@ -6,7 +6,7 @@ float4 createQuatFromDisplacement(float3 angularDisplacement);
 
 void setIntersection(__global Intersection* intersection, ushort type, ushort otherIndex, float intersectionLength, float speed, float3 normal, float3 relativePosition);
 
-void accumulateConstraintImpulse(__global Actor* actor, __global ActorState* actorState, __global ActorState* actorStates, __global Intersection* intersection, __global SoftBodyState* softBodyStates, float3* acc);
+void accumulateConstraintImpulse(__global Actor* actor, __global ActorState* actorState, __global ActorState* actorStates, __global Intersection* intersection, __global SoftBody* softBodys, float3* acc);
 
 void accumulateFrictionalImpulse(__global ActorState* actorState, __global ActorState* actorStates, __global Intersection* intersection, float3* linearMomentumAcc, float3* angularMomentumAcc);
 

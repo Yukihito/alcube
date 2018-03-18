@@ -6,6 +6,11 @@ typedef struct __attribute__ ((packed)) ActorStruct {
   char _padding1[2];
 } Actor;
 
+typedef struct __attribute__ ((packed)) FluidStruct {
+  ushort actorIndex;
+  char _padding0[2];
+} Fluid;
+
 typedef struct __attribute__ ((packed)) FluidSettingsStruct {
   float stiffness;
   float density;
@@ -16,14 +21,6 @@ typedef struct __attribute__ ((packed)) FluidSettingsStruct {
   float spikyGradientConstant;
   float viscosityLaplacianConstant;
 } FluidSettings;
-
-typedef struct __attribute__ ((packed)) FluidStateStruct {
-  float pressure;
-  float density;
-  float3 force;
-  ushort actorIndex;
-  char _padding0[2];
-} FluidState;
 
 typedef struct __attribute__ ((packed)) GridStruct {
   uint xCount;
@@ -61,16 +58,14 @@ typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
   float3 angularMomentum;
 } PhysicalQuantity;
 
-typedef struct __attribute__ ((packed)) SoftBodyStateStruct {
+typedef struct __attribute__ ((packed)) SoftBodyStruct {
   float elasticity;
-  float dynamicFrictionCoefficient;
-  float staticFrictionCoefficient;
   uint springIndices[16];
   uchar springNodeIndices[16];
   uint springCount;
   ushort actorIndex;
   char _padding0[2];
-} SoftBodyState;
+} SoftBody;
 
 typedef struct __attribute__ ((packed)) SpringStruct {
   float k;
@@ -100,6 +95,9 @@ typedef struct __attribute__ ((packed)) ActorStateStruct {
   int isFloating;
   uchar collisionIndices[32];
   Intersection intersections[32];
+  float pressure;
+  float density;
+  float3 fluidForce;
 } ActorState;
 
 typedef struct __attribute__ ((packed)) ConstantsStruct {
@@ -119,7 +117,7 @@ float4 createQuatFromDisplacement(float3 angularDisplacement);
 
 void setIntersection(__global Intersection* intersection, ushort type, ushort otherIndex, float intersectionLength, float speed, float3 normal, float3 relativePosition);
 
-void accumulateConstraintImpulse(__global Actor* actor, __global ActorState* actorState, __global ActorState* actorStates, __global Intersection* intersection, __global SoftBodyState* softBodyStates, float3* acc);
+void accumulateConstraintImpulse(__global Actor* actor, __global ActorState* actorState, __global ActorState* actorStates, __global Intersection* intersection, __global SoftBody* softBodys, float3* acc);
 
 void accumulateFrictionalImpulse(__global ActorState* actorState, __global ActorState* actorStates, __global Intersection* intersection, float3* linearMomentumAcc, float3* angularMomentumAcc);
 
@@ -179,12 +177,12 @@ __kernel void inputActors(
   actorStates[i].mass = physicalQuantities[i].mass;
 }
 
-__kernel void inputSoftBodyStates(
-  __global const SoftBodyState* hostSoftBodyStates,
-  __global SoftBodyState* softBodyStates
+__kernel void inputSoftBodys(
+  __global const SoftBody* hostSoftBodys,
+  __global SoftBody* softBodys
 ) {
   size_t i = get_global_id(0);
-  softBodyStates[i] = hostSoftBodyStates[i];
+  softBodys[i] = hostSoftBodys[i];
 }
 
 __kernel void inputSprings(
@@ -195,12 +193,12 @@ __kernel void inputSprings(
   springStates[i].constants = springs[i];
 }
 
-__kernel void inputFluid(
-  __global FluidState* hostFluidStates,
-  __global FluidState* fluidStates
+__kernel void inputFluids(
+  __global Fluid* hostFluids,
+  __global Fluid* fluids
 ) {
   size_t i = get_global_id(0);
-  fluidStates[i] = hostFluidStates[i];
+  fluids[i] = hostFluids[i];
 }
 
 __kernel void initGridAndActorRelations(
@@ -421,6 +419,9 @@ __kernel void initStepVariables(
   actorState->angularVelocity = physicalQuantity->angularMomentum / momentOfInertia;
   actorState->massForIntersection = mass / actorState->intersectionCount;
   actorState->massForCollision = mass;
+  actorState->fluidForce = (float3)(0.0f);
+  actorState->pressure = 0.0f;
+  actorState->density = 0.0f;
 }
 
 void accumulatePenaltyImpulse(
@@ -434,11 +435,11 @@ void accumulatePenaltyImpulse(
 
 __kernel void updateByPenaltyImpulse(
   __global ActorState* actorStates,
-  __global SoftBodyState* softBodyStates,
+  __global SoftBody* softBodys,
   __global Constants* constants
 ) {
   size_t subIndex = get_global_id(0);
-  ushort actorIndex = softBodyStates[subIndex].actorIndex;
+  ushort actorIndex = softBodys[subIndex].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->intersectionCount;
   if (count == 0) {
@@ -479,10 +480,10 @@ void accumulateFrictionalImpulse(
 
 __kernel void updateByFrictionalImpulse(
   __global ActorState* actorStates,
-  __global SoftBodyState* softBodyStates
+  __global SoftBody* softBodys
 ) {
   size_t subIndex = get_global_id(0);
-  ushort actorIndex = softBodyStates[subIndex].actorIndex;
+  ushort actorIndex = softBodys[subIndex].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->intersectionCount;
   if (count == 0) {
@@ -503,10 +504,10 @@ __kernel void updateByFrictionalImpulse(
 
 __kernel void collectCollisions(
   __global ActorState* actorStates,
-  __global SoftBodyState* softBodyStates
+  __global SoftBody* softBodys
 ) {
   size_t subIndex = get_global_id(0);
-  ushort actorIndex = softBodyStates[subIndex].actorIndex;
+  ushort actorIndex = softBodys[subIndex].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->intersectionCount;
   if (count == 0) {
@@ -531,7 +532,7 @@ void accumulateConstraintImpulse(
   __global ActorState* actorState,
   __global ActorState* actorStates,
   __global Intersection* intersection,
-  __global SoftBodyState* softBodyStates,
+  __global SoftBody* softBodys,
   float3* acc
 ) {
   if (intersection->speed >= 0.0f) {
@@ -540,11 +541,8 @@ void accumulateConstraintImpulse(
   unsigned int intersectionType = intersection->type;
   ushort otherIndex = intersection->otherIndex;
   float mass = actorState->massForCollision;
-  float elasticity = intersectionType == ACTOR_TYPE_RIGID_BODY ? softBodyStates[actor->subPhysicalQuantityIndex].elasticity * softBodyStates[actorStates[otherIndex].constants.subPhysicalQuantityIndex].elasticity : softBodyStates[actor->subPhysicalQuantityIndex].elasticity;
-  float massRatio = intersectionType == ACTOR_TYPE_RIGID_BODY ? mass / actorStates[otherIndex].massForCollision : 0.0f;
-  if (intersectionType == ACTOR_TYPE_FLUID) {
-    massRatio = mass / actorStates[otherIndex].mass;
-  }
+  float elasticity = intersectionType == ACTOR_TYPE_RIGID_BODY ? softBodys[actor->subPhysicalQuantityIndex].elasticity * softBodys[actorStates[otherIndex].constants.subPhysicalQuantityIndex].elasticity : softBodys[actor->subPhysicalQuantityIndex].elasticity;
+  float massRatio = intersectionType == ACTOR_TYPE_RIGID_BODY || intersectionType == ACTOR_TYPE_FLUID ? mass / actorStates[otherIndex].massForCollision : 0.0f;
   float3 intersectionNormal = intersection->normal;
   float speedOnIntersectionNormal = dot(actorState->linearVelocity, intersectionNormal);
   float affectedSpeed = (intersection->speed * (1.0f + elasticity) / (1.0f + massRatio)) + speedOnIntersectionNormal;
@@ -553,10 +551,10 @@ void accumulateConstraintImpulse(
 
 __kernel void updateByConstraintImpulse(
   __global ActorState* actorStates,
-  __global SoftBodyState* softBodyStates
+  __global SoftBody* softBodys
 ) {
   size_t subIndex = get_global_id(0);
-  ushort actorIndex = softBodyStates[subIndex].actorIndex;
+  ushort actorIndex = softBodys[subIndex].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->collisionCount;
   if (count == 0) {
@@ -567,19 +565,17 @@ __kernel void updateByConstraintImpulse(
 
   float3 impulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
-    accumulateConstraintImpulse(actor, actorState, actorStates, &intersections[actorState->collisionIndices[i]], softBodyStates, &impulse);
+    accumulateConstraintImpulse(actor, actorState, actorStates, &intersections[actorState->collisionIndices[i]], softBodys, &impulse);
   }
   actorState->linearVelocity = impulse / actorState->mass;
 }
 
 __kernel void updateDensityAndPressure(
   __global ActorState* actorStates,
-  __global FluidState* fluidStates,
+  __global Fluid* fluids,
   __global Constants* constants
 ) {
-  size_t fluidParticleIndex = get_global_id(0);
-  __global FluidState* fluidState = &fluidStates[fluidParticleIndex];
-  ushort actorIndex = fluidState->actorIndex;
+  ushort actorIndex = fluids[get_global_id(0)].actorIndex;
   __global FluidSettings* fluidSettings = &constants->fluidSettings;
   __global ActorState* actorState = &actorStates[actorIndex];
 
@@ -592,58 +588,54 @@ __kernel void updateDensityAndPressure(
     float q = hh - rr;
     density += fluidSettings->particleMass * fluidSettings->poly6Constant * q * q * q;
   }
-  fluidStates[fluidParticleIndex].density = density;
-  fluidStates[fluidParticleIndex].pressure = fluidSettings->stiffness * fluidSettings->density * (pow(density / fluidSettings->density, 2) - 1.0f);
+  actorState->density = density;
+  actorState->pressure = fluidSettings->stiffness * fluidSettings->density * (pow(density / fluidSettings->density, 2) - 1.0f);
 }
 
 
 __kernel void updateFluidForce(
   __global ActorState* actorStates,
-  __global FluidState* fluidStates,
+  __global Fluid* fluids,
   __global Constants* constants
 ) {
   __global FluidSettings* fluidSettings = &constants->fluidSettings;
-  size_t fluidParticleIndex = get_global_id(0);
-  __global FluidState* fluidState = &fluidStates[fluidParticleIndex];
-  ushort actorIndex = fluidState->actorIndex;
+  ushort actorIndex = fluids[get_global_id(0)].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->intersectionCount;
   __global Intersection* intersections = actorState->intersections;
-  float density = fluidState->density;
+  float density = actorState->density;
   float3 velocity = actorState->linearVelocity;
   float3 force = (float3)(0.0f, 0.0f, 0.0f);
   float pressurePart1 = -density * fluidSettings->particleMass;
-  float pressurePart2 = (fluidState->pressure / (density * density));
+  float pressurePart2 = (actorState->pressure / (density * density));
   float viscosityPart1 = fluidSettings->viscosity * fluidSettings->particleMass;
   for (uchar i = 0; i < count; i++) {
     bool isOtherDynamic = intersections[i].type == ACTOR_TYPE_FLUID || intersections[i].type == ACTOR_TYPE_RIGID_BODY;
     float q = intersections[i].length;
-    ushort otherFluidParticleIndex = actorStates[intersections[i].otherIndex].constants.subPhysicalQuantityIndex;
-    float otherDensity = intersections[i].type == ACTOR_TYPE_FLUID ? fluidStates[otherFluidParticleIndex].density : density;
-    float otherPressure = intersections[i].type == ACTOR_TYPE_FLUID ? fluidStates[otherFluidParticleIndex].pressure : fluidState->pressure;
-    float3 otherVelocity = isOtherDynamic ? actorStates[intersections[i].otherIndex].linearVelocity : 0.0f;
+    ushort otherIndex = intersections[i].otherIndex;
+    float otherDensity = intersections[i].type == ACTOR_TYPE_FLUID ? actorStates[otherIndex].density : density;
+    float otherPressure = intersections[i].type == ACTOR_TYPE_FLUID ? actorStates[otherIndex].pressure : actorState->pressure;
+    float3 otherVelocity = isOtherDynamic ? actorStates[otherIndex].linearVelocity : 0.0f;
     force +=
       // pressure
       pressurePart1 * (pressurePart2 + (otherPressure / (otherDensity * otherDensity))) * fluidSettings->spikyGradientConstant * q * q * intersections[i].normal
       // viscosity
       + viscosityPart1 * ((otherVelocity - velocity) / otherDensity) * fluidSettings->viscosityLaplacianConstant * q;
   }
-  fluidState->force = force;
+  actorState->fluidForce = force;
 }
 
 __kernel void moveFluid(
-  __global FluidState* fluidStates,
+  __global Fluid* fluids,
   __global ActorState* actorStates,
   __global PhysicalQuantity* physicalQuantities,
   __global Constants* constants
 ) {
   __global Grid* grid = &constants->grid;
-  size_t fluidParticleIndex = get_global_id(0);
-  __global FluidState* fluidState = &fluidStates[fluidParticleIndex];
-  ushort actorIndex = fluidState->actorIndex;
+  ushort actorIndex = fluids[get_global_id(0)].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
-  actorState->linearVelocity += (fluidState->force * constants->deltaTime) / constants->fluidSettings.particleMass;
+  actorState->linearVelocity += (actorState->fluidForce * constants->deltaTime) / constants->fluidSettings.particleMass;
   physicalQuantity->position += constants->deltaTime * actorState->linearVelocity;
   float3 corner = grid->origin + (float3)(0.0001f);
   physicalQuantity->position = clamp(physicalQuantity->position, corner, -corner);
@@ -676,22 +668,22 @@ __kernel void calcSpringImpulses(
 
 __kernel void updateBySpringImpulse(
   __global Constants* constants,
-  __global SoftBodyState* softBodyStates,
+  __global SoftBody* softBodys,
   __global ActorState* actorStates,
   __global PhysicalQuantity* physicalQuantities,
   __global SpringState* springStates
 ) {
   size_t softBodyIndex = get_global_id(0);
-  __global SoftBodyState* softBodyState = &softBodyStates[softBodyIndex];
-  size_t actorIndex = softBodyState->actorIndex;
+  __global SoftBody* softBody = &softBodys[softBodyIndex];
+  size_t actorIndex = softBody->actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
-  uchar count = softBodyState->springCount;
+  uchar count = softBody->springCount;
   float3 linearImpulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
 
   for (uchar i = 0; i < count; i++) {
-    linearImpulse += springStates[softBodyState->springIndices[i]].linearImpulses[softBodyState->springNodeIndices[i]];
-    angularImpulse += springStates[softBodyState->springIndices[i]].angularImpulses[softBodyState->springNodeIndices[i]];;
+    linearImpulse += springStates[softBody->springIndices[i]].linearImpulses[softBody->springNodeIndices[i]];
+    angularImpulse += springStates[softBody->springIndices[i]].angularImpulses[softBody->springNodeIndices[i]];;
   }
 
   actorState->linearVelocity += linearImpulse / actorState->mass;

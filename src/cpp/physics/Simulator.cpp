@@ -51,7 +51,7 @@ namespace alcube::physics {
 
     fluidSettings->stiffness = 64.0f;
     fluidSettings->density = 0.02f;
-    fluidSettings->viscosity = 4.0f;
+    fluidSettings->viscosity = 8.0f;
     fluidSettings->particleMass = (4.0f / 3.0f) * CL_M_PI_F * CL_M_PI_F * CL_M_PI_F * fluidSettings->density;
     fluidSettings->effectiveRadius = 2.0f;
     fluidSettings->poly6Constant = 315.0f / (64.0f * CL_M_PI_F * powf(fluidSettings->effectiveRadius, 9));
@@ -73,7 +73,7 @@ namespace alcube::physics {
     memories.springs.at(springIndex)->nodePositionsModelSpace[nodeIndex] = toCl(springs[springIndex]->nodes[nodeIndex].position);
 
     unsigned short softBodyIndex = memories.actors.at(actorIndex)->subPhysicalQuantityIndex;
-    auto hostSoftBodyState = memories.hostSoftBodyStates.at(softBodyIndex);
+    auto hostSoftBodyState = memories.hostSoftBodys.at(softBodyIndex);
     hostSoftBodyState->springIndices[hostSoftBodyState->springCount] = springIndex;
     hostSoftBodyState->springNodeIndices[hostSoftBodyState->springCount] = nodeIndex;
     hostSoftBodyState->springCount++;
@@ -94,10 +94,8 @@ namespace alcube::physics {
       hostPhysicalQuantity->position = toCl(softBodyActor->position);
       hostPhysicalQuantity->rotation = toCl(softBodyActor->rotation);
 
-      auto hostSoftBodyState = memories.hostSoftBodyStates.at(i);
+      auto hostSoftBodyState = memories.hostSoftBodys.at(i);
       hostSoftBodyState->elasticity = softBodyActor->elasticity;
-      hostSoftBodyState->staticFrictionCoefficient = softBodyActor->staticFrictionCoefficient;
-      hostSoftBodyState->dynamicFrictionCoefficient = softBodyActor->dynamicFrictionCoefficient;
       hostSoftBodyState->springCount = 0;
       hostSoftBodyState->actorIndex = (unsigned short)i;
       softBodyActor->index = (unsigned short)i;
@@ -127,10 +125,7 @@ namespace alcube::physics {
       hostPhysicalQuantity->position = toCl(fluidActor->position);
       hostPhysicalQuantity->rotation = {0.0f, 0.0f, 0.0f, 1.0f};
 
-      auto fluidState = memories.hostFluidStates.at(i);
-      fluidState->density = 0.0f;
-      fluidState->force = clFloat3Zero;
-      fluidState->pressure = 0.0f;
+      auto fluidState = memories.hostFluids.at(i);
       fluidState->actorIndex = actorIndex;
     }
   }
@@ -156,21 +151,21 @@ namespace alcube::physics {
   void Simulator::setUpMemories() {
     memories.actors.setCount(actorCount);
     memories.hostPhysicalQuantities.setCount(actorCount);
-    memories.hostSoftBodyStates.setCount(softBodyActorCount);
+    memories.hostSoftBodys.setCount(softBodyActorCount);
     memories.springs.setCount(springCount);
-    memories.hostFluidStates.setCount(fluidActorCount);
+    memories.hostFluids.setCount(fluidActorCount);
 
     memories.actorStates.setCount(actorCount);
     memories.physicalQuantities.setCount(actorCount);
     memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
     memories.springStates.setCount(springCount);
-    memories.fluidStates.setCount(fluidActorCount);
+    memories.fluids.setCount(fluidActorCount);
 
     memories.actors.write();
     memories.hostPhysicalQuantities.write();
-    memories.hostSoftBodyStates.write();
+    memories.hostSoftBodys.write();
     memories.springs.write();
-    memories.hostFluidStates.write();
+    memories.hostFluids.write();
 
     float splitDeltaTime = deltaTime / motionIterationCount;
     kernels.inputConstants(
@@ -192,10 +187,10 @@ namespace alcube::physics {
       memories.physicalQuantities
     );
 
-    kernels.inputSoftBodyStates(
+    kernels.inputSoftBodys(
       softBodyActorCount,
-      memories.hostSoftBodyStates,
-      memories.softBodyStates
+      memories.hostSoftBodys,
+      memories.softBodys
     );
 
     kernels.inputSprings(
@@ -204,10 +199,10 @@ namespace alcube::physics {
       memories.springStates
     );
 
-    kernels.inputFluid(
+    kernels.inputFluids(
       (unsigned short)fluidActorCount,
-      memories.hostFluidStates,
-      memories.fluidStates
+      memories.hostFluids,
+      memories.fluids
     );
   }
 
@@ -289,21 +284,21 @@ namespace alcube::physics {
     kernels.updateByPenaltyImpulse(
       softBodyActorCount,
       memories.actorStates,
-      memories.softBodyStates,
+      memories.softBodys,
       memories.constants
     );
 
     kernels.updateDensityAndPressure(
       fluidActorCount,
       memories.actorStates,
-      memories.fluidStates,
+      memories.fluids,
       memories.constants
     );
 
     kernels.updateFluidForce(
       fluidActorCount,
       memories.actorStates,
-      memories.fluidStates,
+      memories.fluids,
       memories.constants
     );
 
@@ -311,27 +306,27 @@ namespace alcube::physics {
       kernels.collectCollisions(
         softBodyActorCount,
         memories.actorStates,
-        memories.softBodyStates
+        memories.softBodys
       );
 
       kernels.updateByConstraintImpulse(
         softBodyActorCount,
         memories.actorStates,
-        memories.softBodyStates
+        memories.softBodys
       );
     }
 
     kernels.updateByFrictionalImpulse(
       softBodyActorCount,
       memories.actorStates,
-      memories.softBodyStates
+      memories.softBodys
     );
   }
 
   void Simulator::motion() {
     kernels.moveFluid(
       fluidActorCount,
-      memories.fluidStates,
+      memories.fluids,
       memories.actorStates,
       memories.physicalQuantities,
       memories.constants
@@ -349,7 +344,7 @@ namespace alcube::physics {
       kernels.updateBySpringImpulse(
         softBodyActorCount,
         memories.constants,
-        memories.softBodyStates,
+        memories.softBodys,
         memories.actorStates,
         memories.physicalQuantities,
         memories.springStates

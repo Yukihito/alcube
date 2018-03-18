@@ -15,6 +15,14 @@ namespace alcube::gpu::dtos {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
+  class Fluid {
+    public:
+      unsigned short actorIndex;
+      char _padding0[2];
+  };
+#pragma pack(pop)
+
+#pragma pack(push, 1)
   class FluidSettings {
     public:
       float stiffness;
@@ -25,17 +33,6 @@ namespace alcube::gpu::dtos {
       float poly6Constant;
       float spikyGradientConstant;
       float viscosityLaplacianConstant;
-  };
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-  class FluidState {
-    public:
-      float pressure;
-      float density;
-      cl_float3 force;
-      unsigned short actorIndex;
-      char _padding0[2];
   };
 #pragma pack(pop)
 
@@ -88,11 +85,9 @@ namespace alcube::gpu::dtos {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
-  class SoftBodyState {
+  class SoftBody {
     public:
       float elasticity;
-      float dynamicFrictionCoefficient;
-      float staticFrictionCoefficient;
       unsigned int springIndices[16];
       unsigned char springNodeIndices[16];
       unsigned int springCount;
@@ -137,6 +132,9 @@ namespace alcube::gpu::dtos {
       int isFloating;
       unsigned char collisionIndices[32];
       Intersection intersections[32];
+      float pressure;
+      float density;
+      cl_float3 fluidForce;
   };
 #pragma pack(pop)
 

@@ -48,11 +48,11 @@ namespace alcube::gpu {
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
-    class FluidSettings {
+    class Fluid {
       public:
         utils::opencl::Memory* memory;
-        dtos::FluidSettings* dto;
-        dtos::FluidSettings* at(int i);
+        dtos::Fluid* dto;
+        dtos::Fluid* at(int i);
         void write();
         void read();
         void zeroFill();
@@ -60,11 +60,11 @@ namespace alcube::gpu {
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
-    class FluidState {
+    class FluidSettings {
       public:
         utils::opencl::Memory* memory;
-        dtos::FluidState* dto;
-        dtos::FluidState* at(int i);
+        dtos::FluidSettings* dto;
+        dtos::FluidSettings* at(int i);
         void write();
         void read();
         void zeroFill();
@@ -120,11 +120,11 @@ namespace alcube::gpu {
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
-    class SoftBodyState {
+    class SoftBody {
       public:
         utils::opencl::Memory* memory;
-        dtos::SoftBodyState* dto;
-        dtos::SoftBodyState* at(int i);
+        dtos::SoftBody* dto;
+        dtos::SoftBody* at(int i);
         void write();
         void read();
         void zeroFill();
@@ -310,12 +310,12 @@ namespace alcube::gpu {
       memories::ActorState actorStates;
       memories::PhysicalQuantity hostPhysicalQuantities;
       memories::PhysicalQuantity physicalQuantities;
-      memories::SoftBodyState hostSoftBodyStates;
-      memories::SoftBodyState softBodyStates;
+      memories::SoftBody hostSoftBodys;
+      memories::SoftBody softBodys;
       memories::Spring springs;
       memories::SpringState springStates;
-      memories::FluidState hostFluidStates;
-      memories::FluidState fluidStates;
+      memories::Fluid hostFluids;
+      memories::Fluid fluids;
       memories::GridAndActorRelation gridAndActorRelations;
       memories::UintMemory gridStartIndices;
       memories::UintMemory gridEndIndices;
@@ -331,12 +331,12 @@ namespace alcube::gpu {
       dtos::ActorState* actorStates;
       dtos::PhysicalQuantity* hostPhysicalQuantities;
       dtos::PhysicalQuantity* physicalQuantities;
-      dtos::SoftBodyState* hostSoftBodyStates;
-      dtos::SoftBodyState* softBodyStates;
+      dtos::SoftBody* hostSoftBodys;
+      dtos::SoftBody* softBodys;
       dtos::Spring* springs;
       dtos::SpringState* springStates;
-      dtos::FluidState* hostFluidStates;
-      dtos::FluidState* fluidStates;
+      dtos::Fluid* hostFluids;
+      dtos::Fluid* fluids;
       dtos::GridAndActorRelation* gridAndActorRelations;
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
@@ -352,9 +352,9 @@ namespace alcube::gpu {
       cl_kernel setGridRelationIndexRange;
       cl_kernel inputConstants;
       cl_kernel inputActors;
-      cl_kernel inputSoftBodyStates;
+      cl_kernel inputSoftBodys;
       cl_kernel inputSprings;
-      cl_kernel inputFluid;
+      cl_kernel inputFluids;
       cl_kernel moveFluid;
       cl_kernel calcSpringImpulses;
       cl_kernel updateBySpringImpulse;
@@ -381,21 +381,21 @@ namespace alcube::gpu {
       void setGridRelationIndexRange(unsigned int workSize, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, unsigned int actorCount);
       void inputConstants(unsigned int workSize, memories::Constants& constants, memories::Grid& grid, memories::FluidSettings& fluidSettings, float gravityAcceleration, float deltaTime, float splitDeltaTime, float sphericalShellRadius);
       void inputActors(unsigned int workSize, memories::Actor& actors, memories::ActorState& actorStates, memories::PhysicalQuantity& hostPhysicalQuantities, memories::PhysicalQuantity& physicalQuantities);
-      void inputSoftBodyStates(unsigned int workSize, memories::SoftBodyState& hostSoftBodyStates, memories::SoftBodyState& softBodyStates);
+      void inputSoftBodys(unsigned int workSize, memories::SoftBody& hostSoftBodys, memories::SoftBody& softBodys);
       void inputSprings(unsigned int workSize, memories::Spring& springs, memories::SpringState& springStates);
-      void inputFluid(unsigned int workSize, memories::FluidState& hostFluidStates, memories::FluidState& fluidStates);
-      void moveFluid(unsigned int workSize, memories::FluidState& fluidStates, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
+      void inputFluids(unsigned int workSize, memories::Fluid& hostFluids, memories::Fluid& fluids);
+      void moveFluid(unsigned int workSize, memories::Fluid& fluids, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
       void calcSpringImpulses(unsigned int workSize, memories::Constants& constants, memories::SpringState& springStates, memories::PhysicalQuantity& physicalQuantities);
-      void updateBySpringImpulse(unsigned int workSize, memories::Constants& constants, memories::SoftBodyState& softBodyStates, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::SpringState& springStates);
+      void updateBySpringImpulse(unsigned int workSize, memories::Constants& constants, memories::SoftBody& softBodys, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::SpringState& springStates);
       void postProcessing(unsigned int workSize, memories::Constants& constants, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities);
       void collectIntersections(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, memories::Constants& constants);
-      void collectCollisions(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBodyState& softBodyStates);
-      void updateByConstraintImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBodyState& softBodyStates);
-      void updateDensityAndPressure(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
-      void updateFluidForce(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
-      void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBodyState& softBodyStates);
+      void collectCollisions(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys);
+      void updateByConstraintImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys);
+      void updateDensityAndPressure(unsigned int workSize, memories::ActorState& actorStates, memories::Fluid& fluids, memories::Constants& constants);
+      void updateFluidForce(unsigned int workSize, memories::ActorState& actorStates, memories::Fluid& fluids, memories::Constants& constants);
+      void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys);
       void initStepVariables(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
-      void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBodyState& softBodyStates, memories::Constants& constants);
+      void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys, memories::Constants& constants);
       void outputPositions(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
   };
 

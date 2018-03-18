@@ -28,12 +28,12 @@ __kernel void inputActors(
   actorStates[i].mass = physicalQuantities[i].mass;
 }
 
-__kernel void inputSoftBodyStates(
-  __global const SoftBodyState* hostSoftBodyStates,
-  __global SoftBodyState* softBodyStates
+__kernel void inputSoftBodys(
+  __global const SoftBody* hostSoftBodys,
+  __global SoftBody* softBodys
 ) {
   size_t i = get_global_id(0);
-  softBodyStates[i] = hostSoftBodyStates[i];
+  softBodys[i] = hostSoftBodys[i];
 }
 
 __kernel void inputSprings(
@@ -44,10 +44,10 @@ __kernel void inputSprings(
   springStates[i].constants = springs[i];
 }
 
-__kernel void inputFluid(
-  __global FluidState* hostFluidStates,
-  __global FluidState* fluidStates
+__kernel void inputFluids(
+  __global Fluid* hostFluids,
+  __global Fluid* fluids
 ) {
   size_t i = get_global_id(0);
-  fluidStates[i] = hostFluidStates[i];
+  fluids[i] = hostFluids[i];
 }
