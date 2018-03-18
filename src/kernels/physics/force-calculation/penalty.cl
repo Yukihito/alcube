@@ -9,9 +9,11 @@ void accumulatePenaltyImpulse(
 
 __kernel void updateByPenaltyImpulse(
   __global ActorState* actorStates,
-  const float deltaTime
+  __global SoftBodyState* softBodyStates,
+  __global Constants* constants
 ) {
-  size_t actorIndex = get_global_id(0);
+  size_t subIndex = get_global_id(0);
+  ushort actorIndex = softBodyStates[subIndex].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->intersectionCount;
   if (count == 0) {
@@ -20,10 +22,7 @@ __kernel void updateByPenaltyImpulse(
   __global Intersection* intersections = actorState->intersections;
   float3 impulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
-    if (actorState->constants.type == ACTOR_TYPE_FLUID && intersections[i].type == ACTOR_TYPE_FLUID) {
-      continue;
-    }
-    accumulatePenaltyImpulse(&intersections[i], deltaTime, 64.0f, &impulse);
+    accumulatePenaltyImpulse(&intersections[i], constants->deltaTime, 64.0f, &impulse);
   }
   actorState->linearVelocity += impulse / actorState->mass;
 }

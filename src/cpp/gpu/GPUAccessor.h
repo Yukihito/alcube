@@ -395,7 +395,7 @@ namespace alcube::gpu {
       void updateFluidForce(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
       void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBodyState& softBodyStates);
       void initStepVariables(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
-      void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, float deltaTime);
+      void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBodyState& softBodyStates, memories::Constants& constants);
       void outputPositions(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
   };
 

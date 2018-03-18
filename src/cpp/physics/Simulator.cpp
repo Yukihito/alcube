@@ -287,9 +287,10 @@ namespace alcube::physics {
       memories.constants
     );
     kernels.updateByPenaltyImpulse(
-      actorCount,
+      softBodyActorCount,
       memories.actorStates,
-      deltaTime
+      memories.softBodyStates,
+      memories.constants
     );
 
     kernels.updateDensityAndPressure(

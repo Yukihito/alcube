@@ -770,11 +770,13 @@ namespace alcube::gpu {
   void Kernels::updateByPenaltyImpulse(
     unsigned int workSize,
     memories::ActorState& actorStates,
-    float deltaTime
+    memories::SoftBodyState& softBodyStates,
+    memories::Constants& constants
   ) {
     queue->push(rawKernels.updateByPenaltyImpulse, {workSize}, {
       memArg(actorStates.memory),
-      floatArg(deltaTime)
+      memArg(softBodyStates.memory),
+      memArg(constants.memory)
     });
   }
 
