@@ -125,10 +125,10 @@ void accumulateFrictionalImpulse(__global ActorState* actorState, __global Actor
 
 void accumulatePenaltyImpulse(__global Intersection* intersection, const float deltaTime, float penaltyFactor, float3* acc);
 
-#define PARTICLE_TYPE_RIGID_BODY      0
-#define PARTICLE_TYPE_FACE            1
-#define PARTICLE_TYPE_SPHERICAL_SHELL 2
-#define PARTICLE_TYPE_FLUID           3
+#define ACTOR_TYPE_RIGID_BODY      0
+#define ACTOR_TYPE_FACE            1
+#define ACTOR_TYPE_SPHERICAL_SHELL 2
+#define ACTOR_TYPE_FLUID           3
 
 float4 mulQuat(float4 q, float4 r) {
   float4 result;
@@ -365,7 +365,7 @@ __kernel void collectIntersections(
   float* cornerPtr = (float*)&corner;
   for (uint i = 0; i < 3 && !isFullOfIntersection; i++) {
     if (positionPtr[i] <= cornerPtr[i]) {
-      setIntersection(&actorState->intersections[intersectionCount], 1, i, cornerPtr[i] - positionPtr[i], 0.0f, -grid->normals[i], grid->normals[i] * radius);
+      setIntersection(&actorState->intersections[intersectionCount], ACTOR_TYPE_FACE, i, cornerPtr[i] - positionPtr[i], 0.0f, -grid->normals[i], grid->normals[i] * radius);
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= maxIntersection;
       if (i == 1) {
@@ -377,7 +377,7 @@ __kernel void collectIntersections(
   for (uint i = 3; i < 6 && !isFullOfIntersection; i++) {
     uint pi = i - 3;
     if (positionPtr[pi] >= -cornerPtr[pi]) {
-      setIntersection(&actorState->intersections[intersectionCount], 1, i, positionPtr[pi] + cornerPtr[pi], 0.0f, -grid->normals[i], grid->normals[i] * radius);
+      setIntersection(&actorState->intersections[intersectionCount], ACTOR_TYPE_FACE, i, positionPtr[pi] + cornerPtr[pi], 0.0f, -grid->normals[i], grid->normals[i] * radius);
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= maxIntersection;
     }
@@ -385,7 +385,7 @@ __kernel void collectIntersections(
 
   float shellIntersectionLength = length(position) + radius - sphericalShellRadius;
   if (!isFullOfIntersection && shellIntersectionLength + smallValue > 0.0f) {
-    setIntersection(&actorState->intersections[intersectionCount], 2, 0, shellIntersectionLength, 0.0f, normalize(position), -normalize(position) * radius);
+    setIntersection(&actorState->intersections[intersectionCount], ACTOR_TYPE_SPHERICAL_SHELL, 0, shellIntersectionLength, 0.0f, normalize(position), -normalize(position) * radius);
     intersectionCount++;
     isFullOfIntersection = intersectionCount >= maxIntersection;
   }
@@ -445,10 +445,10 @@ __kernel void updateByPenaltyImpulse(
   __global Intersection* intersections = actorState->intersections;
   float3 impulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
-    if (actorState->constants.type == PARTICLE_TYPE_FLUID && intersections[i].type == PARTICLE_TYPE_FLUID) {
+    if (actorState->constants.type == ACTOR_TYPE_FLUID && intersections[i].type == ACTOR_TYPE_FLUID) {
       continue;
     }
-    float penaltyFactor = actorState->constants.type == PARTICLE_TYPE_RIGID_BODY || intersections[i].type == PARTICLE_TYPE_RIGID_BODY ? 64.0f : 1024.0f;
+    float penaltyFactor = actorState->constants.type == ACTOR_TYPE_RIGID_BODY || intersections[i].type == ACTOR_TYPE_RIGID_BODY ? 64.0f : 1024.0f;
     accumulatePenaltyImpulse(&intersections[i], deltaTime, penaltyFactor, &impulse);
   }
   actorState->linearVelocity += impulse / actorState->mass;
@@ -494,7 +494,7 @@ __kernel void updateByFrictionalImpulse(
   float3 impulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
-    if (intersections[i].type == 3) {
+    if (intersections[i].type == ACTOR_TYPE_FLUID) {
       continue;
     }
     accumulateFrictionalImpulse(actorState, actorStates, &intersections[i], &impulse, &angularImpulse);
@@ -517,9 +517,12 @@ __kernel void collectCollisions(
   __global Intersection* intersections = actorState->intersections;
   uchar collisionCount = 0;
   for (uchar i = 0; i < count; i++) {
-    float3 relativeSpeed = intersections[i].type == 0 ? actorStates[intersections[i].otherIndex].linearVelocity - actorState->linearVelocity : - actorState->linearVelocity;
+    if (intersections[actorState->collisionIndices[i]].type == ACTOR_TYPE_FLUID) {
+      continue;
+    }
+    float3 relativeSpeed = intersections[i].type == ACTOR_TYPE_RIGID_BODY ? actorStates[intersections[i].otherIndex].linearVelocity - actorState->linearVelocity : - actorState->linearVelocity;
     intersections[i].speed = dot(intersections[i].normal, relativeSpeed);
-    if (intersections[i].type != 3 && intersections[i].speed < 0.0f) {
+    if (intersections[i].speed < 0.0f) {
       actorState->collisionIndices[collisionCount] = i;
       collisionCount++;
     }
@@ -566,7 +569,7 @@ __kernel void updateByConstraintImpulse(
 
   float3 impulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
-    if (intersections[actorState->collisionIndices[i]].type == 3) {
+    if (intersections[actorState->collisionIndices[i]].type == ACTOR_TYPE_FLUID) {
       continue;
     }
     accumulateConstraintImpulse(actor, actorState, actorStates, &intersections[actorState->collisionIndices[i]], softBodyStates, &impulse);
@@ -592,7 +595,7 @@ __kernel void updateDensityAndPressure(
   for (uchar i = 0; i < count; i++) {
     float rr = intersections[i].distance * intersections[i].distance;
     float q = hh - rr;
-    density += intersections[i].type == PARTICLE_TYPE_FLUID ? fluidSettings->particleMass * fluidSettings->poly6Constant * q * q * q : 0.0f;
+    density += intersections[i].type == ACTOR_TYPE_FLUID ? fluidSettings->particleMass * fluidSettings->poly6Constant * q * q * q : 0.0f;
   }
   fluidStates[fluidParticleIndex].density = density;
   fluidStates[fluidParticleIndex].pressure = fluidSettings->stiffness * fluidSettings->density * (pow(density / fluidSettings->density, 2) - 1.0f);
@@ -618,7 +621,7 @@ __kernel void updateFluidForce(
   float pressurePart2 = (fluidState->pressure / (density * density));
   float viscosityPart1 = fluidSettings->viscosity * fluidSettings->particleMass;
   for (uchar i = 0; i < count; i++) {
-    if (intersections[i].type == PARTICLE_TYPE_FLUID) {
+    if (intersections[i].type == ACTOR_TYPE_FLUID) {
       float q = intersections[i].length;
       ushort otherFluidParticleIndex = actorStates[intersections[i].otherIndex].constants.subPhysicalQuantityIndex;
       float otherDensity = fluidStates[otherFluidParticleIndex].density;

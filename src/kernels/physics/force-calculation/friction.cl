@@ -38,7 +38,7 @@ __kernel void updateByFrictionalImpulse(
   float3 impulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
-    if (intersections[i].type == 3) {
+    if (intersections[i].type == ACTOR_TYPE_FLUID) {
       continue;
     }
     accumulateFrictionalImpulse(actorState, actorStates, &intersections[i], &impulse, &angularImpulse);

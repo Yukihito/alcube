@@ -20,10 +20,10 @@ __kernel void updateByPenaltyImpulse(
   __global Intersection* intersections = actorState->intersections;
   float3 impulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
-    if (actorState->constants.type == PARTICLE_TYPE_FLUID && intersections[i].type == PARTICLE_TYPE_FLUID) {
+    if (actorState->constants.type == ACTOR_TYPE_FLUID && intersections[i].type == ACTOR_TYPE_FLUID) {
       continue;
     }
-    float penaltyFactor = actorState->constants.type == PARTICLE_TYPE_RIGID_BODY || intersections[i].type == PARTICLE_TYPE_RIGID_BODY ? 64.0f : 1024.0f;
+    float penaltyFactor = actorState->constants.type == ACTOR_TYPE_RIGID_BODY || intersections[i].type == ACTOR_TYPE_RIGID_BODY ? 64.0f : 1024.0f;
     accumulatePenaltyImpulse(&intersections[i], deltaTime, penaltyFactor, &impulse);
   }
   actorState->linearVelocity += impulse / actorState->mass;

@@ -78,7 +78,7 @@ __kernel void collectIntersections(
   float* cornerPtr = (float*)&corner;
   for (uint i = 0; i < 3 && !isFullOfIntersection; i++) {
     if (positionPtr[i] <= cornerPtr[i]) {
-      setIntersection(&actorState->intersections[intersectionCount], 1, i, cornerPtr[i] - positionPtr[i], 0.0f, -grid->normals[i], grid->normals[i] * radius);
+      setIntersection(&actorState->intersections[intersectionCount], ACTOR_TYPE_FACE, i, cornerPtr[i] - positionPtr[i], 0.0f, -grid->normals[i], grid->normals[i] * radius);
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= maxIntersection;
       if (i == 1) {
@@ -90,7 +90,7 @@ __kernel void collectIntersections(
   for (uint i = 3; i < 6 && !isFullOfIntersection; i++) {
     uint pi = i - 3;
     if (positionPtr[pi] >= -cornerPtr[pi]) {
-      setIntersection(&actorState->intersections[intersectionCount], 1, i, positionPtr[pi] + cornerPtr[pi], 0.0f, -grid->normals[i], grid->normals[i] * radius);
+      setIntersection(&actorState->intersections[intersectionCount], ACTOR_TYPE_FACE, i, positionPtr[pi] + cornerPtr[pi], 0.0f, -grid->normals[i], grid->normals[i] * radius);
       intersectionCount++;
       isFullOfIntersection = intersectionCount >= maxIntersection;
     }
@@ -98,7 +98,7 @@ __kernel void collectIntersections(
 
   float shellIntersectionLength = length(position) + radius - sphericalShellRadius;
   if (!isFullOfIntersection && shellIntersectionLength + smallValue > 0.0f) {
-    setIntersection(&actorState->intersections[intersectionCount], 2, 0, shellIntersectionLength, 0.0f, normalize(position), -normalize(position) * radius);
+    setIntersection(&actorState->intersections[intersectionCount], ACTOR_TYPE_SPHERICAL_SHELL, 0, shellIntersectionLength, 0.0f, normalize(position), -normalize(position) * radius);
     intersectionCount++;
     isFullOfIntersection = intersectionCount >= maxIntersection;
   }

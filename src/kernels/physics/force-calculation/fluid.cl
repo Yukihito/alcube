@@ -16,7 +16,7 @@ __kernel void updateDensityAndPressure(
   for (uchar i = 0; i < count; i++) {
     float rr = intersections[i].distance * intersections[i].distance;
     float q = hh - rr;
-    density += intersections[i].type == PARTICLE_TYPE_FLUID ? fluidSettings->particleMass * fluidSettings->poly6Constant * q * q * q : 0.0f;
+    density += intersections[i].type == ACTOR_TYPE_FLUID ? fluidSettings->particleMass * fluidSettings->poly6Constant * q * q * q : 0.0f;
   }
   fluidStates[fluidParticleIndex].density = density;
   fluidStates[fluidParticleIndex].pressure = fluidSettings->stiffness * fluidSettings->density * (pow(density / fluidSettings->density, 2) - 1.0f);
@@ -42,7 +42,7 @@ __kernel void updateFluidForce(
   float pressurePart2 = (fluidState->pressure / (density * density));
   float viscosityPart1 = fluidSettings->viscosity * fluidSettings->particleMass;
   for (uchar i = 0; i < count; i++) {
-    if (intersections[i].type == PARTICLE_TYPE_FLUID) {
+    if (intersections[i].type == ACTOR_TYPE_FLUID) {
       float q = intersections[i].length;
       ushort otherFluidParticleIndex = actorStates[intersections[i].otherIndex].constants.subPhysicalQuantityIndex;
       float otherDensity = fluidStates[otherFluidParticleIndex].density;
