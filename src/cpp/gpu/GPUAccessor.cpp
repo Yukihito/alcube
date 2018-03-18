@@ -697,10 +697,12 @@ namespace alcube::gpu {
 
   void Kernels::collectCollisions(
     unsigned int workSize,
-    memories::ActorState& actorStates
+    memories::ActorState& actorStates,
+    memories::SoftBodyState& softBodyStates
   ) {
     queue->push(rawKernels.collectCollisions, {workSize}, {
-      memArg(actorStates.memory)
+      memArg(actorStates.memory),
+      memArg(softBodyStates.memory)
     });
   }
 
@@ -743,10 +745,12 @@ namespace alcube::gpu {
 
   void Kernels::updateByFrictionalImpulse(
     unsigned int workSize,
-    memories::ActorState& actorStates
+    memories::ActorState& actorStates,
+    memories::SoftBodyState& softBodyStates
   ) {
     queue->push(rawKernels.updateByFrictionalImpulse, {workSize}, {
-      memArg(actorStates.memory)
+      memArg(actorStates.memory),
+      memArg(softBodyStates.memory)
     });
   }
 

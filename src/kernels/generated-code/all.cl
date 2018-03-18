@@ -480,9 +480,11 @@ void accumulateFrictionalImpulse(
 }
 
 __kernel void updateByFrictionalImpulse(
-  __global ActorState* actorStates
+  __global ActorState* actorStates,
+  __global SoftBodyState* softBodyStates
 ) {
-  size_t actorIndex = get_global_id(0);
+  size_t subIndex = get_global_id(0);
+  ushort actorIndex = softBodyStates[subIndex].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->intersectionCount;
   if (count == 0) {
@@ -502,9 +504,11 @@ __kernel void updateByFrictionalImpulse(
 }
 
 __kernel void collectCollisions(
-  __global ActorState* actorStates
+  __global ActorState* actorStates,
+  __global SoftBodyState* softBodyStates
 ) {
-  size_t actorIndex = get_global_id(0);
+  size_t subIndex = get_global_id(0);
+  ushort actorIndex = softBodyStates[subIndex].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->intersectionCount;
   if (count == 0) {
@@ -550,7 +554,8 @@ __kernel void updateByConstraintImpulse(
   __global ActorState* actorStates,
   __global SoftBodyState* softBodyStates
 ) {
-  size_t actorIndex = get_global_id(0);
+  size_t subIndex = get_global_id(0);
+  ushort actorIndex = softBodyStates[subIndex].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->collisionCount;
   if (count == 0) {

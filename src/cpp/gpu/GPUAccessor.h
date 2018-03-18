@@ -389,11 +389,11 @@ namespace alcube::gpu {
       void updateBySpringImpulse(unsigned int workSize, memories::Constants& constants, memories::SoftBodyState& softBodyStates, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::SpringState& springStates);
       void postProcessing(unsigned int workSize, memories::Constants& constants, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities);
       void collectIntersections(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, memories::Constants& constants);
-      void collectCollisions(unsigned int workSize, memories::ActorState& actorStates);
+      void collectCollisions(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBodyState& softBodyStates);
       void updateByConstraintImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBodyState& softBodyStates);
       void updateDensityAndPressure(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
       void updateFluidForce(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
-      void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates);
+      void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBodyState& softBodyStates);
       void initStepVariables(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
       void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, float deltaTime);
       void outputPositions(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);

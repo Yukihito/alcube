@@ -309,7 +309,8 @@ namespace alcube::physics {
     for (int i = 0; i < constraintResolvingIterationCount; i++) {
       kernels.collectCollisions(
         softBodyActorCount,
-        memories.actorStates
+        memories.actorStates,
+        memories.softBodyStates
       );
 
       kernels.updateByConstraintImpulse(
@@ -321,7 +322,8 @@ namespace alcube::physics {
 
     kernels.updateByFrictionalImpulse(
       softBodyActorCount,
-      memories.actorStates
+      memories.actorStates,
+      memories.softBodyStates
     );
   }
 
