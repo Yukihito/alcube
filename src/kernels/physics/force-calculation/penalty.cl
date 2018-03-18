@@ -23,8 +23,7 @@ __kernel void updateByPenaltyImpulse(
     if (actorState->constants.type == ACTOR_TYPE_FLUID && intersections[i].type == ACTOR_TYPE_FLUID) {
       continue;
     }
-    float penaltyFactor = actorState->constants.type == ACTOR_TYPE_RIGID_BODY || intersections[i].type == ACTOR_TYPE_RIGID_BODY ? 64.0f : 1024.0f;
-    accumulatePenaltyImpulse(&intersections[i], deltaTime, penaltyFactor, &impulse);
+    accumulatePenaltyImpulse(&intersections[i], deltaTime, 64.0f, &impulse);
   }
   actorState->linearVelocity += impulse / actorState->mass;
 }

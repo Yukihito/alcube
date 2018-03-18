@@ -50,8 +50,8 @@ namespace alcube::physics {
     auto fluidSettings = memories.fluidSettings.at(0);
 
     fluidSettings->stiffness = 64.0f;
-    fluidSettings->density = 0.1f;
-    fluidSettings->viscosity = 8.0f;
+    fluidSettings->density = 0.02f;
+    fluidSettings->viscosity = 4.0f;
     fluidSettings->particleMass = (4.0f / 3.0f) * CL_M_PI_F * CL_M_PI_F * CL_M_PI_F * fluidSettings->density;
     fluidSettings->effectiveRadius = 2.0f;
     fluidSettings->poly6Constant = 315.0f / (64.0f * CL_M_PI_F * powf(fluidSettings->effectiveRadius, 9));

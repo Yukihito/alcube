@@ -16,7 +16,7 @@ __kernel void updateDensityAndPressure(
   for (uchar i = 0; i < count; i++) {
     float rr = intersections[i].distance * intersections[i].distance;
     float q = hh - rr;
-    density += intersections[i].type == ACTOR_TYPE_FLUID ? fluidSettings->particleMass * fluidSettings->poly6Constant * q * q * q : 0.0f;
+    density += /*intersections[i].type == ACTOR_TYPE_FLUID || intersections[i].type == ACTOR_TYPE_RIGID_BODY ? */fluidSettings->particleMass * fluidSettings->poly6Constant * q * q * q/* : 0.0f*/;
   }
   fluidStates[fluidParticleIndex].density = density;
   fluidStates[fluidParticleIndex].pressure = fluidSettings->stiffness * fluidSettings->density * (pow(density / fluidSettings->density, 2) - 1.0f);
@@ -42,20 +42,21 @@ __kernel void updateFluidForce(
   float pressurePart2 = (fluidState->pressure / (density * density));
   float viscosityPart1 = fluidSettings->viscosity * fluidSettings->particleMass;
   for (uchar i = 0; i < count; i++) {
-    if (intersections[i].type == ACTOR_TYPE_FLUID) {
+    bool isOtherDynamic = intersections[i].type == ACTOR_TYPE_FLUID || intersections[i].type == ACTOR_TYPE_RIGID_BODY;
+    //if (isOtherDynamic) {
       float q = intersections[i].length;
       ushort otherFluidParticleIndex = actorStates[intersections[i].otherIndex].constants.subPhysicalQuantityIndex;
-      float otherDensity = fluidStates[otherFluidParticleIndex].density;
-      float otherPressure = fluidStates[otherFluidParticleIndex].pressure;
-      float3 otherVelocity = actorStates[intersections[i].otherIndex].linearVelocity;
+      float otherDensity = intersections[i].type == ACTOR_TYPE_FLUID ? fluidStates[otherFluidParticleIndex].density : density;
+      float otherPressure = intersections[i].type == ACTOR_TYPE_FLUID ? fluidStates[otherFluidParticleIndex].pressure : fluidState->pressure;
+      float3 otherVelocity = isOtherDynamic ? actorStates[intersections[i].otherIndex].linearVelocity : 0.0f;
       force +=
 	// pressure
 	pressurePart1 * (pressurePart2 + (otherPressure / (otherDensity * otherDensity))) * fluidSettings->spikyGradientConstant * q * q * intersections[i].normal
 	// viscosity
 	+ viscosityPart1 * ((otherVelocity - velocity) / otherDensity) * fluidSettings->viscosityLaplacianConstant * q;
-    }/* else {
-      force += (-1024.0f * log2(intersections[i].length + 1.0f)) * intersections[i].normal;
-      }*/
+      //}/* else if (intersections[i].type == ACTOR_TYPE_RIGID_BODY) {
+      //force += (-1024.0f * log2(intersections[i].length + 1.0f)) * intersections[i].normal;
+      //}*/
   }
   fluidState->force = force;
 }

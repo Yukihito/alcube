@@ -12,10 +12,11 @@ __kernel void collectCollisions(
   __global Intersection* intersections = actorState->intersections;
   uchar collisionCount = 0;
   for (uchar i = 0; i < count; i++) {
+    /*
     if (intersections[actorState->collisionIndices[i]].type == ACTOR_TYPE_FLUID) {
       continue;
-    }
-    float3 relativeSpeed = intersections[i].type == ACTOR_TYPE_RIGID_BODY ? actorStates[intersections[i].otherIndex].linearVelocity - actorState->linearVelocity : - actorState->linearVelocity;
+      }*/
+    float3 relativeSpeed = intersections[i].type == ACTOR_TYPE_RIGID_BODY || intersections[i].type == ACTOR_TYPE_FLUID ? actorStates[intersections[i].otherIndex].linearVelocity - actorState->linearVelocity : - actorState->linearVelocity;
     intersections[i].speed = dot(intersections[i].normal, relativeSpeed);
     if (intersections[i].speed < 0.0f) {
       actorState->collisionIndices[collisionCount] = i;
@@ -40,8 +41,11 @@ void accumulateConstraintImpulse(
   unsigned int intersectionType = intersection->type;
   ushort otherIndex = intersection->otherIndex;
   float mass = actorState->massForCollision;
-  float elasticity = intersectionType == 0 ? softBodyStates[actor->subPhysicalQuantityIndex].elasticity * softBodyStates[actorStates[otherIndex].constants.subPhysicalQuantityIndex].elasticity : softBodyStates[actor->subPhysicalQuantityIndex].elasticity;
-  float massRatio = intersectionType == 0 ? mass / actorStates[otherIndex].massForCollision : 0.0f;
+  float elasticity = intersectionType == ACTOR_TYPE_RIGID_BODY ? softBodyStates[actor->subPhysicalQuantityIndex].elasticity * softBodyStates[actorStates[otherIndex].constants.subPhysicalQuantityIndex].elasticity : softBodyStates[actor->subPhysicalQuantityIndex].elasticity;
+  float massRatio = intersectionType == ACTOR_TYPE_RIGID_BODY ? mass / actorStates[otherIndex].massForCollision : 0.0f;
+  if (intersectionType == ACTOR_TYPE_FLUID) {
+    massRatio = mass / actorStates[otherIndex].mass;
+  }
   float3 intersectionNormal = intersection->normal;
   float speedOnIntersectionNormal = dot(actorState->linearVelocity, intersectionNormal);
   float affectedSpeed = (intersection->speed * (1.0f + elasticity) / (1.0f + massRatio)) + speedOnIntersectionNormal;
@@ -64,9 +68,10 @@ __kernel void updateByConstraintImpulse(
 
   float3 impulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
+    /*
     if (intersections[actorState->collisionIndices[i]].type == ACTOR_TYPE_FLUID) {
       continue;
-    }
+      }*/
     accumulateConstraintImpulse(actor, actorState, actorStates, &intersections[actorState->collisionIndices[i]], softBodyStates, &impulse);
   }
   actorState->linearVelocity = impulse / actorState->mass;
