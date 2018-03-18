@@ -66,7 +66,6 @@ namespace alcube::physics {
       void computeNarrowPhase();
       void resolveConstraints();
       void motion();
-      void updateFluid();
 
       void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);
   };

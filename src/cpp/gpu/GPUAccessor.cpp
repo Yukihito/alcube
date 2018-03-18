@@ -484,64 +484,6 @@ namespace alcube::gpu {
     }
   }
 
-  void Kernels::inputConstants(
-    unsigned int workSize,
-    memories::Constants& constants,
-    memories::Grid& grid,
-    memories::FluidSettings& fluidSettings,
-    float gravityAcceleration,
-    float deltaTime,
-    float splitDeltaTime,
-    float sphericalShellRadius
-  ) {
-    queue->push(rawKernels.inputConstants, {workSize}, {
-      memArg(constants.memory),
-      memArg(grid.memory),
-      memArg(fluidSettings.memory),
-      floatArg(gravityAcceleration),
-      floatArg(deltaTime),
-      floatArg(splitDeltaTime),
-      floatArg(sphericalShellRadius)
-    });
-  }
-
-  void Kernels::inputActors(
-    unsigned int workSize,
-    memories::Actor& actors,
-    memories::ActorState& actorStates,
-    memories::PhysicalQuantity& hostPhysicalQuantities,
-    memories::PhysicalQuantity& physicalQuantities
-  ) {
-    queue->push(rawKernels.inputActors, {workSize}, {
-      memArg(actors.memory),
-      memArg(actorStates.memory),
-      memArg(hostPhysicalQuantities.memory),
-      memArg(physicalQuantities.memory)
-    });
-  }
-
-  void Kernels::inputSoftBodyStates(
-    unsigned int workSize,
-    memories::SoftBodyState& hostSoftBodyStates,
-    memories::SoftBodyState& softBodyStates
-  ) {
-    queue->push(rawKernels.inputSoftBodyStates, {workSize}, {
-      memArg(hostSoftBodyStates.memory),
-      memArg(softBodyStates.memory)
-    });
-  }
-
-  void Kernels::inputSprings(
-    unsigned int workSize,
-    memories::Spring& springs,
-    memories::SpringState& springStates
-  ) {
-    queue->push(rawKernels.inputSprings, {workSize}, {
-      memArg(springs.memory),
-      memArg(springStates.memory)
-    });
-  }
-
   void Kernels::initGridAndActorRelations(
     unsigned int workSize,
     memories::GridAndActorRelation& relations,
@@ -607,23 +549,149 @@ namespace alcube::gpu {
     });
   }
 
-  void Kernels::updateByPenaltyImpulse(
+  void Kernels::inputConstants(
     unsigned int workSize,
-    memories::ActorState& actorStates,
-    float deltaTime
+    memories::Constants& constants,
+    memories::Grid& grid,
+    memories::FluidSettings& fluidSettings,
+    float gravityAcceleration,
+    float deltaTime,
+    float splitDeltaTime,
+    float sphericalShellRadius
   ) {
-    queue->push(rawKernels.updateByPenaltyImpulse, {workSize}, {
-      memArg(actorStates.memory),
-      floatArg(deltaTime)
+    queue->push(rawKernels.inputConstants, {workSize}, {
+      memArg(constants.memory),
+      memArg(grid.memory),
+      memArg(fluidSettings.memory),
+      floatArg(gravityAcceleration),
+      floatArg(deltaTime),
+      floatArg(splitDeltaTime),
+      floatArg(sphericalShellRadius)
     });
   }
 
-  void Kernels::updateByFrictionalImpulse(
+  void Kernels::inputActors(
     unsigned int workSize,
-    memories::ActorState& actorStates
+    memories::Actor& actors,
+    memories::ActorState& actorStates,
+    memories::PhysicalQuantity& hostPhysicalQuantities,
+    memories::PhysicalQuantity& physicalQuantities
   ) {
-    queue->push(rawKernels.updateByFrictionalImpulse, {workSize}, {
-      memArg(actorStates.memory)
+    queue->push(rawKernels.inputActors, {workSize}, {
+      memArg(actors.memory),
+      memArg(actorStates.memory),
+      memArg(hostPhysicalQuantities.memory),
+      memArg(physicalQuantities.memory)
+    });
+  }
+
+  void Kernels::inputSoftBodyStates(
+    unsigned int workSize,
+    memories::SoftBodyState& hostSoftBodyStates,
+    memories::SoftBodyState& softBodyStates
+  ) {
+    queue->push(rawKernels.inputSoftBodyStates, {workSize}, {
+      memArg(hostSoftBodyStates.memory),
+      memArg(softBodyStates.memory)
+    });
+  }
+
+  void Kernels::inputSprings(
+    unsigned int workSize,
+    memories::Spring& springs,
+    memories::SpringState& springStates
+  ) {
+    queue->push(rawKernels.inputSprings, {workSize}, {
+      memArg(springs.memory),
+      memArg(springStates.memory)
+    });
+  }
+
+  void Kernels::inputFluid(
+    unsigned int workSize,
+    memories::FluidState& hostFluidStates,
+    memories::FluidState& fluidStates
+  ) {
+    queue->push(rawKernels.inputFluid, {workSize}, {
+      memArg(hostFluidStates.memory),
+      memArg(fluidStates.memory)
+    });
+  }
+
+  void Kernels::moveFluid(
+    unsigned int workSize,
+    memories::FluidState& fluidStates,
+    memories::ActorState& actorStates,
+    memories::PhysicalQuantity& physicalQuantities,
+    memories::Constants& constants
+  ) {
+    queue->push(rawKernels.moveFluid, {workSize}, {
+      memArg(fluidStates.memory),
+      memArg(actorStates.memory),
+      memArg(physicalQuantities.memory),
+      memArg(constants.memory)
+    });
+  }
+
+  void Kernels::calcSpringImpulses(
+    unsigned int workSize,
+    memories::Constants& constants,
+    memories::SpringState& springStates,
+    memories::PhysicalQuantity& physicalQuantities
+  ) {
+    queue->push(rawKernels.calcSpringImpulses, {workSize}, {
+      memArg(constants.memory),
+      memArg(springStates.memory),
+      memArg(physicalQuantities.memory)
+    });
+  }
+
+  void Kernels::updateBySpringImpulse(
+    unsigned int workSize,
+    memories::Constants& constants,
+    memories::SoftBodyState& softBodyStates,
+    memories::ActorState& actorStates,
+    memories::PhysicalQuantity& physicalQuantities,
+    memories::SpringState& springStates
+  ) {
+    queue->push(rawKernels.updateBySpringImpulse, {workSize}, {
+      memArg(constants.memory),
+      memArg(softBodyStates.memory),
+      memArg(actorStates.memory),
+      memArg(physicalQuantities.memory),
+      memArg(springStates.memory)
+    });
+  }
+
+  void Kernels::postProcessing(
+    unsigned int workSize,
+    memories::Constants& constants,
+    memories::ActorState& actorStates,
+    memories::PhysicalQuantity& physicalQuantities
+  ) {
+    queue->push(rawKernels.postProcessing, {workSize}, {
+      memArg(constants.memory),
+      memArg(actorStates.memory),
+      memArg(physicalQuantities.memory)
+    });
+  }
+
+  void Kernels::collectIntersections(
+    unsigned int workSize,
+    memories::ActorState& actorStates,
+    memories::PhysicalQuantity& physicalQuantities,
+    memories::GridAndActorRelation& relations,
+    memories::UintMemory& gridStartIndices,
+    memories::UintMemory& gridEndIndices,
+    memories::Constants& constants
+  ) {
+    queue->push(rawKernels.collectIntersections, {workSize}, {
+      memArg(actorStates.memory),
+      memArg(physicalQuantities.memory),
+      memArg(relations.memory),
+      memArg(gridStartIndices.memory),
+      memArg(gridEndIndices.memory),
+      memArg(constants.memory)
     });
   }
 
@@ -644,17 +712,6 @@ namespace alcube::gpu {
     queue->push(rawKernels.updateByConstraintImpulse, {workSize}, {
       memArg(actorStates.memory),
       memArg(softBodyStates.memory)
-    });
-  }
-
-  void Kernels::inputFluid(
-    unsigned int workSize,
-    memories::FluidState& hostFluidStates,
-    memories::FluidState& fluidStates
-  ) {
-    queue->push(rawKernels.inputFluid, {workSize}, {
-      memArg(hostFluidStates.memory),
-      memArg(fluidStates.memory)
     });
   }
 
@@ -684,79 +741,35 @@ namespace alcube::gpu {
     });
   }
 
-  void Kernels::moveFluid(
+  void Kernels::updateByFrictionalImpulse(
     unsigned int workSize,
-    memories::FluidState& fluidStates,
+    memories::ActorState& actorStates
+  ) {
+    queue->push(rawKernels.updateByFrictionalImpulse, {workSize}, {
+      memArg(actorStates.memory)
+    });
+  }
+
+  void Kernels::initStepVariables(
+    unsigned int workSize,
+    memories::ActorState& actorStates,
     memories::PhysicalQuantity& physicalQuantities,
     memories::Constants& constants
   ) {
-    queue->push(rawKernels.moveFluid, {workSize}, {
-      memArg(fluidStates.memory),
+    queue->push(rawKernels.initStepVariables, {workSize}, {
+      memArg(actorStates.memory),
       memArg(physicalQuantities.memory),
       memArg(constants.memory)
     });
   }
 
-  void Kernels::postProcessing(
-    unsigned int workSize,
-    memories::Constants& constants,
-    memories::ActorState& actorStates,
-    memories::PhysicalQuantity& physicalQuantities,
-    float deltaTime
-  ) {
-    queue->push(rawKernels.postProcessing, {workSize}, {
-      memArg(constants.memory),
-      memArg(actorStates.memory),
-      memArg(physicalQuantities.memory),
-      floatArg(deltaTime)
-    });
-  }
-
-  void Kernels::collectIntersections(
+  void Kernels::updateByPenaltyImpulse(
     unsigned int workSize,
     memories::ActorState& actorStates,
-    memories::PhysicalQuantity& physicalQuantities,
-    memories::GridAndActorRelation& relations,
-    memories::UintMemory& gridStartIndices,
-    memories::UintMemory& gridEndIndices,
-    memories::Constants& constants
-  ) {
-    queue->push(rawKernels.collectIntersections, {workSize}, {
-      memArg(actorStates.memory),
-      memArg(physicalQuantities.memory),
-      memArg(relations.memory),
-      memArg(gridStartIndices.memory),
-      memArg(gridEndIndices.memory),
-      memArg(constants.memory)
-    });
-  }
-
-  void Kernels::calcSpringImpulses(
-    unsigned int workSize,
-    memories::SpringState& springStates,
-    memories::PhysicalQuantity& physicalQuantities,
     float deltaTime
   ) {
-    queue->push(rawKernels.calcSpringImpulses, {workSize}, {
-      memArg(springStates.memory),
-      memArg(physicalQuantities.memory),
-      floatArg(deltaTime)
-    });
-  }
-
-  void Kernels::updateBySpringImpulse(
-    unsigned int workSize,
-    memories::SoftBodyState& softBodyStates,
-    memories::ActorState& actorStates,
-    memories::PhysicalQuantity& physicalQuantities,
-    memories::SpringState& springStates,
-    float deltaTime
-  ) {
-    queue->push(rawKernels.updateBySpringImpulse, {workSize}, {
-      memArg(softBodyStates.memory),
+    queue->push(rawKernels.updateByPenaltyImpulse, {workSize}, {
       memArg(actorStates.memory),
-      memArg(physicalQuantities.memory),
-      memArg(springStates.memory),
       floatArg(deltaTime)
     });
   }
@@ -783,27 +796,28 @@ namespace alcube::gpu {
     cl_program program = resourcesProvider->programFactory->create("../src/kernels/generated-code/all.cl");
     kernels.queue = resourcesProvider->queue;
 
-    kernels.rawKernels.inputConstants = resourcesProvider->kernelFactory->create(program, "inputConstants");
-    kernels.rawKernels.inputActors = resourcesProvider->kernelFactory->create(program, "inputActors");
-    kernels.rawKernels.inputSoftBodyStates = resourcesProvider->kernelFactory->create(program, "inputSoftBodyStates");
-    kernels.rawKernels.inputSprings = resourcesProvider->kernelFactory->create(program, "inputSprings");
     kernels.rawKernels.initGridAndActorRelations = resourcesProvider->kernelFactory->create(program, "initGridAndActorRelations");
     kernels.rawKernels.fillGridIndex = resourcesProvider->kernelFactory->create(program, "fillGridIndex");
     kernels.rawKernels.merge = resourcesProvider->kernelFactory->create(program, "merge");
     kernels.rawKernels.bitonic = resourcesProvider->kernelFactory->create(program, "bitonic");
     kernels.rawKernels.setGridRelationIndexRange = resourcesProvider->kernelFactory->create(program, "setGridRelationIndexRange");
-    kernels.rawKernels.updateByPenaltyImpulse = resourcesProvider->kernelFactory->create(program, "updateByPenaltyImpulse");
-    kernels.rawKernels.updateByFrictionalImpulse = resourcesProvider->kernelFactory->create(program, "updateByFrictionalImpulse");
-    kernels.rawKernels.collectCollisions = resourcesProvider->kernelFactory->create(program, "collectCollisions");
-    kernels.rawKernels.updateByConstraintImpulse = resourcesProvider->kernelFactory->create(program, "updateByConstraintImpulse");
+    kernels.rawKernels.inputConstants = resourcesProvider->kernelFactory->create(program, "inputConstants");
+    kernels.rawKernels.inputActors = resourcesProvider->kernelFactory->create(program, "inputActors");
+    kernels.rawKernels.inputSoftBodyStates = resourcesProvider->kernelFactory->create(program, "inputSoftBodyStates");
+    kernels.rawKernels.inputSprings = resourcesProvider->kernelFactory->create(program, "inputSprings");
     kernels.rawKernels.inputFluid = resourcesProvider->kernelFactory->create(program, "inputFluid");
-    kernels.rawKernels.updateDensityAndPressure = resourcesProvider->kernelFactory->create(program, "updateDensityAndPressure");
-    kernels.rawKernels.updateFluidForce = resourcesProvider->kernelFactory->create(program, "updateFluidForce");
     kernels.rawKernels.moveFluid = resourcesProvider->kernelFactory->create(program, "moveFluid");
-    kernels.rawKernels.postProcessing = resourcesProvider->kernelFactory->create(program, "postProcessing");
-    kernels.rawKernels.collectIntersections = resourcesProvider->kernelFactory->create(program, "collectIntersections");
     kernels.rawKernels.calcSpringImpulses = resourcesProvider->kernelFactory->create(program, "calcSpringImpulses");
     kernels.rawKernels.updateBySpringImpulse = resourcesProvider->kernelFactory->create(program, "updateBySpringImpulse");
+    kernels.rawKernels.postProcessing = resourcesProvider->kernelFactory->create(program, "postProcessing");
+    kernels.rawKernels.collectIntersections = resourcesProvider->kernelFactory->create(program, "collectIntersections");
+    kernels.rawKernels.collectCollisions = resourcesProvider->kernelFactory->create(program, "collectCollisions");
+    kernels.rawKernels.updateByConstraintImpulse = resourcesProvider->kernelFactory->create(program, "updateByConstraintImpulse");
+    kernels.rawKernels.updateDensityAndPressure = resourcesProvider->kernelFactory->create(program, "updateDensityAndPressure");
+    kernels.rawKernels.updateFluidForce = resourcesProvider->kernelFactory->create(program, "updateFluidForce");
+    kernels.rawKernels.updateByFrictionalImpulse = resourcesProvider->kernelFactory->create(program, "updateByFrictionalImpulse");
+    kernels.rawKernels.initStepVariables = resourcesProvider->kernelFactory->create(program, "initStepVariables");
+    kernels.rawKernels.updateByPenaltyImpulse = resourcesProvider->kernelFactory->create(program, "updateByPenaltyImpulse");
     kernels.rawKernels.outputPositions = resourcesProvider->kernelFactory->create(program, "outputPositions");
 
     dtos.grid = new dtos::Grid();

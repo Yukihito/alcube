@@ -18,7 +18,6 @@ typedef struct __attribute__ ((packed)) FluidSettingsStruct {
 } FluidSettings;
 
 typedef struct __attribute__ ((packed)) FluidStateStruct {
-  float3 velocity;
   float pressure;
   float density;
   float3 force;

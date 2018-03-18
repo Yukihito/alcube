@@ -31,7 +31,6 @@ namespace alcube::gpu::dtos {
 #pragma pack(push, 1)
   class FluidState {
     public:
-      cl_float3 velocity;
       float pressure;
       float density;
       cl_float3 force;

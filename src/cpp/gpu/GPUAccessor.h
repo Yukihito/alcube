@@ -345,27 +345,28 @@ namespace alcube::gpu {
 
   class RawKernels {
     public:
-      cl_kernel inputConstants;
-      cl_kernel inputActors;
-      cl_kernel inputSoftBodyStates;
-      cl_kernel inputSprings;
       cl_kernel initGridAndActorRelations;
       cl_kernel fillGridIndex;
       cl_kernel merge;
       cl_kernel bitonic;
       cl_kernel setGridRelationIndexRange;
-      cl_kernel updateByPenaltyImpulse;
-      cl_kernel updateByFrictionalImpulse;
-      cl_kernel collectCollisions;
-      cl_kernel updateByConstraintImpulse;
+      cl_kernel inputConstants;
+      cl_kernel inputActors;
+      cl_kernel inputSoftBodyStates;
+      cl_kernel inputSprings;
       cl_kernel inputFluid;
-      cl_kernel updateDensityAndPressure;
-      cl_kernel updateFluidForce;
       cl_kernel moveFluid;
-      cl_kernel postProcessing;
-      cl_kernel collectIntersections;
       cl_kernel calcSpringImpulses;
       cl_kernel updateBySpringImpulse;
+      cl_kernel postProcessing;
+      cl_kernel collectIntersections;
+      cl_kernel collectCollisions;
+      cl_kernel updateByConstraintImpulse;
+      cl_kernel updateDensityAndPressure;
+      cl_kernel updateFluidForce;
+      cl_kernel updateByFrictionalImpulse;
+      cl_kernel initStepVariables;
+      cl_kernel updateByPenaltyImpulse;
       cl_kernel outputPositions;
   };
 
@@ -373,27 +374,28 @@ namespace alcube::gpu {
     public:
       utils::opencl::CommandQueue* queue;
       RawKernels rawKernels;
-      void inputConstants(unsigned int workSize, memories::Constants& constants, memories::Grid& grid, memories::FluidSettings& fluidSettings, float gravityAcceleration, float deltaTime, float splitDeltaTime, float sphericalShellRadius);
-      void inputActors(unsigned int workSize, memories::Actor& actors, memories::ActorState& actorStates, memories::PhysicalQuantity& hostPhysicalQuantities, memories::PhysicalQuantity& physicalQuantities);
-      void inputSoftBodyStates(unsigned int workSize, memories::SoftBodyState& hostSoftBodyStates, memories::SoftBodyState& softBodyStates);
-      void inputSprings(unsigned int workSize, memories::Spring& springs, memories::SpringState& springStates);
       void initGridAndActorRelations(unsigned int workSize, memories::GridAndActorRelation& relations, unsigned int gridIndex, unsigned short actorIndex);
       void fillGridIndex(unsigned int workSize, memories::Constants& constants, memories::PhysicalQuantity& physicalQuantities, memories::GridAndActorRelation& relations);
       void merge(unsigned int workSize, memories::GridAndActorRelation& relations, unsigned int distance);
       void bitonic(unsigned int workSize, memories::GridAndActorRelation& relations, unsigned int distance, unsigned int stageDistance);
       void setGridRelationIndexRange(unsigned int workSize, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, unsigned int actorCount);
-      void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, float deltaTime);
-      void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates);
+      void inputConstants(unsigned int workSize, memories::Constants& constants, memories::Grid& grid, memories::FluidSettings& fluidSettings, float gravityAcceleration, float deltaTime, float splitDeltaTime, float sphericalShellRadius);
+      void inputActors(unsigned int workSize, memories::Actor& actors, memories::ActorState& actorStates, memories::PhysicalQuantity& hostPhysicalQuantities, memories::PhysicalQuantity& physicalQuantities);
+      void inputSoftBodyStates(unsigned int workSize, memories::SoftBodyState& hostSoftBodyStates, memories::SoftBodyState& softBodyStates);
+      void inputSprings(unsigned int workSize, memories::Spring& springs, memories::SpringState& springStates);
+      void inputFluid(unsigned int workSize, memories::FluidState& hostFluidStates, memories::FluidState& fluidStates);
+      void moveFluid(unsigned int workSize, memories::FluidState& fluidStates, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
+      void calcSpringImpulses(unsigned int workSize, memories::Constants& constants, memories::SpringState& springStates, memories::PhysicalQuantity& physicalQuantities);
+      void updateBySpringImpulse(unsigned int workSize, memories::Constants& constants, memories::SoftBodyState& softBodyStates, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::SpringState& springStates);
+      void postProcessing(unsigned int workSize, memories::Constants& constants, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities);
+      void collectIntersections(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, memories::Constants& constants);
       void collectCollisions(unsigned int workSize, memories::ActorState& actorStates);
       void updateByConstraintImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBodyState& softBodyStates);
-      void inputFluid(unsigned int workSize, memories::FluidState& hostFluidStates, memories::FluidState& fluidStates);
       void updateDensityAndPressure(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
       void updateFluidForce(unsigned int workSize, memories::ActorState& actorStates, memories::FluidState& fluidStates, memories::Constants& constants);
-      void moveFluid(unsigned int workSize, memories::FluidState& fluidStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
-      void postProcessing(unsigned int workSize, memories::Constants& constants, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, float deltaTime);
-      void collectIntersections(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, memories::Constants& constants);
-      void calcSpringImpulses(unsigned int workSize, memories::SpringState& springStates, memories::PhysicalQuantity& physicalQuantities, float deltaTime);
-      void updateBySpringImpulse(unsigned int workSize, memories::SoftBodyState& softBodyStates, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::SpringState& springStates, float deltaTime);
+      void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates);
+      void initStepVariables(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
+      void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, float deltaTime);
       void outputPositions(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
   };
 

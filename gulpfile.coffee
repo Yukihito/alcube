@@ -49,12 +49,15 @@ gulp.task 'concat-clc', ->
     generated_clc_dest + '/dtos.cl',
     generated_clc_dest + '/prototypes.cl',
     'src/kernels/physics/common.cl',
+    'src/kernels/physics/input.cl',
     'src/kernels/physics/broadphase.cl',
     'src/kernels/physics/narrowphase.cl',
-    'src/kernels/physics/constraintresolving.cl',
-    'src/kernels/physics/fluid.cl',
+    'src/kernels/physics/force-calculation/init.cl',
+    'src/kernels/physics/force-calculation/penalty.cl',
+    'src/kernels/physics/force-calculation/friction.cl',
+    'src/kernels/physics/force-calculation/constraint.cl',
+    'src/kernels/physics/force-calculation/fluid.cl',
     'src/kernels/physics/motion.cl',
-    'src/kernels/physics/softbody.cl',
     'src/kernels/drawing/particle.cl'
   ]
     .pipe(concat('all.cl'))
@@ -80,7 +83,12 @@ gulp.task 'build', -> runSequence(
 )
 
 gulp.task 'watch', ->
-  gulp.watch ['gpu-interface.yml', 'src/kernels/physics/*.cl', 'src/kernels/drawing/*.cl'], ['build']
+  gulp.watch [
+    'gpu-interface.yml',
+    'src/kernels/physics/*.cl',
+    'src/kernels/physics/force-calculation/*.cl',
+    'src/kernels/drawing/*.cl'
+  ], ['build']
 
 gulp.task 'watch-coffee', ->
   gulp.watch ['src/coffee/*.coffee'], ['compile-coffee']

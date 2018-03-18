@@ -49,7 +49,7 @@ namespace alcube::physics {
 
     auto fluidSettings = memories.fluidSettings.at(0);
 
-    fluidSettings->stiffness = 16.0f;
+    fluidSettings->stiffness = 64.0f;
     fluidSettings->density = 0.1f;
     fluidSettings->viscosity = 8.0f;
     fluidSettings->particleMass = (4.0f / 3.0f) * CL_M_PI_F * CL_M_PI_F * CL_M_PI_F * fluidSettings->density;
@@ -131,7 +131,6 @@ namespace alcube::physics {
       fluidState->density = 0.0f;
       fluidState->force = clFloat3Zero;
       fluidState->pressure = 0.0f;
-      fluidState->velocity = clFloat3Zero;
       fluidState->actorIndex = actorIndex;
     }
   }
@@ -281,60 +280,18 @@ namespace alcube::physics {
   }
 
   void Simulator::resolveConstraints() {
-    kernels.updateByPenaltyImpulse(
-      softBodyActorCount,
-      memories.actorStates,
-      deltaTime
-    );
-
-    for (int i = 0; i < constraintResolvingIterationCount; i++) {
-      kernels.collectCollisions(
-        softBodyActorCount,
-        memories.actorStates
-      );
-
-      kernels.updateByConstraintImpulse(
-        softBodyActorCount,
-        memories.actorStates,
-        memories.softBodyStates
-      );
-    }
-    kernels.updateByFrictionalImpulse(
-      softBodyActorCount,
-      memories.actorStates
-    );
-  }
-
-  void Simulator::motion() {
-    float splitDeltaTime = deltaTime / motionIterationCount;
-    for (int i = 0; i < motionIterationCount; i++) {
-      if (springCount > 0) {
-        kernels.calcSpringImpulses(
-          springCount,
-          memories.springStates,
-          memories.physicalQuantities,
-          splitDeltaTime
-        );
-      }
-      kernels.updateBySpringImpulse(
-        softBodyActorCount,
-        memories.softBodyStates,
-        memories.actorStates,
-        memories.physicalQuantities,
-        memories.springStates,
-        splitDeltaTime
-      );
-    }
-    kernels.postProcessing(
-      softBodyActorCount,
-      memories.constants,
+    kernels.initStepVariables(
+      actorCount,
       memories.actorStates,
       memories.physicalQuantities,
+      memories.constants
+    );
+    kernels.updateByPenaltyImpulse(
+      actorCount,
+      memories.actorStates,
       deltaTime
     );
-  }
 
-  void Simulator::updateFluid() {
     kernels.updateDensityAndPressure(
       fluidActorCount,
       memories.actorStates,
@@ -349,11 +306,58 @@ namespace alcube::physics {
       memories.constants
     );
 
+    for (int i = 0; i < constraintResolvingIterationCount; i++) {
+      kernels.collectCollisions(
+        softBodyActorCount,
+        memories.actorStates
+      );
+
+      kernels.updateByConstraintImpulse(
+        softBodyActorCount,
+        memories.actorStates,
+        memories.softBodyStates
+      );
+    }
+
+    kernels.updateByFrictionalImpulse(
+      softBodyActorCount,
+      memories.actorStates
+    );
+  }
+
+  void Simulator::motion() {
     kernels.moveFluid(
       fluidActorCount,
       memories.fluidStates,
+      memories.actorStates,
       memories.physicalQuantities,
       memories.constants
+    );
+
+    for (int i = 0; i < motionIterationCount; i++) {
+      if (springCount > 0) {
+        kernels.calcSpringImpulses(
+          springCount,
+          memories.constants,
+          memories.springStates,
+          memories.physicalQuantities
+        );
+      }
+      kernels.updateBySpringImpulse(
+        softBodyActorCount,
+        memories.constants,
+        memories.softBodyStates,
+        memories.actorStates,
+        memories.physicalQuantities,
+        memories.springStates
+      );
+    }
+
+    kernels.postProcessing(
+      softBodyActorCount,
+      memories.constants,
+      memories.actorStates,
+      memories.physicalQuantities
     );
   }
 
@@ -368,7 +372,6 @@ namespace alcube::physics {
     computeNarrowPhase();
     resolveConstraints();
     motion();
-    updateFluid();
   }
 
   void Simulator::add(SoftBodyActor *actor) {

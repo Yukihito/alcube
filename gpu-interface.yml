@@ -1,5 +1,6 @@
 kernels-directories:
   - src/kernels/physics
+  - src/kernels/physics/force-calculation
   - src/kernels/drawing
 
 variables:
@@ -86,7 +87,6 @@ dto-structs:
 
   # Variables for fluid actors
   FluidState: # Physical quantity 3
-    - float3 velocity
     - float  pressure
     - float  density
     - float3 force

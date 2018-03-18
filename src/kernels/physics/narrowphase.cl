@@ -103,21 +103,8 @@ __kernel void collectIntersections(
     isFullOfIntersection = intersectionCount >= maxIntersection;
   }
 
-  float momentOfInertia = (2.0f / 5.0f) * mass * radius * radius;
-  actorState->momentOfInertia = momentOfInertia;
-  float gravityTranslation = gravityAcceleration * deltaTime;
-  float gravity = isFloating ? -gravityTranslation : 0.0f;
-  actorState->linearVelocity = physicalQuantity->linearMomentum / mass + (float3)(0.0f, gravity, 0.0f);
-  float ySpeed = actorState->linearVelocity.y;
-  if (!isFloating && ySpeed * ySpeed < gravityTranslation * gravityTranslation * 16.0f) {
-    actorState->linearVelocity.y = 0.0f;
-  }
-  actorState->angularVelocity = physicalQuantity->angularMomentum / momentOfInertia;
-  actorState->isFloating = isFloating ? 1 : 0;
 
   actorState->intersectionCount = intersectionCount;
   actorState->collisionCount = 0;
-
-  actorState->massForIntersection = mass / intersectionCount;
-  actorState->massForCollision = mass;
+  actorState->isFloating = isFloating ? 1 : 0;
 }

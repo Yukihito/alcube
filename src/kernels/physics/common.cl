@@ -1,7 +1,7 @@
-#define PARTICLE_TYPE_RIGID_BODY      = 0
-#define PARTICLE_TYPE_FACE            = 1
-#define PARTICLE_TYPE_SPHERICAL_SHELL = 2
-#define PARTICLE_TYPE_FLUID           = 3
+#define PARTICLE_TYPE_RIGID_BODY      0
+#define PARTICLE_TYPE_FACE            1
+#define PARTICLE_TYPE_SPHERICAL_SHELL 2
+#define PARTICLE_TYPE_FLUID           3
 
 float4 mulQuat(float4 q, float4 r) {
   float4 result;
