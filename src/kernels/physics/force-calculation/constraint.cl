@@ -12,10 +12,6 @@ __kernel void collectCollisions(
   __global Intersection* intersections = actorState->intersections;
   uchar collisionCount = 0;
   for (uchar i = 0; i < count; i++) {
-    /*
-    if (intersections[actorState->collisionIndices[i]].type == ACTOR_TYPE_FLUID) {
-      continue;
-      }*/
     float3 relativeSpeed = intersections[i].type == ACTOR_TYPE_RIGID_BODY || intersections[i].type == ACTOR_TYPE_FLUID ? actorStates[intersections[i].otherIndex].linearVelocity - actorState->linearVelocity : - actorState->linearVelocity;
     intersections[i].speed = dot(intersections[i].normal, relativeSpeed);
     if (intersections[i].speed < 0.0f) {
@@ -68,10 +64,6 @@ __kernel void updateByConstraintImpulse(
 
   float3 impulse = (float3)(0.0f);
   for (uchar i = 0; i < count; i++) {
-    /*
-    if (intersections[actorState->collisionIndices[i]].type == ACTOR_TYPE_FLUID) {
-      continue;
-      }*/
     accumulateConstraintImpulse(actor, actorState, actorStates, &intersections[actorState->collisionIndices[i]], softBodyStates, &impulse);
   }
   actorState->linearVelocity = impulse / actorState->mass;
