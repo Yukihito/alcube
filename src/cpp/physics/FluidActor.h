@@ -4,12 +4,13 @@
 #include <glm/vec3.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include "Actor.h"
 
 namespace alcube::physics {
-  class FluidActor {
+  class FluidActor: public Actor {
     public:
       explicit FluidActor();
-      glm::vec3 position;
+      gpu::dtos::Fluid subPhysicalQuantity;
   };
 }
 

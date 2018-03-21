@@ -1,6 +1,9 @@
 #ifndef ALCUBE_SPRING_H
 #define ALCUBE_SPRING_H
 
+#include <glm/vec3.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
 #include "SoftBodyActor.h"
 
 namespace alcube::physics {

@@ -1,13 +1,13 @@
 #ifndef ALCUBE_PHYSICS_SOFT_BODY_PARTICLE_H
 #define ALCUBE_PHYSICS_SOFT_BODY_PARTICLE_H
 
-#include "rigidbody/Sphere.h"
+#include "Actor.h"
 
 namespace alcube::physics {
-  class SoftBodyActor : public rigidbody::Sphere {
+  class SoftBodyActor : public Actor {
     public:
       explicit SoftBodyActor();
-      unsigned short index;
+      gpu::dtos::SoftBody subPhysicalQuantity;
   };
 }
 

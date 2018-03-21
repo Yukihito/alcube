@@ -27,9 +27,10 @@ namespace alcube::samples {
     for (int i = 0; i < 32; i++) {
       for (int j = 0; j < i ; j++) {
         for (int k = 0; k < i; k++) {
-          auto particle = new physics::FluidActor();
-          particle->position = glm::vec3((float)i * 2.0f, (float)j * 2.0f, (float)k * 2.0f) - glm::vec3(w/2 - 1.0f, w/2 - 1.0f, w/2 - 1.0f) + 0.01f * glm::vec3(randReal3(mt), randReal3(mt), randReal3(mt));
-          add(particle);
+          auto actor = new physics::FluidActor();
+          glm::vec3 pos = glm::vec3((float)i * 2.0f, (float)j * 2.0f, (float)k * 2.0f) - glm::vec3(w/2 - 1.0f, w/2 - 1.0f, w/2 - 1.0f) + 0.01f * glm::vec3(randReal3(mt), randReal3(mt), randReal3(mt));
+          actor->physicalQuantity.position = { pos.x, pos.y, pos.z };
+          add(actor);
         }
       }
     }
@@ -40,17 +41,18 @@ namespace alcube::samples {
     for (int z = 0; z < softBodySize; z++) {
       for (int y = 0; y < softBodySize; y++) {
         for (int x = 0; x < softBodySize; x++) {
-          auto ball = new physics::SoftBodyActor();
-          ball->mass = 0.2f;
+          auto actor = new physics::SoftBodyActor();
+          actor->physicalQuantity.mass = 0.2f;
           glm::vec3 offset = glm::vec3(-w / 4, w / 4, 0.0f);
-          ball->position = glm::vec3(
+          glm::vec3 pos = glm::vec3(
             x * 2.0f - (softBodyEdgeLength / 2.0f),
             y * 2.0f - (softBodyEdgeLength / 2.0f),
             z * 2.0f - (softBodyEdgeLength / 2.0f)
           ) + offset;
-          ball->linearMomentum = glm::vec3(3.0f, 1.0f, 0.5f);
-          ball->elasticity = 0.0f;
-          add(ball);
+          actor->physicalQuantity.position = {pos.x, pos.y, pos.z};
+          actor->physicalQuantity.linearMomentum = { 3.0f, 1.0f, 0.5f };
+          actor->subPhysicalQuantity.elasticity = 0.0f;
+          add(actor);
         }
       }
     }

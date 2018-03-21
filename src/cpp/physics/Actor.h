@@ -4,17 +4,20 @@
 #include "../gpu/dtos.h"
 
 namespace alcube::physics {
-  enum PhysicalFeature {
-    SOFT_BODY,
+  enum ActorType {
+    SOFT_BODY = 0,
+    FACE,
+    SPHERICAL_SHELL,
     FLUID
   };
 
   class Actor {
     public:
       unsigned short index;
-      unsigned short subPhysicalQuantityIndex;
-      PhysicalFeature feature;
-      gpu::dtos::PhysicalQuantity physicalQuantities;
+      gpu::dtos::Actor actor;
+      gpu::dtos::PhysicalQuantity physicalQuantity;
+    protected:
+      explicit Actor();
   };
 }
 
