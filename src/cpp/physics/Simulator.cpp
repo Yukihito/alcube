@@ -87,26 +87,9 @@ namespace alcube::physics {
       softBodyActor->index = actorIndex;
       softBodyActor->subPhysicalQuantity.actorIndex = actorIndex;
       softBodyActor->actor.subPhysicalQuantityIndex = i;
-      //auto actor = memories.actors.at(i);
       memories.actors.dto[actorIndex] = softBodyActor->actor;
       memories.hostPhysicalQuantities.dto[actorIndex] = softBodyActor->physicalQuantity;
       memories.hostSoftBodys.dto[i] = softBodyActor->subPhysicalQuantity;
-      //auto hostPhysicalQuantity = memories.hostPhysicalQuantities.at(i);
-      /*
-      hostPhysicalQuantity->radius = softBodyActor->radius;
-      hostPhysicalQuantity->mass = softBodyActor->mass;
-      actor->type = 0;
-      actor->subPhysicalQuantityIndex = (unsigned short)i;
-      hostPhysicalQuantity->linearMomentum = toCl(softBodyActor->linearMomentum);
-      hostPhysicalQuantity->angularMomentum = toCl(softBodyActor->angularMomentum);
-      hostPhysicalQuantity->position = toCl(softBodyActor->position);
-      hostPhysicalQuantity->rotation = toCl(softBodyActor->rotation);
-
-      auto hostSoftBodyState = memories.hostSoftBodys.at(i);
-      hostSoftBodyState->elasticity = softBodyActor->elasticity;
-      hostSoftBodyState->springCount = 0;
-      hostSoftBodyState->actorIndex = (unsigned short)i;
-       */
       actorIndex++;
     }
 
@@ -128,23 +111,6 @@ namespace alcube::physics {
       memories.actors.dto[actorIndex] = fluidActor->actor;
       memories.hostPhysicalQuantities.dto[actorIndex] = fluidActor->physicalQuantity;
       memories.hostFluids.dto[i] = fluidActor->subPhysicalQuantity;
-      /*
-      auto actor = memories.actors.at(actorIndex);
-      auto hostPhysicalQuantity = memories.hostPhysicalQuantities.at(actorIndex);
-      hostPhysicalQuantity->radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
-      hostPhysicalQuantity->mass = memories.fluidSettings.at(0)->particleMass;
-      actor->type = 3;
-      actor->subPhysicalQuantityIndex = i;
-
-      cl_float3 clFloat3Zero = {0.0f, 0.0f, 0.0f};
-      hostPhysicalQuantity->linearMomentum = clFloat3Zero;
-      hostPhysicalQuantity->angularMomentum = clFloat3Zero;
-      hostPhysicalQuantity->position = toCl(fluidActor->position);
-      hostPhysicalQuantity->rotation = {0.0f, 0.0f, 0.0f, 1.0f};
-
-      auto fluidState = memories.hostFluids.at(i);
-      fluidState->actorIndex = actorIndex;
-       */
       actorIndex++;
     }
   }
