@@ -10,10 +10,6 @@ __kernel void moveFluid(
   __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
   actorState->linearVelocity += (actorState->fluidForce * constants->deltaTime) / constants->fluidSettings.particleMass;
   physicalQuantity->position += constants->deltaTime * actorState->linearVelocity;
-  float3 corner = grid->origin + (float3)(0.0001f);
-  physicalQuantity->position = clamp(physicalQuantity->position, corner, -corner);
-  physicalQuantity->linearMomentum = actorState->linearVelocity * constants->fluidSettings.particleMass;
-  physicalQuantity->angularMomentum = (float3)(0.0f);
 }
 
 __kernel void calcSpringImpulses(

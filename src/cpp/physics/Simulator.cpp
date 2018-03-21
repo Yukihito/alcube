@@ -62,7 +62,7 @@ namespace alcube::physics {
   void Simulator::setUpComputingSize() {
     softBodyActorCount = (unsigned int)softBodyActors.size();
     fluidActorCount = (unsigned int)fluidActors.size();
-    actorCount = softBodyActorCount + fluidActorCount;
+    actorCount = (unsigned int)actors.size();
     springCount = (unsigned int)springs.size();
     actorCountForBitonicSort = utils::math::powerOf2(actorCount);
   }
@@ -80,59 +80,35 @@ namespace alcube::physics {
   }
 
   void Simulator::writeHostMemories() {
-    // Input soft body actors
-    unsigned short actorIndex = 0;
-    for (unsigned short i = 0; i < softBodyActorCount; i++) {
-      SoftBodyActor* softBodyActor = softBodyActors[i];
-      softBodyActor->index = actorIndex;
-      softBodyActor->subPhysicalQuantity.actorIndex = actorIndex;
-      softBodyActor->actor.subPhysicalQuantityIndex = i;
-      memories.actors.dto[actorIndex] = softBodyActor->actor;
-      memories.hostPhysicalQuantities.dto[actorIndex] = softBodyActor->physicalQuantity;
-      memories.hostSoftBodys.dto[i] = softBodyActor->subPhysicalQuantity;
-      actorIndex++;
+    for (unsigned short i = 0; i < actorCount; i++) {
+      actors[i]->index = i;
     }
 
-    // Input springs
+    for (unsigned short i = 0; i < softBodyActorCount; i++) {
+      auto actor = softBodyActors[i];
+      actor->actor.subPhysicalQuantityIndex = i;
+      actor->subPhysicalQuantity.actorIndex = actor->index;
+      memories.actors.dto[actor->index] = actor->actor;
+      memories.hostPhysicalQuantities.dto[actor->index] = actor->physicalQuantity;
+      memories.hostSoftBodys.dto[i] = actor->subPhysicalQuantity;
+    }
+
+    for (unsigned short i = 0; i < fluidActorCount; i++) {
+      auto actor = fluidActors[i];
+      actor->actor.subPhysicalQuantityIndex = i;
+      actor->subPhysicalQuantity.actorIndex = actor->index;
+      actor->physicalQuantity.radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
+      actor->physicalQuantity.mass = memories.fluidSettings.at(0)->particleMass;
+      memories.actors.dto[actor->index] = actor->actor;
+      memories.hostPhysicalQuantities.dto[actor->index] = actor->physicalQuantity;
+      memories.hostFluids.dto[i] = actor->subPhysicalQuantity;
+    }
+
     for (unsigned int i = 0; i < springCount; i++) {
       memories.springs.at(i)->k = springs[i]->k;
       setUpSpring(i, 0);
       setUpSpring(i, 1);
     }
-
-    // Input fluid actors
-    for (unsigned short i = 0; i < fluidActorCount; i++) {
-      FluidActor* fluidActor = fluidActors[i];
-      fluidActor->index = actorIndex;
-      fluidActor->physicalQuantity.radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
-      fluidActor->physicalQuantity.mass = memories.fluidSettings.at(0)->particleMass;
-      fluidActor->actor.subPhysicalQuantityIndex = i;
-      fluidActor->subPhysicalQuantity.actorIndex = actorIndex;
-      memories.actors.dto[actorIndex] = fluidActor->actor;
-      memories.hostPhysicalQuantities.dto[actorIndex] = fluidActor->physicalQuantity;
-      memories.hostFluids.dto[i] = fluidActor->subPhysicalQuantity;
-      actorIndex++;
-    }
-  }
-
-  void Simulator::output() {
-    /*
-    memories.physicalQuantities.read();
-    for (int i = 0; i < softBodyActorCount; i++) {
-      SoftBodyActor* softBodyActor = softBodyActors[i];
-      auto physicalQuantity = memories.physicalQuantities.at(i);
-      softBodyActor->linearMomentum = toGlm(physicalQuantity->linearMomentum);
-      softBodyActor->angularMomentum = toGlm(physicalQuantity->angularMomentum);
-      softBodyActor->position = toGlm(physicalQuantity->position);
-      softBodyActor->rotation = toGlmQuat(physicalQuantity->rotation);
-    }
-
-    for (int i = 0; i < fluidActorCount; i++) {
-      int globalIndex = i + softBodyActorCount;
-      FluidActor* fluidActor = fluidActors[i];
-      fluidActor->position = toGlm(memories.physicalQuantities.at(globalIndex)->position);
-    }
-     */
   }
 
   void Simulator::setUpMemories() {
@@ -268,6 +244,7 @@ namespace alcube::physics {
       memories.physicalQuantities,
       memories.constants
     );
+
     kernels.updateByPenaltyImpulse(
       softBodyActorCount,
       memories.actorStates,
@@ -339,7 +316,7 @@ namespace alcube::physics {
     }
 
     kernels.postProcessing(
-      softBodyActorCount,
+      actorCount,
       memories.constants,
       memories.actorStates,
       memories.physicalQuantities
@@ -360,6 +337,7 @@ namespace alcube::physics {
   }
 
   void Simulator::add(SoftBodyActor *actor) {
+    actors.push_back(actor);
     softBodyActors.push_back(actor);
   }
 
@@ -372,6 +350,7 @@ namespace alcube::physics {
   }
 
   void Simulator::add(FluidActor *actor) {
+    actors.push_back(actor);
     fluidActors.push_back(actor);
   }
 }

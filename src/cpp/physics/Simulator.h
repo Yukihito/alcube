@@ -38,13 +38,13 @@ namespace alcube::physics {
       SoftBodyActor* getSoftBodyActor(unsigned long i);
       void input();
       void update();
-      void output();
       float gravity;
       float sphericalShellRadius;
       unsigned int actorCount;
     private:
       gpu::Kernels kernels;
       gpu::Memories memories;
+      std::vector<Actor*> actors;
       std::vector<SoftBodyActor*> softBodyActors;
       std::vector<FluidActor*> fluidActors;
       std::vector<Spring*> springs;
