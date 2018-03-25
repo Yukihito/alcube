@@ -8,10 +8,10 @@ namespace alcube::physics::fluid {
 
   void Simulator::setUpConstants() {
     auto fluidSettings = memories.fluidSettings.at(0);
-    fluidSettings->stiffness = 64.0f;
-    fluidSettings->density = 0.02f;
-    fluidSettings->viscosity = 8.0f;
-    fluidSettings->particleMass = (4.0f / 3.0f) * CL_M_PI_F * CL_M_PI_F * CL_M_PI_F * fluidSettings->density;
+    fluidSettings->stiffness = Actor::stiffness; //64.0f;
+    fluidSettings->density = Actor::density; //0.02f;
+    fluidSettings->viscosity = Actor::viscosity; //8.0f;
+    fluidSettings->particleMass = Actor::mass; //(4.0f / 3.0f) * CL_M_PI_F * CL_M_PI_F * CL_M_PI_F * fluidSettings->density;
     fluidSettings->effectiveRadius = 2.0f;
     fluidSettings->poly6Constant = 315.0f / (64.0f * CL_M_PI_F * powf(fluidSettings->effectiveRadius, 9));
     fluidSettings->spikyGradientConstant = 45.0f / (CL_M_PI_F * powf(fluidSettings->effectiveRadius, 6));
@@ -73,12 +73,11 @@ namespace alcube::physics::fluid {
   }
 
   bool Simulator::add(physics::Actor *actor) {
-    auto fluidActor = dynamic_cast<Actor*>(actor);
-    if (fluidActor == nullptr) {
-      return false;
-    } else {
-      actors.push_back(fluidActor);
+    if (Actor::instances.count(actor) > 0) {
+      actors.push_back(Actor::instances[actor]);
       return true;
+    } else {
+      return false;
     }
   }
 }

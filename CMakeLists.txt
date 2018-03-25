@@ -69,10 +69,9 @@ target_link_libraries(alcube_physics_lib
 ### Alcube
 set(ALCUBE_ALCUBE_SOURCE_FILES
         src/cpp/models/actor/Actor.cpp src/cpp/models/actor/Actor.h
-        src/cpp/models/link/Link.cpp src/cpp/models/link/Link.h
         src/cpp/models/physics/Accessors.cpp src/cpp/models/physics/Accessors.h
         src/cpp/models/physics/Features.cpp src/cpp/models/physics/Features.h
-        src/cpp/models/Simulator.cpp src/cpp/models/Simulator.h)
+        src/cpp/models/Alcube.cpp src/cpp/models/Alcube.h src/cpp/models/physics/fluid/Features.cpp src/cpp/models/physics/fluid/Features.h src/cpp/models/physics/softbody/Features.cpp src/cpp/models/physics/softbody/Features.h src/cpp/models/physics/softbody/Spring.cpp src/cpp/models/physics/softbody/Spring.h)
 add_library(alcube_models_lib STATIC ${ALCUBE_ALCUBE_SOURCE_FILES})
 target_link_libraries(alcube_models_lib
         alcube_utils_lib
@@ -104,6 +103,8 @@ target_link_libraries(alcube_samples_lib
         alcube_utils_lib
         alcube_gpu_accessor_lib
         alcube_drawing_lib
+        alcube_models_lib
+        alcube_scripting_lib
         )
 
 

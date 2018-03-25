@@ -102,17 +102,16 @@ namespace alcube::physics::softbody {
   }
 
   bool Simulator::add(physics::Actor *actor) {
-    auto softBodyActor = dynamic_cast<Actor*>(actor);
-    if (softBodyActor == nullptr) {
-      return false;
-    } else {
-      actors.push_back(softBodyActor);
+    if (Actor::instances.count(actor) > 0) {
+      actors.push_back(Actor::instances[actor]);
       return true;
+    } else {
+      return false;
     }
   }
 
   void Simulator::setUpSpring(unsigned int springIndex, unsigned char nodeIndex) {
-    unsigned short actorIndex = springs[springIndex]->nodes[nodeIndex].particle->index;
+    unsigned short actorIndex = springs[springIndex]->nodes[nodeIndex].actor->index;
     memories.springs.at(springIndex)->actorIndices[nodeIndex] = actorIndex;
     memories.springs.at(springIndex)->nodePositionsModelSpace[nodeIndex] = toCl(springs[springIndex]->nodes[nodeIndex].position);
 
@@ -125,9 +124,5 @@ namespace alcube::physics::softbody {
 
   void Simulator::add(Spring *spring) {
     springs.push_back(spring);
-  }
-
-  Actor* Simulator::getActor(unsigned long i) {
-    return actors[i];
   }
 }

@@ -9,7 +9,7 @@
 namespace alcube::physics::softbody {
   class SpringNode {
     public:
-      Actor* particle;
+      physics::Actor* actor;
       glm::vec3 position;
   };
 

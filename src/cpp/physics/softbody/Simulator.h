@@ -18,18 +18,17 @@ namespace alcube::physics::softbody {
       void motion() override;
       bool add(physics::Actor* actor) override;
       void add(Spring* spring);
-      Actor* getActor(unsigned long i);
 
     private:
       void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);
       gpu::Kernels kernels = {};
       gpu::Memories memories = {};
-      unsigned int actorCount;
-      unsigned int springCount;
+      unsigned int actorCount = 0;
+      unsigned int springCount = 0;
       unsigned int motionIterationCount = 8;
       unsigned int constraintResolvingIterationCount = 16;
-      std::vector<softbody::Actor*> actors;
-      std::vector<softbody::Spring*> springs;
+      std::vector<softbody::Actor*> actors = {};
+      std::vector<softbody::Spring*> springs = {};
   };
 }
 

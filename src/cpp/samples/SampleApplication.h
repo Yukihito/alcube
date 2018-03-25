@@ -5,6 +5,8 @@
 #include <glm/gtx/transform.hpp>
 #include "ApplicationBase.h"
 #include "SphereDrawable.h"
+#include "../models/physics/fluid/Features.h"
+#include "../models/physics/softbody/Features.h"
 
 namespace alcube::samples {
   class SampleApplication : public ApplicationBase {
@@ -14,9 +16,12 @@ namespace alcube::samples {
       void onInit() override;
     private:
       SphereDrawable* drawable;
-      unsigned short actorCount;
+      /*
+            unsigned short actorCount;
       void add(physics::softbody::Actor *actor);
       void add(physics::fluid::Actor *actor);
+      void add(models::actor::Actor* actor);
+       */
   };
 }
 

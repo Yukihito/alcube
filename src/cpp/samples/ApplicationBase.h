@@ -9,6 +9,7 @@
 #include "../drawing/DrawerWithProfiler.h"
 #include "../physics/fluid/Simulator.h"
 #include "../physics/softbody/Simulator.h"
+#include "../models/Alcube.h"
 
 
 namespace alcube::samples {
@@ -43,6 +44,10 @@ namespace alcube::samples {
       utils::Profiler *profiler;
       physics::Simulator *physicsSimulator;
       physics::softbody::Simulator* softBodySimulator;
+      physics::fluid::Simulator* fluidSimulator;
+      models::Alcube* cube;
+      models::actor::ActorFactory* actorFactory;
+      models::physics::softbody::SpringFactory* springFactory;
       Profilers profilers;
       unsigned int maxCellCount;
       float deltaTime;

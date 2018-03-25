@@ -2,18 +2,8 @@
 
 namespace alcube::models::actor {
   using namespace utils::opencl::conversions;
-  Actor::Actor(int id, int physicsFeaturesId, alcube::physics::Actor* physicsActor) {
-    this->id = id;
-    this->physicsFeaturesId = physicsFeaturesId;
+  Actor::Actor(alcube::physics::Actor* physicsActor) {
     this->physicsActor = physicsActor;
-  }
-
-  int Actor::getId() {
-    return id;
-  }
-
-  int Actor::getPhysicsFeaturesId() {
-    return physicsFeaturesId;
   }
 
   glm::vec3 Actor::getPosition() {
@@ -49,15 +39,12 @@ namespace alcube::models::actor {
     physicsActor->physicalQuantity.angularMomentum = toCl(arg);
   }
 
-  Actor* ActorRepository::find(int id) {
-    return actors[id];
+  Actor* ActorFactory::create(physics::Features *feature) {
+    auto physicsActor = feature->createPhysicsActor();
+    return new Actor(physicsActor);
   }
 
-  void ActorRepository::store(Actor *entity) {
-    actors[entity->getId()] = entity;
-  }
-
-  void ActorRepository::del(int id) {
-    actors.erase(id);
+  alcube::physics::Actor* Actor::getPhysicsActor() {
+    return physicsActor;
   }
 }

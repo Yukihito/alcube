@@ -11,7 +11,6 @@
 namespace alcube::models::actor {
   class Actor : public physics::Accessors {
     public:
-      int getId();
       glm::vec3 getPosition() override;
       void setPosition(glm::vec3 arg) override;
       glm::quat getRotation() override;
@@ -20,30 +19,16 @@ namespace alcube::models::actor {
       void setLinearMomentum(glm::vec3 arg) override;
       glm::vec3 getAngularMomentum() override;
       void setAngularMomentum(glm::vec3 arg) override;
-      // package private:
-      explicit Actor(int id, int physicsFeaturesId, alcube::physics::Actor* physicsActor);
-      int getPhysicsFeaturesId();
-      virtual void addTo(alcube::physics::Simulator* physicsSimulator) = 0;
 
+      explicit Actor(alcube::physics::Actor* physicsActor);
+      alcube::physics::Actor* getPhysicsActor();
     private:
-      int id;
-      int physicsFeaturesId;
       alcube::physics::Actor* physicsActor;
-  };
-
-  class ActorRepository {
-    public:
-      Actor* find(int id);
-      void store(Actor* entity);
-      void del(int id);
-
-    private:
-      std::map<int, Actor*> actors;
   };
 
   class ActorFactory {
     public:
-      virtual Actor* create(physics::Features* feature) = 0;
+      Actor* create(physics::Features* feature);
   };
 }
 
