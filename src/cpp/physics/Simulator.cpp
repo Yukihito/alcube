@@ -216,17 +216,12 @@ namespace alcube::physics {
     motion();
   }
 
-  void Simulator::add(softbody::Actor *actor) {
+  void Simulator::add(Actor *actor) {
     actors.push_back(actor);
     for (auto subSimulator : subSimulators) {
-      subSimulator->add(actor);
-    }
-  }
-
-  void Simulator::add(fluid::Actor *actor) {
-    actors.push_back(actor);
-    for (auto subSimulator : subSimulators) {
-      subSimulator->add(actor);
+      if (subSimulator->add(actor)) {
+        return;
+      }
     }
   }
 

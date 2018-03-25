@@ -11,13 +11,10 @@
 #include "../utils/opencl/ProgramFactory.h"
 #include "../utils/opencl/Resources.h"
 #include "../utils/opencl/conversions.h"
-#include "softbody/Spring.h"
 #include "../utils/alcubemath.h"
 #include "../gpu/GPUAccessor.h"
 #include "../utils/opencl/ResourcesProvider.h"
-#include "fluid/Actor.h"
 #include "SubSimulator.h"
-#include "softbody/Actor.h"
 
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
@@ -33,8 +30,7 @@ namespace alcube::physics {
         float deltaTime,
         gpu::GPUAccessor* gpuAccessor
       );
-      void add(softbody::Actor* actor);
-      void add(fluid::Actor* actor);
+      void add(Actor* actor);
       void add(SubSimulator* subSimulator);
       void input();
       void update();
