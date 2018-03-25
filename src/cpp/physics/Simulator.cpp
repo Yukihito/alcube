@@ -11,23 +11,23 @@ namespace alcube::physics {
     unsigned int yGridCount,
     unsigned int zGridCount,
     float deltaTime,
-    gpu::GPUAccessor* gpu
+    gpu::GPUAccessor* gpuAccessor
   ) {
-    kernels = gpu->kernels;
-    memories = gpu->memories;
+    this->gpuAccessor = gpuAccessor;
+    kernels = gpuAccessor->kernels;
+    memories = gpuAccessor->memories;
     this->deltaTime = deltaTime;
     this->maxActorCount = maxActorCount;
     this->allGridCount = xGridCount * yGridCount * zGridCount;
-    softBodyActors = {};
-    springs = {};
-    fluidActors = {};
-    motionIterationCount = 8;
-    constraintResolvingIterationCount = 16;
-
-    // Set up constants.
+    this->gridEdgeLength = gridEdgeLength;
+    this->xGridCount = xGridCount;
+    this->yGridCount = yGridCount;
+    this->zGridCount = zGridCount;
     gravity = 0.0f;
     sphericalShellRadius = 100000.0f;
+  }
 
+  void Simulator::setUpConstants() {
     auto grid = memories.grid.at(0);
     grid->edgeLength = gridEdgeLength;
     grid->xCount = xGridCount;
@@ -38,45 +38,28 @@ namespace alcube::physics {
       -(float)((yGridCount * gridEdgeLength) / 2),
       -(float)((zGridCount * gridEdgeLength) / 2)
     };
+
     for (int i = 0; i < 3; i++) {
       grid->normals[i] = {0.0f, 0.0f, 0.0f};
       grid->normals[i].s[i] = 1.0f;
     }
+
     for (int i = 3; i < 6; i++) {
       grid->normals[i] = {0.0f, 0.0f, 0.0f};
       grid->normals[i].s[i - 3] = -1.0f;
     }
 
-    auto fluidSettings = memories.fluidSettings.at(0);
-
-    fluidSettings->stiffness = 64.0f;
-    fluidSettings->density = 0.02f;
-    fluidSettings->viscosity = 8.0f;
-    fluidSettings->particleMass = (4.0f / 3.0f) * CL_M_PI_F * CL_M_PI_F * CL_M_PI_F * fluidSettings->density;
-    fluidSettings->effectiveRadius = 2.0f;
-    fluidSettings->poly6Constant = 315.0f / (64.0f * CL_M_PI_F * powf(fluidSettings->effectiveRadius, 9));
-    fluidSettings->spikyGradientConstant = 45.0f / (CL_M_PI_F * powf(fluidSettings->effectiveRadius, 6));
-    fluidSettings->viscosityLaplacianConstant = 45.0f / (CL_M_PI_F * powf(fluidSettings->effectiveRadius, 6));
+    for (auto subSimulator : subSimulators) {
+      subSimulator->setUpConstants();
+    }
   }
 
   void Simulator::setUpComputingSize() {
-    softBodyActorCount = (unsigned int)softBodyActors.size();
-    fluidActorCount = (unsigned int)fluidActors.size();
     actorCount = (unsigned int)actors.size();
-    springCount = (unsigned int)springs.size();
     actorCountForBitonicSort = utils::math::powerOf2(actorCount);
-  }
-
-  void Simulator::setUpSpring(unsigned int springIndex, unsigned char nodeIndex) {
-    unsigned short actorIndex = springs[springIndex]->nodes[nodeIndex].particle->index;
-    memories.springs.at(springIndex)->actorIndices[nodeIndex] = actorIndex;
-    memories.springs.at(springIndex)->nodePositionsModelSpace[nodeIndex] = toCl(springs[springIndex]->nodes[nodeIndex].position);
-
-    unsigned short softBodyIndex = memories.actors.at(actorIndex)->subPhysicalQuantityIndex;
-    auto hostSoftBodyState = memories.hostSoftBodys.at(softBodyIndex);
-    hostSoftBodyState->springIndices[hostSoftBodyState->springCount] = springIndex;
-    hostSoftBodyState->springNodeIndices[hostSoftBodyState->springCount] = nodeIndex;
-    hostSoftBodyState->springCount++;
+    for (auto subSimulator : subSimulators) {
+      subSimulator->setUpComputingSize();
+    }
   }
 
   void Simulator::writeHostMemories() {
@@ -84,53 +67,23 @@ namespace alcube::physics {
       actors[i]->index = i;
     }
 
-    for (unsigned short i = 0; i < softBodyActorCount; i++) {
-      auto actor = softBodyActors[i];
-      actor->actor.subPhysicalQuantityIndex = i;
-      actor->subPhysicalQuantity.actorIndex = actor->index;
-      memories.actors.dto[actor->index] = actor->actor;
-      memories.hostPhysicalQuantities.dto[actor->index] = actor->physicalQuantity;
-      memories.hostSoftBodys.dto[i] = actor->subPhysicalQuantity;
-    }
-
-    for (unsigned short i = 0; i < fluidActorCount; i++) {
-      auto actor = fluidActors[i];
-      actor->actor.subPhysicalQuantityIndex = i;
-      actor->subPhysicalQuantity.actorIndex = actor->index;
-      actor->physicalQuantity.radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
-      actor->physicalQuantity.mass = memories.fluidSettings.at(0)->particleMass;
-      memories.actors.dto[actor->index] = actor->actor;
-      memories.hostPhysicalQuantities.dto[actor->index] = actor->physicalQuantity;
-      memories.hostFluids.dto[i] = actor->subPhysicalQuantity;
-    }
-
-    for (unsigned int i = 0; i < springCount; i++) {
-      memories.springs.at(i)->k = springs[i]->k;
-      setUpSpring(i, 0);
-      setUpSpring(i, 1);
+    for (auto subSimulator : subSimulators) {
+      subSimulator->writeHostMemories();
     }
   }
 
   void Simulator::setUpMemories() {
     memories.actors.setCount(actorCount);
     memories.hostPhysicalQuantities.setCount(actorCount);
-    memories.hostSoftBodys.setCount(softBodyActorCount);
-    memories.springs.setCount(springCount);
-    memories.hostFluids.setCount(fluidActorCount);
 
     memories.actorStates.setCount(actorCount);
     memories.physicalQuantities.setCount(actorCount);
     memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
-    memories.springStates.setCount(springCount);
-    memories.fluids.setCount(fluidActorCount);
 
     memories.actors.write();
     memories.hostPhysicalQuantities.write();
-    memories.hostSoftBodys.write();
-    memories.springs.write();
-    memories.hostFluids.write();
 
-    float splitDeltaTime = deltaTime / motionIterationCount;
+    float splitDeltaTime = deltaTime / /*motionIterationCount*/8;
     kernels.inputConstants(
       1,
       memories.constants,
@@ -150,23 +103,9 @@ namespace alcube::physics {
       memories.physicalQuantities
     );
 
-    kernels.inputSoftBodys(
-      softBodyActorCount,
-      memories.hostSoftBodys,
-      memories.softBodys
-    );
-
-    kernels.inputSprings(
-      springCount,
-      memories.springs,
-      memories.springStates
-    );
-
-    kernels.inputFluids(
-      (unsigned short)fluidActorCount,
-      memories.hostFluids,
-      memories.fluids
-    );
+    for (auto subSimulator : subSimulators) {
+      subSimulator->setUpMemories();
+    }
   }
 
   void Simulator::computeBroadPhase() {
@@ -237,7 +176,7 @@ namespace alcube::physics {
     );
   }
 
-  void Simulator::resolveConstraints() {
+  void Simulator::updateForce() {
     kernels.initStepVariables(
       actorCount,
       memories.actorStates,
@@ -245,74 +184,14 @@ namespace alcube::physics {
       memories.constants
     );
 
-    kernels.updateByPenaltyImpulse(
-      softBodyActorCount,
-      memories.actorStates,
-      memories.softBodys,
-      memories.constants
-    );
-
-    kernels.updateDensityAndPressure(
-      fluidActorCount,
-      memories.actorStates,
-      memories.fluids,
-      memories.constants
-    );
-
-    kernels.updateFluidForce(
-      fluidActorCount,
-      memories.actorStates,
-      memories.fluids,
-      memories.constants
-    );
-
-    for (int i = 0; i < constraintResolvingIterationCount; i++) {
-      kernels.collectCollisions(
-        softBodyActorCount,
-        memories.actorStates,
-        memories.softBodys
-      );
-
-      kernels.updateByConstraintImpulse(
-        softBodyActorCount,
-        memories.actorStates,
-        memories.softBodys
-      );
+    for (auto subSimulator : subSimulators) {
+      subSimulator->updateForce();
     }
-
-    kernels.updateByFrictionalImpulse(
-      softBodyActorCount,
-      memories.actorStates,
-      memories.softBodys
-    );
   }
 
   void Simulator::motion() {
-    kernels.moveFluid(
-      fluidActorCount,
-      memories.fluids,
-      memories.actorStates,
-      memories.physicalQuantities,
-      memories.constants
-    );
-
-    for (int i = 0; i < motionIterationCount; i++) {
-      if (springCount > 0) {
-        kernels.calcSpringImpulses(
-          springCount,
-          memories.constants,
-          memories.springStates,
-          memories.physicalQuantities
-        );
-      }
-      kernels.updateBySpringImpulse(
-        softBodyActorCount,
-        memories.constants,
-        memories.softBodys,
-        memories.actorStates,
-        memories.physicalQuantities,
-        memories.springStates
-      );
+    for (auto subSimulator : subSimulators) {
+      subSimulator->motion();
     }
 
     kernels.postProcessing(
@@ -324,6 +203,7 @@ namespace alcube::physics {
   }
 
   void Simulator::input() {
+    setUpConstants();
     setUpComputingSize();
     writeHostMemories();
     setUpMemories();
@@ -332,25 +212,26 @@ namespace alcube::physics {
   void Simulator::update() {
     computeBroadPhase();
     computeNarrowPhase();
-    resolveConstraints();
+    updateForce();
     motion();
   }
 
-  void Simulator::add(SoftBodyActor *actor) {
+  void Simulator::add(softbody::Actor *actor) {
     actors.push_back(actor);
-    softBodyActors.push_back(actor);
+    for (auto subSimulator : subSimulators) {
+      subSimulator->add(actor);
+    }
   }
 
-  SoftBodyActor* Simulator::getSoftBodyActor(unsigned long i) {
-    return softBodyActors[i];
-  }
-
-  void Simulator::add(Spring *spring) {
-    springs.push_back(spring);
-  }
-
-  void Simulator::add(FluidActor *actor) {
+  void Simulator::add(fluid::Actor *actor) {
     actors.push_back(actor);
-    fluidActors.push_back(actor);
+    for (auto subSimulator : subSimulators) {
+      subSimulator->add(actor);
+    }
+  }
+
+  void Simulator::add(SubSimulator *subSimulator) {
+    subSimulator->set(gpuAccessor);
+    subSimulators.push_back(subSimulator);
   }
 }

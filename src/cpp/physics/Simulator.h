@@ -11,12 +11,13 @@
 #include "../utils/opencl/ProgramFactory.h"
 #include "../utils/opencl/Resources.h"
 #include "../utils/opencl/conversions.h"
-#include "SoftBodyActor.h"
-#include "Spring.h"
-#include "FluidActor.h"
+#include "softbody/Spring.h"
 #include "../utils/alcubemath.h"
 #include "../gpu/GPUAccessor.h"
 #include "../utils/opencl/ResourcesProvider.h"
+#include "fluid/Actor.h"
+#include "SubSimulator.h"
+#include "softbody/Actor.h"
 
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
@@ -30,44 +31,40 @@ namespace alcube::physics {
         unsigned int yGridCount,
         unsigned int zGridCount,
         float deltaTime,
-        gpu::GPUAccessor* gpu
+        gpu::GPUAccessor* gpuAccessor
       );
-      void add(SoftBodyActor* actor);
-      void add(Spring* spring);
-      void add(FluidActor* actor);
-      SoftBodyActor* getSoftBodyActor(unsigned long i);
+      void add(softbody::Actor* actor);
+      void add(fluid::Actor* actor);
+      void add(SubSimulator* subSimulator);
       void input();
       void update();
       float gravity;
       float sphericalShellRadius;
       unsigned int actorCount;
     private:
+      unsigned int gridEdgeLength;
+      unsigned int xGridCount;
+      unsigned int yGridCount;
+      unsigned int zGridCount;
+      gpu::GPUAccessor* gpuAccessor;
       gpu::Kernels kernels;
       gpu::Memories memories;
       std::vector<Actor*> actors;
-      std::vector<SoftBodyActor*> softBodyActors;
-      std::vector<FluidActor*> fluidActors;
-      std::vector<Spring*> springs;
+      std::vector<SubSimulator*> subSimulators;
 
       unsigned int allGridCount;
-      unsigned int softBodyActorCount;
       unsigned int maxActorCount;
       unsigned int actorCountForBitonicSort;
-      unsigned int springCount;
-      unsigned int fluidActorCount;
-      unsigned int motionIterationCount;
-      unsigned int constraintResolvingIterationCount;
       float deltaTime;
 
+      void setUpConstants();
       void setUpComputingSize();
       void setUpMemories();
       void writeHostMemories();
       void computeBroadPhase();
       void computeNarrowPhase();
-      void resolveConstraints();
+      void updateForce();
       void motion();
-
-      void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);
   };
 }
 

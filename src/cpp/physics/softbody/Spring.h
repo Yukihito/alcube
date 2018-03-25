@@ -4,12 +4,12 @@
 #include <glm/vec3.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
-#include "SoftBodyActor.h"
+#include "Actor.h"
 
-namespace alcube::physics {
+namespace alcube::physics::softbody {
   class SpringNode {
     public:
-      SoftBodyActor* particle;
+      Actor* particle;
       glm::vec3 position;
   };
 

@@ -4,12 +4,7 @@
 #include <vector>
 
 namespace alcube::scripting {
-  class Actor {
-      unsigned int id;
-  };
   class Evaluator {
-    private:
-      std::vector<Actor> actors;
   };
 }
 

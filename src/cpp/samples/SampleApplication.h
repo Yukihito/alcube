@@ -15,8 +15,8 @@ namespace alcube::samples {
     private:
       SphereDrawable* drawable;
       unsigned short actorCount;
-      void add(physics::SoftBodyActor *actor);
-      void add(physics::FluidActor *actor);
+      void add(physics::softbody::Actor *actor);
+      void add(physics::fluid::Actor *actor);
   };
 }
 

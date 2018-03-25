@@ -1,5 +1,5 @@
-#ifndef ALCUBE_ACTOR_H
-#define ALCUBE_ACTOR_H
+#ifndef ALCUBE_PHYSICS_ACTOR_H
+#define ALCUBE_PHYSICS_ACTOR_H
 
 #include "../gpu/dtos.h"
 
@@ -16,10 +16,11 @@ namespace alcube::physics {
       unsigned short index;
       gpu::dtos::Actor actor;
       gpu::dtos::PhysicalQuantity physicalQuantity;
+      virtual ~Actor() = default;
     protected:
       explicit Actor();
   };
 }
 
 
-#endif //ALCUBE_ACTOR_H
+#endif //ALCUBE_PHYSICS_ACTOR_H

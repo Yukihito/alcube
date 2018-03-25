@@ -40,6 +40,7 @@ namespace alcube::samples {
     profiler = new utils::Profiler();
     drawer = new drawing::DrawerWithProfiler(camera, profiler);
     shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);
+    softBodySimulator = new physics::softbody::Simulator();
     physicsSimulator = new physics::Simulator(
       maxCellCount,
       gridEdgeLength,
@@ -49,6 +50,8 @@ namespace alcube::samples {
       deltaTime,
       gpuAccessor
     );
+    physicsSimulator->add(softBodySimulator);
+    physicsSimulator->add(new physics::fluid::Simulator());
     physicsSimulator->gravity = gravity;
 
     profiler->setShowInterval(1000);

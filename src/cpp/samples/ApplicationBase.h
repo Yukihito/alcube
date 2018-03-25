@@ -7,6 +7,8 @@
 #include "../utils/Profiler.h"
 #include "../physics/Simulator.h"
 #include "../drawing/DrawerWithProfiler.h"
+#include "../physics/fluid/Simulator.h"
+#include "../physics/softbody/Simulator.h"
 
 
 namespace alcube::samples {
@@ -40,6 +42,7 @@ namespace alcube::samples {
       utils::FileUtil *fileUtil;
       utils::Profiler *profiler;
       physics::Simulator *physicsSimulator;
+      physics::softbody::Simulator* softBodySimulator;
       Profilers profilers;
       unsigned int maxCellCount;
       float deltaTime;

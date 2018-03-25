@@ -52,16 +52,33 @@ target_link_libraries(alcube_drawing_lib
 
 ### Physics
 set(ALCUBE_PHYSICS_SOURCE_FILES
-        src/cpp/physics/SoftBodyActor.cpp src/cpp/physics/SoftBodyActor.h
+        src/cpp/physics/softbody/Actor.cpp src/cpp/physics/softbody/Actor.h
         src/cpp/physics/Simulator.cpp src/cpp/physics/Simulator.h
-        src/cpp/physics/Spring.cpp src/cpp/physics/Spring.h
-        src/cpp/physics/FluidActor.cpp src/cpp/physics/FluidActor.h
-        src/cpp/physics/Actor.cpp src/cpp/physics/Actor.h)
+        src/cpp/physics/softbody/Spring.cpp src/cpp/physics/softbody/Spring.h
+        src/cpp/physics/fluid/Actor.cpp src/cpp/physics/fluid/Actor.h
+        src/cpp/physics/Actor.cpp src/cpp/physics/Actor.h
+        src/cpp/physics/SubSimulator.cpp src/cpp/physics/SubSimulator.h
+        src/cpp/physics/fluid/Simulator.cpp src/cpp/physics/fluid/Simulator.h
+        src/cpp/physics/softbody/Simulator.cpp src/cpp/physics/softbody/Simulator.h)
 add_library(alcube_physics_lib STATIC ${ALCUBE_PHYSICS_SOURCE_FILES})
 target_link_libraries(alcube_physics_lib
         alcube_utils_lib
         alcube_gpu_accessor_lib
         )
+
+### Alcube
+set(ALCUBE_ALCUBE_SOURCE_FILES
+        src/cpp/models/actor/Actor.cpp src/cpp/models/actor/Actor.h
+        src/cpp/models/link/Link.cpp src/cpp/models/link/Link.h
+        src/cpp/models/physics/Accessors.cpp src/cpp/models/physics/Accessors.h
+        src/cpp/models/physics/Features.cpp src/cpp/models/physics/Features.h
+        src/cpp/models/Simulator.cpp src/cpp/models/Simulator.h)
+add_library(alcube_models_lib STATIC ${ALCUBE_ALCUBE_SOURCE_FILES})
+target_link_libraries(alcube_models_lib
+        alcube_utils_lib
+        alcube_drawing_lib
+        alcube_physics_lib
+)
 
 ### Scripting
 set(ALCUBE_SCRIPTING_SOURCE_FILES
