@@ -3,14 +3,14 @@
 namespace alcube::scripting {
   using namespace utils;
   Evaluator::Evaluator(
-    alcube::models::actor::ActorFactory *actorFactory,
+    alcube::models::ActorFactory *actorFactory,
     alcube::utils::FileUtil* fileUtil,
     const char* programName
   ) {
     this->programName = programName;
     templates = {};
-    actorTemplate = new mappings::actor::ActorTemplate();
-    actorFactoryTemplate = new mappings::actor::ActorFactoryTemplate(actorFactory);
+    actorTemplate = new mappings::Actor::Prototype();
+    actorFactoryTemplate = new mappings::ActorFactory::Prototype(actorFactory);
     templates.push_back(actorTemplate);
     templates.push_back(actorFactoryTemplate);
     this->fileUtil = fileUtil;
@@ -77,7 +77,7 @@ namespace alcube::scripting {
   }
 
   void Evaluator::registerFunctions() {
-    registerFunction("createActorFactory", mappings::actor::ActorFactoryTemplate::constructor);
+    registerFunction("createActorFactory", mappings::ActorFactory::Prototype::constructor);
     registerFunction("print", Evaluator::print);
   }
 

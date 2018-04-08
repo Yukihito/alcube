@@ -14,8 +14,8 @@ namespace alcube::models::physics::softbody {
   }
 
   Spring* SpringFactory::create(
-    models::actor::Actor *actor0, glm::vec3 position0,
-    models::actor::Actor *actor1, glm::vec3 position1) {
+    models::Actor *actor0, glm::vec3 position0,
+    models::Actor *actor1, glm::vec3 position1) {
     auto spring = new alcube::physics::softbody::Spring();
     spring->nodes[0].actor = actor0->getPhysicsActor();
     spring->nodes[0].position = position0;

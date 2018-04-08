@@ -46,7 +46,7 @@ namespace alcube::samples {
       physics::softbody::Simulator* softBodySimulator;
       physics::fluid::Simulator* fluidSimulator;
       models::Alcube* cube;
-      models::actor::ActorFactory* actorFactory;
+      models::ActorFactory* actorFactory;
       models::physics::softbody::SpringFactory* springFactory;
       Profilers profilers;
       unsigned int maxCellCount;

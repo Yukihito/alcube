@@ -12,7 +12,7 @@
 
 namespace alcube::scripting::utils {
   v8::Local<v8::Value> v8str(v8::Isolate* isolate, const char* str);
-  class Template {
+  class Prototype {
     public:
       v8::Local<v8::ObjectTemplate> objectTemplate;
       virtual void init() = 0;
@@ -33,7 +33,7 @@ namespace alcube::scripting::utils {
   template <class T, class U, class V>
   class Accessor {
     public:
-      static void create(Template* templ);
+      static void create(Prototype* prototype);
 
     protected:
       static U get(T *);
@@ -67,14 +67,14 @@ namespace alcube::scripting::utils {
   };
 
   template <class T, class U, class V>
-  void Accessor<T, U, V>::create(scripting::utils::Template *templ) {
+  void Accessor<T, U, V>::create(scripting::utils::Prototype *prototype) {
     v8::Isolate* isolate = v8::Isolate::GetCurrent();
     int stat;
     char *rawName = abi::__cxa_demangle(typeid(V).name(), nullptr, nullptr, &stat);
     std::stringstream name(rawName);
     std::string shortName;
     while (std::getline(name, shortName, ':')) {}
-    templ->objectTemplate->SetAccessor(v8::String::NewFromUtf8(isolate, shortName.c_str()), v8Getter, v8Setter);
+    prototype->objectTemplate->SetAccessor(v8::String::NewFromUtf8(isolate, shortName.c_str()), v8Getter, v8Setter);
     free(rawName);
   }
 

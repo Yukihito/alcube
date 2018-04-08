@@ -3,15 +3,15 @@
 
 #include "libplatform/libplatform.h"
 #include "v8.h"
-#include "../models/actor/Actor.h"
-#include "mappings/actor/ActorTemplate.h"
+#include "../models/Actor.h"
+#include "mappings/actor/Prototype.h"
 #include <vector>
 
 namespace alcube::scripting {
   class Evaluator {
     public:
       explicit Evaluator(
-        models::actor::ActorFactory* actorFactory,
+        models::ActorFactory* actorFactory,
         alcube::utils::FileUtil* fileUtil,
         const char* programName
       );
@@ -27,9 +27,9 @@ namespace alcube::scripting {
       v8::Isolate::CreateParams createParams;
       v8::Local<v8::ObjectTemplate> global;
       v8::Local<v8::Context> context;
-      mappings::actor::ActorTemplate* actorTemplate;
-      mappings::actor::ActorFactoryTemplate* actorFactoryTemplate;
-      std::vector<utils::Template*> templates;
+      mappings::Actor::Prototype* actorTemplate;
+      mappings::ActorFactory::Prototype* actorFactoryTemplate;
+      std::vector<utils::Prototype*> templates;
       static void print(const v8::FunctionCallbackInfo<v8::Value> &args);
       void initV8();
       void loadLibs();

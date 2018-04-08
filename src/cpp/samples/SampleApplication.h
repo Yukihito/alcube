@@ -20,7 +20,7 @@ namespace alcube::samples {
             unsigned short actorCount;
       void add(physics::softbody::Actor *actor);
       void add(physics::fluid::Actor *actor);
-      void add(models::actor::Actor* actor);
+      void add(models::Actor* actor);
        */
   };
 }

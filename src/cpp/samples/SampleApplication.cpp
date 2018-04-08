@@ -27,7 +27,7 @@ namespace alcube::samples {
     }
 
     // soft body
-    std::vector<models::actor::Actor*> softBodies = {};
+    std::vector<models::Actor*> softBodies = {};
     auto softbodyFeatures = new models::physics::softbody::Features();
     softbodyFeatures->setElasticity(0.0f);
     softbodyFeatures->setMass(0.2f);

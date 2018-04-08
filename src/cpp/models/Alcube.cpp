@@ -13,7 +13,7 @@ namespace alcube::models {
     physicsSimulator->add(fluidSimulator);
   }
 
-  void Alcube::add(actor::Actor *actor) {
+  void Alcube::add(Actor *actor) {
     physicsSimulator->add(actor->getPhysicsActor());
   }
 

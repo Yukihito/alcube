@@ -58,7 +58,7 @@ namespace alcube::samples {
       softBodySimulator,
       physicsSimulator
     );
-    actorFactory = new models::actor::ActorFactory(new utils::MemoryPool<models::actor::Actor>(65536));
+    actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(65536));
     springFactory = new models::physics::softbody::SpringFactory();
     physicsSimulator->gravity = gravity;
 

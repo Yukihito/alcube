@@ -2,7 +2,7 @@
 //#include "libplatform/libplatform.h"
 //#include "v8.h"
 #include "../../utils/FileUtil.h"
-#include "../../scripting/mappings/actor/ActorTemplate.h"
+#include "../../scripting/mappings/actor/Prototype.h"
 #include "../../scripting/Evaluator.h"
 
 /*
@@ -54,7 +54,7 @@ void newObj(const v8::FunctionCallbackInfo<v8::Value>& args) {
 */
 int main(int argc, char * argv[]) {
   auto fileUtil = new alcube::utils::FileUtil();
-  auto actorFactory = new alcube::models::actor::ActorFactory(new alcube::utils::MemoryPool<alcube::models::actor::Actor>(65536));
+  auto actorFactory = new alcube::models::ActorFactory(new alcube::utils::MemoryPool<alcube::models::Actor>(65536));
   auto evaluator = new alcube::scripting::Evaluator(actorFactory, fileUtil, argv[0]);
   evaluator->withScope([](alcube::scripting::Evaluator* e) {
     e->evaluate("../src/js/test.js");
@@ -91,7 +91,7 @@ int main(int argc, char * argv[]) {
                               v8::NewStringType::kNormal).ToLocalChecked();
 
     alcube::scripting::mappings::actor::Actor::initObjectTemplate();
-    alcube::scripting::mappings::actor::ActorFactory::instance = new alcube::models::actor::ActorFactory(new alcube::models::actor::MemoryPool(65536));
+    alcube::scripting::mappings::actor::ActorFactory::instance = new alcube::models::ActorFactory(new alcube::models::actor::MemoryPool(65536));
     global->Set(v8::String::NewFromUtf8(isolate, "createActor"), v8::FunctionTemplate::New(isolate, alcube::scripting::mappings::actor::ActorFactory::createFluid));
 
 

@@ -3,14 +3,14 @@
 
 #include <map>
 #include <stack>
-#include "../physics/Features.h"
-#include "../physics/Accessors.h"
-#include "../../physics/Actor.h"
-#include "../../physics/Simulator.h"
-#include "../../utils/opencl/conversions.h"
-#include "../../utils/MemoryPool.h"
+#include "physics/Features.h"
+#include "physics/Accessors.h"
+#include "../physics/Actor.h"
+#include "../physics/Simulator.h"
+#include "../utils/opencl/conversions.h"
+#include "../utils/MemoryPool.h"
 
-namespace alcube::models::actor {
+namespace alcube::models {
   class Actor : public physics::Accessors {
     public:
       int getId();

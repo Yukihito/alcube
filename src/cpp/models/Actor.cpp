@@ -1,6 +1,6 @@
 #include "Actor.h"
 
-namespace alcube::models::actor {
+namespace alcube::models {
   using namespace utils::opencl::conversions;
 
   void Actor::init(alcube::physics::Actor *physicsActor) {

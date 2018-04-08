@@ -1,7 +1,7 @@
 #ifndef ALCUBE_MODELS_SIMULATOR_H
 #define ALCUBE_MODELS_SIMULATOR_H
 
-#include "actor/Actor.h"
+#include "Actor.h"
 #include "physics/softbody/Spring.h"
 #include "Alcube.h"
 #include "../physics/fluid/Simulator.h"
@@ -15,7 +15,7 @@ namespace alcube::models {
         alcube::physics::softbody::Simulator* softbodySimulator,
         alcube::physics::Simulator* physicsSimulator
       );
-      void add(actor::Actor* actor);
+      void add(Actor* actor);
       void add(physics::softbody::Spring* spring);
       unsigned int getActorCount();
 
