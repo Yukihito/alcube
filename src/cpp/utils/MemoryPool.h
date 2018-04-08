@@ -6,10 +6,16 @@
 
 namespace alcube::utils {
   template <class T>
-  class MemoryPool {
+  class InstanceFinder {
+    public:
+      virtual T* find(int id) = 0;
+  };
+
+  template <class T>
+  class MemoryPool : public InstanceFinder<T> {
     public:
       explicit MemoryPool(int size);
-      T* find(int id);
+      T* find(int id) override;
       T* get();
 
     private:

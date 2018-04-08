@@ -20,11 +20,11 @@ namespace alcube::models::physics::fluid {
 
   class FeaturesFactory {
     public:
-      explicit FeaturesFactory(utils::MemoryPool<Features>* memoryPool);
+      explicit FeaturesFactory(SubFeaturesMemoryPool<Features>* memoryPool);
       Features* create();
 
     private:
-      utils::MemoryPool<Features>* memoryPool;
+      SubFeaturesMemoryPool<Features>* memoryPool;
   };
 }
 

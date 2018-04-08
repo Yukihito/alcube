@@ -36,7 +36,7 @@ namespace alcube::models::physics::fluid {
     return actor;
   }
 
-  FeaturesFactory::FeaturesFactory(alcube::utils::MemoryPool<alcube::models::physics::fluid::Features> *memoryPool) {
+  FeaturesFactory::FeaturesFactory(SubFeaturesMemoryPool<Features> *memoryPool) {
     this->memoryPool = memoryPool;
   }
 
