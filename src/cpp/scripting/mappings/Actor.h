@@ -15,7 +15,7 @@ namespace alcube::scripting::mappings {
       class angularMomentum {};
     }
 
-    class Prototype : public utils::Prototype {
+    class Prototype : public utils::TypedPrototype<models::Actor> {
       public:
         explicit Prototype();
         void init() override;
@@ -24,14 +24,13 @@ namespace alcube::scripting::mappings {
   }
 
   namespace ActorFactory {
-    class Prototype : public utils::Prototype {
+    class Prototype : public utils::SingletonPrototype<models::ActorFactory> {
       public:
         explicit Prototype(models::ActorFactory* underlying);
         void init() override;
         static Prototype* instance;
         static void constructor(const v8::FunctionCallbackInfo<v8::Value>&);
-      private:
-        alcube::models::ActorFactory* underlying;
+        static void createFluid(const v8::FunctionCallbackInfo<v8::Value>&);
     };
   }
 }

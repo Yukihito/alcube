@@ -9,10 +9,8 @@ namespace alcube::scripting {
   ) {
     this->programName = programName;
     prototypes = {};
-    actorTemplate = new mappings::Actor::Prototype();
-    actorFactoryTemplate = new mappings::ActorFactory::Prototype(actorFactory);
-    prototypes.push_back(actorTemplate);
-    prototypes.push_back(actorFactoryTemplate);
+    prototypes.push_back(new mappings::Actor::Prototype());
+    prototypes.push_back(new mappings::ActorFactory::Prototype(actorFactory));
     this->fileUtil = fileUtil;
   }
 
@@ -71,8 +69,8 @@ namespace alcube::scripting {
   }
 
   void Evaluator::initTemplates() {
-    for (auto templ : prototypes) {
-      templ->init();
+    for (auto prototype : prototypes) {
+      prototype->init();
     }
   }
 

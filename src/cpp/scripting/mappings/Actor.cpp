@@ -1,6 +1,7 @@
 #include "Actor.h"
 
 namespace alcube::scripting::mappings {
+  using namespace utils;
   namespace Actor {
     Prototype *Prototype::instance;
 
@@ -22,8 +23,7 @@ namespace alcube::scripting::mappings {
   namespace ActorFactory {
     Prototype *Prototype::instance;
 
-    Prototype::Prototype(models::ActorFactory *underlying) {
-      this->underlying = underlying;
+    Prototype::Prototype(models::ActorFactory *underlying) : SingletonPrototype<models::ActorFactory>(underlying) {
       Prototype::instance = this;
     }
 
@@ -31,39 +31,36 @@ namespace alcube::scripting::mappings {
       v8::Isolate *isolate = v8::Isolate::GetCurrent();
       objectTemplate = v8::ObjectTemplate::New(isolate);
       objectTemplate->SetInternalFieldCount(1);
-
       objectTemplate->Set(
         v8::String::NewFromUtf8(isolate, "createFluid"),
-        v8::FunctionTemplate::New(isolate, [](const v8::FunctionCallbackInfo<v8::Value> &args) {
-          v8::Local<v8::Object> self = args.Holder();
-          v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(self->GetInternalField(0));
-          void *ptr = wrap->Value();
-          auto instance = static_cast<models::ActorFactory *>(ptr);
-          v8::Isolate *isolate = v8::Isolate::GetCurrent();
-          v8::HandleScope scope(isolate);
-          if (args.Length() < 1) {
-            args.GetReturnValue().Set(v8::Undefined(isolate));
-          }
-          v8::Local<v8::Object> featuresDTO = args[0]->ToObject();
-          auto density = (float) featuresDTO->Get(utils::v8str(isolate, "density"))->NumberValue();
-          auto stiffness = (float) featuresDTO->Get(utils::v8str(isolate, "stiffness"))->NumberValue();
-          auto viscosity = (float) featuresDTO->Get(utils::v8str(isolate, "viscosity"))->NumberValue();
-          models::physics::fluid::Features features = models::physics::fluid::Features();
-          features.setDensity(density);
-          features.setStiffness(stiffness);
-          features.setViscosity(viscosity);
-          auto underlying = instance->create(&features);
-          auto actor = Actor::Prototype::instance->objectTemplate->NewInstance();
-          actor->SetInternalField(0, v8::External::New(isolate, underlying));
-          args.GetReturnValue().Set(actor);
-        }));
+        v8::FunctionTemplate::New(isolate, Prototype::createFluid));
     }
 
-    void Prototype::constructor(const v8::FunctionCallbackInfo<v8::Value> &args) {
+    void Prototype::constructor(const v8::FunctionCallbackInfo<v8::Value> &info) {
       v8::Isolate *isolate = v8::Isolate::GetCurrent();
       auto actorFactory = Prototype::instance->objectTemplate->NewInstance();
       actorFactory->SetInternalField(0, v8::External::New(isolate, Prototype::instance->underlying));
-      args.GetReturnValue().Set(actorFactory);
+      info.GetReturnValue().Set(actorFactory);
+    }
+
+    void Prototype::createFluid(const v8::FunctionCallbackInfo<v8::Value> &info) {
+      v8::Isolate* isolate = v8::Isolate::GetCurrent();
+      v8::HandleScope scope(isolate);
+      if (info.Length() < 1) {
+        info.GetReturnValue().Set(v8::Undefined(isolate));
+      }
+      v8::Local<v8::Object> featuresDTO = info[0]->ToObject();
+      auto density = (float) featuresDTO->Get(utils::v8str(isolate, "density"))->NumberValue();
+      auto stiffness = (float) featuresDTO->Get(utils::v8str(isolate, "stiffness"))->NumberValue();
+      auto viscosity = (float) featuresDTO->Get(utils::v8str(isolate, "viscosity"))->NumberValue();
+      models::physics::fluid::Features features = models::physics::fluid::Features();
+      features.setDensity(density);
+      features.setStiffness(stiffness);
+      features.setViscosity(viscosity);
+      auto underlying = self(info)->create(&features);
+      auto actor = Actor::Prototype::instance->objectTemplate->NewInstance();
+      actor->SetInternalField(0, v8::External::New(isolate, underlying));
+      info.GetReturnValue().Set(actor);
     }
   }
 }

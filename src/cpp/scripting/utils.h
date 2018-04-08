@@ -19,6 +19,32 @@ namespace alcube::scripting::utils {
   };
 
   template <class T>
+  class TypedPrototype : public Prototype {
+    public:
+      static T* self(const v8::FunctionCallbackInfo<v8::Value>& info);
+  };
+
+  template <class T>
+  T* TypedPrototype<T>::self(const v8::FunctionCallbackInfo<v8::Value> &info) {
+    v8::Local<v8::Object> selfObject = info.Holder();
+    v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(selfObject->GetInternalField(0));
+    void *ptr = wrap->Value();
+    return static_cast<T*>(ptr);
+  }
+
+  template <class T>
+  class SingletonPrototype : public TypedPrototype<T> {
+    public:
+      explicit SingletonPrototype(T* underlying);
+      T* underlying;
+  };
+
+  template <class T>
+  SingletonPrototype<T>::SingletonPrototype(T *underlying) {
+    this->underlying = underlying;
+  }
+
+  template <class T>
   T convertV8ValueTo(v8::Local<v8::Value> value);
 
   template <class T>
