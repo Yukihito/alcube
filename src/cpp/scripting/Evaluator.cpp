@@ -8,11 +8,11 @@ namespace alcube::scripting {
     const char* programName
   ) {
     this->programName = programName;
-    templates = {};
+    prototypes = {};
     actorTemplate = new mappings::Actor::Prototype();
     actorFactoryTemplate = new mappings::ActorFactory::Prototype(actorFactory);
-    templates.push_back(actorTemplate);
-    templates.push_back(actorFactoryTemplate);
+    prototypes.push_back(actorTemplate);
+    prototypes.push_back(actorFactoryTemplate);
     this->fileUtil = fileUtil;
   }
 
@@ -71,7 +71,7 @@ namespace alcube::scripting {
   }
 
   void Evaluator::initTemplates() {
-    for (auto templ : templates) {
+    for (auto templ : prototypes) {
       templ->init();
     }
   }

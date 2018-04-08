@@ -29,7 +29,7 @@ namespace alcube::scripting {
       v8::Local<v8::Context> context;
       mappings::Actor::Prototype* actorTemplate;
       mappings::ActorFactory::Prototype* actorFactoryTemplate;
-      std::vector<utils::Prototype*> templates;
+      std::vector<utils::Prototype*> prototypes;
       static void print(const v8::FunctionCallbackInfo<v8::Value> &args);
       void initV8();
       void loadLibs();
