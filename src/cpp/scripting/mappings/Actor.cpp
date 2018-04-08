@@ -1,7 +1,6 @@
-#include "Prototype.h"
+#include "Actor.h"
 
 namespace alcube::scripting::mappings {
-  using namespace alcube::scripting::utils;
   namespace Actor {
     Prototype *Prototype::instance;
 
@@ -13,10 +12,10 @@ namespace alcube::scripting::mappings {
       v8::Isolate *isolate = v8::Isolate::GetCurrent();
       objectTemplate = v8::ObjectTemplate::New(isolate);
       objectTemplate->SetInternalFieldCount(1);
-      Accessor<models::Actor, glm::vec3, variables::position>::create(this);
-      Accessor<models::Actor, glm::quat, variables::rotation>::create(this);
-      Accessor<models::Actor, glm::vec3, variables::linearMomentum>::create(this);
-      Accessor<models::Actor, glm::vec3, variables::angularMomentum>::create(this);
+      utils::Accessor<models::Actor, glm::vec3, fields::position>::create(this);
+      utils::Accessor<models::Actor, glm::quat, fields::rotation>::create(this);
+      utils::Accessor<models::Actor, glm::vec3, fields::linearMomentum>::create(this);
+      utils::Accessor<models::Actor, glm::vec3, fields::angularMomentum>::create(this);
     }
   }
 
@@ -46,9 +45,9 @@ namespace alcube::scripting::mappings {
             args.GetReturnValue().Set(v8::Undefined(isolate));
           }
           v8::Local<v8::Object> featuresDTO = args[0]->ToObject();
-          auto density = (float) featuresDTO->Get(v8str(isolate, "density"))->NumberValue();
-          auto stiffness = (float) featuresDTO->Get(v8str(isolate, "stiffness"))->NumberValue();
-          auto viscosity = (float) featuresDTO->Get(v8str(isolate, "viscosity"))->NumberValue();
+          auto density = (float) featuresDTO->Get(utils::v8str(isolate, "density"))->NumberValue();
+          auto stiffness = (float) featuresDTO->Get(utils::v8str(isolate, "stiffness"))->NumberValue();
+          auto viscosity = (float) featuresDTO->Get(utils::v8str(isolate, "viscosity"))->NumberValue();
           models::physics::fluid::Features features = models::physics::fluid::Features();
           features.setDensity(density);
           features.setStiffness(stiffness);
@@ -72,42 +71,42 @@ namespace alcube::scripting::mappings {
 namespace alcube::scripting::utils {
   using namespace mappings::Actor;
   template <>
-  glm::vec3 Accessor<models::Actor, glm::vec3, variables::position>::get(models::Actor* actor) {
+  glm::vec3 Accessor<models::Actor, glm::vec3, fields::position>::get(models::Actor* actor) {
     return actor->getPosition();
   }
 
   template <>
-  void Accessor<models::Actor, glm::vec3, variables::position>::set(models::Actor * actor, glm::vec3 v) {
+  void Accessor<models::Actor, glm::vec3, fields::position>::set(models::Actor * actor, glm::vec3 v) {
     actor->setPosition(v);
   }
 
   template <>
-  glm::quat Accessor<models::Actor, glm::quat, variables::rotation>::get(models::Actor* actor) {
+  glm::quat Accessor<models::Actor, glm::quat, fields::rotation>::get(models::Actor* actor) {
     return actor->getRotation();
   }
 
   template <>
-  void Accessor<models::Actor, glm::quat, variables::rotation>::set(models::Actor * actor, glm::quat v) {
+  void Accessor<models::Actor, glm::quat, fields::rotation>::set(models::Actor * actor, glm::quat v) {
     actor->setRotation(v);
   }
 
   template <>
-  glm::vec3 Accessor<models::Actor, glm::vec3, variables::linearMomentum>::get(models::Actor* actor) {
+  glm::vec3 Accessor<models::Actor, glm::vec3, fields::linearMomentum>::get(models::Actor* actor) {
     return actor->getLinearMomentum();
   }
 
   template <>
-  void Accessor<models::Actor, glm::vec3, variables::linearMomentum>::set(models::Actor * actor, glm::vec3 v) {
+  void Accessor<models::Actor, glm::vec3, fields::linearMomentum>::set(models::Actor * actor, glm::vec3 v) {
     actor->setLinearMomentum(v);
   }
 
   template <>
-  glm::vec3 Accessor<models::Actor, glm::vec3, variables::angularMomentum>::get(models::Actor* actor) {
+  glm::vec3 Accessor<models::Actor, glm::vec3, fields::angularMomentum>::get(models::Actor* actor) {
     return actor->getAngularMomentum();
   }
 
   template <>
-  void Accessor<models::Actor, glm::vec3, variables::angularMomentum>::set(models::Actor * actor, glm::vec3 v) {
+  void Accessor<models::Actor, glm::vec3, fields::angularMomentum>::set(models::Actor * actor, glm::vec3 v) {
     actor->setAngularMomentum(v);
   }
 }

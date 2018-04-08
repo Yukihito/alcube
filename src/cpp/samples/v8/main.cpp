@@ -2,7 +2,7 @@
 //#include "libplatform/libplatform.h"
 //#include "v8.h"
 #include "../../utils/FileUtil.h"
-#include "../../scripting/mappings/actor/Prototype.h"
+#include "../../scripting/mappings/Actor.h"
 #include "../../scripting/Evaluator.h"
 
 /*

@@ -132,7 +132,10 @@ set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${G
 ### Scripting
 set(ALCUBE_SCRIPTING_SOURCE_FILES
         src/cpp/scripting/Evaluator.cpp src/cpp/scripting/Evaluator.h
-        src/cpp/scripting/mappings/actor/Prototype.cpp src/cpp/scripting/mappings/actor/Prototype.h src/cpp/scripting/utils.cpp src/cpp/scripting/utils.h src/cpp/scripting/mappings/physics/fluid/Features.cpp src/cpp/scripting/mappings/physics/fluid/Features.h)
+        src/cpp/scripting/mappings/Actor.cpp src/cpp/scripting/mappings/Actor.h
+        src/cpp/scripting/utils.cpp src/cpp/scripting/utils.h
+        src/cpp/scripting/mappings/physics/fluid/Features.cpp src/cpp/scripting/mappings/physics/fluid/Features.h
+        )
 add_library(alcube_scripting_lib STATIC ${ALCUBE_SCRIPTING_SOURCE_FILES})
 target_link_libraries(alcube_scripting_lib
         ${EXTRA_LIBS}

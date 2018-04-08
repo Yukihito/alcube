@@ -2,13 +2,13 @@
 #define ALCUBE_SCRIPTING_MAPPINGS_ACTOR_H
 
 #include "v8.h"
-#include "../../../models/Actor.h"
-#include "../../utils.h"
-#include "../../../models/physics/fluid/Features.h"
+#include "../../models/Actor.h"
+#include "../utils.h"
+#include "../../models/physics/fluid/Features.h"
 
 namespace alcube::scripting::mappings {
   namespace Actor {
-    namespace variables {
+    namespace fields {
       class position {};
       class rotation {};
       class linearMomentum {};

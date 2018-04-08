@@ -4,7 +4,7 @@
 #include "libplatform/libplatform.h"
 #include "v8.h"
 #include "../models/Actor.h"
-#include "mappings/actor/Prototype.h"
+#include "mappings/Actor.h"
 #include <vector>
 
 namespace alcube::scripting {
