@@ -35,4 +35,12 @@ namespace alcube::models::physics::fluid {
     actor->physicalQuantity.mass = alcube::physics::fluid::Actor::mass;
     return actor;
   }
+
+  FeaturesFactory::FeaturesFactory(alcube::utils::MemoryPool<alcube::models::physics::fluid::Features> *memoryPool) {
+    this->memoryPool = memoryPool;
+  }
+
+  Features* FeaturesFactory::create() {
+    return memoryPool->get();
+  }
 }

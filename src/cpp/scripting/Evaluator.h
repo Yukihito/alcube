@@ -1,12 +1,43 @@
 #ifndef ALCUBE_EVALUATOR_H
 #define ALCUBE_EVALUATOR_H
 
+#include "libplatform/libplatform.h"
+#include "v8.h"
+#include "../models/actor/Actor.h"
+#include "mappings/actor/ActorTemplate.h"
 #include <vector>
 
 namespace alcube::scripting {
   class Evaluator {
+    public:
+      explicit Evaluator(
+        models::actor::ActorFactory* actorFactory,
+        alcube::utils::FileUtil* fileUtil,
+        const char* programName
+      );
+
+      void evaluate(const char* path);
+      void withScope(std::function<void(Evaluator*)> f);
+
+    private:
+      const char* programName;
+      alcube::utils::FileUtil* fileUtil;
+      v8::Isolate* isolate;
+      v8::Platform* platform;
+      v8::Isolate::CreateParams createParams;
+      v8::Local<v8::ObjectTemplate> global;
+      v8::Local<v8::Context> context;
+      mappings::actor::ActorTemplate* actorTemplate;
+      mappings::actor::ActorFactoryTemplate* actorFactoryTemplate;
+      std::vector<utils::Template*> templates;
+      static void print(const v8::FunctionCallbackInfo<v8::Value> &args);
+      void initV8();
+      void loadLibs();
+      void loadLib(const char* filePath);
+      void initTemplates();
+      void registerFunctions();
+      void registerFunction(const char* name, v8::FunctionCallback f);
   };
 }
-
 
 #endif //ALCUBE_EVALUATOR_H

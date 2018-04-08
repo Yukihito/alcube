@@ -5,6 +5,7 @@
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
 #include "../../actor/Actor.h"
+#include "../../../physics/softbody/Spring.h"
 
 namespace alcube::models::physics::softbody {
   class Spring {

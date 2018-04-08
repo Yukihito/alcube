@@ -21,7 +21,7 @@ set(ALCUBE_UTILS_SOURCE_FILES
         src/cpp/utils/Mouse.cpp src/cpp/utils/Mouse.h
         src/cpp/utils/Keyboard.cpp src/cpp/utils/Keyboard.h
         src/cpp/utils/opencl/ResourcesProvider.cpp src/cpp/utils/opencl/ResourcesProvider.h
-        )
+        src/cpp/utils/MemoryPool.cpp src/cpp/utils/MemoryPool.h)
 add_library(alcube_utils_lib STATIC ${ALCUBE_UTILS_SOURCE_FILES})
 
 ### GPU Accessor
@@ -79,33 +79,6 @@ target_link_libraries(alcube_models_lib
         alcube_physics_lib
 )
 
-### Scripting
-set(ALCUBE_SCRIPTING_SOURCE_FILES
-        src/cpp/scripting/Evaluator.cpp src/cpp/scripting/Evaluator.h
-        )
-add_library(alcube_scripting_lib STATIC ${ALCUBE_SCRIPTING_SOURCE_FILES})
-target_link_libraries(alcube_scripting_lib
-        alcube_utils_lib
-        alcube_drawing_lib
-        alcube_physics_lib
-        )
-
-### Samples
-set(ALCUBE_SAMPLES_SOURCE_FILES
-        src/cpp/samples/SphereDrawable.cpp src/cpp/samples/SphereDrawable.h
-        src/cpp/samples/ApplicationBase.cpp src/cpp/samples/ApplicationBase.h
-        src/cpp/samples/SampleApplication.cpp src/cpp/samples/SampleApplication.h
-        )
-
-add_library(alcube_samples_lib STATIC ${ALCUBE_SAMPLES_SOURCE_FILES})
-target_link_libraries(alcube_samples_lib
-        alcube_physics_lib
-        alcube_utils_lib
-        alcube_gpu_accessor_lib
-        alcube_drawing_lib
-        alcube_models_lib
-        alcube_scripting_lib
-        )
 
 
 ### Extra libs
@@ -119,7 +92,7 @@ link_directories(ext/v8/v8/out.gn/x64.release/obj/third_party)
 link_directories(ext/v8/v8/out.gn/x64.release/obj/third_party/icu)
 link_directories(ext/v8/v8/out.gn/x64.release/obj/src/inspector)
 
-include_directories(${OpenGL_gl_INCLUDE_DIR} ${OpenCL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${V8_INCLUDE_DIR})
+include_directories(${OpenGL_gl_INCLUDE_DIR} ${OpenCL_INCLUDE_DIR} ${GLEW_INCLUDE_DIRS} ${V8_INCLUDE_DIR} /usr/include/libcxxabi)
 set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${GLEW_LIBRARIES} glfw
         _wasm_fuzzer_common
         fuzzer_support
@@ -156,6 +129,37 @@ set (EXTRA_LIBS ${OPENGL_gl_LIBRARY} ${OPENGL_glu_LIBRARY} ${OpenCL_LIBRARY} ${G
         #icuuc icui18n v8_libbase v8_libplatform
         )
 
+### Scripting
+set(ALCUBE_SCRIPTING_SOURCE_FILES
+        src/cpp/scripting/Evaluator.cpp src/cpp/scripting/Evaluator.h
+        src/cpp/scripting/mappings/actor/ActorTemplate.cpp src/cpp/scripting/mappings/actor/ActorTemplate.h src/cpp/scripting/utils.cpp src/cpp/scripting/utils.h src/cpp/scripting/mappings/physics/fluid/Features.cpp src/cpp/scripting/mappings/physics/fluid/Features.h)
+add_library(alcube_scripting_lib STATIC ${ALCUBE_SCRIPTING_SOURCE_FILES})
+target_link_libraries(alcube_scripting_lib
+        ${EXTRA_LIBS}
+        alcube_utils_lib
+        alcube_drawing_lib
+        alcube_physics_lib
+        alcube_models_lib
+        )
+
+### Samples
+set(ALCUBE_SAMPLES_SOURCE_FILES
+        src/cpp/samples/SphereDrawable.cpp src/cpp/samples/SphereDrawable.h
+        src/cpp/samples/ApplicationBase.cpp src/cpp/samples/ApplicationBase.h
+        src/cpp/samples/SampleApplication.cpp src/cpp/samples/SampleApplication.h
+        )
+
+add_library(alcube_samples_lib STATIC ${ALCUBE_SAMPLES_SOURCE_FILES})
+target_link_libraries(alcube_samples_lib
+        alcube_physics_lib
+        alcube_utils_lib
+        alcube_gpu_accessor_lib
+        alcube_drawing_lib
+        alcube_models_lib
+        alcube_scripting_lib
+        )
+
+
 ### Aggregated libs
 add_library(alcube_lib STATIC)
 
@@ -165,6 +169,8 @@ target_link_libraries(alcube_lib
         alcube_utils_lib
         alcube_drawing_lib
         alcube_physics_lib
+        alcube_models_lib
+        alcube_scripting_lib
         )
 
 #### Executables

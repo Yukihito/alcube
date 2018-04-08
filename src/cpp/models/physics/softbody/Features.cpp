@@ -23,4 +23,19 @@ namespace alcube::models::physics::softbody {
     actor->physicalQuantity.mass = mass;
     return actor;
   }
+
+  void Features::init(int id) {
+    physics::Features::init(id);
+    elasticity = 1.0f;
+    mass = 1.0f;
+  }
+
+  FeaturesFactory::FeaturesFactory(
+    alcube::utils::MemoryPool<alcube::models::physics::softbody::Features> *memoryPool) {
+    this->memoryPool = memoryPool;
+  }
+
+  Features* FeaturesFactory::create() {
+    return memoryPool->get();
+  }
 }

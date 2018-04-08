@@ -1,30 +1,18 @@
-var Actor, Material, actor, vec, vec3;
+// class Material
+//   constructor: (@diffuse, @ambient, @specular) ->
 
-Material = class Material {
-  constructor(diffuse, ambient, specular) {
-    this.diffuse = diffuse;
-    this.ambient = ambient;
-    this.specular = specular;
-  }
+// class Actor
+//   constructor: (@ident, @position, @material) ->
 
-};
+// vec3 = (x, y, z) ->
+//   new THREE.Vector3(x, y, z);
 
-Actor = class Actor {
-  constructor(ident, position, material) {
-    this.ident = ident;
-    this.position = position;
-    this.material = material;
-  }
+// actor = new Actor(1, [0, 1.2, 3.14], new Material([1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 3.0]))
 
-};
+// # actor
 
-vec3 = function(x, y, z) {
-  return new THREE.Vector3(x, y, z);
-};
+// vec = vec3(1.0, 2.0, 3.0); # /*add(newObj()['hoge'], 1)*
+// vec
+var fluidFeatures;
 
-actor = new Actor(1, [0, 1.2, 3.14], new Material([1.0, 0.0, 0.0], [0.0, 2.0, 0.0], [0.0, 0.0, 3.0]));
-
-// actor
-vec = vec3(newObj()['hoge'], 2.0, 3.0);
-
-vec;
+fluidFeatures = new FluidFeatures();

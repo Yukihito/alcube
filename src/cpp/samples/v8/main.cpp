@@ -1,7 +1,29 @@
 #include <map>
-#include "libplatform/libplatform.h"
-#include "v8.h"
+//#include "libplatform/libplatform.h"
+//#include "v8.h"
 #include "../../utils/FileUtil.h"
+#include "../../scripting/mappings/actor/ActorTemplate.h"
+#include "../../scripting/Evaluator.h"
+
+/*
+class Adder {
+  public:
+    static void add(const v8::FunctionCallbackInfo<v8::Value>& args);
+};
+
+void Adder::add(const v8::FunctionCallbackInfo<v8::Value> &args) {
+  v8::Isolate* isolate = v8::Isolate::GetCurrent();
+  v8::HandleScope scope(isolate);
+  if (args.Length() < 2) {
+    args.GetReturnValue().Set(v8::Undefined(isolate));
+  }
+
+  int32_t a = args[0]->Int32Value();
+  int32_t b = args[1]->Int32Value();
+  int32_t sum = a + b;
+
+  args.GetReturnValue().Set(v8::Int32::New(isolate, sum));
+}
 
 v8::Local<v8::Value> v8str(v8::Isolate* isolate, const char* str) {
   return v8::Local<v8::Value>::Cast(v8::String::NewFromUtf8(isolate, str, v8::NewStringType::kNormal).ToLocalChecked());
@@ -29,9 +51,17 @@ void newObj(const v8::FunctionCallbackInfo<v8::Value>& args) {
   obj->Set(v8str(isolate, "hoge"), v8::Number::New(isolate, 5));
   args.GetReturnValue().Set(obj);
 }
-
+*/
 int main(int argc, char * argv[]) {
   auto fileUtil = new alcube::utils::FileUtil();
+  auto actorFactory = new alcube::models::actor::ActorFactory(new alcube::utils::MemoryPool<alcube::models::actor::Actor>(65536));
+  auto evaluator = new alcube::scripting::Evaluator(actorFactory, fileUtil, argv[0]);
+  evaluator->withScope([](alcube::scripting::Evaluator* e) {
+    e->evaluate("../src/js/test.js");
+  });
+
+  /*
+  auto adder = new Adder();
   // Initialize V8.
   v8::V8::InitializeICUDefaultLocation(argv[0]);
   v8::V8::InitializeExternalStartupData(argv[0]);
@@ -49,7 +79,7 @@ int main(int argc, char * argv[]) {
     // Create a stack-allocated handle scope.
     v8::HandleScope handle_scope(isolate);
     v8::Local<v8::ObjectTemplate> global = v8::ObjectTemplate::New(isolate);
-    global->Set(v8::String::NewFromUtf8(isolate, "add"), v8::FunctionTemplate::New(isolate, add));
+    global->Set(v8::String::NewFromUtf8(isolate, "add"), v8::FunctionTemplate::New(isolate, adder->add));
     global->Set(v8::String::NewFromUtf8(isolate, "newObj"), v8::FunctionTemplate::New(isolate, newObj));
     // Create a new context.
     v8::Local<v8::Context> context = v8::Context::New(isolate, nullptr, global);
@@ -59,6 +89,12 @@ int main(int argc, char * argv[]) {
     v8::Local<v8::String> threeJs =
       v8::String::NewFromUtf8(isolate, (fileUtil->readFile("../src/js/three.min.js")).c_str(),
                               v8::NewStringType::kNormal).ToLocalChecked();
+
+    alcube::scripting::mappings::actor::Actor::initObjectTemplate();
+    alcube::scripting::mappings::actor::ActorFactory::instance = new alcube::models::actor::ActorFactory(new alcube::models::actor::MemoryPool(65536));
+    global->Set(v8::String::NewFromUtf8(isolate, "createActor"), v8::FunctionTemplate::New(isolate, alcube::scripting::mappings::actor::ActorFactory::createFluid));
+
+
     v8::Local<v8::String> source =
       v8::String::NewFromUtf8(isolate, (fileUtil->readFile("../src/js/test2.js")).c_str(),
                               v8::NewStringType::kNormal).ToLocalChecked();
@@ -86,6 +122,7 @@ int main(int argc, char * argv[]) {
       }
     }
      */
+  /*
     printf("%s\n", *utf8);
   }
   // Dispose the isolate and tear down V8.
@@ -94,4 +131,6 @@ int main(int argc, char * argv[]) {
   v8::V8::ShutdownPlatform();
   delete platform;
   delete create_params.array_buffer_allocator;
+   */
+
 }

@@ -2,8 +2,18 @@
 
 namespace alcube::models::actor {
   using namespace utils::opencl::conversions;
-  Actor::Actor(alcube::physics::Actor* physicsActor) {
+
+  void Actor::init(alcube::physics::Actor *physicsActor) {
     this->physicsActor = physicsActor;
+  }
+
+  void Actor::init(int id) {
+    this->id = id;
+    this->physicsActor = nullptr;
+  }
+
+  int Actor::getId() {
+    return id;
   }
 
   glm::vec3 Actor::getPosition() {
@@ -39,9 +49,15 @@ namespace alcube::models::actor {
     physicsActor->physicalQuantity.angularMomentum = toCl(arg);
   }
 
+  ActorFactory::ActorFactory(utils::MemoryPool<Actor> *memoryPool) {
+    this->memoryPool = memoryPool;
+  }
+
   Actor* ActorFactory::create(physics::Features *feature) {
     auto physicsActor = feature->createPhysicsActor();
-    return new Actor(physicsActor);
+    auto actor = memoryPool->get();
+    actor->init(physicsActor);
+    return actor;
   }
 
   alcube::physics::Actor* Actor::getPhysicsActor() {

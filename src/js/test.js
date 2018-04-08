@@ -1,7 +1,14 @@
-'hello' + ' world';
-1 + 1;
-var dict = {
-    "hoge": "yukihito",
-    "fuga" : 3.14
+var a, fluid, fluidFeatures;
+
+fluidFeatures = new FluidFeatures();
+
+fluid = function(position) {
+  var actor;
+  actor = actorFactory.create(fluidFeatures);
+  actor.position(position);
+  return actor;
 };
-dict;
+
+a = fluid(vec3(1.1, 2.2, 3.3));
+
+a.position().x;
