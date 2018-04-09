@@ -1,5 +1,5 @@
 vec3 = (x, y, z) ->
-  new THREE.Vector3 x, y, z
+  new THREE.Vector3 parseFloat(x), parseFloat(y), parseFloat(z)
 
 quat = (w, x, y, z) ->
   new THREE.Quaternion x, y, z, w
@@ -15,6 +15,13 @@ quatToArray = (value) ->
 
 arrayToQuat = (raw) ->
   quat raw[0], raw[1], raw[2], raw[3]
+
+rand = () ->
+  Math.random()
+
+vec3Zero = vec3(0, 0, 0)
+vec3Rand = () ->
+  vec3 rand(), rand(), rand()
 
 primitiveAccessor = (wrapper, name) ->
   accessor = (value) ->
@@ -80,6 +87,7 @@ class Spring
 class SpringFactory
   wrap: () =>
     @underlying = constructSpringFactory()
+    primitiveAccessor this, 'k'
 
   create: (actor0, position0, actor1, position1) =>
     spring = new Spring
@@ -124,6 +132,9 @@ softbodyFeaturesFactory.wrap()
 
 actorFactory = new ActorFactory()
 actorFactory.wrap()
+
+springFactory = new SpringFactory()
+springFactory.wrap()
 
 cube = new Alcube()
 cube.wrap()

@@ -17,6 +17,7 @@ namespace alcube::scripting {
     prototypes.push_back(new mappings::ActorFactory::Prototype(actorFactory));
     prototypes.push_back(new mappings::physics::fluid::Features::Prototype());
     prototypes.push_back(new mappings::physics::fluid::FeaturesFactory::Prototype(fluidFeaturesFactory));
+    prototypes.push_back(new mappings::physics::softbody::Spring::Prototype());
     prototypes.push_back(new mappings::physics::softbody::SpringFactory::Prototype(springFactory));
     prototypes.push_back(new mappings::physics::softbody::Features::Prototype());
     prototypes.push_back(new mappings::physics::softbody::FeaturesFactory::Prototype(softbodyFeaturesFactory));

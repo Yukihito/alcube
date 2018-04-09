@@ -1,7 +1,7 @@
-var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, softbodyFeaturesFactory, vec3, vec3Accessor, vec3ToArray;
+var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, softbodyFeaturesFactory, springFactory, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
 
 vec3 = function(x, y, z) {
-  return new THREE.Vector3(x, y, z);
+  return new THREE.Vector3(parseFloat(x), parseFloat(y), parseFloat(z));
 };
 
 quat = function(w, x, y, z) {
@@ -22,6 +22,16 @@ quatToArray = function(value) {
 
 arrayToQuat = function(raw) {
   return quat(raw[0], raw[1], raw[2], raw[3]);
+};
+
+rand = function() {
+  return Math.random();
+};
+
+vec3Zero = vec3(0, 0, 0);
+
+vec3Rand = function() {
+  return vec3(rand(), rand(), rand());
 };
 
 primitiveAccessor = function(wrapper, name) {
@@ -144,7 +154,8 @@ SpringFactory = class SpringFactory {
   }
 
   wrap() {
-    return this.underlying = constructSpringFactory();
+    this.underlying = constructSpringFactory();
+    return primitiveAccessor(this, 'k');
   }
 
   create(actor0, position0, actor1, position1) {
@@ -222,6 +233,10 @@ softbodyFeaturesFactory.wrap();
 actorFactory = new ActorFactory();
 
 actorFactory.wrap();
+
+springFactory = new SpringFactory();
+
+springFactory.wrap();
 
 cube = new Alcube();
 

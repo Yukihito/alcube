@@ -8,6 +8,7 @@ namespace alcube::samples {
     float w = 64;
     deltaTime *= 1.0f;
     physicsSimulator->gravity *= 2.0f;
+    /*
     std::random_device rnd;
     std::mt19937 mt(rnd());
     std::uniform_real_distribution<float> randReal(0, 0.5);
@@ -84,6 +85,7 @@ namespace alcube::samples {
         }
       }
     }
+     */
 
     glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
     drawable = new SphereDrawable(
@@ -92,7 +94,7 @@ namespace alcube::samples {
       maxCellCount,
       (GLfloat*)gpuAccessor->memories.positions.dto
     );
-    drawable->shape->instanceCount = /*actorCount*/cube->getActorCount();
+    drawable->shape->instanceCount = cube->getActorCount();
     drawer->add(drawable);
     afterSetup();
   }

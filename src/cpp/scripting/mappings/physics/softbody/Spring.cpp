@@ -7,6 +7,10 @@ namespace alcube::scripting::mappings::physics::softbody {
     Prototype::Prototype() {
       Prototype::instance = this;
     }
+
+    void Prototype::init() {
+      utils::Prototype::init();
+    }
   }
 
   namespace SpringFactory {

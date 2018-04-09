@@ -9,6 +9,7 @@ namespace alcube::scripting::mappings::physics::softbody {
     class Prototype : public utils::TypedPrototype<models::physics::softbody::Spring> {
       public:
         explicit Prototype();
+        void init() override;
         static Prototype* instance;
     };
   }

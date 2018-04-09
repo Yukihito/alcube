@@ -69,9 +69,7 @@ namespace alcube::samples {
     softbodyFeaturesFactory = new models::physics::softbody::FeaturesFactory(new utils::MemoryPool<models::physics::softbody::Features>(65536));
 
     evaluator = new scripting::Evaluator(actorFactory, fluidFeaturesFactory, springFactory, softbodyFeaturesFactory, cube, fileUtil, programName);
-    evaluator->withScope([](alcube::scripting::Evaluator* e) {
-      e->evaluate("../src/js/test.js");
-    });
+    evaluator->withScope([](alcube::scripting::Evaluator* e) { e->evaluate("../src/js/test.js"); });
     profiler->setShowInterval(1000);
     profiler->enabled = true;
     profilers.update = profiler->create("update");
