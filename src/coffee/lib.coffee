@@ -16,7 +16,7 @@ quatToArray = (value) ->
 arrayToQuat = (raw) ->
   quat raw[0], raw[1], raw[2], raw[3]
 
-numberAccessor = (wrapper, name) ->
+primitiveAccessor = (wrapper, name) ->
   accessor = (value) ->
     if value is undefined
       wrapper.underlying[name]
@@ -43,10 +43,10 @@ quatAccessor = (wrapper, name) ->
 class FluidFeatures
   wrap: (underlying) =>
     @underlying = underlying
-    numberAccessor this, 'mass'
-    numberAccessor this, 'density'
-    numberAccessor this, 'stiffness'
-    numberAccessor this, 'viscosity'
+    primitiveAccessor this, 'mass'
+    primitiveAccessor this, 'density'
+    primitiveAccessor this, 'stiffness'
+    primitiveAccessor this, 'viscosity'
 
 class FluidFeaturesFactory
   wrap: () =>
@@ -60,8 +60,8 @@ class FluidFeaturesFactory
 class SoftbodyFeatures
   wrap: (underlying) =>
     @underlying = underlying
-    numberAccessor this, 'elasticity'
-    numberAccessor this, 'mass'
+    primitiveAccessor this, 'elasticity'
+    primitiveAccessor this, 'mass'
 
 
 class SoftbodyFeaturesFactory
@@ -103,6 +103,19 @@ class ActorFactory
     actor.wrap @underlying.create features.underlying
     actor
 
+
+class Alcube
+  wrap: () =>
+    @underlying = constructAlcube()
+    primitiveAccessor this, 'actorCount'
+
+  add: (obj) =>
+    if obj.constructor.name == 'Actor'
+      @underlying.addActor obj.underlying
+    else if obj.constructor.name == 'Spring'
+      @underlying.addSpring obj.underlying
+
+
 fluidFeaturesFactory = new FluidFeaturesFactory()
 fluidFeaturesFactory.wrap()
 
@@ -111,3 +124,7 @@ softbodyFeaturesFactory.wrap()
 
 actorFactory = new ActorFactory()
 actorFactory.wrap()
+
+cube = new Alcube()
+cube.wrap()
+

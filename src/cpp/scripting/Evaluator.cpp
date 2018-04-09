@@ -89,6 +89,7 @@ namespace alcube::scripting {
     registerFunction("constructFluidFeaturesFactory", mappings::physics::fluid::FeaturesFactory::Prototype::constructor);
     registerFunction("constructSoftbodyFeaturesFactory", mappings::physics::softbody::FeaturesFactory::Prototype::constructor);
     registerFunction("constructSpringFactory", mappings::physics::softbody::SpringFactory::Prototype::constructor);
+    registerFunction("constructAlcube", mappings::Alcube::Prototype::constructor);
     registerFunction("print", Evaluator::print);
   }
 

@@ -6,4 +6,4 @@ fluid = (position) ->
   actor
 
 a = fluid vec3 1.1, 2.2, 3.3
-a.position().x
+print a.position().x

@@ -10,6 +10,7 @@
 #include "../physics/fluid/Simulator.h"
 #include "../physics/softbody/Simulator.h"
 #include "../models/Alcube.h"
+#include "../scripting/Evaluator.h"
 
 
 namespace alcube::samples {
@@ -26,7 +27,8 @@ namespace alcube::samples {
         unsigned int windowWidth,
         unsigned int windowHeight,
         unsigned int fps,
-        const std::string &appName
+        const std::string &appName,
+        const char* programName
       );
 
     protected:
@@ -48,9 +50,13 @@ namespace alcube::samples {
       models::Alcube* cube;
       models::ActorFactory* actorFactory;
       models::physics::softbody::SpringFactory* springFactory;
+      models::physics::fluid::FeaturesFactory* fluidFeaturesFactory;
+      models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory;
+      scripting::Evaluator* evaluator;
       Profilers profilers;
       unsigned int maxCellCount;
       float deltaTime;
+      const char* programName;
 
       void beforeSetup(
         unsigned int worldSize,

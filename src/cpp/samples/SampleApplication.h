@@ -11,17 +11,11 @@
 namespace alcube::samples {
   class SampleApplication : public ApplicationBase {
     public:
-      explicit SampleApplication();
+      explicit SampleApplication(const char* programName);
     protected:
       void onInit() override;
     private:
       SphereDrawable* drawable;
-      /*
-            unsigned short actorCount;
-      void add(physics::softbody::Actor *actor);
-      void add(physics::fluid::Actor *actor);
-      void add(models::Actor* actor);
-       */
   };
 }
 

@@ -53,3 +53,14 @@ namespace alcube::scripting::mappings {
     }
   }
 }
+
+namespace alcube::scripting::utils {
+  using namespace mappings::Alcube;
+  template <>
+  int Accessor<models::Alcube, int, fields::actorCount>::get(alcube::models::Alcube* alcube) {
+    return alcube->getActorCount();
+  }
+
+  template <>
+  void Accessor<models::Alcube, int, fields::actorCount>::set(alcube::models::Alcube* alcube, int v) {}
+}

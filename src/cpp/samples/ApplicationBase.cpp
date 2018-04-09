@@ -5,8 +5,11 @@ namespace alcube::samples {
     unsigned int windowWidth,
     unsigned int windowHeight,
     unsigned int fps,
-    const std::string& appName
-  ) : OpenGLApplication(windowWidth, windowHeight, fps, appName) {}
+    const std::string& appName,
+    const char* programName
+  ) : OpenGLApplication(windowWidth, windowHeight, fps, appName) {
+    this->programName = programName;
+  }
 
   void ApplicationBase::beforeSetup(unsigned int worldSize, unsigned int maxCellCount) {
     printSystemInfo();
@@ -59,9 +62,16 @@ namespace alcube::samples {
       physicsSimulator
     );
     actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(65536));
-    springFactory = new models::physics::softbody::SpringFactory();
+    springFactory = new models::physics::softbody::SpringFactory(new utils::MemoryPool<models::physics::softbody::Spring>(65536));
     physicsSimulator->gravity = gravity;
 
+    fluidFeaturesFactory = new models::physics::fluid::FeaturesFactory(new utils::MemoryPool<models::physics::fluid::Features>(65536));
+    softbodyFeaturesFactory = new models::physics::softbody::FeaturesFactory(new utils::MemoryPool<models::physics::softbody::Features>(65536));
+
+    evaluator = new scripting::Evaluator(actorFactory, fluidFeaturesFactory, springFactory, softbodyFeaturesFactory, cube, fileUtil, programName);
+    evaluator->withScope([](alcube::scripting::Evaluator* e) {
+      e->evaluate("../src/js/test.js");
+    });
     profiler->setShowInterval(1000);
     profiler->enabled = true;
     profilers.update = profiler->create("update");

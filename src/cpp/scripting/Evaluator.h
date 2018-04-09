@@ -17,7 +17,7 @@ namespace alcube::scripting {
     public:
       explicit Evaluator(
         models::ActorFactory* actorFactory,
-        alcube::models::physics::fluid::FeaturesFactory* featuresFactory,
+        alcube::models::physics::fluid::FeaturesFactory* fluidFeaturesFactory,
         alcube::models::physics::softbody::SpringFactory* springFactory,
         alcube::models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory,
         alcube::models::Alcube* alcube,

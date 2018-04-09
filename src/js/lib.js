@@ -1,4 +1,4 @@
-var Actor, ActorFactory, FluidFeatures, FluidFeaturesFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, actorFactory, arrayToQuat, arrayToVec3, fluidFeaturesFactory, numberAccessor, quat, quatAccessor, quatToArray, softbodyFeaturesFactory, vec3, vec3Accessor, vec3ToArray;
+var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, softbodyFeaturesFactory, vec3, vec3Accessor, vec3ToArray;
 
 vec3 = function(x, y, z) {
   return new THREE.Vector3(x, y, z);
@@ -24,7 +24,7 @@ arrayToQuat = function(raw) {
   return quat(raw[0], raw[1], raw[2], raw[3]);
 };
 
-numberAccessor = function(wrapper, name) {
+primitiveAccessor = function(wrapper, name) {
   var accessor;
   accessor = function(value) {
     if (value === void 0) {
@@ -67,10 +67,10 @@ FluidFeatures = class FluidFeatures {
 
   wrap(underlying) {
     this.underlying = underlying;
-    numberAccessor(this, 'mass');
-    numberAccessor(this, 'density');
-    numberAccessor(this, 'stiffness');
-    return numberAccessor(this, 'viscosity');
+    primitiveAccessor(this, 'mass');
+    primitiveAccessor(this, 'density');
+    primitiveAccessor(this, 'stiffness');
+    return primitiveAccessor(this, 'viscosity');
   }
 
 };
@@ -101,8 +101,8 @@ SoftbodyFeatures = class SoftbodyFeatures {
 
   wrap(underlying) {
     this.underlying = underlying;
-    numberAccessor(this, 'elasticity');
-    return numberAccessor(this, 'mass');
+    primitiveAccessor(this, 'elasticity');
+    return primitiveAccessor(this, 'mass');
   }
 
 };
@@ -190,6 +190,27 @@ ActorFactory = class ActorFactory {
 
 };
 
+Alcube = class Alcube {
+  constructor() {
+    this.wrap = this.wrap.bind(this);
+    this.add = this.add.bind(this);
+  }
+
+  wrap() {
+    this.underlying = constructAlcube();
+    return primitiveAccessor(this, 'actorCount');
+  }
+
+  add(obj) {
+    if (obj.constructor.name === 'Actor') {
+      return this.underlying.addActor(obj.underlying);
+    } else if (obj.constructor.name === 'Spring') {
+      return this.underlying.addSpring(obj.underlying);
+    }
+  }
+
+};
+
 fluidFeaturesFactory = new FluidFeaturesFactory();
 
 fluidFeaturesFactory.wrap();
@@ -201,3 +222,7 @@ softbodyFeaturesFactory.wrap();
 actorFactory = new ActorFactory();
 
 actorFactory.wrap();
+
+cube = new Alcube();
+
+cube.wrap();

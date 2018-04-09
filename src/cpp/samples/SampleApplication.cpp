@@ -1,7 +1,7 @@
 #include "SampleApplication.h"
 
 namespace alcube::samples {
-  SampleApplication::SampleApplication() : ApplicationBase(1600, 1200, 60, "SampleApplication") {}
+  SampleApplication::SampleApplication(const char* programName) : ApplicationBase(1600, 1200, 60, "SampleApplication", programName) {}
 
   void SampleApplication::onInit() {
     beforeSetup(64, 65536);
