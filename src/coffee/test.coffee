@@ -14,7 +14,6 @@ softbody = (position, linearMomentum) ->
   actor = actorFactory.create softbodyFeatures
   actor.position position
   actor.linearMomentum linearMomentum
-  print vec3ToArray actor.linearMomentum()
   softbodies.push actor
   actor
 
