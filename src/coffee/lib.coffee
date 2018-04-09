@@ -1,30 +1,71 @@
 vec3 = (x, y, z) ->
-  new THREE.Vector3(x, y, z);
+  new THREE.Vector3 x, y, z
+
+quat = (w, x, y, z) ->
+  new THREE.Quaternion x, y, z, w
+
+numberAccessor = (wrapper, name) ->
+  accessor = (value) ->
+    if value is undefined
+      wrapper.underlying[name]
+    else
+      wrapper.underlying[name] = value
+  wrapper[name] = accessor
+
+vec3Accessor = (wrapper, name) ->
+  accessor = (value) ->
+    if value is undefined
+      raw = wrapper.underlying[name]
+      vec3 raw[0], raw[1], raw[2]
+    else
+      wrapper.underlying[name] = [value.x, value.y, value.z]
+  wrapper[name] = accessor
+
+quatAccessor = (wrapper, name) ->
+  accessor = (value) ->
+    if value is undefined
+      raw = wrapper.underlying[name]
+      quat raw[0], raw[1], raw[2], raw[3]
+    else
+      wrapper.underlying[name] = [value.w, value.x, value.y, value.z]
+  wrapper[name] = accessor
 
 class FluidFeatures
-  constructor: () ->
-    @underlying = createActorFactory()
-    @stiffness = 64.0
-    @density = 0.02
-    @viscosity = 8.0
+  wrap: (underlying) =>
+    @underlying = underlying
+    numberAccessor this, 'mass'
+    numberAccessor this, 'density'
+    numberAccessor this, 'stiffness'
+    numberAccessor this, 'viscosity'
 
-  createActor: () =>
-    @underlying.createFluid(this)
+class FluidFeaturesFactory
+  wrap: () =>
+    @underlying = constructFluidFeaturesFactory()
 
+  create: () =>
+    features = new FluidFeatures()
+    features.wrap @underlying.create()
+    features
 
 class Actor
-  constructor: (underlying) ->
+  wrap: (underlying) =>
     @underlying = underlying
-
-  position : (vec) =>
-    if arguments.length > 0
-      @underlying.position = [vec.x, vec.y, vec.z]
-    else
-      p = @underlying.position
-      vec3 p[0], p[1], p[2]
+    vec3Accessor this, 'position'
+    quatAccessor this, 'rotation'
+    vec3Accessor this, 'linearMomentum'
+    vec3Accessor this, 'angularMomentum'
 
 class ActorFactory
-  create: (features) =>
-    new Actor features.createActor()
+  wrap: () =>
+    @underlying = constructActorFactory()
 
-actorFactory = new ActorFactory
+  create: (features) =>
+    actor = new Actor
+    actor.wrap @underlying.create features.underlying
+    actor
+
+fluidFeaturesFactory = new FluidFeaturesFactory()
+fluidFeaturesFactory.wrap()
+
+actorFactory = new ActorFactory()
+actorFactory.wrap()

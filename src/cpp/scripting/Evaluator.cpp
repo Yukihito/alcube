@@ -4,6 +4,7 @@ namespace alcube::scripting {
   using namespace utils;
   Evaluator::Evaluator(
     alcube::models::ActorFactory *actorFactory,
+    alcube::models::physics::fluid::FeaturesFactory* featuresFactory,
     alcube::utils::FileUtil* fileUtil,
     const char* programName
   ) {
@@ -11,6 +12,8 @@ namespace alcube::scripting {
     prototypes = {};
     prototypes.push_back(new mappings::Actor::Prototype());
     prototypes.push_back(new mappings::ActorFactory::Prototype(actorFactory));
+    prototypes.push_back(new mappings::physics::fluid::Features::Prototype());
+    prototypes.push_back(new mappings::physics::fluid::FeaturesFactory::Prototype(featuresFactory));
     this->fileUtil = fileUtil;
   }
 
@@ -75,7 +78,8 @@ namespace alcube::scripting {
   }
 
   void Evaluator::registerFunctions() {
-    registerFunction("createActorFactory", mappings::ActorFactory::Prototype::constructor);
+    registerFunction("constructActorFactory", mappings::ActorFactory::Prototype::constructor);
+    registerFunction("constructFluidFeaturesFactory", mappings::physics::fluid::FeaturesFactory::Prototype::constructor);
     registerFunction("print", Evaluator::print);
   }
 

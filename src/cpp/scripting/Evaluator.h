@@ -5,6 +5,7 @@
 #include "v8.h"
 #include "../models/Actor.h"
 #include "mappings/Actor.h"
+#include "mappings/physics/fluid/Features.h"
 #include <vector>
 
 namespace alcube::scripting {
@@ -12,6 +13,7 @@ namespace alcube::scripting {
     public:
       explicit Evaluator(
         models::ActorFactory* actorFactory,
+        alcube::models::physics::fluid::FeaturesFactory* featuresFactory,
         alcube::utils::FileUtil* fileUtil,
         const char* programName
       );

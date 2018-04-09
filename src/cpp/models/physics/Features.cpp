@@ -8,14 +8,4 @@ namespace alcube::models::physics {
   int Features::getId() {
     return id;
   }
-
-  Features* FeaturesFinder::find(int id) {
-    for (utils::InstanceFinder<Features>* finder : finders) {
-      auto instance = finder->find(id);
-      if (instance != nullptr) {
-        return instance;
-      }
-    }
-    return nullptr;
-  }
 }

@@ -59,7 +59,7 @@ namespace alcube::scripting::utils {
   template <class T, class U, class V>
   class Accessor {
     public:
-      static void create(Prototype* prototype);
+      static void define(Prototype *prototype);
 
     protected:
       static U get(T *);
@@ -93,7 +93,7 @@ namespace alcube::scripting::utils {
   };
 
   template <class T, class U, class V>
-  void Accessor<T, U, V>::create(scripting::utils::Prototype *prototype) {
+  void Accessor<T, U, V>::define(scripting::utils::Prototype *prototype) {
     v8::Isolate* isolate = v8::Isolate::GetCurrent();
     int stat;
     char *rawName = abi::__cxa_demangle(typeid(V).name(), nullptr, nullptr, &stat);

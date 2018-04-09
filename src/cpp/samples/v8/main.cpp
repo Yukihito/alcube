@@ -55,7 +55,8 @@ void newObj(const v8::FunctionCallbackInfo<v8::Value>& args) {
 int main(int argc, char * argv[]) {
   auto fileUtil = new alcube::utils::FileUtil();
   auto actorFactory = new alcube::models::ActorFactory(new alcube::utils::MemoryPool<alcube::models::Actor>(65536));
-  auto evaluator = new alcube::scripting::Evaluator(actorFactory, fileUtil, argv[0]);
+  auto fluidFeaturesFactory = new alcube::models::physics::fluid::FeaturesFactory(new alcube::utils::MemoryPool<alcube::models::physics::fluid::Features>(65536));
+  auto evaluator = new alcube::scripting::Evaluator(actorFactory, fluidFeaturesFactory, fileUtil, argv[0]);
   evaluator->withScope([](alcube::scripting::Evaluator* e) {
     e->evaluate("../src/js/test.js");
   });

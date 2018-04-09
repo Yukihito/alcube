@@ -13,10 +13,10 @@ namespace alcube::scripting::mappings {
       v8::Isolate *isolate = v8::Isolate::GetCurrent();
       objectTemplate = v8::ObjectTemplate::New(isolate);
       objectTemplate->SetInternalFieldCount(1);
-      utils::Accessor<models::Actor, glm::vec3, fields::position>::create(this);
-      utils::Accessor<models::Actor, glm::quat, fields::rotation>::create(this);
-      utils::Accessor<models::Actor, glm::vec3, fields::linearMomentum>::create(this);
-      utils::Accessor<models::Actor, glm::vec3, fields::angularMomentum>::create(this);
+      Accessor<models::Actor, glm::vec3, fields::position>::define(this);
+      Accessor<models::Actor, glm::quat, fields::rotation>::define(this);
+      Accessor<models::Actor, glm::vec3, fields::linearMomentum>::define(this);
+      Accessor<models::Actor, glm::vec3, fields::angularMomentum>::define(this);
     }
   }
 
@@ -28,36 +28,34 @@ namespace alcube::scripting::mappings {
     }
 
     void Prototype::init() {
-      v8::Isolate *isolate = v8::Isolate::GetCurrent();
+      v8::Isolate* isolate = v8::Isolate::GetCurrent();
       objectTemplate = v8::ObjectTemplate::New(isolate);
       objectTemplate->SetInternalFieldCount(1);
       objectTemplate->Set(
-        v8::String::NewFromUtf8(isolate, "createFluid"),
-        v8::FunctionTemplate::New(isolate, Prototype::createFluid));
+        v8::String::NewFromUtf8(isolate, "create"),
+        v8::FunctionTemplate::New(isolate, Prototype::create)
+      );
     }
 
     void Prototype::constructor(const v8::FunctionCallbackInfo<v8::Value> &info) {
       v8::Isolate *isolate = v8::Isolate::GetCurrent();
-      auto actorFactory = Prototype::instance->objectTemplate->NewInstance();
-      actorFactory->SetInternalField(0, v8::External::New(isolate, Prototype::instance->underlying));
-      info.GetReturnValue().Set(actorFactory);
+      auto v8Instance = Prototype::instance->objectTemplate->NewInstance();
+      v8Instance->SetInternalField(0, v8::External::New(isolate, Prototype::instance->underlying));
+      info.GetReturnValue().Set(v8Instance);
     }
 
-    void Prototype::createFluid(const v8::FunctionCallbackInfo<v8::Value> &info) {
+    void Prototype::create(const v8::FunctionCallbackInfo<v8::Value> &info) {
       v8::Isolate* isolate = v8::Isolate::GetCurrent();
       v8::HandleScope scope(isolate);
       if (info.Length() < 1) {
         info.GetReturnValue().Set(v8::Undefined(isolate));
       }
-      v8::Local<v8::Object> featuresDTO = info[0]->ToObject();
-      auto density = (float) featuresDTO->Get(utils::v8str(isolate, "density"))->NumberValue();
-      auto stiffness = (float) featuresDTO->Get(utils::v8str(isolate, "stiffness"))->NumberValue();
-      auto viscosity = (float) featuresDTO->Get(utils::v8str(isolate, "viscosity"))->NumberValue();
-      models::physics::fluid::Features features = models::physics::fluid::Features();
-      features.setDensity(density);
-      features.setStiffness(stiffness);
-      features.setViscosity(viscosity);
-      auto underlying = self(info)->create(&features);
+      v8::Local<v8::Object> featuresObject = info[0]->ToObject();
+      auto internalField = featuresObject->GetInternalField(0);
+      v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(internalField);
+      void *ptr = wrap->Value();
+      auto features = static_cast<models::physics::fluid::Features*>(ptr);
+      auto underlying = self(info)->create(features);
       auto actor = Actor::Prototype::instance->objectTemplate->NewInstance();
       actor->SetInternalField(0, v8::External::New(isolate, underlying));
       info.GetReturnValue().Set(actor);

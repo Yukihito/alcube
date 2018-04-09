@@ -1,4 +1,4 @@
-fluidFeatures = new FluidFeatures()
+fluidFeatures = fluidFeaturesFactory.create()
 
 fluid = (position) ->
   actor = actorFactory.create fluidFeatures

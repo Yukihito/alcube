@@ -30,7 +30,7 @@ namespace alcube::scripting::mappings {
         void init() override;
         static Prototype* instance;
         static void constructor(const v8::FunctionCallbackInfo<v8::Value>&);
-        static void createFluid(const v8::FunctionCallbackInfo<v8::Value>&);
+        static void create(const v8::FunctionCallbackInfo<v8::Value>&);
     };
   }
 }

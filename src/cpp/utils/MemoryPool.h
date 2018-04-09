@@ -6,21 +6,12 @@
 
 namespace alcube::utils {
   template <class T>
-  class InstanceFinder {
-    public:
-      virtual T* find(int id) = 0;
-  };
-
-  template <class T>
-  class MemoryPool : public InstanceFinder<T> {
+  class MemoryPool {
     public:
       explicit MemoryPool(int size);
-      T* find(int id) override;
       T* get();
 
     private:
-      int instanceCount;
-      std::map<int, T*> idToInstance;
       int size;
       T* instances;
       std::stack<int> freeIndices;
@@ -34,24 +25,13 @@ namespace alcube::utils {
     for (int i = 0; i < size; i++) {
       freeIndices.push(i);
     }
-    this->idToInstance = {};
-    this->instanceCount = 0;
   }
 
   template <class T>
   T* MemoryPool<T>::get() {
     auto instance = &instances[freeIndices.top()];
-    int nextId = instanceCount;
-    instance->init(nextId);
-    idToInstance[nextId] = instance;
     freeIndices.pop();
-    instanceCount++;
     return instance;
-  }
-
-  template <class T>
-  T* MemoryPool<T>::find(int id) {
-    return idToInstance[id];
   }
 }
 

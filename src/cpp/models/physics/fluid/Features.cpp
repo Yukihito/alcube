@@ -36,11 +36,14 @@ namespace alcube::models::physics::fluid {
     return actor;
   }
 
-  FeaturesFactory::FeaturesFactory(SubFeaturesMemoryPool<Features> *memoryPool) {
+  FeaturesFactory::FeaturesFactory(utils::MemoryPool<Features> *memoryPool) {
     this->memoryPool = memoryPool;
   }
 
   Features* FeaturesFactory::create() {
-    return memoryPool->get();
+    auto features = memoryPool->get();
+    int nextId = instanceCount;
+    features->init(nextId);
+    return features;
   }
 }

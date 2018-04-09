@@ -1,6 +1,6 @@
 var a, fluid, fluidFeatures;
 
-fluidFeatures = new FluidFeatures();
+fluidFeatures = fluidFeaturesFactory.create();
 
 fluid = function(position) {
   var actor;

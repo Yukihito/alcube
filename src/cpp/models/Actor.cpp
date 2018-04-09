@@ -3,13 +3,10 @@
 namespace alcube::models {
   using namespace utils::opencl::conversions;
 
-  void Actor::init(alcube::physics::Actor *physicsActor) {
-    this->physicsActor = physicsActor;
-  }
-
-  void Actor::init(int id) {
+  void Actor::init(int id, alcube::physics::Actor *physicsActor) {
     this->id = id;
     this->physicsActor = nullptr;
+    this->physicsActor = physicsActor;
   }
 
   int Actor::getId() {
@@ -56,7 +53,9 @@ namespace alcube::models {
   Actor* ActorFactory::create(physics::Features *feature) {
     auto physicsActor = feature->createPhysicsActor();
     auto actor = memoryPool->get();
-    actor->init(physicsActor);
+    int nextId = instanceCount;
+    actor->init(nextId, physicsActor);
+    instanceCount++;
     return actor;
   }
 

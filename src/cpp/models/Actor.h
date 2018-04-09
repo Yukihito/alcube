@@ -22,8 +22,7 @@ namespace alcube::models {
       void setLinearMomentum(glm::vec3 arg) override;
       glm::vec3 getAngularMomentum() override;
       void setAngularMomentum(glm::vec3 arg) override;
-      void init(alcube::physics::Actor* physicsActor);
-      void init(int id);
+      void init(int id, alcube::physics::Actor* physicsActor);
 
       alcube::physics::Actor* getPhysicsActor();
     private:
@@ -37,6 +36,7 @@ namespace alcube::models {
       Actor* create(physics::Features* feature);
 
     private:
+      int instanceCount = 0;
       utils::MemoryPool<Actor>* memoryPool;
   };
 }
