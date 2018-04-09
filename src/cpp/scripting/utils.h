@@ -12,10 +12,11 @@
 
 namespace alcube::scripting::utils {
   v8::Local<v8::Value> v8str(v8::Isolate* isolate, const char* str);
+
   class Prototype {
     public:
       v8::Local<v8::ObjectTemplate> objectTemplate;
-      virtual void init() = 0;
+      virtual void init();
   };
 
   template <class T>
@@ -45,6 +46,9 @@ namespace alcube::scripting::utils {
   }
 
   template <class T>
+  T* getUnderlying(v8::Local<v8::Value> value);
+
+  template <class T>
   T convertV8ValueTo(v8::Local<v8::Value> value);
 
   template <class T>
@@ -69,6 +73,15 @@ namespace alcube::scripting::utils {
       static void v8Getter(v8::Local<v8::String>, const v8::PropertyCallbackInfo<v8::Value>&);
       static void v8Setter(v8::Local<v8::String> property, v8::Local<v8::Value>, const v8::PropertyCallbackInfo<void>&);
   };
+
+  template <class T>
+  T* getUnderlying(v8::Local<v8::Value> value) {
+    v8::Local<v8::Object> obj = value->ToObject();
+    auto internalField = obj->GetInternalField(0);
+    v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(internalField);
+    void *ptr = wrap->Value();
+    return static_cast<T*>(ptr);
+  }
 
   template <class T, class U>
   void getter(const v8::PropertyCallbackInfo<v8::Value> &info, std::function<U(T*)> rawGetter) {

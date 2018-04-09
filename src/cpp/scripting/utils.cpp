@@ -5,6 +5,12 @@ namespace alcube::scripting::utils {
     return v8::Local<v8::Value>::Cast(v8::String::NewFromUtf8(isolate, str, v8::NewStringType::kNormal).ToLocalChecked());
   }
 
+  void Prototype::init() {
+    v8::Isolate *isolate = v8::Isolate::GetCurrent();
+    objectTemplate = v8::ObjectTemplate::New(isolate);
+    objectTemplate->SetInternalFieldCount(1);
+  }
+
   // float
   template <>
   float convertV8ValueTo(v8::Local<v8::Value> value) {

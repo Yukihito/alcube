@@ -9,9 +9,7 @@ namespace alcube::scripting::mappings::physics::fluid {
     }
 
     void Prototype::init() {
-      v8::Isolate *isolate = v8::Isolate::GetCurrent();
-      objectTemplate = v8::ObjectTemplate::New(isolate);
-      objectTemplate->SetInternalFieldCount(1);
+      utils::Prototype::init();
       Accessor<models::physics::fluid::Features, float, fields::mass>::define(this);
       Accessor<models::physics::fluid::Features, float, fields::density>::define(this);
       Accessor<models::physics::fluid::Features, float, fields::stiffness>::define(this);
@@ -26,9 +24,8 @@ namespace alcube::scripting::mappings::physics::fluid {
     }
 
     void Prototype::init() {
+      utils::Prototype::init();
       v8::Isolate* isolate = v8::Isolate::GetCurrent();
-      objectTemplate = v8::ObjectTemplate::New(isolate);
-      objectTemplate->SetInternalFieldCount(1);
       objectTemplate->Set(
         v8::String::NewFromUtf8(isolate, "create"),
         v8::FunctionTemplate::New(isolate, Prototype::create)

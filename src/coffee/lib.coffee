@@ -4,6 +4,18 @@ vec3 = (x, y, z) ->
 quat = (w, x, y, z) ->
   new THREE.Quaternion x, y, z, w
 
+arrayToVec3 = (raw) ->
+  vec3 raw[0], raw[1], raw[2]
+
+vec3ToArray = (value) ->
+  [value.x, value.y, value.z]
+
+quatToArray = (value) ->
+  [value.w, value.x, value.y, value.z]
+
+arrayToQuat = (raw) ->
+  quat raw[0], raw[1], raw[2], raw[3]
+
 numberAccessor = (wrapper, name) ->
   accessor = (value) ->
     if value is undefined
@@ -15,19 +27,17 @@ numberAccessor = (wrapper, name) ->
 vec3Accessor = (wrapper, name) ->
   accessor = (value) ->
     if value is undefined
-      raw = wrapper.underlying[name]
-      vec3 raw[0], raw[1], raw[2]
+      arrayToVec3 wrapper.underlying[name]
     else
-      wrapper.underlying[name] = [value.x, value.y, value.z]
+      wrapper.underlying[name] = vec3ToArray value
   wrapper[name] = accessor
 
 quatAccessor = (wrapper, name) ->
   accessor = (value) ->
     if value is undefined
-      raw = wrapper.underlying[name]
-      quat raw[0], raw[1], raw[2], raw[3]
+      arrayToQuat wrapper.underlying[name]
     else
-      wrapper.underlying[name] = [value.w, value.x, value.y, value.z]
+      wrapper.underlying[name] = quatToArray
   wrapper[name] = accessor
 
 class FluidFeatures
@@ -46,6 +56,19 @@ class FluidFeaturesFactory
     features = new FluidFeatures()
     features.wrap @underlying.create()
     features
+
+class Spring
+  wrap: (underlying) =>
+    @underlying = underlying
+
+class SpringFactory
+  wrap: () =>
+    @underlying = constructSpringFactory()
+
+  create: (actor0, position0, actor1, position1) =>
+    spring = new Spring
+    spring.wrap @underlying.create actor0.underlying, vec3ToArray(position0), actor1.underlying, vec3ToArray(position1)
+    spring
 
 class Actor
   wrap: (underlying) =>

@@ -10,9 +10,7 @@ namespace alcube::scripting::mappings {
     }
 
     void Prototype::init() {
-      v8::Isolate *isolate = v8::Isolate::GetCurrent();
-      objectTemplate = v8::ObjectTemplate::New(isolate);
-      objectTemplate->SetInternalFieldCount(1);
+      utils::Prototype::init();
       Accessor<models::Actor, glm::vec3, fields::position>::define(this);
       Accessor<models::Actor, glm::quat, fields::rotation>::define(this);
       Accessor<models::Actor, glm::vec3, fields::linearMomentum>::define(this);
@@ -28,9 +26,8 @@ namespace alcube::scripting::mappings {
     }
 
     void Prototype::init() {
+      utils::Prototype::init();
       v8::Isolate* isolate = v8::Isolate::GetCurrent();
-      objectTemplate = v8::ObjectTemplate::New(isolate);
-      objectTemplate->SetInternalFieldCount(1);
       objectTemplate->Set(
         v8::String::NewFromUtf8(isolate, "create"),
         v8::FunctionTemplate::New(isolate, Prototype::create)
@@ -50,11 +47,8 @@ namespace alcube::scripting::mappings {
       if (info.Length() < 1) {
         info.GetReturnValue().Set(v8::Undefined(isolate));
       }
-      v8::Local<v8::Object> featuresObject = info[0]->ToObject();
-      auto internalField = featuresObject->GetInternalField(0);
-      v8::Local<v8::External> wrap = v8::Local<v8::External>::Cast(internalField);
-      void *ptr = wrap->Value();
-      auto features = static_cast<models::physics::fluid::Features*>(ptr);
+
+      auto features = getUnderlying<models::physics::fluid::Features>(info[0]);
       auto underlying = self(info)->create(features);
       auto actor = Actor::Prototype::instance->objectTemplate->NewInstance();
       actor->SetInternalField(0, v8::External::New(isolate, underlying));

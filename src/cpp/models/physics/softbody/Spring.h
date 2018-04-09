@@ -10,7 +10,7 @@
 namespace alcube::models::physics::softbody {
   class Spring {
     public:
-      explicit Spring(alcube::physics::softbody::Spring* underlying);
+      void init(alcube::physics::softbody::Spring* underlying);
       alcube::physics::softbody::Spring* getUnderlying();
     private:
       alcube::physics::softbody::Spring* underlying;
@@ -18,6 +18,8 @@ namespace alcube::models::physics::softbody {
 
   class SpringFactory {
     public:
+      explicit SpringFactory(utils::MemoryPool<Spring>* memoryPool);
+      float getK();
       void setK(float k);
       Spring* create(
         models::Actor* actor0, glm::vec3 position0,
@@ -26,6 +28,7 @@ namespace alcube::models::physics::softbody {
 
     private:
       float k;
+      utils::MemoryPool<Spring>* memoryPool;
   };
 }
 
