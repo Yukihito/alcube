@@ -135,7 +135,7 @@ set(ALCUBE_SCRIPTING_SOURCE_FILES
         src/cpp/scripting/mappings/Actor.cpp src/cpp/scripting/mappings/Actor.h
         src/cpp/scripting/utils.cpp src/cpp/scripting/utils.h
         src/cpp/scripting/mappings/physics/fluid/Features.cpp src/cpp/scripting/mappings/physics/fluid/Features.h
-        src/cpp/scripting/mappings/physics/softbody/Spring.cpp src/cpp/scripting/mappings/physics/softbody/Spring.h)
+        src/cpp/scripting/mappings/physics/softbody/Spring.cpp src/cpp/scripting/mappings/physics/softbody/Spring.h src/cpp/scripting/mappings/physics/softbody/Features.cpp src/cpp/scripting/mappings/physics/softbody/Features.h)
 add_library(alcube_scripting_lib STATIC ${ALCUBE_SCRIPTING_SOURCE_FILES})
 target_link_libraries(alcube_scripting_lib
         ${EXTRA_LIBS}

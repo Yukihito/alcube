@@ -1,12 +1,12 @@
 #include "Evaluator.h"
-#include "mappings/physics/softbody/Spring.h"
 
 namespace alcube::scripting {
   using namespace utils;
   Evaluator::Evaluator(
     alcube::models::ActorFactory *actorFactory,
-    alcube::models::physics::fluid::FeaturesFactory* featuresFactory,
+    alcube::models::physics::fluid::FeaturesFactory* fluidFeaturesFactory,
     alcube::models::physics::softbody::SpringFactory* springFactory,
+    alcube::models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory,
     alcube::utils::FileUtil* fileUtil,
     const char* programName
   ) {
@@ -15,8 +15,10 @@ namespace alcube::scripting {
     prototypes.push_back(new mappings::Actor::Prototype());
     prototypes.push_back(new mappings::ActorFactory::Prototype(actorFactory));
     prototypes.push_back(new mappings::physics::fluid::Features::Prototype());
-    prototypes.push_back(new mappings::physics::fluid::FeaturesFactory::Prototype(featuresFactory));
+    prototypes.push_back(new mappings::physics::fluid::FeaturesFactory::Prototype(fluidFeaturesFactory));
     prototypes.push_back(new mappings::physics::softbody::SpringFactory::Prototype(springFactory));
+    prototypes.push_back(new mappings::physics::softbody::Features::Prototype());
+    prototypes.push_back(new mappings::physics::softbody::FeaturesFactory::Prototype(softbodyFeaturesFactory));
     this->fileUtil = fileUtil;
   }
 
@@ -83,6 +85,7 @@ namespace alcube::scripting {
   void Evaluator::registerFunctions() {
     registerFunction("constructActorFactory", mappings::ActorFactory::Prototype::constructor);
     registerFunction("constructFluidFeaturesFactory", mappings::physics::fluid::FeaturesFactory::Prototype::constructor);
+    registerFunction("constructSoftbodyFeaturesFactory", mappings::physics::softbody::FeaturesFactory::Prototype::constructor);
     registerFunction("constructSpringFactory", mappings::physics::softbody::SpringFactory::Prototype::constructor);
     registerFunction("print", Evaluator::print);
   }

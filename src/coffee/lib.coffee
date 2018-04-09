@@ -57,6 +57,22 @@ class FluidFeaturesFactory
     features.wrap @underlying.create()
     features
 
+class SoftbodyFeatures
+  wrap: (underlying) =>
+    @underlying = underlying
+    numberAccessor this, 'elasticity'
+    numberAccessor this, 'mass'
+
+
+class SoftbodyFeaturesFactory
+  wrap: () =>
+    @underlying = constructSoftbodyFeaturesFactory()
+
+  create: () =>
+    features = new SoftbodyFeatures()
+    features.wrap @underlying.create()
+    features
+
 class Spring
   wrap: (underlying) =>
     @underlying = underlying
@@ -89,6 +105,9 @@ class ActorFactory
 
 fluidFeaturesFactory = new FluidFeaturesFactory()
 fluidFeaturesFactory.wrap()
+
+softbodyFeaturesFactory = new SoftbodyFeaturesFactory()
+softbodyFeaturesFactory.wrap()
 
 actorFactory = new ActorFactory()
 actorFactory.wrap()

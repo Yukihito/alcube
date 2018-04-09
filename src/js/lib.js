@@ -1,4 +1,4 @@
-var Actor, ActorFactory, FluidFeatures, FluidFeaturesFactory, Spring, SpringFactory, actorFactory, arrayToQuat, arrayToVec3, fluidFeaturesFactory, numberAccessor, quat, quatAccessor, quatToArray, vec3, vec3Accessor, vec3ToArray;
+var Actor, ActorFactory, FluidFeatures, FluidFeaturesFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, actorFactory, arrayToQuat, arrayToVec3, fluidFeaturesFactory, numberAccessor, quat, quatAccessor, quatToArray, softbodyFeaturesFactory, vec3, vec3Accessor, vec3ToArray;
 
 vec3 = function(x, y, z) {
   return new THREE.Vector3(x, y, z);
@@ -94,6 +94,38 @@ FluidFeaturesFactory = class FluidFeaturesFactory {
 
 };
 
+SoftbodyFeatures = class SoftbodyFeatures {
+  constructor() {
+    this.wrap = this.wrap.bind(this);
+  }
+
+  wrap(underlying) {
+    this.underlying = underlying;
+    numberAccessor(this, 'elasticity');
+    return numberAccessor(this, 'mass');
+  }
+
+};
+
+SoftbodyFeaturesFactory = class SoftbodyFeaturesFactory {
+  constructor() {
+    this.wrap = this.wrap.bind(this);
+    this.create = this.create.bind(this);
+  }
+
+  wrap() {
+    return this.underlying = constructSoftbodyFeaturesFactory();
+  }
+
+  create() {
+    var features;
+    features = new SoftbodyFeatures();
+    features.wrap(this.underlying.create());
+    return features;
+  }
+
+};
+
 Spring = class Spring {
   constructor() {
     this.wrap = this.wrap.bind(this);
@@ -161,6 +193,10 @@ ActorFactory = class ActorFactory {
 fluidFeaturesFactory = new FluidFeaturesFactory();
 
 fluidFeaturesFactory.wrap();
+
+softbodyFeaturesFactory = new SoftbodyFeaturesFactory();
+
+softbodyFeaturesFactory.wrap();
 
 actorFactory = new ActorFactory();
 
