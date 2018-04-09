@@ -10,6 +10,7 @@
 #include <vector>
 #include "mappings/physics/softbody/Spring.h"
 #include "mappings/physics/softbody/Features.h"
+#include "mappings/Alcube.h"
 
 namespace alcube::scripting {
   class Evaluator {
@@ -19,6 +20,7 @@ namespace alcube::scripting {
         alcube::models::physics::fluid::FeaturesFactory* featuresFactory,
         alcube::models::physics::softbody::SpringFactory* springFactory,
         alcube::models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory,
+        alcube::models::Alcube* alcube,
         alcube::utils::FileUtil* fileUtil,
         const char* programName
       );

@@ -22,6 +22,17 @@ namespace alcube::scripting::utils {
     return v8::Number::New(isolate, raw);
   }
 
+  // int
+  template <>
+  int convertV8ValueTo(v8::Local<v8::Value> value) {
+    return value->Int32Value();
+  }
+
+  template <>
+  v8::Handle<v8::Value> convertToV8Value(v8::Isolate* isolate, int raw) {
+    return v8::Int32::New(isolate, raw);
+  }
+
   // vec3
   template<>
   glm::vec3 convertV8ValueTo(v8::Local<v8::Value> value) {

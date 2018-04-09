@@ -46,8 +46,8 @@ namespace alcube::scripting::mappings {
       v8::HandleScope scope(isolate);
       if (info.Length() < 1) {
         info.GetReturnValue().Set(v8::Undefined(isolate));
+        return;
       }
-
       auto features = getUnderlying<models::physics::fluid::Features>(info[0]);
       auto underlying = self(info)->create(features);
       auto actor = Actor::Prototype::instance->objectTemplate->NewInstance();

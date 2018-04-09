@@ -7,6 +7,7 @@ namespace alcube::scripting {
     alcube::models::physics::fluid::FeaturesFactory* fluidFeaturesFactory,
     alcube::models::physics::softbody::SpringFactory* springFactory,
     alcube::models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory,
+    alcube::models::Alcube* alcube,
     alcube::utils::FileUtil* fileUtil,
     const char* programName
   ) {
@@ -19,6 +20,7 @@ namespace alcube::scripting {
     prototypes.push_back(new mappings::physics::softbody::SpringFactory::Prototype(springFactory));
     prototypes.push_back(new mappings::physics::softbody::Features::Prototype());
     prototypes.push_back(new mappings::physics::softbody::FeaturesFactory::Prototype(softbodyFeaturesFactory));
+    prototypes.push_back(new mappings::Alcube::Prototype(alcube));
     this->fileUtil = fileUtil;
   }
 
