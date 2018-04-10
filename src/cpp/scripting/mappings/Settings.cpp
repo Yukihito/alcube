@@ -61,4 +61,23 @@ namespace alcube::scripting::mappings {
       info.GetReturnValue().Set(v8Instance);
     }
   }
+
+  namespace Settings {
+    Prototype* Prototype::instance;
+    Prototype::Prototype(alcube::models::Settings *underlying) : SingletonPrototype(underlying) {
+      Prototype::instance = this;
+    }
+
+    void Prototype::init() {
+      utils::Prototype::init();
+      Accessor<models::Settings, int, fields::fps>::define(this);
+    }
+
+    void Prototype::constructor(const v8::FunctionCallbackInfo<v8::Value> &info) {
+      v8::Isolate *isolate = v8::Isolate::GetCurrent();
+      auto v8Instance = Prototype::instance->objectTemplate->NewInstance();
+      v8Instance->SetInternalField(0, v8::External::New(isolate, Prototype::instance->underlying));
+      info.GetReturnValue().Set(v8Instance);
+    }
+  }
 }
