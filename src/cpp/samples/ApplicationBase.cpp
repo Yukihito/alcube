@@ -2,24 +2,20 @@
 
 namespace alcube::samples {
   ApplicationBase::ApplicationBase(
-    unsigned int windowWidth,
-    unsigned int windowHeight,
-    unsigned int fps,
+    models::Settings* settings,
     const std::string& appName,
     const char* programName
-  ) : OpenGLApplication(windowWidth, windowHeight, fps, appName) {
+  ) : OpenGLApplication(settings->window.width, settings->window.height, settings->fps, appName) {
+    this->settings = settings;
     this->programName = programName;
   }
 
-  void ApplicationBase::beforeSetup(unsigned int worldSize, unsigned int maxCellCount) {
+  void ApplicationBase::beforeSetup() {
     printSystemInfo();
-    this->maxCellCount = maxCellCount;
-    deltaTime = 1.0f / (float)fps;
-    float gravity = 9.8f;
     unsigned int gridEdgeLength = 8;
-    unsigned int xGridCount = worldSize / gridEdgeLength;
-    unsigned int yGridCount = worldSize / gridEdgeLength;
-    unsigned int zGridCount = worldSize / gridEdgeLength;
+    unsigned int xGridCount = (unsigned int)settings->world.size / gridEdgeLength;
+    unsigned int yGridCount = (unsigned int)settings->world.size / gridEdgeLength;
+    unsigned int zGridCount = (unsigned int)settings->world.size / gridEdgeLength;
     float near = 0.1f;
     float far = gridEdgeLength * xGridCount * 4.0f;
     camera = new drawing::Camera(
@@ -35,9 +31,9 @@ namespace alcube::samples {
     resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
     gpuAccessor = new gpu::GPUAccessor(
       resourcesProvider,
-      maxCellCount,
-      utils::math::powerOf2(maxCellCount),
-      maxCellCount * 16,
+      settings->world.maxActorCount,
+      utils::math::powerOf2(settings->world.maxActorCount),
+      settings->world.maxActorCount * 16,
       xGridCount * yGridCount * zGridCount
     );
     profiler = new utils::Profiler();
@@ -46,27 +42,25 @@ namespace alcube::samples {
     softBodySimulator = new physics::softbody::Simulator();
     fluidSimulator = new physics::fluid::Simulator();
     physicsSimulator = new physics::Simulator(
-      maxCellCount,
+      settings->world.maxActorCount,
       gridEdgeLength,
       xGridCount,
       yGridCount,
       zGridCount,
-      deltaTime,
+      settings->physics.timeStepSize,
       gpuAccessor
     );
-    //physicsSimulator->add(softBodySimulator);
-    //physicsSimulator->add();
     cube = new models::Alcube(
       fluidSimulator,
       softBodySimulator,
       physicsSimulator
     );
-    actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(65536));
-    springFactory = new models::physics::softbody::SpringFactory(new utils::MemoryPool<models::physics::softbody::Spring>(65536));
-    physicsSimulator->gravity = gravity;
+    actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(settings->world.maxActorCount));
+    springFactory = new models::physics::softbody::SpringFactory(new utils::MemoryPool<models::physics::softbody::Spring>(settings->world.maxActorCount));
+    physicsSimulator->gravity = settings->physics.gravity;
 
-    fluidFeaturesFactory = new models::physics::fluid::FeaturesFactory(new utils::MemoryPool<models::physics::fluid::Features>(65536));
-    softbodyFeaturesFactory = new models::physics::softbody::FeaturesFactory(new utils::MemoryPool<models::physics::softbody::Features>(65536));
+    fluidFeaturesFactory = new models::physics::fluid::FeaturesFactory(new utils::MemoryPool<models::physics::fluid::Features>(settings->world.maxActorCount));
+    softbodyFeaturesFactory = new models::physics::softbody::FeaturesFactory(new utils::MemoryPool<models::physics::softbody::Features>(settings->world.maxActorCount));
 
     evaluator = new scripting::Evaluator(actorFactory, fluidFeaturesFactory, springFactory, softbodyFeaturesFactory, cube, fileUtil, programName);
     evaluator->withScope([](alcube::scripting::Evaluator* e) { e->evaluate("../src/js/test.js"); });

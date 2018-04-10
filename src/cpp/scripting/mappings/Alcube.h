@@ -10,7 +10,7 @@ namespace alcube::scripting::mappings {
       class actorCount {};
     }
 
-    class Prototype :public utils::SingletonPrototype<models::Alcube> {
+    class Prototype : public utils::SingletonPrototype<models::Alcube> {
       public:
         explicit Prototype(models::Alcube* underlying);
         void init() override;

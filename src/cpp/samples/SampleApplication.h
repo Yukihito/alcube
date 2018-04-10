@@ -11,7 +11,7 @@
 namespace alcube::samples {
   class SampleApplication : public ApplicationBase {
     public:
-      explicit SampleApplication(const char* programName);
+      explicit SampleApplication(models::Settings* settings, const char* programName);
     protected:
       void onInit() override;
     private:

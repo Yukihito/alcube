@@ -11,6 +11,7 @@
 #include "../physics/softbody/Simulator.h"
 #include "../models/Alcube.h"
 #include "../scripting/Evaluator.h"
+#include "../models/Settings.h"
 
 
 namespace alcube::samples {
@@ -24,9 +25,7 @@ namespace alcube::samples {
   class ApplicationBase : public utils::app::OpenGLApplication {
     public:
       explicit ApplicationBase(
-        unsigned int windowWidth,
-        unsigned int windowHeight,
-        unsigned int fps,
+        models::Settings* settings,
         const std::string &appName,
         const char* programName
       );
@@ -37,6 +36,7 @@ namespace alcube::samples {
       void onUpdate() override;
 
       void onClose() override;
+      models::Settings* settings;
       gpu::GPUAccessor* gpuAccessor;
       drawing::Drawer *drawer;
       drawing::Camera *camera;
@@ -54,14 +54,9 @@ namespace alcube::samples {
       models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory;
       scripting::Evaluator* evaluator;
       Profilers profilers;
-      unsigned int maxCellCount;
-      float deltaTime;
       const char* programName;
 
-      void beforeSetup(
-        unsigned int worldSize,
-        unsigned int maxCellCount
-      );
+      void beforeSetup();
 
       void afterSetup();
   };
