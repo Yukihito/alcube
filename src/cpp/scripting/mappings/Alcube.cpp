@@ -4,10 +4,7 @@ namespace alcube::scripting::mappings {
   using namespace alcube::scripting::utils;
 
   namespace Alcube {
-    Prototype* Prototype::instance;
-    Prototype::Prototype(models::Alcube *underlying) : SingletonPrototype(underlying) {
-      Prototype::instance = this;
-    }
+    Prototype::Prototype(models::Alcube *underlying) : SingletonPrototype(underlying) {}
 
     void Prototype::init() {
       utils::Prototype::init();
@@ -21,13 +18,6 @@ namespace alcube::scripting::mappings {
         v8::String::NewFromUtf8(isolate, "addSpring"),
         v8::FunctionTemplate::New(isolate, Prototype::addSpring)
       );
-    }
-
-    void Prototype::constructor(const v8::FunctionCallbackInfo<v8::Value> &info) {
-      v8::Isolate *isolate = v8::Isolate::GetCurrent();
-      auto v8Instance = Prototype::instance->objectTemplate->NewInstance();
-      v8Instance->SetInternalField(0, v8::External::New(isolate, Prototype::instance->underlying));
-      info.GetReturnValue().Set(v8Instance);
     }
 
     void Prototype::addActor(const v8::FunctionCallbackInfo<v8::Value> &info) {

@@ -8,9 +8,7 @@ namespace alcube::scripting::mappings::physics::softbody {
   namespace Spring {
     class Prototype : public utils::TypedPrototype<models::physics::softbody::Spring> {
       public:
-        explicit Prototype();
         void init() override;
-        static Prototype* instance;
     };
   }
 
@@ -23,8 +21,6 @@ namespace alcube::scripting::mappings::physics::softbody {
       public:
         explicit Prototype(models::physics::softbody::SpringFactory* underlying);
         void init() override;
-        static Prototype* instance;
-        static void constructor(const v8::FunctionCallbackInfo<v8::Value>& info);
         static void create(const v8::FunctionCallbackInfo<v8::Value>& info);
     };
   }

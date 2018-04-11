@@ -3,11 +3,6 @@
 namespace alcube::scripting::mappings::physics::fluid {
   using namespace alcube::scripting::utils;
   namespace Features {
-    Prototype* Prototype::instance;
-    Prototype::Prototype() {
-      Prototype::instance = this;
-    }
-
     void Prototype::init() {
       utils::Prototype::init();
       Accessor<models::physics::fluid::Features, float, fields::mass>::define(this);
@@ -18,10 +13,7 @@ namespace alcube::scripting::mappings::physics::fluid {
   }
 
   namespace FeaturesFactory {
-    Prototype* Prototype::instance;
-    Prototype::Prototype(alcube::models::physics::fluid::FeaturesFactory* underlying) : utils::SingletonPrototype<models::physics::fluid::FeaturesFactory>(underlying) {
-      Prototype::instance = this;
-    }
+    Prototype::Prototype(alcube::models::physics::fluid::FeaturesFactory* underlying) : utils::SingletonPrototype<models::physics::fluid::FeaturesFactory>(underlying) {}
 
     void Prototype::init() {
       utils::Prototype::init();
@@ -30,13 +22,6 @@ namespace alcube::scripting::mappings::physics::fluid {
         v8::String::NewFromUtf8(isolate, "create"),
         v8::FunctionTemplate::New(isolate, Prototype::create)
       );
-    }
-
-    void Prototype::constructor(const v8::FunctionCallbackInfo<v8::Value> &info) {
-      v8::Isolate *isolate = v8::Isolate::GetCurrent();
-      auto v8Instance = Prototype::instance->objectTemplate->NewInstance();
-      v8Instance->SetInternalField(0, v8::External::New(isolate, Prototype::instance->underlying));
-      info.GetReturnValue().Set(v8Instance);
     }
 
     void Prototype::create(const v8::FunctionCallbackInfo<v8::Value> &info) {

@@ -15,8 +15,6 @@ namespace alcube::scripting::mappings {
       public:
         explicit Prototype(models::PhysicsSettings* underlying);
         void init() override;
-        static Prototype* instance;
-        static void constructor(const v8::FunctionCallbackInfo<v8::Value>& info);
     };
   }
 
@@ -30,8 +28,6 @@ namespace alcube::scripting::mappings {
       public:
         explicit Prototype(models::WindowSettings* underlying);
         void init() override;
-        static Prototype* instance;
-        static void constructor(const v8::FunctionCallbackInfo<v8::Value>& info);
     };
   }
 
@@ -45,8 +41,6 @@ namespace alcube::scripting::mappings {
       public:
         explicit Prototype(models::WorldSettings* underlying);
         void init() override;
-        static Prototype* instance;
-        static void constructor(const v8::FunctionCallbackInfo<v8::Value>& info);
     };
   }
 
@@ -59,8 +53,6 @@ namespace alcube::scripting::mappings {
       public:
         explicit Prototype(models::Settings* underlying);
         void init() override;
-        static Prototype* instance;
-        static void constructor(const v8::FunctionCallbackInfo<v8::Value>& info);
     };
   }
 }

@@ -8,7 +8,6 @@ namespace alcube::samples {
 
   void SampleApplication::onInit() {
     beforeSetup();
-    //physicsSimulator->gravity *= 2.0f;
 
     glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
     drawable = new SphereDrawable(

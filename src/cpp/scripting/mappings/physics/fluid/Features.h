@@ -16,9 +16,7 @@ namespace alcube::scripting::mappings::physics::fluid {
 
     class Prototype : public utils::TypedPrototype<models::physics::fluid::Features> {
       public:
-        explicit Prototype();
         void init() override;
-        static Prototype* instance;
     };
   }
 
@@ -27,8 +25,6 @@ namespace alcube::scripting::mappings::physics::fluid {
       public:
         explicit Prototype(models::physics::fluid::FeaturesFactory* underlying);
         void init() override;
-        static Prototype* instance;
-        static void constructor(const v8::FunctionCallbackInfo<v8::Value>& info);
         static void create(const v8::FunctionCallbackInfo<v8::Value>& info);
     };
   }

@@ -3,12 +3,6 @@
 namespace alcube::scripting::mappings {
   using namespace utils;
   namespace Actor {
-    Prototype *Prototype::instance;
-
-    Prototype::Prototype() {
-      Prototype::instance = this;
-    }
-
     void Prototype::init() {
       utils::Prototype::init();
       Accessor<models::Actor, glm::vec3, fields::position>::define(this);
@@ -19,11 +13,7 @@ namespace alcube::scripting::mappings {
   }
 
   namespace ActorFactory {
-    Prototype *Prototype::instance;
-
-    Prototype::Prototype(models::ActorFactory *underlying) : SingletonPrototype<models::ActorFactory>(underlying) {
-      Prototype::instance = this;
-    }
+    Prototype::Prototype(models::ActorFactory *underlying) : SingletonPrototype<models::ActorFactory>(underlying) {}
 
     void Prototype::init() {
       utils::Prototype::init();
@@ -32,13 +22,6 @@ namespace alcube::scripting::mappings {
         v8::String::NewFromUtf8(isolate, "create"),
         v8::FunctionTemplate::New(isolate, Prototype::create)
       );
-    }
-
-    void Prototype::constructor(const v8::FunctionCallbackInfo<v8::Value> &info) {
-      v8::Isolate *isolate = v8::Isolate::GetCurrent();
-      auto v8Instance = Prototype::instance->objectTemplate->NewInstance();
-      v8Instance->SetInternalField(0, v8::External::New(isolate, Prototype::instance->underlying));
-      info.GetReturnValue().Set(v8Instance);
     }
 
     void Prototype::create(const v8::FunctionCallbackInfo<v8::Value> &info) {

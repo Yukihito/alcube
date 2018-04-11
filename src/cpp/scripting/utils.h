@@ -22,7 +22,9 @@ namespace alcube::scripting::utils {
   template <class T>
   class TypedPrototype : public Prototype {
     public:
+      explicit TypedPrototype();
       static T* self(const v8::FunctionCallbackInfo<v8::Value>& info);
+      static TypedPrototype<T>* instance;
   };
 
   template <class T>
@@ -37,12 +39,28 @@ namespace alcube::scripting::utils {
   class SingletonPrototype : public TypedPrototype<T> {
     public:
       explicit SingletonPrototype(T* underlying);
+      static void constructor(const v8::FunctionCallbackInfo<v8::Value>& info);
+      static SingletonPrototype<T>* instance;
       T* underlying;
   };
 
   template <class T>
-  SingletonPrototype<T>::SingletonPrototype(T *underlying) {
+  void SingletonPrototype<T>::constructor(const v8::FunctionCallbackInfo<v8::Value> &info) {
+    v8::Isolate *isolate = v8::Isolate::GetCurrent();
+    auto v8Instance = SingletonPrototype<T>::instance->objectTemplate->NewInstance();
+    v8Instance->SetInternalField(0, v8::External::New(isolate, SingletonPrototype<T>::instance->underlying));
+    info.GetReturnValue().Set(v8Instance);
+  }
+
+  template <class T>
+  TypedPrototype<T>::TypedPrototype() {
+    TypedPrototype<T>::instance = this;
+  }
+
+  template <class T>
+  SingletonPrototype<T>::SingletonPrototype(T *underlying) : TypedPrototype<T>::TypedPrototype() {
     this->underlying = underlying;
+    SingletonPrototype<T>::instance = this;
   }
 
   template <class T>
@@ -126,6 +144,15 @@ namespace alcube::scripting::utils {
   void Accessor<T, U, V>::v8Setter(v8::Local<v8::String> property, v8::Local<v8::Value> value, const v8::PropertyCallbackInfo<void> &info) {
     setter<T, U>(value, info, Accessor<T, U, V>::set);
   }
+}
+
+
+namespace alcube::scripting::utils {
+  template <class T>
+  TypedPrototype<T>* TypedPrototype<T>::instance;
+
+  template <class T>
+  SingletonPrototype<T>* SingletonPrototype<T>::instance;
 }
 
 #endif //ALCUBE_SCRIPTING_UTILS_H

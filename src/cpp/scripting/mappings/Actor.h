@@ -17,9 +17,9 @@ namespace alcube::scripting::mappings {
 
     class Prototype : public utils::TypedPrototype<models::Actor> {
       public:
-        explicit Prototype();
+        //explicit Prototype();
         void init() override;
-        static Prototype* instance;
+        //static Prototype* instance;
     };
   }
 
@@ -28,8 +28,8 @@ namespace alcube::scripting::mappings {
       public:
         explicit Prototype(models::ActorFactory* underlying);
         void init() override;
-        static Prototype* instance;
-        static void constructor(const v8::FunctionCallbackInfo<v8::Value>&);
+        //static Prototype* instance;
+        //static void constructor(const v8::FunctionCallbackInfo<v8::Value>&);
         static void create(const v8::FunctionCallbackInfo<v8::Value>&);
     };
   }

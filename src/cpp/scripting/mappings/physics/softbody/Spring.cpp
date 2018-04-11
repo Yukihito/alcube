@@ -3,21 +3,13 @@
 namespace alcube::scripting::mappings::physics::softbody {
   using namespace utils;
   namespace Spring {
-    Prototype* Prototype::instance;
-    Prototype::Prototype() {
-      Prototype::instance = this;
-    }
-
     void Prototype::init() {
       utils::Prototype::init();
     }
   }
 
   namespace SpringFactory {
-    Prototype* Prototype::instance;
-    Prototype::Prototype(models::physics::softbody::SpringFactory *underlying) : utils::SingletonPrototype<models::physics::softbody::SpringFactory>(underlying) {
-      Prototype::instance = this;
-    }
+    Prototype::Prototype(models::physics::softbody::SpringFactory *underlying) : utils::SingletonPrototype<models::physics::softbody::SpringFactory>(underlying) {}
 
     void Prototype::init() {
       utils::Prototype::init();
@@ -27,13 +19,6 @@ namespace alcube::scripting::mappings::physics::softbody {
         v8::String::NewFromUtf8(isolate, "create"),
         v8::FunctionTemplate::New(isolate, Prototype::create)
       );
-    }
-
-    void Prototype::constructor(const v8::FunctionCallbackInfo<v8::Value> &info) {
-      v8::Isolate *isolate = v8::Isolate::GetCurrent();
-      auto v8Instance = Prototype::instance->objectTemplate->NewInstance();
-      v8Instance->SetInternalField(0, v8::External::New(isolate, Prototype::instance->underlying));
-      info.GetReturnValue().Set(v8Instance);
     }
 
     void Prototype::create(const v8::FunctionCallbackInfo<v8::Value> &info) {

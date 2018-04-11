@@ -14,8 +14,6 @@ namespace alcube::scripting::mappings {
       public:
         explicit Prototype(models::Alcube* underlying);
         void init() override;
-        static Prototype* instance;
-        static void constructor(const v8::FunctionCallbackInfo<v8::Value>& info);
         static void addActor(const v8::FunctionCallbackInfo<v8::Value>& info);
         static void addSpring(const v8::FunctionCallbackInfo<v8::Value>& info);
     };
