@@ -5,24 +5,14 @@
 #include "../../../../models/physics/softbody/Spring.h"
 
 namespace alcube::scripting::mappings::physics::softbody {
-  namespace Spring {
-    class Prototype : public utils::TypedPrototype<models::physics::softbody::Spring> {
-      public:
-        void init() override;
-    };
-  }
+  class Spring : public utils::TypedPrototype<models::physics::softbody::Spring> {};
 
-  namespace SpringFactory {
-    namespace fields {
-      class k {};
-    }
-
-    class Prototype : public utils::SingletonPrototype<models::physics::softbody::SpringFactory> {
-      public:
-        explicit Prototype(models::physics::softbody::SpringFactory* underlying);
-        void init() override;
-        static void create(const v8::FunctionCallbackInfo<v8::Value>& info);
-    };
-  }
+  class SpringFactory  : public utils::SingletonPrototype<models::physics::softbody::SpringFactory> {
+    public:
+      DEFPARAM(models::physics::softbody::SpringFactory, float, k);
+      explicit SpringFactory(models::physics::softbody::SpringFactory* underlying);
+      void init() override;
+      static void create(const v8::FunctionCallbackInfo<v8::Value>& info);
+  };
 }
 #endif //ALCUBE_SCRIPTING_MAPPINGS_SOFTBODY_SPRING_H

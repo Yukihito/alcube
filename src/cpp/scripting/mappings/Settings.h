@@ -5,6 +5,7 @@
 #include "../../models/Settings.h"
 
 namespace alcube::scripting::mappings {
+  /*
   namespace PhysicsSettings {
     namespace fields {
       class timeStepSize {};
@@ -55,6 +56,7 @@ namespace alcube::scripting::mappings {
         void init() override;
     };
   }
+   */
 }
 
 #endif //ALCUBE_SCRIPTING_MAPPINGS_SETTINGS_H

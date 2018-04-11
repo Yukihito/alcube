@@ -11,6 +11,14 @@ namespace alcube::scripting::utils {
     objectTemplate->SetInternalFieldCount(1);
   }
 
+  void Prototype::defineMethod(const char *name, v8::FunctionCallback f) {
+    v8::Isolate* isolate = v8::Isolate::GetCurrent();
+    objectTemplate->Set(
+      v8::String::NewFromUtf8(isolate, name),
+      v8::FunctionTemplate::New(isolate, f)
+    );
+  }
+
   // float
   template <>
   float convertV8ValueTo(v8::Local<v8::Value> value) {

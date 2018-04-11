@@ -2,6 +2,7 @@
 
 namespace alcube::scripting::mappings {
   using namespace alcube::scripting::utils;
+  /*
   namespace PhysicsSettings {
     Prototype::Prototype(alcube::models::PhysicsSettings *underlying) : SingletonPrototype(underlying) {}
 
@@ -46,4 +47,5 @@ namespace alcube::scripting::mappings {
       Accessor<models::Settings, int, fields::fps>::define(this);
     }
   }
+   */
 }

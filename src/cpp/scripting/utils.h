@@ -13,10 +13,14 @@
 namespace alcube::scripting::utils {
   v8::Local<v8::Value> v8str(v8::Isolate* isolate, const char* str);
 
+  template <class T, class U, class V>
+  class Accessor;
+
   class Prototype {
     public:
       v8::Local<v8::ObjectTemplate> objectTemplate;
       virtual void init();
+      void defineMethod(const char* name, v8::FunctionCallback f);
   };
 
   template <class T>
@@ -25,6 +29,10 @@ namespace alcube::scripting::utils {
       explicit TypedPrototype();
       static T* self(const v8::FunctionCallbackInfo<v8::Value>& info);
       static TypedPrototype<T>* instance;
+      template <class U, class V>
+      void define() {
+        Accessor<T, U, V>::define(this);
+      };
   };
 
   template <class T>
@@ -92,6 +100,16 @@ namespace alcube::scripting::utils {
       static void v8Setter(v8::Local<v8::String> property, v8::Local<v8::Value>, const v8::PropertyCallbackInfo<void>&);
   };
 
+  template <class T, class U, class V>
+  U Accessor<T, U, V>::get(T * t) {
+    return V::get(t);
+  }
+
+  template <class T, class U, class V>
+  void Accessor<T, U, V>::set(T* t, U u) {
+    V::set(t, u);
+  }
+
   template <class T>
   T* getUnderlying(v8::Local<v8::Value> value) {
     v8::Local<v8::Object> obj = value->ToObject();
@@ -154,5 +172,7 @@ namespace alcube::scripting::utils {
   template <class T>
   SingletonPrototype<T>* SingletonPrototype<T>::instance;
 }
+
+#define DEFPARAM(owner, type, name) struct name { static type get(owner*); static void set(owner*, type); };
 
 #endif //ALCUBE_SCRIPTING_UTILS_H

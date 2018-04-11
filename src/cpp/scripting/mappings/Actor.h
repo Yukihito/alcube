@@ -7,32 +7,21 @@
 #include "../../models/physics/fluid/Features.h"
 
 namespace alcube::scripting::mappings {
-  namespace Actor {
-    namespace fields {
-      class position {};
-      class rotation {};
-      class linearMomentum {};
-      class angularMomentum {};
-    }
+  class Actor  : public utils::TypedPrototype<models::Actor> {
+    public:
+      void init() override;
+      DEFPARAM(models::Actor, glm::vec3, position);
+      DEFPARAM(models::Actor, glm::quat, rotation);
+      DEFPARAM(models::Actor, glm::vec3, linearMomentum);
+      DEFPARAM(models::Actor, glm::vec3, angularMomentum);
+  };
 
-    class Prototype : public utils::TypedPrototype<models::Actor> {
-      public:
-        //explicit Prototype();
-        void init() override;
-        //static Prototype* instance;
-    };
-  }
-
-  namespace ActorFactory {
-    class Prototype : public utils::SingletonPrototype<models::ActorFactory> {
-      public:
-        explicit Prototype(models::ActorFactory* underlying);
-        void init() override;
-        //static Prototype* instance;
-        //static void constructor(const v8::FunctionCallbackInfo<v8::Value>&);
-        static void create(const v8::FunctionCallbackInfo<v8::Value>&);
-    };
-  }
+  class ActorFactory : public utils::SingletonPrototype<models::ActorFactory>  {
+    public:
+      explicit ActorFactory(models::ActorFactory* underlying);
+      void init() override;
+      static void create(const v8::FunctionCallbackInfo<v8::Value>&);
+  };
 }
 
 #endif //ALCUBE_SCRIPTING_MAPPINGS_ACTOR_H

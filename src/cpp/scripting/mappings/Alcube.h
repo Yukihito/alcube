@@ -5,19 +5,14 @@
 #include "../../models/Alcube.h"
 
 namespace alcube::scripting::mappings {
-  namespace Alcube {
-    namespace fields {
-      class actorCount {};
-    }
-
-    class Prototype : public utils::SingletonPrototype<models::Alcube> {
-      public:
-        explicit Prototype(models::Alcube* underlying);
-        void init() override;
-        static void addActor(const v8::FunctionCallbackInfo<v8::Value>& info);
-        static void addSpring(const v8::FunctionCallbackInfo<v8::Value>& info);
-    };
-  }
+  class Alcube : public utils::SingletonPrototype<models::Alcube> {
+    public:
+      DEFPARAM(models::Alcube, int, actorCount);
+      explicit Alcube(models::Alcube* underlying);
+      void init() override;
+      static void addActor(const v8::FunctionCallbackInfo<v8::Value>& info);
+      static void addSpring(const v8::FunctionCallbackInfo<v8::Value>& info);
+  };
 }
 
 
