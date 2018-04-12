@@ -11,6 +11,7 @@
 #include "mappings/physics/softbody/Spring.h"
 #include "mappings/physics/softbody/Features.h"
 #include "mappings/Alcube.h"
+#include "mappings/Settings.h"
 
 namespace alcube::scripting {
   class Evaluator {
@@ -20,6 +21,7 @@ namespace alcube::scripting {
         alcube::models::physics::fluid::FeaturesFactory* fluidFeaturesFactory,
         alcube::models::physics::softbody::SpringFactory* springFactory,
         alcube::models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory,
+        alcube::models::Settings* settings,
         alcube::models::Alcube* alcube,
         alcube::utils::FileUtil* fileUtil,
         const char* programName
