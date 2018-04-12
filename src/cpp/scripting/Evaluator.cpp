@@ -1,4 +1,5 @@
 #include "Evaluator.h"
+#include "mappings/Settings.h"
 
 namespace alcube::scripting {
   using namespace utils;
@@ -90,6 +91,10 @@ namespace alcube::scripting {
     registerFunction("constructFluidFeaturesFactory", mappings::physics::fluid::FeaturesFactory::constructor);
     registerFunction("constructSoftbodyFeaturesFactory", mappings::physics::softbody::FeaturesFactory::constructor);
     registerFunction("constructSpringFactory", mappings::physics::softbody::SpringFactory::constructor);
+    registerFunction("constructPhysicsSettings", mappings::PhysicsSettings::constructor);
+    registerFunction("constructWorldSettings", mappings::WorldSettings::constructor);
+    registerFunction("constructWindowSettings", mappings::WindowSettings::constructor);
+    registerFunction("constructSettings", mappings::Settings::constructor);
     registerFunction("constructAlcube", mappings::Alcube::constructor);
     registerFunction("print", Evaluator::print);
   }
