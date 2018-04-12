@@ -7,16 +7,8 @@ namespace alcube::scripting::mappings::physics::softbody {
 
   void SpringFactory::init() {
     Prototype::init();
-    define<float, k>();
-    defineMethod("create", create);
-  }
-
-  float SpringFactory::k::get(alcube::models::physics::softbody::SpringFactory* factory) {
-    return factory->getK();
-  }
-
-  void SpringFactory::k::set(alcube::models::physics::softbody::SpringFactory* factory, float k) {
-    factory->setK(k);
+    define<float, K>();
+    DEFMETHOD(create);
   }
 
   void SpringFactory::create(const v8::FunctionCallbackInfo<v8::Value> &info) {

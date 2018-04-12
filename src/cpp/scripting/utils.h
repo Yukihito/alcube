@@ -149,6 +149,9 @@ namespace alcube::scripting::utils {
     std::stringstream name(rawName);
     std::string shortName;
     while (std::getline(name, shortName, ':')) {}
+    if (shortName[0] < 'a') {
+      shortName[0] += 32;
+    }
     prototype->objectTemplate->SetAccessor(v8::String::NewFromUtf8(isolate, shortName.c_str()), v8Getter, v8Setter);
     free(rawName);
   }
@@ -173,6 +176,8 @@ namespace alcube::scripting::utils {
   SingletonPrototype<T>* SingletonPrototype<T>::instance;
 }
 
-#define DEFPARAM(owner, type, name) struct name { static type get(owner*); static void set(owner*, type); };
-
+#define DEFACCESSOR(owner, type, name) struct name { static type get(owner* o){ return o->get##name(); }; static void set(owner* o, type v){ o->set##name(v); } };
+#define DEFVAR(owner, type, name) struct name { static type get(owner* o){ return o->name; }; static void set(owner* o, type v){ o->name = v; } };
+#define DEFGETTER(owner, type, name) struct name { static type get(owner* o){ return o->get##name(); }; static void set(owner* o, type v){  }; };
+#define DEFMETHOD(name) defineMethod(#name, name)
 #endif //ALCUBE_SCRIPTING_UTILS_H

@@ -1,51 +1,34 @@
 #include "Settings.h"
 
 namespace alcube::scripting::mappings {
-  using namespace alcube::scripting::utils;
-  /*
-  namespace PhysicsSettings {
-    Prototype::Prototype(alcube::models::PhysicsSettings *underlying) : SingletonPrototype(underlying) {}
-
-    void Prototype::init() {
-      utils::Prototype::init();
-      Accessor<models::PhysicsSettings, float, fields::timeStepSize>::define(this);
-      Accessor<models::PhysicsSettings, float, fields::gravity>::define(this);
-    }
+  using namespace utils;
+  PhysicsSettings::PhysicsSettings(alcube::models::PhysicsSettings *underlying) : SingletonPrototype(underlying) {}
+  void PhysicsSettings::init() {
+    Prototype::init();
+    define<float, timeStepSize>();
+    define<float, gravity>();
   }
 
-  namespace WindowSettings {
-    Prototype::Prototype(alcube::models::WindowSettings *underlying) : SingletonPrototype(underlying) {
-      Prototype::instance = this;
-    }
+  WindowSettings::WindowSettings(alcube::models::WindowSettings *underlying) : SingletonPrototype(underlying) {}
 
-    void Prototype::init() {
-      utils::Prototype::init();
-      Accessor<models::WindowSettings, int, fields::width>::define(this);
-      Accessor<models::WindowSettings, int, fields::height>::define(this);
-    }
+  void WindowSettings::init() {
+    Prototype::init();
+    define<int, width>();
+    define<int, height>();
   }
 
-  namespace WorldSettings {
-    Prototype::Prototype(alcube::models::WorldSettings *underlying) : SingletonPrototype(underlying) {
-      Prototype::instance = this;
-    }
+  WorldSettings::WorldSettings(alcube::models::WorldSettings *underlying) : SingletonPrototype(underlying) {}
 
-    void Prototype::init() {
-      utils::Prototype::init();
-      Accessor<models::WorldSettings, float, fields::size>::define(this);
-      Accessor<models::WorldSettings, int, fields::maxActorCount>::define(this);
-    }
+  void WorldSettings::init() {
+    Prototype::init();
+    define<float, size>();
+    define<int, maxActorCount>();
   }
 
-  namespace Settings {
-    Prototype::Prototype(alcube::models::Settings *underlying) : SingletonPrototype(underlying) {
-      Prototype::instance = this;
-    }
+  Settings::Settings(alcube::models::Settings *underlying) : SingletonPrototype(underlying) {}
 
-    void Prototype::init() {
-      utils::Prototype::init();
-      Accessor<models::Settings, int, fields::fps>::define(this);
-    }
+  void Settings::init() {
+    Prototype::init();
+    define<int, fps>();
   }
-   */
 }

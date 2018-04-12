@@ -5,58 +5,36 @@
 #include "../../models/Settings.h"
 
 namespace alcube::scripting::mappings {
-  /*
-  namespace PhysicsSettings {
-    namespace fields {
-      class timeStepSize {};
-      class gravity {};
-    }
+  class PhysicsSettings : public utils::SingletonPrototype<models::PhysicsSettings> {
+    public:
+      explicit PhysicsSettings(models::PhysicsSettings* underlying);
+      void init() override;
+      DEFVAR(models::PhysicsSettings, float, timeStepSize);
+      DEFVAR(models::PhysicsSettings, float, gravity);
+  };
 
-    class Prototype : public utils::SingletonPrototype<models::PhysicsSettings> {
-      public:
-        explicit Prototype(models::PhysicsSettings* underlying);
-        void init() override;
-    };
-  }
+  class WindowSettings : public utils::SingletonPrototype<models::WindowSettings> {
+    public:
+      explicit WindowSettings(models::WindowSettings* underlying);
+      void init() override;
+      DEFVAR(models::WindowSettings, int, width);
+      DEFVAR(models::WindowSettings, int, height);
+  };
 
-  namespace WindowSettings {
-    namespace fields {
-      class width {};
-      class height {};
-    }
+  class WorldSettings : public utils::SingletonPrototype<models::WorldSettings> {
+    public:
+      explicit WorldSettings(models::WorldSettings* underlying);
+      void init() override;
+      DEFVAR(models::WorldSettings, float, size);
+      DEFVAR(models::WorldSettings, int, maxActorCount);
+  };
 
-    class Prototype : public utils::SingletonPrototype<models::WindowSettings> {
-      public:
-        explicit Prototype(models::WindowSettings* underlying);
-        void init() override;
-    };
-  }
-
-  namespace WorldSettings {
-    namespace fields {
-      class size {};
-      class maxActorCount {};
-    }
-
-    class Prototype : public utils::SingletonPrototype<models::WorldSettings> {
-      public:
-        explicit Prototype(models::WorldSettings* underlying);
-        void init() override;
-    };
-  }
-
-  namespace Settings {
-    namespace fields {
-      class fps {};
-    }
-
-    class Prototype : public utils::SingletonPrototype<models::Settings> {
-      public:
-        explicit Prototype(models::Settings* underlying);
-        void init() override;
-    };
-  }
-   */
+  class Settings : public utils::SingletonPrototype<models::Settings> {
+    public:
+      explicit Settings(models::Settings* underlying);
+      void init() override;
+      DEFVAR(models::Settings, int, fps);
+  };
 }
 
 #endif //ALCUBE_SCRIPTING_MAPPINGS_SETTINGS_H

@@ -15,12 +15,12 @@ namespace alcube::scripting {
     prototypes = {};
     prototypes.push_back(new mappings::Actor());
     prototypes.push_back(new mappings::ActorFactory(actorFactory));
-    prototypes.push_back(new mappings::physics::fluid::Features::Prototype());
-    prototypes.push_back(new mappings::physics::fluid::FeaturesFactory::Prototype(fluidFeaturesFactory));
+    prototypes.push_back(new mappings::physics::fluid::Features());
+    prototypes.push_back(new mappings::physics::fluid::FeaturesFactory(fluidFeaturesFactory));
     prototypes.push_back(new mappings::physics::softbody::Spring());
     prototypes.push_back(new mappings::physics::softbody::SpringFactory(springFactory));
-    prototypes.push_back(new mappings::physics::softbody::Features::Prototype());
-    prototypes.push_back(new mappings::physics::softbody::FeaturesFactory::Prototype(softbodyFeaturesFactory));
+    prototypes.push_back(new mappings::physics::softbody::Features());
+    prototypes.push_back(new mappings::physics::softbody::FeaturesFactory(softbodyFeaturesFactory));
     prototypes.push_back(new mappings::Alcube(alcube));
     this->fileUtil = fileUtil;
   }
@@ -87,8 +87,8 @@ namespace alcube::scripting {
 
   void Evaluator::registerFunctions() {
     registerFunction("constructActorFactory", mappings::ActorFactory::constructor);
-    registerFunction("constructFluidFeaturesFactory", mappings::physics::fluid::FeaturesFactory::Prototype::constructor);
-    registerFunction("constructSoftbodyFeaturesFactory", mappings::physics::softbody::FeaturesFactory::Prototype::constructor);
+    registerFunction("constructFluidFeaturesFactory", mappings::physics::fluid::FeaturesFactory::constructor);
+    registerFunction("constructSoftbodyFeaturesFactory", mappings::physics::softbody::FeaturesFactory::constructor);
     registerFunction("constructSpringFactory", mappings::physics::softbody::SpringFactory::constructor);
     registerFunction("constructAlcube", mappings::Alcube::constructor);
     registerFunction("print", Evaluator::print);

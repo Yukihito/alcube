@@ -10,10 +10,10 @@ namespace alcube::scripting::mappings {
   class Actor  : public utils::TypedPrototype<models::Actor> {
     public:
       void init() override;
-      DEFPARAM(models::Actor, glm::vec3, position);
-      DEFPARAM(models::Actor, glm::quat, rotation);
-      DEFPARAM(models::Actor, glm::vec3, linearMomentum);
-      DEFPARAM(models::Actor, glm::vec3, angularMomentum);
+      DEFACCESSOR(models::Actor, glm::vec3, Position);
+      DEFACCESSOR(models::Actor, glm::quat, Rotation);
+      DEFACCESSOR(models::Actor, glm::vec3, LinearMomentum);
+      DEFACCESSOR(models::Actor, glm::vec3, AngularMomentum);
   };
 
   class ActorFactory : public utils::SingletonPrototype<models::ActorFactory>  {

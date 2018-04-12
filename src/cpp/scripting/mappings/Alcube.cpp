@@ -1,22 +1,16 @@
 #include "Alcube.h"
 
 namespace alcube::scripting::mappings {
-  using namespace alcube::scripting::utils;
+  using namespace utils;
 
   Alcube::Alcube(models::Alcube *underlying) : SingletonPrototype(underlying) {}
 
   void Alcube::init() {
-    utils::Prototype::init();
-    define<int, actorCount>();
-    defineMethod("addActor", addActor);
-    defineMethod("addSpring", addSpring);
+    Prototype::init();
+    define<int, ActorCount>();
+    DEFMETHOD(addActor);
+    DEFMETHOD(addSpring);
   }
-
-  int Alcube::actorCount::get(alcube::models::Alcube *cube) {
-    return cube->getActorCount();
-  }
-
-  void Alcube::actorCount::set(alcube::models::Alcube *, int) {}
 
   void Alcube::addActor(const v8::FunctionCallbackInfo<v8::Value> &info) {
     v8::Isolate *isolate = v8::Isolate::GetCurrent();
