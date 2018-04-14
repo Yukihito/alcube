@@ -1,9 +1,7 @@
-#include "SampleApplication.h"
+#include "ApplicationBase.h"
 
 int main(int argc, char * argv[]) {
-  auto settings = new alcube::models::Settings();
-  settings->physics.gravity *= 2.0f;
-  auto sample = new alcube::samples::SampleApplication(settings, argv[0]);
-  sample->runApp(argc, argv);
+  auto sample = new alcube::samples::ApplicationBase(argv[0]);
+  sample->run();
   return 0;
 }

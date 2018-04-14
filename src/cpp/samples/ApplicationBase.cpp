@@ -1,17 +1,53 @@
 #include "ApplicationBase.h"
 
 namespace alcube::samples {
-  ApplicationBase::ApplicationBase(
-    models::Settings* settings,
-    const std::string& appName,
-    const char* programName
-  ) : OpenGLApplication(settings->window.width, settings->window.height, settings->fps, appName) {
-    this->settings = settings;
+  ApplicationBase* ApplicationBase::instance;
+  ApplicationBase::ApplicationBase(const char* programName) {
     this->programName = programName;
+    ApplicationBase::instance = this;
+    atexit(atexitCallback);
+    closingStatus = ApplicationClosingStatus::NONE;
   }
 
-  void ApplicationBase::beforeSetup() {
-    printSystemInfo();
+  void ApplicationBase::run() {
+    initServices();
+    glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
+    auto drawable = new SphereDrawable(
+      shaders->directionalLight,
+      color,
+      settings->world.maxActorCount,
+      (GLfloat*)gpuAccessor->memories.positions.dto
+    );
+    drawable->shape->instanceCount = cube->getActorCount();
+    drawer->add(drawable);
+    physicsSimulator->input();
+    gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
+
+    std::thread th = std::thread(updateLoopCallback);
+    th.detach();
+    window->run();
+    while (closingStatus == NONE) {
+      std::chrono::milliseconds intervalMs(1);
+      std::this_thread::sleep_for(intervalMs);
+    }
+    std::cout << "application finished" << std::endl;
+    closingStatus = ApplicationClosingStatus::FINISHED;
+    window->clean();
+    exit(0);
+  }
+
+  void ApplicationBase::initServices() {
+    window = new utils::app::OpenGLWindow(/*[&]() {
+      profiler->start(profilers.updateDrawable);
+      gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
+      gpuAccessor->memories.positions.read(); // 不要な気がする
+      profiler->stop(profilers.updateDrawable);
+      drawer->draw();
+    }*/draw);
+    settings = new models::Settings();
+    settings->physics.gravity *= 2.0f;
+    settings->physics.timeStepSize = 1.0f / 60.0f;
+    window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
     unsigned int gridEdgeLength = 8;
     unsigned int xGridCount = (unsigned int)settings->world.size / gridEdgeLength;
     unsigned int yGridCount = (unsigned int)settings->world.size / gridEdgeLength;
@@ -22,12 +58,13 @@ namespace alcube::samples {
       glm::vec3(0.0f, 0.0f, far / 2.0f),
       glm::quat(),
       glm::radians(45.0f),
-      (float)windowWidth,
-      (float)windowHeight,
+      (float)settings->window.width,
+      (float)settings->window.height,
       near,
       far
     );
     fileUtil = new utils::FileUtil();
+
     resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
     gpuAccessor = new gpu::GPUAccessor(
       resourcesProvider,
@@ -63,7 +100,12 @@ namespace alcube::samples {
     softbodyFeaturesFactory = new models::physics::softbody::FeaturesFactory(new utils::MemoryPool<models::physics::softbody::Features>(settings->world.maxActorCount));
 
     evaluator = new scripting::Evaluator(actorFactory, fluidFeaturesFactory, springFactory, softbodyFeaturesFactory, settings, cube, fileUtil, programName);
-    evaluator->withScope([](alcube::scripting::Evaluator* e) { e->evaluate("../src/js/test.js"); });
+
+    evaluator->withScope([](alcube::scripting::Evaluator* e) {
+      e->evaluate("../src/js/test.js");
+    });
+
+
     profiler->setShowInterval(1000);
     profiler->enabled = true;
     profilers.update = profiler->create("update");
@@ -72,17 +114,12 @@ namespace alcube::samples {
     profiler->start(profilers.all);
   }
 
-  void ApplicationBase::afterSetup() {
-    physicsSimulator->input();
-    gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
-  }
-
-  void ApplicationBase::onDraw() {
-    profiler->start(profilers.updateDrawable);
-    gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
-    gpuAccessor->memories.positions.read();
-    profiler->stop(profilers.updateDrawable);
-    drawer->draw();
+  void ApplicationBase::draw() {
+    instance->profiler->start(instance->profilers.updateDrawable);
+    instance->gpuAccessor->memories.positions.setCount(instance->physicsSimulator->actorCount);
+    instance->gpuAccessor->memories.positions.read(); // 不要な気がする
+    instance->profiler->stop(instance->profilers.updateDrawable);
+    instance->drawer->draw();
   }
 
   void ApplicationBase::onUpdate() {
@@ -102,8 +139,33 @@ namespace alcube::samples {
     profiler->start(profilers.all);
   }
 
-  void ApplicationBase::onClose() {
-    resourcesProvider->resources->release();
+  void ApplicationBase::updateLoopCallback() {
+    while (!utils::app::OpenGLWindow::instance->isClosed()) {
+      std::chrono::system_clock::time_point updateStartTime = std::chrono::system_clock::now();
+      instance->onUpdate();
+      std::chrono::system_clock::time_point updateEndTime = std::chrono::system_clock::now();
+      int elapsedTime = (int) std::chrono::duration_cast<std::chrono::milliseconds>(updateEndTime - updateStartTime).count();
+      auto nextFlameInterval = (int)(instance->settings->physics.timeStepSize * 1000.0f - elapsedTime);
+      if (nextFlameInterval > 0) {
+        std::chrono::milliseconds intervalMs(nextFlameInterval);
+        std::this_thread::sleep_for(intervalMs);
+      }
+    }
+    instance->closingStatus = ApplicationClosingStatus::PROCESSING;
+    std::cout << "update loop finished" << std::endl;
   }
 
+  void ApplicationBase::onClose() {
+    std::cout << "begin onClose" << std::endl;
+    resourcesProvider->resources->release();
+    std::cout << "closed" << std::endl;
+  }
+
+  void ApplicationBase::atexitCallback() {
+    std::cout << "begin atexit" << std::endl;
+    instance->onClose();
+    std::cout << "begin terminate" << std::endl;
+    glfwTerminate();
+    std::cout << "end terminate" << std::endl;
+  }
 }

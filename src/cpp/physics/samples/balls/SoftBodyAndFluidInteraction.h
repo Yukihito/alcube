@@ -5,7 +5,7 @@
 #include "../../Simulator.h"
 #include "../../../drawing/Drawer.h"
 #include "../../../drawing/shaders/Shaders.h"
-#include "../../../utils/app/OpenGLApplication.h"
+#include "../../../utils/app/OpenGLWindow.h"
 #include "../../../utils/Profiler.h"
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtx/transform.hpp>

@@ -1,6 +1,6 @@
 #ifndef ALCUBE_SAMPLES_APPLICATIONBASE_H
 #define ALCUBE_SAMPLES_APPLICATIONBASE_H
-#include "../utils/app/OpenGLApplication.h"
+#include "../utils/app/OpenGLWindow.h"
 #include "../gpu/GPUAccessor.h"
 #include "../drawing/Drawer.h"
 #include "../drawing/shaders/Shaders.h"
@@ -12,7 +12,7 @@
 #include "../models/Alcube.h"
 #include "../scripting/Evaluator.h"
 #include "../models/Settings.h"
-
+#include "SphereDrawable.h"
 
 namespace alcube::samples {
   class Profilers {
@@ -22,20 +22,21 @@ namespace alcube::samples {
       int updateDrawable;
   };
 
-  class ApplicationBase : public utils::app::OpenGLApplication {
+  enum ApplicationClosingStatus {
+    NONE,
+    PROCESSING,
+    FINISHED
+  };
+
+  class ApplicationBase {
     public:
-      explicit ApplicationBase(
-        models::Settings* settings,
-        const std::string &appName,
-        const char* programName
-      );
-
-    protected:
-      void onDraw() override;
-
-      void onUpdate() override;
-
-      void onClose() override;
+      static ApplicationBase* instance;
+      explicit ApplicationBase(const char* programName);
+      void run();
+    private:
+      const char* programName;
+      ApplicationClosingStatus closingStatus;
+      utils::app::OpenGLWindow* window;
       models::Settings* settings;
       gpu::GPUAccessor* gpuAccessor;
       drawing::Drawer *drawer;
@@ -54,11 +55,13 @@ namespace alcube::samples {
       models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory;
       scripting::Evaluator* evaluator;
       Profilers profilers;
-      const char* programName;
 
-      void beforeSetup();
-
-      void afterSetup();
+      void initServices();
+      void onClose();
+      void onUpdate();
+      static void atexitCallback();
+      static void updateLoopCallback();
+      static void draw();
   };
 }
 

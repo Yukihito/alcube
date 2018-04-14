@@ -1,7 +1,7 @@
 #ifndef ALCUBE_PHYSICS_SAMPLE_BASEAPPLICATION_H
 #define ALCUBE_PHYSICS_SAMPLE_BASEAPPLICATION_H
 
-#include "../../utils/app/OpenGLApplication.h"
+#include "../../utils/app/OpenGLWindow.h"
 #include "../Simulator.h"
 #include "../../utils/Profiler.h"
 #include "../../drawing/shaders/Shaders.h"

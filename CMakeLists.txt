@@ -16,8 +16,7 @@ set(ALCUBE_UTILS_SOURCE_FILES
         src/cpp/utils/opencl/ProgramFactory.cpp src/cpp/utils/opencl/ProgramFactory.h
         src/cpp/utils/opencl/KernelFactory.cpp src/cpp/utils/opencl/KernelFactory.h
         src/cpp/utils/alcubemath.h src/cpp/utils/alcubemath.cpp
-        src/cpp/utils/app/Application.cpp src/cpp/utils/app/Application.h
-        src/cpp/utils/app/OpenGLApplication.cpp src/cpp/utils/app/OpenGLApplication.h
+        src/cpp/utils/app/OpenGLWindow.cpp src/cpp/utils/app/OpenGLWindow.h
         src/cpp/utils/Mouse.cpp src/cpp/utils/Mouse.h
         src/cpp/utils/Keyboard.cpp src/cpp/utils/Keyboard.h
         src/cpp/utils/opencl/ResourcesProvider.cpp src/cpp/utils/opencl/ResourcesProvider.h
@@ -149,7 +148,6 @@ target_link_libraries(alcube_scripting_lib
 set(ALCUBE_SAMPLES_SOURCE_FILES
         src/cpp/samples/SphereDrawable.cpp src/cpp/samples/SphereDrawable.h
         src/cpp/samples/ApplicationBase.cpp src/cpp/samples/ApplicationBase.h
-        src/cpp/samples/SampleApplication.cpp src/cpp/samples/SampleApplication.h
         )
 
 add_library(alcube_samples_lib STATIC ${ALCUBE_SAMPLES_SOURCE_FILES})
