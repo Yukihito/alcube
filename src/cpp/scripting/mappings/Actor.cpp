@@ -11,7 +11,7 @@ namespace alcube::scripting::mappings {
     define<glm::vec3, AngularMomentum>();
   }
 
-  ActorFactory::ActorFactory(models::ActorFactory *underlying) : SingletonPrototype<models::ActorFactory>(underlying) {}
+  ActorFactory::ActorFactory(models::ActorFactory *underlying) : SingletonPrototype(underlying) {}
 
   void ActorFactory::init() {
     Prototype::init();

@@ -5,7 +5,7 @@ namespace alcube::utils::app {
   OpenGLWindow::OpenGLWindow(std::function<void()> draw) {
     OpenGLWindow::instance = this;
     fps = 30;
-    this->draw = draw;
+    this->draw = std::move(draw);
     keyboard = new Keyboard();
     closingStatus = WindowClosingStatus::NONE;
   }

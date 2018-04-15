@@ -11,6 +11,8 @@ namespace alcube::scripting::utils {
     objectTemplate->SetInternalFieldCount(1);
   }
 
+  void Prototype::registerConstructor(v8::Local<v8::ObjectTemplate>& obj) {}
+
   void Prototype::defineMethod(const char *name, v8::FunctionCallback f) {
     v8::Isolate* isolate = v8::Isolate::GetCurrent();
     objectTemplate->Set(

@@ -13,6 +13,7 @@ namespace alcube::scripting::mappings::physics::softbody {
   void FeaturesFactory::init() {
     Prototype::init();
     DEFMETHOD(create);
+    classNamePrefix = "Softbody";
   }
 
   void FeaturesFactory::create(const v8::FunctionCallbackInfo<v8::Value> &info) {

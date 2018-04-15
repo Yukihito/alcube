@@ -15,6 +15,7 @@ namespace alcube::scripting::mappings::physics::fluid {
   void FeaturesFactory::init() {
     Prototype::init();
     DEFMETHOD(create);
+    classNamePrefix = "Fluid";
   }
 
   void FeaturesFactory::create(const v8::FunctionCallbackInfo<v8::Value> &info) {

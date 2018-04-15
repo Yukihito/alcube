@@ -21,6 +21,7 @@ namespace alcube::scripting::utils {
       v8::Local<v8::ObjectTemplate> objectTemplate;
       virtual void init();
       void defineMethod(const char* name, v8::FunctionCallback f);
+      virtual void registerConstructor(v8::Local<v8::ObjectTemplate>& obj);
   };
 
   template <class T>
@@ -49,8 +50,23 @@ namespace alcube::scripting::utils {
       explicit SingletonPrototype(T* underlying);
       static void constructor(const v8::FunctionCallbackInfo<v8::Value>& info);
       static SingletonPrototype<T>* instance;
+      void registerConstructor(v8::Local<v8::ObjectTemplate>& obj) override;
       T* underlying;
+    protected:
+      std::string classNamePrefix = "";
   };
+
+  template <class T>
+  void SingletonPrototype<T>::registerConstructor(v8::Local<v8::ObjectTemplate>& obj) {
+    int stat;
+    char *rawName = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, &stat);
+    std::stringstream name(rawName);
+    std::string shortName;
+    while (std::getline(name, shortName, ':')) {}
+    v8::Isolate *isolate = v8::Isolate::GetCurrent();
+    std::string constructorName = (std::string("construct") + classNamePrefix + shortName);
+    obj->Set(v8::String::NewFromUtf8(isolate, constructorName.c_str()), v8::FunctionTemplate::New(isolate, constructor));
+  }
 
   template <class T>
   void SingletonPrototype<T>::constructor(const v8::FunctionCallbackInfo<v8::Value> &info) {

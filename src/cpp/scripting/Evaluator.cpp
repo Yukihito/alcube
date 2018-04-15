@@ -92,6 +92,7 @@ namespace alcube::scripting {
   }
 
   void Evaluator::registerFunctions() {
+    /*
     registerFunction("constructActorFactory", mappings::ActorFactory::constructor);
     registerFunction("constructFluidFeaturesFactory", mappings::physics::fluid::FeaturesFactory::constructor);
     registerFunction("constructSoftbodyFeaturesFactory", mappings::physics::softbody::FeaturesFactory::constructor);
@@ -102,6 +103,10 @@ namespace alcube::scripting {
     registerFunction("constructSettings", mappings::Settings::constructor);
     registerFunction("constructAlcube", mappings::Alcube::constructor);
     registerFunction("print", Evaluator::print);
+     */
+    for (auto prototype : prototypes) {
+      prototype->registerConstructor(global);
+    }
   }
 
   void Evaluator::registerFunction(const char *name, v8::FunctionCallback f) {
