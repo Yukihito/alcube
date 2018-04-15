@@ -28,10 +28,10 @@ namespace alcube::samples {
     FINISHED
   };
 
-  class ApplicationBase {
+  class Application {
     public:
-      static ApplicationBase* instance;
-      explicit ApplicationBase(const char* programName);
+      static Application* instance;
+      explicit Application(const char* programName);
       void run();
     private:
       const char* programName;

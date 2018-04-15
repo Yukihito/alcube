@@ -147,7 +147,7 @@ target_link_libraries(alcube_scripting_lib
 ### Samples
 set(ALCUBE_SAMPLES_SOURCE_FILES
         src/cpp/samples/SphereDrawable.cpp src/cpp/samples/SphereDrawable.h
-        src/cpp/samples/ApplicationBase.cpp src/cpp/samples/ApplicationBase.h
+        src/cpp/samples/Application.cpp src/cpp/samples/Application.h
         )
 
 add_library(alcube_samples_lib STATIC ${ALCUBE_SAMPLES_SOURCE_FILES})

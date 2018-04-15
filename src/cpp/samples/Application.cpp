@@ -1,14 +1,14 @@
-#include "ApplicationBase.h"
+#include "Application.h"
 
 namespace alcube::samples {
-  ApplicationBase* ApplicationBase::instance;
-  ApplicationBase::ApplicationBase(const char* programName) {
+  Application* Application::instance;
+  Application::Application(const char* programName) {
     this->programName = programName;
-    ApplicationBase::instance = this;
+    Application::instance = this;
     closingStatus = ApplicationClosingStatus::NONE;
   }
 
-  void ApplicationBase::run() {
+  void Application::run() {
     initServices();
     glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
     auto drawable = new SphereDrawable(
@@ -32,7 +32,7 @@ namespace alcube::samples {
     closingStatus = ApplicationClosingStatus::FINISHED;
   }
 
-  void ApplicationBase::initServices() {
+  void Application::initServices() {
     settings = new models::Settings();
     settings->physics.gravity *= 2.0f;
     settings->physics.timeStepSize = 1.0f / 60.0f;
@@ -100,7 +100,7 @@ namespace alcube::samples {
     profiler->start(profilers.all);
   }
 
-  void ApplicationBase::onDraw() {
+  void Application::onDraw() {
     profiler->start(profilers.updateDrawable);
     gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
     gpuAccessor->memories.positions.read();
@@ -108,7 +108,7 @@ namespace alcube::samples {
     drawer->draw();
   }
 
-  void ApplicationBase::onUpdate() {
+  void Application::onUpdate() {
     profiler->start(profilers.update);
     physicsSimulator->update();
     gpuAccessor->kernels.outputPositions(
@@ -125,7 +125,7 @@ namespace alcube::samples {
     profiler->start(profilers.all);
   }
 
-  void ApplicationBase::updateLoopCallback() {
+  void Application::updateLoopCallback() {
     while (!utils::app::OpenGLWindow::instance->isClosed()) {
       std::chrono::system_clock::time_point updateStartTime = std::chrono::system_clock::now();
       instance->onUpdate();
@@ -140,12 +140,12 @@ namespace alcube::samples {
     instance->closingStatus = ApplicationClosingStatus::PROCESSING;
   }
 
-  void ApplicationBase::onClose() {
+  void Application::onClose() {
     resourcesProvider->resources->release();
     glfwTerminate();
   }
 
-  void ApplicationBase::atexitCallback() {
+  void Application::atexitCallback() {
     instance->onClose();
   }
 }
