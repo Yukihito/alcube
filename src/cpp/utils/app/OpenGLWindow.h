@@ -20,7 +20,7 @@ namespace alcube::utils::app {
   class OpenGLWindow {
     public:
       static OpenGLWindow* instance;
-      explicit OpenGLWindow(void (*draw)());
+      explicit OpenGLWindow(std::function<void()> draw);
       void setup(
         unsigned int width,
         unsigned int height,
@@ -35,7 +35,7 @@ namespace alcube::utils::app {
     private:
       Keyboard* keyboard = nullptr;
       unsigned int fps;
-      void (*draw)();
+      std::function<void()> draw;
       static void keyEvent(GLFWwindow* window, int key, int scancode, int action, int mods);
       WindowClosingStatus closingStatus;
       GLFWwindow* window;

@@ -123,6 +123,10 @@ class Alcube
     else if obj.constructor.name == 'Spring'
       @underlying.addSpring obj.underlying
 
+settings = constructSettings()
+settings.physics = constructPhysicsSettings()
+settings.window = constructWindowSettings()
+settings.world = constructWorldSettings()
 
 fluidFeaturesFactory = new FluidFeaturesFactory()
 fluidFeaturesFactory.wrap()

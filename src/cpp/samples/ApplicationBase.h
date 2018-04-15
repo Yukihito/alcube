@@ -59,9 +59,9 @@ namespace alcube::samples {
       void initServices();
       void onClose();
       void onUpdate();
+      void onDraw();
       static void atexitCallback();
       static void updateLoopCallback();
-      static void draw();
   };
 }
 

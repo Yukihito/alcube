@@ -2,7 +2,7 @@
 
 namespace alcube::utils::app {
   OpenGLWindow* OpenGLWindow::instance;
-  OpenGLWindow::OpenGLWindow(void (*draw)()) {
+  OpenGLWindow::OpenGLWindow(std::function<void()> draw) {
     OpenGLWindow::instance = this;
     fps = 30;
     this->draw = draw;

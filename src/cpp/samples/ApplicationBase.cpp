@@ -37,8 +37,7 @@ namespace alcube::samples {
     settings->physics.gravity *= 2.0f;
     settings->physics.timeStepSize = 1.0f / 60.0f;
     settings->fps = 30;
-    window = new utils::app::OpenGLWindow(draw);
-    window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
+    window = new utils::app::OpenGLWindow([&]() {onDraw();});
     unsigned int gridEdgeLength = 8;
     unsigned int xGridCount = (unsigned int)settings->world.size / gridEdgeLength;
     unsigned int yGridCount = (unsigned int)settings->world.size / gridEdgeLength;
@@ -65,8 +64,6 @@ namespace alcube::samples {
       xGridCount * yGridCount * zGridCount
     );
     profiler = new utils::Profiler();
-    drawer = new drawing::DrawerWithProfiler(camera, profiler);
-    shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);
     softBodySimulator = new physics::softbody::Simulator();
     fluidSimulator = new physics::fluid::Simulator();
     physicsSimulator = new physics::Simulator(
@@ -92,6 +89,9 @@ namespace alcube::samples {
 
     evaluator = new scripting::Evaluator(actorFactory, fluidFeaturesFactory, springFactory, softbodyFeaturesFactory, settings, cube, fileUtil, programName);
     evaluator->withScope([](alcube::scripting::Evaluator* e) { e->evaluate("../src/js/test.js"); });
+    window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
+    drawer = new drawing::DrawerWithProfiler(camera, profiler);
+    shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);
     profiler->setShowInterval(1000);
     profiler->enabled = true;
     profilers.update = profiler->create("update");
@@ -100,12 +100,12 @@ namespace alcube::samples {
     profiler->start(profilers.all);
   }
 
-  void ApplicationBase::draw() {
-    instance->profiler->start(instance->profilers.updateDrawable);
-    instance->gpuAccessor->memories.positions.setCount(instance->physicsSimulator->actorCount);
-    instance->gpuAccessor->memories.positions.read();
-    instance->profiler->stop(instance->profilers.updateDrawable);
-    instance->drawer->draw();
+  void ApplicationBase::onDraw() {
+    profiler->start(profilers.updateDrawable);
+    gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
+    gpuAccessor->memories.positions.read();
+    profiler->stop(profilers.updateDrawable);
+    drawer->draw();
   }
 
   void ApplicationBase::onUpdate() {
@@ -142,10 +142,10 @@ namespace alcube::samples {
 
   void ApplicationBase::onClose() {
     resourcesProvider->resources->release();
+    glfwTerminate();
   }
 
   void ApplicationBase::atexitCallback() {
     instance->onClose();
-    glfwTerminate();
   }
 }
