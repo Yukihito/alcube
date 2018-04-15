@@ -28,13 +28,11 @@ namespace alcube::utils::app {
         std::string name
       );
       void run();
-      void clean();
       bool isClosed();
     protected:
       void close();
       void printSystemInfo();
     private:
-      std::mutex closingStatusMutex;
       Keyboard* keyboard = nullptr;
       unsigned int fps;
       void (*draw)();

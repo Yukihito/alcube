@@ -11,16 +11,11 @@ namespace alcube::utils::app {
   }
 
   bool OpenGLWindow::isClosed() {
-    closingStatusMutex.lock();
-    bool r = closingStatus == WindowClosingStatus::FINISHED;
-    closingStatusMutex.unlock();
-    return r;
+    return closingStatus == WindowClosingStatus::FINISHED;
   }
 
   void OpenGLWindow::close() {
-    closingStatusMutex.lock();
     closingStatus = WindowClosingStatus::PROCESSING;
-    closingStatusMutex.unlock();
   }
 
   void OpenGLWindow::keyEvent(GLFWwindow *window, int key, int scancode, int action, int mods) {
@@ -67,14 +62,7 @@ namespace alcube::utils::app {
   void OpenGLWindow::run() {
     glfwSetKeyCallback(window, keyEvent);
 
-    while (!glfwWindowShouldClose(window)) {
-      closingStatusMutex.lock();
-      if (closingStatus != WindowClosingStatus::NONE) {
-        closingStatus = WindowClosingStatus::PROCESSING;
-        closingStatusMutex.unlock();
-        break;
-      }
-      closingStatusMutex.unlock();
+    while (closingStatus == WindowClosingStatus::NONE) {
       std::chrono::system_clock::time_point drawingStartTime = std::chrono::system_clock::now();
       draw();
       glfwSwapBuffers(window);
@@ -88,22 +76,10 @@ namespace alcube::utils::app {
         std::this_thread::sleep_for(intervalMs);
       }
 
-      /*
       if (glfwWindowShouldClose(window)) {
-        closingStatusMutex.lock();
         closingStatus = WindowClosingStatus::PROCESSING;
-        closingStatusMutex.unlock();
       }
-       */
     }
-    closingStatusMutex.lock();
     closingStatus = WindowClosingStatus::FINISHED;
-    closingStatusMutex.unlock();
-  }
-
-  void OpenGLWindow::clean() {
-    draw();
-    glfwSwapBuffers(window);
-    glfwPollEvents();
   }
 }

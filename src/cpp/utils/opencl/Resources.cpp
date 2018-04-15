@@ -28,23 +28,16 @@ namespace alcube::utils::opencl {
   }
 
   void Resources::release() {
-    std::cout << "release 0" << std::endl;
     memoryManager->release();
-    std::cout << "release 1" << std::endl;
     for (cl_kernel kernel : kernels) {
       clReleaseKernel(kernel);
     }
-    std::cout << "release 2" << std::endl;
     for (cl_program program: programs) {
       clReleaseProgram(program);
     }
-    std::cout << "release 3" << std::endl;
     for (cl_command_queue queue: queues) {
-      std::cout << "before release 3" << std::endl;
       clReleaseCommandQueue(queue);
-      std::cout << "after release 3" << std::endl;
     }
-    std::cout << "release 4" << std::endl;
     clReleaseContext(context);
   }
 }
