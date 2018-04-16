@@ -192,7 +192,6 @@ namespace alcube::samples {
     );
     clFinish(resourcesProvider->queue->queue);
 
-    //physicsSimulator->output(); // TODO: delete
     profiler->stop(profilers.update);
     profiler->stop(profilers.all);
     profiler->update();
