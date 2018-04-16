@@ -58,6 +58,13 @@ namespace alcube::samples {
     explicit Mappings();
   };
 
+  struct Grid {
+    unsigned int xCount;
+    unsigned int yCount;
+    unsigned int zCount;
+    unsigned int edgeLength;
+  };
+
   class Application {
     public:
       static Application* instance;
@@ -85,11 +92,15 @@ namespace alcube::samples {
       scripting::Evaluator* evaluator;
       Profilers profilers;
       Mappings mappings;
+      Grid grid;
 
       void initServices();
       void onClose();
       void onUpdate();
       void onDraw();
+      void waitCloseAllThreads();
+      void loadBasicLibraries();
+      void loadSettings();
       static void atexitCallback();
       static void updateLoopCallback();
   };
