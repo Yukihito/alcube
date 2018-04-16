@@ -10,7 +10,7 @@ namespace alcube::scripting::mappings::physics::fluid {
       define<float, Viscosity>();
   }
 
-  FeaturesFactory::FeaturesFactory(alcube::models::physics::fluid::FeaturesFactory* underlying) : utils::SingletonPrototype<models::physics::fluid::FeaturesFactory>(underlying) {}
+  //FeaturesFactory::FeaturesFactory() : utils::SingletonPrototype<models::physics::fluid::FeaturesFactory>() {}
 
   void FeaturesFactory::init() {
     Prototype::init();

@@ -3,7 +3,7 @@
 namespace alcube::scripting::mappings::physics::softbody {
   using namespace utils;
 
-  SpringFactory::SpringFactory(models::physics::softbody::SpringFactory *underlying) : utils::SingletonPrototype<models::physics::softbody::SpringFactory>(underlying) {}
+  //SpringFactory::SpringFactory(models::physics::softbody::SpringFactory *underlying) : utils::SingletonPrototype<models::physics::softbody::SpringFactory>(underlying) {}
 
   void SpringFactory::init() {
     Prototype::init();

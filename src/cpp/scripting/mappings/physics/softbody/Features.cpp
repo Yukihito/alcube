@@ -8,7 +8,7 @@ namespace alcube::scripting::mappings::physics::softbody {
     define<float, Mass>();
   }
 
-  FeaturesFactory::FeaturesFactory(alcube::models::physics::softbody::FeaturesFactory *underlying) : SingletonPrototype<alcube::models::physics::softbody::FeaturesFactory>(underlying){}
+  //FeaturesFactory::FeaturesFactory(alcube::models::physics::softbody::FeaturesFactory *underlying) : SingletonPrototype<alcube::models::physics::softbody::FeaturesFactory>(underlying){}
 
   void FeaturesFactory::init() {
     Prototype::init();

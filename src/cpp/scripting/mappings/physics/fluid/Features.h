@@ -17,7 +17,6 @@ namespace alcube::scripting::mappings::physics::fluid {
 
   class FeaturesFactory : public utils::SingletonPrototype<models::physics::fluid::FeaturesFactory> {
     public:
-      explicit FeaturesFactory(models::physics::fluid::FeaturesFactory* underlying);
       void init() override;
       static void create(const v8::FunctionCallbackInfo<v8::Value>& info);
   };

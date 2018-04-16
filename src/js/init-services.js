@@ -1,4 +1,4 @@
-var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, settings, softbodyFeaturesFactory, springFactory, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
+var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, softbodyFeaturesFactory, springFactory, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
 
 vec3 = function(x, y, z) {
   return new THREE.Vector3(parseFloat(x), parseFloat(y), parseFloat(z));
@@ -221,14 +221,6 @@ Alcube = class Alcube {
   }
 
 };
-
-settings = constructSettings();
-
-settings.physics = constructPhysicsSettings();
-
-settings.window = constructWindowSettings();
-
-settings.world = constructWorldSettings();
 
 fluidFeaturesFactory = new FluidFeaturesFactory();
 

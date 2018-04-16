@@ -47,11 +47,14 @@ namespace alcube::scripting::utils {
   template <class T>
   class SingletonPrototype : public TypedPrototype<T> {
     public:
-      explicit SingletonPrototype(T* underlying);
+      explicit SingletonPrototype();
       static void constructor(const v8::FunctionCallbackInfo<v8::Value>& info);
       static SingletonPrototype<T>* instance;
       void registerConstructor(v8::Local<v8::ObjectTemplate>& obj) override;
       T* underlying;
+      void setUnderlying(T* underlying) {
+        this->underlying = underlying;
+      };
     protected:
       std::string classNamePrefix = "";
   };
@@ -82,8 +85,7 @@ namespace alcube::scripting::utils {
   }
 
   template <class T>
-  SingletonPrototype<T>::SingletonPrototype(T *underlying) : TypedPrototype<T>::TypedPrototype() {
-    this->underlying = underlying;
+  SingletonPrototype<T>::SingletonPrototype() : TypedPrototype<T>::TypedPrototype() {
     SingletonPrototype<T>::instance = this;
   }
 

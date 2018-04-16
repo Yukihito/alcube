@@ -17,19 +17,12 @@ namespace alcube::scripting {
   class Evaluator {
     public:
       explicit Evaluator(
-        models::ActorFactory* actorFactory,
-        alcube::models::physics::fluid::FeaturesFactory* fluidFeaturesFactory,
-        alcube::models::physics::softbody::SpringFactory* springFactory,
-        alcube::models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory,
-        alcube::models::Settings* settings,
-        alcube::models::Alcube* alcube,
         alcube::utils::FileUtil* fileUtil,
         const char* programName
       );
-
       void evaluate(const char* path);
-      void withScope(std::function<void(Evaluator*)> f);
-
+      void withScope(std::function<void()> f);
+      void add(std::vector<utils::Prototype*> prototypes);
     private:
       const char* programName;
       alcube::utils::FileUtil* fileUtil;
@@ -40,12 +33,10 @@ namespace alcube::scripting {
       v8::Local<v8::Context> context;
       std::vector<utils::Prototype*> prototypes;
       static void print(const v8::FunctionCallbackInfo<v8::Value> &args);
-      void initV8();
-      void loadLibs();
-      void loadLib(const char* filePath);
-      void initTemplates();
-      void registerFunctions();
       void registerFunction(const char* name, v8::FunctionCallback f);
+      void initPrototypes();
+      void initV8();
+      void finalizeV8();
   };
 }
 

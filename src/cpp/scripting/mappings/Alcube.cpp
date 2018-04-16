@@ -3,7 +3,7 @@
 namespace alcube::scripting::mappings {
   using namespace utils;
 
-  Alcube::Alcube(models::Alcube *underlying) : SingletonPrototype(underlying) {}
+  //Alcube::Alcube(models::Alcube *underlying) : SingletonPrototype(underlying) {}
 
   void Alcube::init() {
     Prototype::init();

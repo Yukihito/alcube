@@ -14,7 +14,7 @@ namespace alcube::scripting::mappings::physics::softbody {
 
   class FeaturesFactory  : public utils::SingletonPrototype<models::physics::softbody::FeaturesFactory> {
     public:
-      explicit FeaturesFactory(models::physics::softbody::FeaturesFactory* underlying);
+      //explicit FeaturesFactory(models::physics::softbody::FeaturesFactory* underlying);
       void init() override;
       static void create(const v8::FunctionCallbackInfo<v8::Value>& info);
   };

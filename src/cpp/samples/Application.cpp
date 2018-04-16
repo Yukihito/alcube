@@ -1,43 +1,90 @@
 #include "Application.h"
 
 namespace alcube::samples {
+  Mappings::Mappings() {
+    settings.window = new alcube::scripting::mappings::WindowSettings();
+    settings.physics = new alcube::scripting::mappings::PhysicsSettings();
+    settings.world = new alcube::scripting::mappings::WorldSettings();
+    settings.root = new alcube::scripting::mappings::Settings();
+
+    services.actorFactory = new alcube::scripting::mappings::ActorFactory();
+    services.softbodyFeaturesFactory = new alcube::scripting::mappings::physics::softbody::FeaturesFactory();
+    services.fluidFeaturesFactory = new alcube::scripting::mappings::physics::fluid::FeaturesFactory();
+    services.springFactory = new alcube::scripting::mappings::physics::softbody::SpringFactory();
+    services.cube = new alcube::scripting::mappings::Alcube();
+
+    entities.actor = new alcube::scripting::mappings::Actor();
+    entities.fluidFeatures = new alcube::scripting::mappings::physics::fluid::Features();
+    entities.softbodyFeatures = new alcube::scripting::mappings::physics::softbody::Features();
+    entities.spring = new alcube::scripting::mappings::physics::softbody::Spring();
+
+    all = {
+      entities.actor,
+      services.actorFactory,
+      entities.fluidFeatures,
+      services.fluidFeaturesFactory,
+      entities.spring,
+      services.springFactory,
+      entities.softbodyFeatures,
+      services.softbodyFeaturesFactory,
+      settings.physics,
+      settings.world,
+      settings.window,
+      settings.root,
+      services.cube
+    };
+  }
+
   Application* Application::instance;
-  Application::Application(const char* programName) {
-    this->programName = programName;
+  Application::Application(const char* programName) : mappings() {
     Application::instance = this;
     closingStatus = ApplicationClosingStatus::NONE;
+    fileUtil = new utils::FileUtil();
+    profiler = new utils::Profiler();
+    evaluator = new scripting::Evaluator(fileUtil, programName);
+    evaluator->add(mappings.all);
   }
 
   void Application::run() {
-    initServices();
-    glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
-    auto drawable = new SphereDrawable(
-      shaders->directionalLight,
-      color,
-      settings->world.maxActorCount,
-      (GLfloat*)gpuAccessor->memories.positions.dto
-    );
-    drawable->shape->instanceCount = cube->getActorCount();
-    drawer->add(drawable);
-    physicsSimulator->input();
-    gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
-    atexit(atexitCallback);
-    std::thread th = std::thread(updateLoopCallback);
-    th.detach();
-    window->run();
-    while (closingStatus == NONE) {
-      std::chrono::milliseconds intervalMs(100);
-      std::this_thread::sleep_for(intervalMs);
-    }
-    closingStatus = ApplicationClosingStatus::FINISHED;
+    evaluator->withScope([&]() {
+      initServices();
+      glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
+      auto drawable = new SphereDrawable(
+        shaders->directionalLight,
+        color,
+        settings->world.maxActorCount,
+        (GLfloat*)gpuAccessor->memories.positions.dto
+      );
+      drawable->shape->instanceCount = cube->getActorCount();
+      drawer->add(drawable);
+      physicsSimulator->input();
+      gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
+      atexit(atexitCallback);
+      std::thread th = std::thread(updateLoopCallback);
+      th.detach();
+      window->run();
+      while (closingStatus == NONE) {
+        std::chrono::milliseconds intervalMs(100);
+        std::this_thread::sleep_for(intervalMs);
+      }
+      closingStatus = ApplicationClosingStatus::FINISHED;
+    });
   }
 
   void Application::initServices() {
+
+    //settings->physics.gravity *= 2.0f;
+    //settings->physics.timeStepSize = 1.0f / 60.0f;
+    //settings->fps = 30;
+
+    evaluator->evaluate("../src/js/three.min.js");
     settings = new models::Settings();
-    settings->physics.gravity *= 2.0f;
-    settings->physics.timeStepSize = 1.0f / 60.0f;
-    settings->fps = 30;
-    window = new utils::app::OpenGLWindow([&]() {onDraw();});
+    mappings.settings.window->setUnderlying(&settings->window);
+    mappings.settings.physics->setUnderlying(&settings->physics);
+    mappings.settings.world->setUnderlying(&settings->world);
+    mappings.settings.root->setUnderlying(settings);
+    evaluator->evaluate("../src/js/init-settings.js");
+    evaluator->evaluate("../src/js/settings.js");
     unsigned int gridEdgeLength = 8;
     unsigned int xGridCount = (unsigned int)settings->world.size / gridEdgeLength;
     unsigned int yGridCount = (unsigned int)settings->world.size / gridEdgeLength;
@@ -53,7 +100,6 @@ namespace alcube::samples {
       near,
       far
     );
-    fileUtil = new utils::FileUtil();
 
     resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
     gpuAccessor = new gpu::GPUAccessor(
@@ -63,7 +109,7 @@ namespace alcube::samples {
       settings->world.maxActorCount * 16,
       xGridCount * yGridCount * zGridCount
     );
-    profiler = new utils::Profiler();
+
     softBodySimulator = new physics::softbody::Simulator();
     fluidSimulator = new physics::fluid::Simulator();
     physicsSimulator = new physics::Simulator(
@@ -86,9 +132,16 @@ namespace alcube::samples {
 
     fluidFeaturesFactory = new models::physics::fluid::FeaturesFactory(new utils::MemoryPool<models::physics::fluid::Features>(settings->world.maxActorCount));
     softbodyFeaturesFactory = new models::physics::softbody::FeaturesFactory(new utils::MemoryPool<models::physics::softbody::Features>(settings->world.maxActorCount));
+    mappings.services.actorFactory->setUnderlying(actorFactory);
+    mappings.services.softbodyFeaturesFactory->setUnderlying(softbodyFeaturesFactory);
+    mappings.services.fluidFeaturesFactory->setUnderlying(fluidFeaturesFactory);
+    mappings.services.springFactory->setUnderlying(springFactory);
+    mappings.services.cube->setUnderlying(cube);
 
-    evaluator = new scripting::Evaluator(actorFactory, fluidFeaturesFactory, springFactory, softbodyFeaturesFactory, settings, cube, fileUtil, programName);
-    evaluator->withScope([](alcube::scripting::Evaluator* e) { e->evaluate("../src/js/test.js"); });
+    evaluator->evaluate("../src/js/init-services.js");
+    evaluator->evaluate("../src/js/test.js");
+
+    window = new utils::app::OpenGLWindow([&]() { onDraw(); });
     window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
     drawer = new drawing::DrawerWithProfiler(camera, profiler);
     shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);

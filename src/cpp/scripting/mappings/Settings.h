@@ -7,7 +7,7 @@
 namespace alcube::scripting::mappings {
   class PhysicsSettings : public utils::SingletonPrototype<models::PhysicsSettings> {
     public:
-      explicit PhysicsSettings(models::PhysicsSettings* underlying);
+      //explicit PhysicsSettings(models::PhysicsSettings* underlying);
       void init() override;
       DEFVAR(models::PhysicsSettings, float, timeStepSize);
       DEFVAR(models::PhysicsSettings, float, gravity);
@@ -15,7 +15,7 @@ namespace alcube::scripting::mappings {
 
   class WindowSettings : public utils::SingletonPrototype<models::WindowSettings> {
     public:
-      explicit WindowSettings(models::WindowSettings* underlying);
+      //explicit WindowSettings(models::WindowSettings* underlying);
       void init() override;
       DEFVAR(models::WindowSettings, int, width);
       DEFVAR(models::WindowSettings, int, height);
@@ -23,7 +23,7 @@ namespace alcube::scripting::mappings {
 
   class WorldSettings : public utils::SingletonPrototype<models::WorldSettings> {
     public:
-      explicit WorldSettings(models::WorldSettings* underlying);
+      //explicit WorldSettings(models::WorldSettings* underlying);
       void init() override;
       DEFVAR(models::WorldSettings, float, size);
       DEFVAR(models::WorldSettings, int, maxActorCount);
@@ -31,7 +31,7 @@ namespace alcube::scripting::mappings {
 
   class Settings : public utils::SingletonPrototype<models::Settings> {
     public:
-      explicit Settings(models::Settings* underlying);
+      //explicit Settings(models::Settings* underlying);
       void init() override;
       DEFVAR(models::Settings, int, fps);
   };
