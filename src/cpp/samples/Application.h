@@ -63,6 +63,7 @@ namespace alcube::samples {
     unsigned int yCount;
     unsigned int zCount;
     unsigned int edgeLength;
+    explicit Grid(unsigned int worldSize);
   };
 
   class Application {
@@ -92,7 +93,7 @@ namespace alcube::samples {
       scripting::Evaluator* evaluator;
       Profilers profilers;
       Mappings mappings;
-      Grid grid;
+      Grid* grid;
 
       void initServices();
       void onClose();

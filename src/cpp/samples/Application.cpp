@@ -35,6 +35,13 @@ namespace alcube::samples {
     };
   }
 
+  Grid::Grid(unsigned int worldSize) {
+    edgeLength = 8;
+    xCount = worldSize / edgeLength;
+    yCount = worldSize / edgeLength;
+    zCount = worldSize / edgeLength;
+  }
+
   Application* Application::instance;
   Application::Application(const char* programName) : mappings() {
     Application::instance = this;
@@ -92,10 +99,7 @@ namespace alcube::samples {
 
   void Application::initServices() {
     // Grid
-    grid.edgeLength = 8;
-    grid.xCount = (unsigned int)settings->world.size / grid.edgeLength;
-    grid.yCount = (unsigned int)settings->world.size / grid.edgeLength;
-    grid.zCount = (unsigned int)settings->world.size / grid.edgeLength;
+    grid = new Grid((unsigned int)settings->world.size);
 
     // Basic resources
     resourcesProvider = new utils::opencl::ResourcesProvider(fileUtil, new utils::opencl::Resources());
@@ -104,7 +108,7 @@ namespace alcube::samples {
       settings->world.maxActorCount,
       utils::math::powerOf2(settings->world.maxActorCount),
       settings->world.maxActorCount * 16,
-      grid.xCount * grid.yCount * grid.zCount
+      grid->xCount * grid->yCount * grid->zCount
     );
 
     // Simulators
@@ -112,10 +116,10 @@ namespace alcube::samples {
     fluidSimulator = new physics::fluid::Simulator();
     physicsSimulator = new physics::Simulator(
       settings->world.maxActorCount,
-      grid.edgeLength,
-      grid.xCount,
-      grid.yCount,
-      grid.zCount,
+      grid->edgeLength,
+      grid->xCount,
+      grid->yCount,
+      grid->zCount,
       settings->physics.timeStepSize,
       gpuAccessor
     );
@@ -151,16 +155,14 @@ namespace alcube::samples {
     window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
 
     // Drawer
-    float near = 0.1f;
-    float far = grid.edgeLength * grid.xCount * 4.0f;
     camera = new drawing::Camera(
-      glm::vec3(0.0f, 0.0f, far / 2.0f),
+      glm::vec3(0.0f, 0.0f, settings->world.size * 2.0f),
       glm::quat(),
       glm::radians(45.0f),
       (float)settings->window.width,
       (float)settings->window.height,
-      near,
-      far
+      0.1f, // near
+      settings->world.size * 4.0f // far
     );
     drawer = new drawing::DrawerWithProfiler(camera, profiler);
     shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);
