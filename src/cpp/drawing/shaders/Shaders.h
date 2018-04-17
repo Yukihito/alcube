@@ -5,16 +5,22 @@
 #include "StandardShader.h"
 #include "ParticleShader.h"
 #include "TileShader.h"
-#include "DirectionalLightShader.h"
+#include "directionallight/SingleColorShader.h"
+#include "directionallight/InstanceColorShader.h"
 
 namespace alcube::drawing::shaders {
+  struct DirectionalLight {
+    directionallight::SingleColorShader singleColor;
+    directionallight::InstanceColorShader instanceColor;
+    explicit DirectionalLight(utils::FileUtil* fileUtil, Context& context);
+  };
   class Shaders {
     public:
       //SimpleShader simple;
       //StandardShader standard;
       //ParticleShader particle;
       //TileShader tile;
-      DirectionalLightShader directionalLight;
+      DirectionalLight directionalLight;
       explicit Shaders(utils::FileUtil* fileUtil, Context& context);
   };
 }

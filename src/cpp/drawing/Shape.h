@@ -8,12 +8,12 @@ namespace alcube::drawing {
   enum VertexBufferType {
     VERTICES = 0,
     NORMALS,
-    COLORS,
     UVS
   };
 
   enum InstanceBufferType {
-    POSITIONS = 0
+    POSITIONS = 0,
+    COLORS
   };
 
   class Shape {
@@ -23,7 +23,7 @@ namespace alcube::drawing {
       unsigned int instanceCount = 0;
       IndexBuffer* indexBuffer;
       VertexBuffer* vertexBuffers[4];
-      InstanceBuffer* instanceBuffers[1];
+      InstanceBuffer* instanceBuffers[2];
       void update();
   };
 }

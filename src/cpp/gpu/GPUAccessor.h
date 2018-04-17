@@ -320,6 +320,7 @@ namespace alcube::gpu {
       memories::UintMemory gridStartIndices;
       memories::UintMemory gridEndIndices;
       memories::Float3Memory positions;
+      memories::Float3Memory colors;
   };
 
   class Dtos {
@@ -341,6 +342,7 @@ namespace alcube::gpu {
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
       cl_float3* positions;
+      cl_float3* colors;
   };
 
   class RawKernels {
@@ -367,7 +369,8 @@ namespace alcube::gpu {
       cl_kernel updateByFrictionalImpulse;
       cl_kernel initStepVariables;
       cl_kernel updateByPenaltyImpulse;
-      cl_kernel outputPositions;
+      cl_kernel updateDrawingBuffer;
+      cl_kernel updateDrawingBuffer_linearMomentumToColor;
   };
 
   class Kernels {
@@ -396,7 +399,8 @@ namespace alcube::gpu {
       void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys);
       void initStepVariables(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
       void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys, memories::Constants& constants);
-      void outputPositions(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
+      void updateDrawingBuffer(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
+      void updateDrawingBuffer_linearMomentumToColor(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::PhysicalQuantity& physicalQuantities);
   };
 
   class GPUAccessor {

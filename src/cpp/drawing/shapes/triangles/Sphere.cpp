@@ -8,7 +8,8 @@ namespace alcube::drawing::shapes::triangles {
   Sphere::Sphere(
     size_t splitCount,
     unsigned int maxInstanceCount,
-    GLfloat* positions
+    GLfloat* positions,
+    GLfloat* colors
   ) : Shape() {
     this->instanceCount = 0;
 
@@ -57,6 +58,7 @@ namespace alcube::drawing::shapes::triangles {
     vertexBuffers[NORMALS] = new VertexBuffer(3, verticesLength, normals, false);
     vertexBuffers[UVS] = new VertexBuffer(2, verticesLength, uvs, false);
     instanceBuffers[POSITIONS] = new InstanceBuffer(4, maxInstanceCount, positions, true);
+    instanceBuffers[COLORS] = new InstanceBuffer(4, maxInstanceCount, colors, true);
 
     indexBuffer->update();
     vertexBuffers[VERTICES]->update();

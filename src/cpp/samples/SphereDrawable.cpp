@@ -5,12 +5,14 @@ namespace alcube::samples {
     drawing::Shader &shader,
     glm::vec3 diffuse,
     unsigned int maxInstanceCount,
-    GLfloat* positions
+    GLfloat* positions,
+    GLfloat* colors
   ) {
     shape = new drawing::shapes::triangles::Sphere(
       8,
       maxInstanceCount,
-      positions
+      positions,
+      colors
     );
     this->shader = &shader;
     material.diffuse = diffuse;

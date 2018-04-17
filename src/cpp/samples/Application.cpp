@@ -59,15 +59,17 @@ namespace alcube::samples {
       initServices();
       glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
       auto drawable = new SphereDrawable(
-        shaders->directionalLight,
+        shaders->directionalLight.instanceColor,
         color,
         settings->world.maxActorCount,
-        (GLfloat*)gpuAccessor->memories.positions.dto
+        (GLfloat*)gpuAccessor->memories.positions.dto,
+        (GLfloat*)gpuAccessor->memories.colors.dto
       );
       drawable->shape->instanceCount = cube->getActorCount();
       drawer->add(drawable);
       physicsSimulator->input();
       gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
+      gpuAccessor->memories.colors.setCount(physicsSimulator->actorCount);
       atexit(atexitCallback);
       std::thread(updateLoopCallback).detach();
       window->run();
@@ -180,6 +182,8 @@ namespace alcube::samples {
     profiler->start(profilers.updateDrawable);
     gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
     gpuAccessor->memories.positions.read();
+    gpuAccessor->memories.colors.setCount(physicsSimulator->actorCount);
+    gpuAccessor->memories.colors.read();
     profiler->stop(profilers.updateDrawable);
     drawer->draw();
   }
@@ -187,9 +191,10 @@ namespace alcube::samples {
   void Application::onUpdate() {
     profiler->start(profilers.update);
     physicsSimulator->update();
-    gpuAccessor->kernels.outputPositions(
+    gpuAccessor->kernels.updateDrawingBuffer_linearMomentumToColor(
       physicsSimulator->actorCount,
       gpuAccessor->memories.positions,
+      gpuAccessor->memories.colors,
       gpuAccessor->memories.physicalQuantities
     );
     clFinish(resourcesProvider->queue->queue);

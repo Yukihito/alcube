@@ -1,9 +1,9 @@
-#include "DirectionalLightShader.h"
+#include "SingleColorShader.h"
 
-namespace alcube::drawing::shaders {
-  DirectionalLightShader::DirectionalLightShader(utils::FileUtil *fileUtil, Context& context) {
-    std::string vertexShaderCodeStr = fileUtil->readFile("../src/shaders/directional-light.vertexshader");
-    std::string fragmentShaderCodeStr = fileUtil->readFile("../src/shaders/directional-light.fragmentshader");
+namespace alcube::drawing::shaders::directionallight {
+  SingleColorShader::SingleColorShader(utils::FileUtil *fileUtil, Context& context) {
+    std::string vertexShaderCodeStr = fileUtil->readFile("../src/shaders/directional-light/single-color.vertexshader");
+    std::string fragmentShaderCodeStr = fileUtil->readFile("../src/shaders/directional-light/single-color.fragmentshader");
     static const char* vertexShaderCode = vertexShaderCodeStr.c_str();
     static const char* fragmentShaderCode = fragmentShaderCodeStr.c_str();
     uniforms.push_back(new MatrixUniform("VP", &context.vp[0][0]));

@@ -14,7 +14,8 @@ namespace alcube::samples {
         drawing::Shader &shader,
         glm::vec3 diffuse,
         unsigned int maxInstanceCount,
-        GLfloat* positions
+        GLfloat* positions,
+        GLfloat* colors
       );
   };
 }

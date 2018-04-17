@@ -780,13 +780,26 @@ namespace alcube::gpu {
     });
   }
 
-  void Kernels::outputPositions(
+  void Kernels::updateDrawingBuffer(
     unsigned int workSize,
     memories::Float3Memory& positions,
     memories::PhysicalQuantity& physicalQuantities
   ) {
-    queue->push(rawKernels.outputPositions, {workSize}, {
+    queue->push(rawKernels.updateDrawingBuffer, {workSize}, {
       memArg(positions.memory),
+      memArg(physicalQuantities.memory)
+    });
+  }
+
+  void Kernels::updateDrawingBuffer_linearMomentumToColor(
+    unsigned int workSize,
+    memories::Float3Memory& positions,
+    memories::Float3Memory& colors,
+    memories::PhysicalQuantity& physicalQuantities
+  ) {
+    queue->push(rawKernels.updateDrawingBuffer_linearMomentumToColor, {workSize}, {
+      memArg(positions.memory),
+      memArg(colors.memory),
       memArg(physicalQuantities.memory)
     });
   }
@@ -824,7 +837,8 @@ namespace alcube::gpu {
     kernels.rawKernels.updateByFrictionalImpulse = resourcesProvider->kernelFactory->create(program, "updateByFrictionalImpulse");
     kernels.rawKernels.initStepVariables = resourcesProvider->kernelFactory->create(program, "initStepVariables");
     kernels.rawKernels.updateByPenaltyImpulse = resourcesProvider->kernelFactory->create(program, "updateByPenaltyImpulse");
-    kernels.rawKernels.outputPositions = resourcesProvider->kernelFactory->create(program, "outputPositions");
+    kernels.rawKernels.updateDrawingBuffer = resourcesProvider->kernelFactory->create(program, "updateDrawingBuffer");
+    kernels.rawKernels.updateDrawingBuffer_linearMomentumToColor = resourcesProvider->kernelFactory->create(program, "updateDrawingBuffer_linearMomentumToColor");
 
     dtos.grid = new dtos::Grid();
     dtos.fluidSettings = new dtos::FluidSettings();
@@ -843,6 +857,7 @@ namespace alcube::gpu {
     dtos.gridStartIndices = new unsigned int[allGridCount];
     dtos.gridEndIndices = new unsigned int[allGridCount];
     dtos.positions = new cl_float3[maxActorCount];
+    dtos.colors = new cl_float3[maxActorCount];
 
     memories.grid.memory = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);
     memories.fluidSettings.memory = defineHostMemory("fluidSettings", sizeof(dtos::FluidSettings), dtos.fluidSettings, 1);
@@ -861,6 +876,7 @@ namespace alcube::gpu {
     memories.gridStartIndices.memory = defineGPUMemory("gridStartIndices", sizeof(unsigned int), allGridCount);
     memories.gridEndIndices.memory = defineGPUMemory("gridEndIndices", sizeof(unsigned int), allGridCount);
     memories.positions.memory = defineGPUMemory("positions", sizeof(cl_float3), maxActorCount);
+    memories.colors.memory = defineGPUMemory("colors", sizeof(cl_float3), maxActorCount);
 
     memories.grid.dto = dtos.grid;
     memories.fluidSettings.dto = dtos.fluidSettings;
@@ -879,6 +895,7 @@ namespace alcube::gpu {
     memories.gridStartIndices.dto = dtos.gridStartIndices;
     memories.gridEndIndices.dto = dtos.gridEndIndices;
     memories.positions.dto = dtos.positions;
+    memories.colors.dto = dtos.colors;
 
     memories.grid.resourcesProvider = resourcesProvider;
     memories.fluidSettings.resourcesProvider = resourcesProvider;
@@ -896,7 +913,8 @@ namespace alcube::gpu {
     memories.gridAndActorRelations.resourcesProvider = resourcesProvider;
     memories.gridStartIndices.resourcesProvider = resourcesProvider;
     memories.gridEndIndices.resourcesProvider = resourcesProvider;
-    memories.positions.resourcesProvider = resourcesProvider;;
+    memories.positions.resourcesProvider = resourcesProvider;
+    memories.colors.resourcesProvider = resourcesProvider;;
 
     resourcesProvider->resources->memoryManager->allocate();
   }

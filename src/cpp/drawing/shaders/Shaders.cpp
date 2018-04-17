@@ -1,6 +1,9 @@
 #include "Shaders.h"
 
 namespace alcube::drawing::shaders {
-  Shaders::Shaders(utils::FileUtil* fileUtil, Context& context) :
-    directionalLight(fileUtil, context){}
+  DirectionalLight::DirectionalLight(utils::FileUtil *fileUtil, Context &context) :
+    singleColor(fileUtil, context),
+    instanceColor(fileUtil, context) {}
+
+  Shaders::Shaders(utils::FileUtil* fileUtil, Context& context) : directionalLight(fileUtil, context) {}
 }

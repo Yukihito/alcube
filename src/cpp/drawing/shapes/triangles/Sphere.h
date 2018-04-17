@@ -12,7 +12,8 @@ namespace alcube::drawing::shapes::triangles {
       explicit Sphere(
         size_t splitCount,
         unsigned int maxInstanceCount,
-        GLfloat* positions
+        GLfloat* positions,
+        GLfloat* colors
       );
 
     protected:
