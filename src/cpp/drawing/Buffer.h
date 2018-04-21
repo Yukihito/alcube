@@ -1,8 +1,6 @@
-#define GL_GLEXT_PROTOTYPES
 #ifndef ALCUBE_BUFFER_H
 #define ALCUBE_BUFFER_H
 #include <GL/glew.h>
-#include <cstddef>
 
 namespace alcube::drawing {
   class Buffer {
