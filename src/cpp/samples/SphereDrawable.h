@@ -15,6 +15,10 @@ namespace alcube::samples {
         glm::vec3 diffuse,
         unsigned int maxInstanceCount,
         GLfloat* positions,
+        GLfloat* rotations0,
+        GLfloat* rotations1,
+        GLfloat* rotations2,
+        GLfloat* rotations3,
         GLfloat* colors
       );
   };

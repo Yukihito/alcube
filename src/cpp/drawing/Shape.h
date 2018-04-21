@@ -13,7 +13,10 @@ namespace alcube::drawing {
 
   enum InstanceBufferType {
     POSITIONS = 0,
-    ROTATIONS = 0,
+    ROTATIONS_0,
+    ROTATIONS_1,
+    ROTATIONS_2,
+    ROTATIONS_3,
     COLORS
   };
 
@@ -24,7 +27,7 @@ namespace alcube::drawing {
       unsigned int instanceCount = 0;
       IndexBuffer* indexBuffer;
       VertexBuffer* vertexBuffers[3];
-      InstanceBuffer* instanceBuffers[3];
+      InstanceBuffer* instanceBuffers[6];
       void update();
   };
 }

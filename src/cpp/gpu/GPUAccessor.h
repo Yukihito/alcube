@@ -332,7 +332,10 @@ namespace alcube::gpu {
       memories::UintMemory gridStartIndices;
       memories::UintMemory gridEndIndices;
       memories::Float3Memory positions;
-      memories::Float16Memory rotations;
+      memories::Float4Memory rotations0;
+      memories::Float4Memory rotations1;
+      memories::Float4Memory rotations2;
+      memories::Float4Memory rotations3;
       memories::Float3Memory colors;
   };
 
@@ -355,7 +358,10 @@ namespace alcube::gpu {
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
       cl_float3* positions;
-      cl_float16* rotations;
+      cl_float4* rotations0;
+      cl_float4* rotations1;
+      cl_float4* rotations2;
+      cl_float4* rotations3;
       cl_float3* colors;
   };
 
@@ -383,9 +389,9 @@ namespace alcube::gpu {
       cl_kernel updateByFrictionalImpulse;
       cl_kernel initStepVariables;
       cl_kernel updateByPenaltyImpulse;
-      cl_kernel updateDrawingBuffer;
-      cl_kernel updateDrawingBuffer_linearMomentumToColor;
-      cl_kernel updateDrawingBuffer_rotation;
+      cl_kernel updateDrawingBuffer_SingleColor;
+      cl_kernel updateDrawingBuffer_InstanceColor;
+      cl_kernel updateDrawingBuffer_Texture_SingleColor;
   };
 
   class Kernels {
@@ -414,9 +420,9 @@ namespace alcube::gpu {
       void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys);
       void initStepVariables(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
       void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys, memories::Constants& constants);
-      void updateDrawingBuffer(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
-      void updateDrawingBuffer_linearMomentumToColor(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::PhysicalQuantity& physicalQuantities);
-      void updateDrawingBuffer_rotation(unsigned int workSize, memories::Float3Memory& positions, memories::Float16Memory& rotations, memories::PhysicalQuantity& physicalQuantities);
+      void updateDrawingBuffer_SingleColor(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
+      void updateDrawingBuffer_InstanceColor(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::PhysicalQuantity& physicalQuantities);
+      void updateDrawingBuffer_Texture_SingleColor(unsigned int workSize, memories::Float3Memory& positions, memories::Float4Memory& rotations0, memories::Float4Memory& rotations1, memories::Float4Memory& rotations2, memories::Float4Memory& rotations3, memories::PhysicalQuantity& physicalQuantities);
   };
 
   class GPUAccessor {

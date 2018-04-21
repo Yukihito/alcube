@@ -13,6 +13,10 @@ namespace alcube::drawing::shapes::triangles {
         size_t splitCount,
         unsigned int maxInstanceCount,
         GLfloat* positions,
+        GLfloat* rotations0,
+        GLfloat* rotations1,
+        GLfloat* rotations2,
+        GLfloat* rotations3,
         GLfloat* colors
       );
 

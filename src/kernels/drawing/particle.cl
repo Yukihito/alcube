@@ -1,4 +1,4 @@
-__kernel void updateDrawingBuffer(
+__kernel void updateDrawingBuffer_SingleColor(
   __global float3* positions,
   __global PhysicalQuantity* physicalQuantities
 ) {
@@ -6,7 +6,7 @@ __kernel void updateDrawingBuffer(
   positions[i] = physicalQuantities[i].position;
 }
 
-__kernel void updateDrawingBuffer_linearMomentumToColor(
+__kernel void updateDrawingBuffer_InstanceColor(
   __global float3* positions,
   __global float3* colors,
   __global PhysicalQuantity* physicalQuantities
@@ -16,9 +16,12 @@ __kernel void updateDrawingBuffer_linearMomentumToColor(
   colors[i] = fabs(physicalQuantities[i].linearMomentum);
 }
 
-__kernel void updateDrawingBuffer_rotation(
+__kernel void updateDrawingBuffer_Texture_SingleColor(
   __global float3* positions,
-  __global float16* rotations,
+  __global float4* rotations0,
+  __global float4* rotations1,
+  __global float4* rotations2,
+  __global float4* rotations3,
   __global PhysicalQuantity* physicalQuantities
 ) {
   size_t i = get_global_id(0);
@@ -28,10 +31,9 @@ __kernel void updateDrawingBuffer_rotation(
   float y = r->y;
   float z = r->z;
   float w = r->w;
-  rotations[i] = (float16)(
-    1.0f - 2.0f * (y*y + z*z), 2.0f * (x*y + w*z), 2.0f * (x*z - w*y), 0.0f,
-    2.0f * (x*y - w*z), 1.0f - 2.0f * (x*x + z*z), 2.0f * (y*z + w*x), 0.0f,
-    2.0f * (x*z + w*y), 2.0f * (y*z - w*x), 1.0f - 2.0f * (x*x + y*y), 0.0f,
-    0.0f, 0.0f, 0.0f, 1.0f
-  );
+
+  rotations0[i] = (float4)(1.0f - 2.0f * (y*y + z*z), 2.0f * (x*y + w*z), 2.0f * (x*z - w*y), 0.0f);
+  rotations1[i] = (float4)(2.0f * (x*y - w*z), 1.0f - 2.0f * (x*x + z*z), 2.0f * (y*z + w*x), 0.0f);
+  rotations2[i] = (float4)(2.0f * (x*z + w*y), 2.0f * (y*z - w*x), 1.0f - 2.0f * (x*x + y*y), 0.0f);
+  rotations3[i] = (float4)(0.0f, 0.0f, 0.0f, 1.0f);
 }

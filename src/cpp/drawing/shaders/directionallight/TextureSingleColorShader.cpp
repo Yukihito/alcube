@@ -17,7 +17,11 @@ namespace alcube::drawing::shaders::directionallight {
     compile(vertexShaderCode, fragmentShaderCode);
     vertexAttributes.push_back(new VertexAttribute(VERTICES, 0));
     vertexAttributes.push_back(new VertexAttribute(NORMALS, 1));
-    vertexAttributes.push_back(new VertexAttribute(UVS, 3));
     instanceAttributes.push_back(new InstanceAttribute(POSITIONS, 2));
+    instanceAttributes.push_back(new InstanceAttribute(ROTATIONS_0, 4));
+    instanceAttributes.push_back(new InstanceAttribute(ROTATIONS_1, 5));
+    instanceAttributes.push_back(new InstanceAttribute(ROTATIONS_2, 6));
+    instanceAttributes.push_back(new InstanceAttribute(ROTATIONS_3, 7));
+    vertexAttributes.push_back(new VertexAttribute(UVS, 3));
   }
 }

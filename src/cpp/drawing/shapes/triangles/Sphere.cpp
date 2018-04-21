@@ -9,6 +9,10 @@ namespace alcube::drawing::shapes::triangles {
     size_t splitCount,
     unsigned int maxInstanceCount,
     GLfloat* positions,
+    GLfloat* rotations0,
+    GLfloat* rotations1,
+    GLfloat* rotations2,
+    GLfloat* rotations3,
     GLfloat* colors
   ) : Shape() {
     this->instanceCount = 0;
@@ -58,6 +62,10 @@ namespace alcube::drawing::shapes::triangles {
     vertexBuffers[NORMALS] = new VertexBuffer(3, verticesLength, normals, false);
     vertexBuffers[UVS] = new VertexBuffer(2, verticesLength, uvs, false);
     instanceBuffers[POSITIONS] = new InstanceBuffer(4, maxInstanceCount, positions, true);
+    instanceBuffers[ROTATIONS_0] = new InstanceBuffer(4, maxInstanceCount, rotations0, true);
+    instanceBuffers[ROTATIONS_1] = new InstanceBuffer(4, maxInstanceCount, rotations1, true);
+    instanceBuffers[ROTATIONS_2] = new InstanceBuffer(4, maxInstanceCount, rotations2, true);
+    instanceBuffers[ROTATIONS_3] = new InstanceBuffer(4, maxInstanceCount, rotations3, true);
     instanceBuffers[COLORS] = new InstanceBuffer(4, maxInstanceCount, colors, true);
 
     indexBuffer->update();

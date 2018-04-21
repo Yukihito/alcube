@@ -63,6 +63,10 @@ namespace alcube::samples {
         color,
         settings->world.maxActorCount,
         (GLfloat*)gpuAccessor->memories.positions.dto,
+        (GLfloat*)gpuAccessor->memories.rotations0.dto,
+        (GLfloat*)gpuAccessor->memories.rotations1.dto,
+        (GLfloat*)gpuAccessor->memories.rotations2.dto,
+        (GLfloat*)gpuAccessor->memories.rotations3.dto,
         (GLfloat*)gpuAccessor->memories.colors.dto
       );
       drawable->texture = new drawing::textures::CheckTexture(128, 128);
@@ -70,6 +74,10 @@ namespace alcube::samples {
       drawer->add(drawable);
       physicsSimulator->input();
       gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
+      gpuAccessor->memories.rotations0.setCount(physicsSimulator->actorCount);
+      gpuAccessor->memories.rotations1.setCount(physicsSimulator->actorCount);
+      gpuAccessor->memories.rotations2.setCount(physicsSimulator->actorCount);
+      gpuAccessor->memories.rotations3.setCount(physicsSimulator->actorCount);
       gpuAccessor->memories.colors.setCount(physicsSimulator->actorCount);
       atexit(atexitCallback);
       std::thread(updateLoopCallback).detach();
@@ -183,6 +191,14 @@ namespace alcube::samples {
     profiler->start(profilers.updateDrawable);
     gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
     gpuAccessor->memories.positions.read();
+    gpuAccessor->memories.rotations0.setCount(physicsSimulator->actorCount);
+    gpuAccessor->memories.rotations0.read();
+    gpuAccessor->memories.rotations1.setCount(physicsSimulator->actorCount);
+    gpuAccessor->memories.rotations1.read();
+    gpuAccessor->memories.rotations2.setCount(physicsSimulator->actorCount);
+    gpuAccessor->memories.rotations2.read();
+    gpuAccessor->memories.rotations3.setCount(physicsSimulator->actorCount);
+    gpuAccessor->memories.rotations3.read();
     gpuAccessor->memories.colors.setCount(physicsSimulator->actorCount);
     gpuAccessor->memories.colors.read();
     profiler->stop(profilers.updateDrawable);
@@ -192,10 +208,13 @@ namespace alcube::samples {
   void Application::onUpdate() {
     profiler->start(profilers.update);
     physicsSimulator->update();
-    gpuAccessor->kernels.updateDrawingBuffer_linearMomentumToColor(
+    gpuAccessor->kernels.updateDrawingBuffer_Texture_SingleColor(
       physicsSimulator->actorCount,
       gpuAccessor->memories.positions,
-      gpuAccessor->memories.colors,
+      gpuAccessor->memories.rotations0,
+      gpuAccessor->memories.rotations1,
+      gpuAccessor->memories.rotations2,
+      gpuAccessor->memories.rotations3,
       gpuAccessor->memories.physicalQuantities
     );
     clFinish(resourcesProvider->queue->queue);
