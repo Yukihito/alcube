@@ -59,12 +59,13 @@ namespace alcube::samples {
       initServices();
       glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
       auto drawable = new SphereDrawable(
-        shaders->directionalLight.instanceColor,
+        shaders->directionalLight.textureSingleColor,
         color,
         settings->world.maxActorCount,
         (GLfloat*)gpuAccessor->memories.positions.dto,
         (GLfloat*)gpuAccessor->memories.colors.dto
       );
+      drawable->texture = new drawing::textures::CheckTexture(128, 128);
       drawable->shape->instanceCount = cube->getActorCount();
       drawer->add(drawable);
       physicsSimulator->input();

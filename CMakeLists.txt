@@ -43,7 +43,7 @@ set(ALCUBE_DRAWING_SOURCE_FILES
         src/cpp/drawing/shaders/Shaders.cpp src/cpp/drawing/shaders/Shaders.h
         src/cpp/drawing/shaders/directionallight/SingleColorShader.cpp src/cpp/drawing/shaders/directionallight/SingleColorShader.h
         src/cpp/drawing/shapes/triangles/Sphere.cpp src/cpp/drawing/shapes/triangles/Sphere.h
-        src/cpp/drawing/shaders/directionallight/InstanceColorShader.cpp src/cpp/drawing/shaders/directionallight/InstanceColorShader.h src/cpp/drawing/Texture.cpp src/cpp/drawing/Texture.h src/cpp/drawing/textures/CheckTexture.cpp src/cpp/drawing/textures/CheckTexture.h)
+        src/cpp/drawing/shaders/directionallight/InstanceColorShader.cpp src/cpp/drawing/shaders/directionallight/InstanceColorShader.h src/cpp/drawing/Texture.cpp src/cpp/drawing/Texture.h src/cpp/drawing/textures/CheckTexture.cpp src/cpp/drawing/textures/CheckTexture.h src/cpp/drawing/shaders/directionallight/TextureSingleColorShader.cpp src/cpp/drawing/shaders/directionallight/TextureSingleColorShader.h)
 add_library(alcube_drawing_lib STATIC ${ALCUBE_DRAWING_SOURCE_FILES})
 target_link_libraries(alcube_drawing_lib
         alcube_utils_lib

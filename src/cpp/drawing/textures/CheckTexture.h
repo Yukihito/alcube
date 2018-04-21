@@ -6,6 +6,7 @@
 
 namespace alcube::drawing::textures {
   class CheckTexture : public Texture {
+    public:
       explicit CheckTexture(unsigned int width, unsigned int height);
   };
 }

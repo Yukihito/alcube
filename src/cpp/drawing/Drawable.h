@@ -5,6 +5,7 @@
 #include "Shape.h"
 #include "Shader.h"
 #include "Context.h"
+#include "Texture.h"
 
 namespace alcube::drawing {
   class Drawable {
@@ -12,6 +13,7 @@ namespace alcube::drawing {
       void draw(Context& context);
       Shape* shape = nullptr;
       Shader* shader = nullptr;
+      Texture* texture = nullptr;
     protected:
       Material material;
   };

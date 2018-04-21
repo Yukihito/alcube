@@ -183,6 +183,10 @@ dto-instances:
     type: float3
     length: maxActorCount
 
+  - name: rotations
+    type: float16
+    length: maxActorCount
+
   - name: colors
     type: float3
     length: maxActorCount

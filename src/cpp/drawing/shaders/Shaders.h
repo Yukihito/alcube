@@ -7,11 +7,13 @@
 #include "TileShader.h"
 #include "directionallight/SingleColorShader.h"
 #include "directionallight/InstanceColorShader.h"
+#include "directionallight/TextureSingleColorShader.h"
 
 namespace alcube::drawing::shaders {
   struct DirectionalLight {
     directionallight::SingleColorShader singleColor;
     directionallight::InstanceColorShader instanceColor;
+    directionallight::TextureSingleColorShader textureSingleColor;
     explicit DirectionalLight(utils::FileUtil* fileUtil, Context& context);
   };
   class Shaders {

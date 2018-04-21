@@ -7,6 +7,7 @@
 #include "../utils/Profiler.h"
 #include "../physics/Simulator.h"
 #include "../drawing/DrawerWithProfiler.h"
+#include "../drawing/textures/CheckTexture.h"
 #include "../physics/fluid/Simulator.h"
 #include "../physics/softbody/Simulator.h"
 #include "../models/Alcube.h"

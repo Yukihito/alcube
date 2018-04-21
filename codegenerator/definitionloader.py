@@ -163,7 +163,8 @@ class Definition:
             TypeDefinition('float', 'float', 4, is_struct=False),
             TypeDefinition('double', 'double', 8, is_struct=False),
             TypeDefinition('float3', 'cl_float3', 4 * 3, is_struct=False),
-            TypeDefinition('float4', 'cl_float4', 4 * 4, is_struct=False)
+            TypeDefinition('float4', 'cl_float4', 4 * 4, is_struct=False),
+            TypeDefinition('float16', 'cl_float16', 4 * 4 * 4, is_struct=False)
         }
 
         defined_type_definitions_map = dict()

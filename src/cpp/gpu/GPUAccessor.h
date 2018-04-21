@@ -192,6 +192,18 @@ namespace alcube::gpu {
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
+    class Float16Memory {
+      public:
+        utils::opencl::Memory* memory;
+        cl_float16* dto;
+        cl_float16* at(int i);
+        void write();
+        void read();
+        void zeroFill();
+        void setCount(size_t count);
+        utils::opencl::ResourcesProvider* resourcesProvider;
+    };
+
     class Float3Memory {
       public:
         utils::opencl::Memory* memory;
@@ -320,6 +332,7 @@ namespace alcube::gpu {
       memories::UintMemory gridStartIndices;
       memories::UintMemory gridEndIndices;
       memories::Float3Memory positions;
+      memories::Float16Memory rotations;
       memories::Float3Memory colors;
   };
 
@@ -342,6 +355,7 @@ namespace alcube::gpu {
       unsigned int* gridStartIndices;
       unsigned int* gridEndIndices;
       cl_float3* positions;
+      cl_float16* rotations;
       cl_float3* colors;
   };
 
@@ -371,6 +385,7 @@ namespace alcube::gpu {
       cl_kernel updateByPenaltyImpulse;
       cl_kernel updateDrawingBuffer;
       cl_kernel updateDrawingBuffer_linearMomentumToColor;
+      cl_kernel updateDrawingBuffer_rotation;
   };
 
   class Kernels {
@@ -401,6 +416,7 @@ namespace alcube::gpu {
       void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys, memories::Constants& constants);
       void updateDrawingBuffer(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
       void updateDrawingBuffer_linearMomentumToColor(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::PhysicalQuantity& physicalQuantities);
+      void updateDrawingBuffer_rotation(unsigned int workSize, memories::Float3Memory& positions, memories::Float16Memory& rotations, memories::PhysicalQuantity& physicalQuantities);
   };
 
   class GPUAccessor {
