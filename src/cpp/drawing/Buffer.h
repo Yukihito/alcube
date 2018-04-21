@@ -15,18 +15,21 @@ namespace alcube::drawing {
         unsigned int elementCountParVertex,
         void* data
       );
-      GLuint bufferId;
-      void* data;
-      unsigned int length;
-      unsigned int elementCountParVertex;
       virtual void disable();
-      bool isDynamic;
       void update();
+      void setLength(unsigned int length);
+      bool shouldUpdateDynamically();
 
     protected:
-      size_t elementSize;
-    protected:
+      GLuint bufferId;
       GLenum target;
+      unsigned int elementCountParVertex;
+
+    private:
+      bool isDynamic;
+      void* data;
+      size_t elementSize;
+      unsigned int length;
   };
 
 

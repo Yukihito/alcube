@@ -12,18 +12,18 @@ namespace alcube::drawing {
   }
 
   void Shape::update() {
-    if (indexBuffer != nullptr && indexBuffer->isDynamic) {
+    if (indexBuffer != nullptr && indexBuffer->shouldUpdateDynamically()) {
       indexBuffer->update();
     }
 
     for (auto &vertexBuffer : vertexBuffers) {
-      if (vertexBuffer != nullptr && vertexBuffer->isDynamic) {
+      if (vertexBuffer != nullptr && vertexBuffer->shouldUpdateDynamically()) {
         vertexBuffer->update();
       }
     }
     for (auto &instanceBuffer : instanceBuffers) {
-      if (instanceBuffer != nullptr && instanceBuffer->isDynamic) {
-        instanceBuffer->length = instanceCount;
+      if (instanceBuffer != nullptr && instanceBuffer->shouldUpdateDynamically()) {
+        instanceBuffer->setLength(instanceCount);
         instanceBuffer->update();
       }
     }

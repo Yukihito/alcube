@@ -29,6 +29,14 @@ namespace alcube::drawing {
     glBindBuffer(target, 0);
   }
 
+  void Buffer::setLength(unsigned int length) {
+    this->length = length;
+  }
+
+  bool Buffer::shouldUpdateDynamically() {
+    return data != nullptr && isDynamic;
+  }
+
   void Buffer::disable() {
     glBindBuffer(target, 0);
   }
