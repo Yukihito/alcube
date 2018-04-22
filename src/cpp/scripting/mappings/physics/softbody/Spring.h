@@ -10,7 +10,6 @@ namespace alcube::scripting::mappings::physics::softbody {
   class SpringFactory  : public utils::SingletonPrototype<models::physics::softbody::SpringFactory> {
     public:
       DEFACCESSOR(models::physics::softbody::SpringFactory, float, K);
-      //explicit SpringFactory(models::physics::softbody::SpringFactory* underlying);
       void init() override;
       static void create(const v8::FunctionCallbackInfo<v8::Value>& info);
   };
