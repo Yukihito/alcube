@@ -1,9 +1,9 @@
 #include "SphereDrawable.h"
 
-namespace alcube::samples {
+namespace alcube::models::drawing {
   SphereDrawable::SphereDrawable(
-    drawing::Shader &shader,
-    glm::vec3 diffuse,
+    alcube::drawing::Shader &shader,
+    alcube::drawing::Material material,
     unsigned int maxInstanceCount,
     GLfloat* positions,
     GLfloat* rotations0,
@@ -12,7 +12,7 @@ namespace alcube::samples {
     GLfloat* rotations3,
     GLfloat* colors
   ) {
-    shape = new drawing::shapes::triangles::Sphere(
+    shape = new alcube::drawing::shapes::triangles::Sphere(
       8,
       maxInstanceCount,
       positions,
@@ -23,8 +23,11 @@ namespace alcube::samples {
       colors
     );
     this->shader = &shader;
+    this->material = material;
+    /*
     material.diffuse = diffuse;
     material.ambient = diffuse / 2.0f;
     material.specular = glm::vec3(0.1f, 0.1f, 0.1f);
+     */
   }
 }

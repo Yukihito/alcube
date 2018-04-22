@@ -58,6 +58,11 @@ typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
   float3 angularMomentum;
 } PhysicalQuantity;
 
+typedef struct __attribute__ ((packed)) RendererStruct {
+  int refersToRotations;
+  uint instanceColorType;
+} Renderer;
+
 typedef struct __attribute__ ((packed)) SoftBodyStruct {
   float elasticity;
   uint springIndices[16];

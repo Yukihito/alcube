@@ -120,6 +120,18 @@ namespace alcube::gpu {
         utils::opencl::ResourcesProvider* resourcesProvider;
     };
 
+    class Renderer {
+      public:
+        utils::opencl::Memory* memory;
+        dtos::Renderer* dto;
+        dtos::Renderer* at(int i);
+        void write();
+        void read();
+        void zeroFill();
+        void setCount(size_t count);
+        utils::opencl::ResourcesProvider* resourcesProvider;
+    };
+
     class SoftBody {
       public:
         utils::opencl::Memory* memory;
@@ -337,6 +349,8 @@ namespace alcube::gpu {
       memories::Float4Memory rotations2;
       memories::Float4Memory rotations3;
       memories::Float3Memory colors;
+      memories::Renderer hostRenderers;
+      memories::Renderer renderers;
   };
 
   class Dtos {
@@ -363,6 +377,8 @@ namespace alcube::gpu {
       cl_float4* rotations2;
       cl_float4* rotations3;
       cl_float3* colors;
+      dtos::Renderer* hostRenderers;
+      dtos::Renderer* renderers;
   };
 
   class RawKernels {

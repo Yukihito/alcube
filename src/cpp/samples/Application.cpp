@@ -59,9 +59,13 @@ namespace alcube::samples {
       initServices();
       //glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
       glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
-      auto drawable = new SphereDrawable(
+      drawing::Material material;
+      material.diffuse = color;
+      material.ambient = color / 2.0f;
+      material.specular = glm::vec3(0.1f, 0.1f, 0.1f);
+      auto drawable = new models::drawing::SphereDrawable(
         shaders->directionalLight.instanceColor,
-        color,
+        material,
         settings->world.maxActorCount,
         (GLfloat*)gpuAccessor->memories.positions.dto,
         (GLfloat*)gpuAccessor->memories.rotations0.dto,

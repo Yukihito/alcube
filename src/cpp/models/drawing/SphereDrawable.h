@@ -2,17 +2,17 @@
 #define ALCUBE_SAMPLES_SPHEREDRAWABLES_H
 
 #include <glm/vec3.hpp>
-#include "../gpu/GPUAccessor.h"
-#include "../drawing/shaders/Shaders.h"
-#include "../drawing/Drawable.h"
-#include "../drawing/shapes/triangles/Sphere.h"
+#include "../../gpu/GPUAccessor.h"
+#include "../../drawing/shaders/Shaders.h"
+#include "../../drawing/Drawable.h"
+#include "../../drawing/shapes/triangles/Sphere.h"
 
-namespace alcube::samples {
-  class SphereDrawable : public drawing::Drawable {
+namespace alcube::models::drawing {
+  class SphereDrawable : public alcube::drawing::Drawable {
     public:
       SphereDrawable(
-        drawing::Shader &shader,
-        glm::vec3 diffuse,
+        alcube::drawing::Shader &shader,
+        alcube::drawing::Material material,
         unsigned int maxInstanceCount,
         GLfloat* positions,
         GLfloat* rotations0,

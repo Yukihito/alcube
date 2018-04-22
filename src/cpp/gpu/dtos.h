@@ -85,6 +85,14 @@ namespace alcube::gpu::dtos {
 #pragma pack(pop)
 
 #pragma pack(push, 1)
+  class Renderer {
+    public:
+      int refersToRotations;
+      unsigned int instanceColorType;
+  };
+#pragma pack(pop)
+
+#pragma pack(push, 1)
   class SoftBody {
     public:
       float elasticity;

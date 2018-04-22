@@ -104,6 +104,10 @@ dto-structs:
     - uint   gridIndex
     - ushort actorIndex
 
+  Renderer:
+    - int refersToRotations
+    - uint instanceColorType
+
 dto-instances:
   # Constants
   - name: grid
@@ -203,4 +207,12 @@ dto-instances:
     type: float3
     length: maxActorCount
 
+  - name: hostRenderers
+    type: Renderer
+    length: maxActorCount
+    host-ptr: true
+
+  - name: renderers
+    type: Renderer
+    length: maxActorCount
 

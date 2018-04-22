@@ -13,7 +13,7 @@
 #include "../models/Alcube.h"
 #include "../scripting/Evaluator.h"
 #include "../models/Settings.h"
-#include "SphereDrawable.h"
+#include "../models/drawing/SphereDrawable.h"
 
 namespace alcube::samples {
   class Profilers {
