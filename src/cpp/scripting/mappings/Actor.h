@@ -18,7 +18,6 @@ namespace alcube::scripting::mappings {
 
   class ActorFactory : public utils::SingletonPrototype<models::ActorFactory>  {
     public:
-      //explicit ActorFactory(models::ActorFactory* underlying);
       void init() override;
       static void create(const v8::FunctionCallbackInfo<v8::Value>&);
   };
