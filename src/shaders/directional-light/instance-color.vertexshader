@@ -7,7 +7,7 @@ layout(location = 3) in vec4 instanceColor;
 
 out vec3 eyeDirection_camera;
 out vec3 normal_camera;
-out vec3 diffuse;
+out vec3 vertexColor;
 
 uniform mat4 VP;
 uniform mat4 V;
@@ -18,5 +18,5 @@ void main() {
   vec3 vertexPosition_camera = (V * vec4(vertexPosition_model, 1.0f)).xyz;
   eyeDirection_camera = -vertexPosition_camera;
   normal_camera = (V * vec4(vertexNormal_model, 0)).xyz;
-  diffuse = instanceColor.xyz;
+  vertexColor = instanceColor.xyz;
 }

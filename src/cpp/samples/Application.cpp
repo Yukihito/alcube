@@ -57,9 +57,10 @@ namespace alcube::samples {
       loadBasicLibraries();
       loadSettings();
       initServices();
-      glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
+      //glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
+      glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
       auto drawable = new SphereDrawable(
-        shaders->directionalLight.textureSingleColor,
+        shaders->directionalLight.instanceColor,
         color,
         settings->world.maxActorCount,
         (GLfloat*)gpuAccessor->memories.positions.dto,
@@ -208,6 +209,7 @@ namespace alcube::samples {
   void Application::onUpdate() {
     profiler->start(profilers.update);
     physicsSimulator->update();
+    /*
     gpuAccessor->kernels.updateDrawingBuffer_Texture_SingleColor(
       physicsSimulator->actorCount,
       gpuAccessor->memories.positions,
@@ -215,6 +217,13 @@ namespace alcube::samples {
       gpuAccessor->memories.rotations1,
       gpuAccessor->memories.rotations2,
       gpuAccessor->memories.rotations3,
+      gpuAccessor->memories.physicalQuantities
+    );
+     */
+    gpuAccessor->kernels.updateDrawingBuffer_InstanceColor(
+      physicsSimulator->actorCount,
+      gpuAccessor->memories.positions,
+      gpuAccessor->memories.colors,
       gpuAccessor->memories.physicalQuantities
     );
     clFinish(resourcesProvider->queue->queue);

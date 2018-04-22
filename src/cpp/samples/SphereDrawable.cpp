@@ -25,6 +25,6 @@ namespace alcube::samples {
     this->shader = &shader;
     material.diffuse = diffuse;
     material.ambient = diffuse / 2.0f;
-    material.specular = glm::vec3(0.3f, 0.3f, 0.3f);
+    material.specular = glm::vec3(0.1f, 0.1f, 0.1f);
   }
 }

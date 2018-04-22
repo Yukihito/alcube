@@ -26,5 +26,5 @@ void main() {
     float specularIntensity = max(dot(h, n), 0.0f);
     spec = specular * pow(specularIntensity, shininess);
   }
-  color = max(intensity *  diffuse * textureColor + spec, ambient * textureColor);
+  color = max(intensity * diffuse * textureColor + spec, ambient * textureColor);
 }
