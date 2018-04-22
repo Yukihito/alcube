@@ -820,6 +820,40 @@ namespace alcube::gpu {
     });
   }
 
+  void Kernels::inputRenderers(
+    unsigned int workSize,
+    memories::Renderer& hostRenderers,
+    memories::Renderer& renderers
+  ) {
+    queue->push(rawKernels.inputRenderers, {workSize}, {
+      memArg(hostRenderers.memory),
+      memArg(renderers.memory)
+    });
+  }
+
+  void Kernels::updateDrawingBuffer(
+    unsigned int workSize,
+    memories::Float3Memory& positions,
+    memories::Float3Memory& colors,
+    memories::Float4Memory& rotations0,
+    memories::Float4Memory& rotations1,
+    memories::Float4Memory& rotations2,
+    memories::Float4Memory& rotations3,
+    memories::PhysicalQuantity& physicalQuantities,
+    memories::Renderer& renderers
+  ) {
+    queue->push(rawKernels.updateDrawingBuffer, {workSize}, {
+      memArg(positions.memory),
+      memArg(colors.memory),
+      memArg(rotations0.memory),
+      memArg(rotations1.memory),
+      memArg(rotations2.memory),
+      memArg(rotations3.memory),
+      memArg(physicalQuantities.memory),
+      memArg(renderers.memory)
+    });
+  }
+
   void Kernels::updateDrawingBuffer_SingleColor(
     unsigned int workSize,
     memories::Float3Memory& positions,
@@ -896,6 +930,8 @@ namespace alcube::gpu {
     kernels.rawKernels.updateByFrictionalImpulse = resourcesProvider->kernelFactory->create(program, "updateByFrictionalImpulse");
     kernels.rawKernels.initStepVariables = resourcesProvider->kernelFactory->create(program, "initStepVariables");
     kernels.rawKernels.updateByPenaltyImpulse = resourcesProvider->kernelFactory->create(program, "updateByPenaltyImpulse");
+    kernels.rawKernels.inputRenderers = resourcesProvider->kernelFactory->create(program, "inputRenderers");
+    kernels.rawKernels.updateDrawingBuffer = resourcesProvider->kernelFactory->create(program, "updateDrawingBuffer");
     kernels.rawKernels.updateDrawingBuffer_SingleColor = resourcesProvider->kernelFactory->create(program, "updateDrawingBuffer_SingleColor");
     kernels.rawKernels.updateDrawingBuffer_InstanceColor = resourcesProvider->kernelFactory->create(program, "updateDrawingBuffer_InstanceColor");
     kernels.rawKernels.updateDrawingBuffer_Texture_SingleColor = resourcesProvider->kernelFactory->create(program, "updateDrawingBuffer_Texture_SingleColor");

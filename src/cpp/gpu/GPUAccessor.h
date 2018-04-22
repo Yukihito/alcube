@@ -405,6 +405,8 @@ namespace alcube::gpu {
       cl_kernel updateByFrictionalImpulse;
       cl_kernel initStepVariables;
       cl_kernel updateByPenaltyImpulse;
+      cl_kernel inputRenderers;
+      cl_kernel updateDrawingBuffer;
       cl_kernel updateDrawingBuffer_SingleColor;
       cl_kernel updateDrawingBuffer_InstanceColor;
       cl_kernel updateDrawingBuffer_Texture_SingleColor;
@@ -436,6 +438,8 @@ namespace alcube::gpu {
       void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys);
       void initStepVariables(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
       void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys, memories::Constants& constants);
+      void inputRenderers(unsigned int workSize, memories::Renderer& hostRenderers, memories::Renderer& renderers);
+      void updateDrawingBuffer(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::Float4Memory& rotations0, memories::Float4Memory& rotations1, memories::Float4Memory& rotations2, memories::Float4Memory& rotations3, memories::PhysicalQuantity& physicalQuantities, memories::Renderer& renderers);
       void updateDrawingBuffer_SingleColor(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
       void updateDrawingBuffer_InstanceColor(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::PhysicalQuantity& physicalQuantities);
       void updateDrawingBuffer_Texture_SingleColor(unsigned int workSize, memories::Float3Memory& positions, memories::Float4Memory& rotations0, memories::Float4Memory& rotations1, memories::Float4Memory& rotations2, memories::Float4Memory& rotations3, memories::PhysicalQuantity& physicalQuantities);

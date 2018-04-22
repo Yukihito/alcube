@@ -61,6 +61,7 @@ typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
 typedef struct __attribute__ ((packed)) RendererStruct {
   int refersToRotations;
   uint instanceColorType;
+  float3 instanceColor;
 } Renderer;
 
 typedef struct __attribute__ ((packed)) SoftBodyStruct {

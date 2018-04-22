@@ -107,6 +107,7 @@ dto-structs:
   Renderer:
     - int refersToRotations
     - uint instanceColorType
+    - float3 instanceColor
 
 dto-instances:
   # Constants
