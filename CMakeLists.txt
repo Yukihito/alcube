@@ -70,6 +70,7 @@ set(ALCUBE_ALCUBE_SOURCE_FILES
         src/cpp/models/Actor.cpp src/cpp/models/Actor.h
         src/cpp/models/physics/Accessors.cpp src/cpp/models/physics/Accessors.h
         src/cpp/models/physics/Features.cpp src/cpp/models/physics/Features.h
+        src/cpp/models/drawing/SphereDrawable.cpp src/cpp/models/drawing/SphereDrawable.h
         src/cpp/models/Alcube.cpp src/cpp/models/Alcube.h src/cpp/models/physics/fluid/Features.cpp src/cpp/models/physics/fluid/Features.h src/cpp/models/physics/softbody/Features.cpp src/cpp/models/physics/softbody/Features.h src/cpp/models/physics/softbody/Spring.cpp src/cpp/models/physics/softbody/Spring.h src/cpp/models/Settings.cpp src/cpp/models/Settings.h src/cpp/models/drawing/Renderer.cpp src/cpp/models/drawing/Renderer.h)
 add_library(alcube_models_lib STATIC ${ALCUBE_ALCUBE_SOURCE_FILES})
 target_link_libraries(alcube_models_lib
@@ -138,8 +139,7 @@ set(ALCUBE_SCRIPTING_SOURCE_FILES
         src/cpp/scripting/mappings/physics/softbody/Features.cpp src/cpp/scripting/mappings/physics/softbody/Features.h
         src/cpp/scripting/mappings/Alcube.cpp src/cpp/scripting/mappings/Alcube.h
         src/cpp/scripting/mappings/Settings.cpp src/cpp/scripting/mappings/Settings.h
-        src/cpp/models/drawing/SphereDrawable.cpp src/cpp/models/drawing/SphereDrawable.h
-        )
+        src/cpp/scripting/mappings/drawing/Renderer.cpp src/cpp/scripting/mappings/drawing/Renderer.h)
 add_library(alcube_scripting_lib STATIC ${ALCUBE_SCRIPTING_SOURCE_FILES})
 target_link_libraries(alcube_scripting_lib
         ${EXTRA_LIBS}

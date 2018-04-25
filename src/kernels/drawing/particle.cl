@@ -1,9 +1,12 @@
 __kernel void inputRenderers(
   __global const Renderer* hostRenderers,
-  __global Renderer* renderers
+  __global Renderer* renderers,
+  __global const float3* hostColors,
+  __global float3* colors
 ) {
   size_t i = get_global_id(0);
   renderers[i] = hostRenderers[i];
+  colors[i] = hostColors[i];
 }
 
 __kernel void updateDrawingBuffer(

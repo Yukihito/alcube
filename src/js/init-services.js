@@ -1,4 +1,4 @@
-var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, softbodyFeaturesFactory, springFactory, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
+var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, InstanceColorType, Renderer, RendererFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, Texture, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, rendererFactory, softbodyFeaturesFactory, springFactory, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
 
 vec3 = function(x, y, z) {
   return new THREE.Vector3(parseFloat(x), parseFloat(y), parseFloat(z));
@@ -32,6 +32,18 @@ vec3Zero = vec3(0, 0, 0);
 
 vec3Rand = function() {
   return vec3(rand(), rand(), rand());
+};
+
+Texture = {
+  NONE: 0,
+  CHECK: 1
+};
+
+InstanceColorType = {
+  NONE: 0,
+  MANUAL: 1,
+  RANDOM: 2,
+  LINEAR_MOMENTUM: 3
 };
 
 primitiveAccessor = function(wrapper, name) {
@@ -177,7 +189,8 @@ Actor = class Actor {
     vec3Accessor(this, 'position');
     quatAccessor(this, 'rotation');
     vec3Accessor(this, 'linearMomentum');
-    return vec3Accessor(this, 'angularMomentum');
+    vec3Accessor(this, 'angularMomentum');
+    return vec3Accessor(this, 'color');
   }
 
 };
@@ -192,11 +205,51 @@ ActorFactory = class ActorFactory {
     return this.underlying = constructActorFactory();
   }
 
-  create(features) {
+  create(features, renderer) {
     var actor;
     actor = new Actor;
-    actor.wrap(this.underlying.create(features.underlying));
+    actor.wrap(this.underlying.create(features.underlying, renderer.underlying));
     return actor;
+  }
+
+};
+
+Renderer = class Renderer {
+  constructor() {
+    this.wrap = this.wrap.bind(this);
+    this.setUpResources = this.setUpResources.bind(this);
+  }
+
+  wrap(underlying) {
+    this.underlying = underlying;
+    vec3Accessor(this, 'diffuse');
+    vec3Accessor(this, 'ambient');
+    vec3Accessor(this, 'specular');
+    primitiveAccessor(this, 'texture');
+    return primitiveAccessor(this, 'instanceColorType');
+  }
+
+  setUpResources() {
+    return this.underlying.setUpResources();
+  }
+
+};
+
+RendererFactory = class RendererFactory {
+  constructor() {
+    this.wrap = this.wrap.bind(this);
+    this.create = this.create.bind(this);
+  }
+
+  wrap() {
+    return this.underlying = constructRendererFactory();
+  }
+
+  create() {
+    var renderer;
+    renderer = new Renderer;
+    renderer.wrap(this.underlying.create());
+    return renderer;
   }
 
 };
@@ -237,6 +290,10 @@ actorFactory.wrap();
 springFactory = new SpringFactory();
 
 springFactory.wrap();
+
+rendererFactory = new RendererFactory();
+
+rendererFactory.wrap();
 
 cube = new Alcube();
 

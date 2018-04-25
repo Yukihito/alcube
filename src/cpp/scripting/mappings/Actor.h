@@ -7,13 +7,14 @@
 #include "../../models/physics/fluid/Features.h"
 
 namespace alcube::scripting::mappings {
-  class Actor  : public utils::TypedPrototype<models::Actor> {
+  class Actor : public utils::TypedPrototype<models::Actor> {
     public:
       void init() override;
       DEFACCESSOR(models::Actor, glm::vec3, Position);
       DEFACCESSOR(models::Actor, glm::quat, Rotation);
       DEFACCESSOR(models::Actor, glm::vec3, LinearMomentum);
       DEFACCESSOR(models::Actor, glm::vec3, AngularMomentum);
+      DEFACCESSOR(models::Actor, glm::vec3, Color);
   };
 
   class ActorFactory : public utils::SingletonPrototype<models::ActorFactory>  {

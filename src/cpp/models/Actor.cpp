@@ -3,10 +3,15 @@
 namespace alcube::models {
   using namespace utils::opencl::conversions;
 
-  void Actor::init(int id, alcube::physics::Actor *physicsActor) {
+  void Actor::init(
+    int id,
+    alcube::physics::Actor *physicsActor,
+    models::drawing::InstanceRenderer* instanceRenderer
+  ) {
     this->id = id;
     this->physicsActor = nullptr;
     this->physicsActor = physicsActor;
+    this->instanceRenderer = instanceRenderer;
   }
 
   int Actor::getId() {
@@ -46,15 +51,35 @@ namespace alcube::models {
     physicsActor->physicalQuantity.angularMomentum = toCl(arg);
   }
 
-  ActorFactory::ActorFactory(utils::MemoryPool<Actor> *memoryPool) {
-    this->memoryPool = memoryPool;
+  glm::vec3 Actor::getColor() {
+    return instanceRenderer->getColor();
   }
 
-  Actor* ActorFactory::create(physics::Features *feature) {
+  void Actor::setColor(glm::vec3 arg) {
+    instanceRenderer->setColor(arg);
+  }
+
+  unsigned int Actor::getIndex() {
+    return physicsActor->index;
+  }
+
+  ActorFactory::ActorFactory(
+    utils::MemoryPool<Actor> *memoryPool,
+    drawing::InstanceRendererFactory* instanceRendererFactory
+  ) {
+    this->memoryPool = memoryPool;
+    this->instanceRendererFactory = instanceRendererFactory;
+  }
+
+  Actor* ActorFactory::create(
+    physics::Features *feature,
+    models::drawing::Renderer* renderer
+  ) {
     auto physicsActor = feature->createPhysicsActor();
     auto actor = memoryPool->get();
+    auto instanceRenderer = instanceRendererFactory->create(actor, renderer);
     int nextId = instanceCount;
-    actor->init(nextId, physicsActor);
+    actor->init(nextId, physicsActor, instanceRenderer);
     instanceCount++;
     return actor;
   }

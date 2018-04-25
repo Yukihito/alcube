@@ -107,7 +107,6 @@ dto-structs:
   Renderer:
     - int refersToRotations
     - uint instanceColorType
-    - float3 instanceColor
 
 dto-instances:
   # Constants
@@ -203,6 +202,11 @@ dto-instances:
   - name: rotations3
     type: float4
     length: maxActorCount
+
+  - name: hostColors
+    type: float3
+    length: maxActorCount
+    host-ptr: true
 
   - name: colors
     type: float3

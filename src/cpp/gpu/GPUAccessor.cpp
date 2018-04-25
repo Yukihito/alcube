@@ -823,11 +823,15 @@ namespace alcube::gpu {
   void Kernels::inputRenderers(
     unsigned int workSize,
     memories::Renderer& hostRenderers,
-    memories::Renderer& renderers
+    memories::Renderer& renderers,
+    memories::Float3Memory& hostColors,
+    memories::Float3Memory& colors
   ) {
     queue->push(rawKernels.inputRenderers, {workSize}, {
       memArg(hostRenderers.memory),
-      memArg(renderers.memory)
+      memArg(renderers.memory),
+      memArg(hostColors.memory),
+      memArg(colors.memory)
     });
   }
 
@@ -957,6 +961,7 @@ namespace alcube::gpu {
     dtos.rotations1 = new cl_float4[maxActorCount];
     dtos.rotations2 = new cl_float4[maxActorCount];
     dtos.rotations3 = new cl_float4[maxActorCount];
+    dtos.hostColors = new cl_float3[maxActorCount];
     dtos.colors = new cl_float3[maxActorCount];
     dtos.hostRenderers = new dtos::Renderer[maxActorCount];
     dtos.renderers = new dtos::Renderer[maxActorCount];
@@ -982,6 +987,7 @@ namespace alcube::gpu {
     memories.rotations1.memory = defineGPUMemory("rotations1", sizeof(cl_float4), maxActorCount);
     memories.rotations2.memory = defineGPUMemory("rotations2", sizeof(cl_float4), maxActorCount);
     memories.rotations3.memory = defineGPUMemory("rotations3", sizeof(cl_float4), maxActorCount);
+    memories.hostColors.memory = defineHostMemory("hostColors", sizeof(cl_float3), dtos.hostColors, maxActorCount);
     memories.colors.memory = defineGPUMemory("colors", sizeof(cl_float3), maxActorCount);
     memories.hostRenderers.memory = defineHostMemory("hostRenderers", sizeof(dtos::Renderer), dtos.hostRenderers, maxActorCount);
     memories.renderers.memory = defineGPUMemory("renderers", sizeof(dtos::Renderer), maxActorCount);
@@ -1007,6 +1013,7 @@ namespace alcube::gpu {
     memories.rotations1.dto = dtos.rotations1;
     memories.rotations2.dto = dtos.rotations2;
     memories.rotations3.dto = dtos.rotations3;
+    memories.hostColors.dto = dtos.hostColors;
     memories.colors.dto = dtos.colors;
     memories.hostRenderers.dto = dtos.hostRenderers;
     memories.renderers.dto = dtos.renderers;
@@ -1032,6 +1039,7 @@ namespace alcube::gpu {
     memories.rotations1.resourcesProvider = resourcesProvider;
     memories.rotations2.resourcesProvider = resourcesProvider;
     memories.rotations3.resourcesProvider = resourcesProvider;
+    memories.hostColors.resourcesProvider = resourcesProvider;
     memories.colors.resourcesProvider = resourcesProvider;
     memories.hostRenderers.resourcesProvider = resourcesProvider;
     memories.renderers.resourcesProvider = resourcesProvider;;

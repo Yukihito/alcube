@@ -348,6 +348,7 @@ namespace alcube::gpu {
       memories::Float4Memory rotations1;
       memories::Float4Memory rotations2;
       memories::Float4Memory rotations3;
+      memories::Float3Memory hostColors;
       memories::Float3Memory colors;
       memories::Renderer hostRenderers;
       memories::Renderer renderers;
@@ -376,6 +377,7 @@ namespace alcube::gpu {
       cl_float4* rotations1;
       cl_float4* rotations2;
       cl_float4* rotations3;
+      cl_float3* hostColors;
       cl_float3* colors;
       dtos::Renderer* hostRenderers;
       dtos::Renderer* renderers;
@@ -438,7 +440,7 @@ namespace alcube::gpu {
       void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys);
       void initStepVariables(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
       void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodys, memories::Constants& constants);
-      void inputRenderers(unsigned int workSize, memories::Renderer& hostRenderers, memories::Renderer& renderers);
+      void inputRenderers(unsigned int workSize, memories::Renderer& hostRenderers, memories::Renderer& renderers, memories::Float3Memory& hostColors, memories::Float3Memory& colors);
       void updateDrawingBuffer(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::Float4Memory& rotations0, memories::Float4Memory& rotations1, memories::Float4Memory& rotations2, memories::Float4Memory& rotations3, memories::PhysicalQuantity& physicalQuantities, memories::Renderer& renderers);
       void updateDrawingBuffer_SingleColor(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
       void updateDrawingBuffer_InstanceColor(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::PhysicalQuantity& physicalQuantities);

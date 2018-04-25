@@ -63,9 +63,11 @@ namespace alcube::physics {
   }
 
   void Simulator::writeHostMemories() {
+    /*
     for (unsigned short i = 0; i < actorCount; i++) {
       actors[i]->index = i;
     }
+     */
 
     for (auto subSimulator : subSimulators) {
       subSimulator->writeHostMemories();
@@ -217,6 +219,7 @@ namespace alcube::physics {
   }
 
   void Simulator::add(Actor *actor) {
+    actor->index = (unsigned short)actors.size();
     actors.push_back(actor);
     actorCount = (unsigned int)actors.size();
     for (auto subSimulator : subSimulators) {

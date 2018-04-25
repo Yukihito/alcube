@@ -9,9 +9,11 @@
 #include "../physics/Simulator.h"
 #include "../utils/opencl/conversions.h"
 #include "../utils/MemoryPool.h"
+#include "drawing/Renderer.h"
+#include "v8.h"
 
 namespace alcube::models {
-  class Actor : public physics::Accessors {
+  class Actor : public physics::Accessors, public drawing::IndexHolder {
     public:
       int getId();
       glm::vec3 getPosition() override;
@@ -22,22 +24,37 @@ namespace alcube::models {
       void setLinearMomentum(glm::vec3 arg) override;
       glm::vec3 getAngularMomentum() override;
       void setAngularMomentum(glm::vec3 arg) override;
-      void init(int id, alcube::physics::Actor* physicsActor);
+      glm::vec3 getColor();
+      void setColor(glm::vec3 arg);
+      void init(
+        int id,
+        alcube::physics::Actor* physicsActor,
+        alcube::models::drawing::InstanceRenderer* instanceRenderer
+      );
 
       alcube::physics::Actor* getPhysicsActor();
+      unsigned int getIndex() override;
     private:
       alcube::physics::Actor* physicsActor = nullptr;
+      alcube::models::drawing::InstanceRenderer* instanceRenderer = nullptr;
       int id = 0;
   };
 
   class ActorFactory {
     public:
-      explicit ActorFactory(utils::MemoryPool<Actor>* memoryPool);
-      Actor* create(physics::Features* feature);
+      explicit ActorFactory(
+        utils::MemoryPool<Actor>* memoryPool,
+        drawing::InstanceRendererFactory* instanceRendererFactory
+      );
+      Actor* create(
+        physics::Features* feature,
+        models::drawing::Renderer* renderer
+      );
 
     private:
       int instanceCount = 0;
       utils::MemoryPool<Actor>* memoryPool;
+      drawing::InstanceRendererFactory* instanceRendererFactory;
   };
 }
 

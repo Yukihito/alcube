@@ -11,12 +11,14 @@ namespace alcube::samples {
     services.softbodyFeaturesFactory = new alcube::scripting::mappings::physics::softbody::FeaturesFactory();
     services.fluidFeaturesFactory = new alcube::scripting::mappings::physics::fluid::FeaturesFactory();
     services.springFactory = new alcube::scripting::mappings::physics::softbody::SpringFactory();
+    services.rendererFactory = new alcube::scripting::mappings::drawing::RendererFactory();
     services.cube = new alcube::scripting::mappings::Alcube();
 
     entities.actor = new alcube::scripting::mappings::Actor();
     entities.fluidFeatures = new alcube::scripting::mappings::physics::fluid::Features();
     entities.softbodyFeatures = new alcube::scripting::mappings::physics::softbody::Features();
     entities.spring = new alcube::scripting::mappings::physics::softbody::Spring();
+    entities.renderer = new alcube::scripting::mappings::drawing::Renderer();
 
     all = {
       entities.actor,
@@ -27,6 +29,8 @@ namespace alcube::samples {
       services.springFactory,
       entities.softbodyFeatures,
       services.softbodyFeaturesFactory,
+      services.rendererFactory,
+      entities.renderer,
       settings.physics,
       settings.world,
       settings.window,
@@ -58,11 +62,13 @@ namespace alcube::samples {
       loadSettings();
       initServices();
       //glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
+      /*
       glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
       drawing::Material material;
       material.diffuse = color;
       material.ambient = color / 2.0f;
       material.specular = glm::vec3(0.1f, 0.1f, 0.1f);
+
       auto drawable = new models::drawing::SphereDrawable(
         shaders->directionalLight.instanceColor,
         material,
@@ -77,6 +83,7 @@ namespace alcube::samples {
       drawable->texture = new drawing::textures::CheckTexture(128, 128);
       drawable->shape->instanceCount = cube->getActorCount();
       drawer->add(drawable);
+              */
       physicsSimulator->input();
       gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
       gpuAccessor->memories.rotations0.setCount(physicsSimulator->actorCount);
@@ -114,6 +121,23 @@ namespace alcube::samples {
   }
 
   void Application::initServices() {
+    // Window
+    window = new utils::app::OpenGLWindow([&]() { onDraw(); });
+    window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
+
+    // Drawer
+    camera = new drawing::Camera(
+      glm::vec3(0.0f, 0.0f, settings->world.size * 2.0f),
+      glm::quat(),
+      glm::radians(45.0f),
+      (float)settings->window.width,
+      (float)settings->window.height,
+      0.1f, // near
+      settings->world.size * 4.0f // far
+    );
+    drawer = new drawing::DrawerWithProfiler(camera, profiler);
+    shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);
+
     // Grid
     grid = new Grid((unsigned int)settings->world.size);
 
@@ -150,7 +174,11 @@ namespace alcube::samples {
     mappings.services.cube->setUnderlying(cube);
 
     // Factories
-    actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(settings->world.maxActorCount));
+    instanceRendererFactory = new models::drawing::InstanceRendererFactory(new utils::MemoryPool<models::drawing::InstanceRenderer>(settings->world.maxActorCount), gpuAccessor);
+    rendererFactory = new models::drawing::RendererFactory(new utils::MemoryPool<models::drawing::Renderer>(settings->world.maxActorCount), gpuAccessor, shaders, drawer, settings);
+    mappings.services.rendererFactory->setUnderlying(rendererFactory);
+
+    actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(settings->world.maxActorCount), instanceRendererFactory);
     mappings.services.actorFactory->setUnderlying(actorFactory);
 
     springFactory = new models::physics::softbody::SpringFactory(new utils::MemoryPool<models::physics::softbody::Spring>(settings->world.maxActorCount));
@@ -165,23 +193,6 @@ namespace alcube::samples {
     // Load initial cube states
     evaluator->evaluate("../src/js/init-services.js");
     evaluator->evaluate("../src/js/test.js");
-
-    // Window
-    window = new utils::app::OpenGLWindow([&]() { onDraw(); });
-    window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
-
-    // Drawer
-    camera = new drawing::Camera(
-      glm::vec3(0.0f, 0.0f, settings->world.size * 2.0f),
-      glm::quat(),
-      glm::radians(45.0f),
-      (float)settings->window.width,
-      (float)settings->window.height,
-      0.1f, // near
-      settings->world.size * 4.0f // far
-    );
-    drawer = new drawing::DrawerWithProfiler(camera, profiler);
-    shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);
 
     // Profiler
     profiler->setShowInterval(1000);
@@ -223,12 +234,24 @@ namespace alcube::samples {
       gpuAccessor->memories.rotations3,
       gpuAccessor->memories.physicalQuantities
     );
-     */
+
     gpuAccessor->kernels.updateDrawingBuffer_InstanceColor(
       physicsSimulator->actorCount,
       gpuAccessor->memories.positions,
       gpuAccessor->memories.colors,
       gpuAccessor->memories.physicalQuantities
+    );
+          */
+    gpuAccessor->kernels.updateDrawingBuffer(
+      physicsSimulator->actorCount,
+      gpuAccessor->memories.positions,
+      gpuAccessor->memories.colors,
+      gpuAccessor->memories.rotations0,
+      gpuAccessor->memories.rotations1,
+      gpuAccessor->memories.rotations2,
+      gpuAccessor->memories.rotations3,
+      gpuAccessor->memories.physicalQuantities,
+      gpuAccessor->memories.renderers
     );
     clFinish(resourcesProvider->queue->queue);
 

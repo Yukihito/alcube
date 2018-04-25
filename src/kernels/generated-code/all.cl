@@ -61,7 +61,6 @@ typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
 typedef struct __attribute__ ((packed)) RendererStruct {
   int refersToRotations;
   uint instanceColorType;
-  float3 instanceColor;
 } Renderer;
 
 typedef struct __attribute__ ((packed)) SoftBodyStruct {
@@ -720,10 +719,13 @@ __kernel void postProcessing(
 
 __kernel void inputRenderers(
   __global const Renderer* hostRenderers,
-  __global Renderer* renderers
+  __global Renderer* renderers,
+  __global const float3* hostColors,
+  __global float3* colors
 ) {
   size_t i = get_global_id(0);
   renderers[i] = hostRenderers[i];
+  colors[i] = hostColors[i];
 }
 
 __kernel void updateDrawingBuffer(

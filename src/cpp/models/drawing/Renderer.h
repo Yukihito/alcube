@@ -8,6 +8,9 @@
 #include "../../gpu/GPUAccessor.h"
 #include "SphereDrawable.h"
 #include "../Settings.h"
+#include "../../drawing/Drawer.h"
+#include <CL/cl_platform.h>
+#include "../../drawing/textures/CheckTexture.h"
 
 namespace alcube::models::drawing {
   enum Texture {
@@ -29,6 +32,12 @@ namespace alcube::models::drawing {
 
   class Renderer {
     public:
+      void init(
+        gpu::GPUAccessor* gpuAccessor,
+        alcube::drawing::shaders::Shaders* shaders,
+        alcube::drawing::Drawer* drawer,
+        Settings* settings
+      );
       glm::vec3 getDiffuse();
       void setDiffuse(glm::vec3 v);
       glm::vec3 getAmbient();
@@ -40,13 +49,8 @@ namespace alcube::models::drawing {
       InstanceColorType  getInstanceColorType();
       void setInstanceColorType(InstanceColorType v);
       void setUpResources();
-
-      void init(
-        gpu::GPUAccessor* gpuAccessor,
-        alcube::drawing::shaders::Shaders* shaders,
-        Settings* settings
-      );
       bool refersToRotations();
+      void incrementChildCount();
 
     private:
       alcube::drawing::Material material = {};
@@ -56,6 +60,8 @@ namespace alcube::models::drawing {
       gpu::GPUAccessor* gpuAccessor = nullptr;
       alcube::drawing::shaders::Shaders* shaders = nullptr;
       Settings* settings = nullptr;
+      alcube::drawing::Drawer* drawer = nullptr;
+      unsigned int childCount = 0;
   };
 
   class RendererFactory {
@@ -64,6 +70,7 @@ namespace alcube::models::drawing {
         utils::MemoryPool<Renderer>* memoryPool,
         gpu::GPUAccessor* gpuAccessor,
         alcube::drawing::shaders::Shaders* shaders,
+        alcube::drawing::Drawer* drawer,
         Settings* settings
       );
       Renderer* create();
@@ -72,6 +79,7 @@ namespace alcube::models::drawing {
       utils::MemoryPool<Renderer>* memoryPool;
       gpu::GPUAccessor* gpuAccessor;
       alcube::drawing::shaders::Shaders* shaders;
+      alcube::drawing::Drawer* drawer;
       Settings* settings;
   };
 

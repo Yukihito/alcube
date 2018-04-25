@@ -89,7 +89,6 @@ namespace alcube::gpu::dtos {
     public:
       int refersToRotations;
       unsigned int instanceColorType;
-      cl_float3 instanceColor;
   };
 #pragma pack(pop)
 

@@ -1,7 +1,13 @@
+renderer = rendererFactory.create()
+renderer.diffuse vec3 1.0, 1.0, 1.0
+renderer.ambient vec3 0.3, 0.3, 0.3
+renderer.specular vec3 0.1, 0.1, 0.1
+renderer.instanceColorType InstanceColorType.LINEAR_MOMENTUM
+
 fluidFeatures = fluidFeaturesFactory.create()
 
 fluid = (position) ->
-  actor = actorFactory.create fluidFeatures
+  actor = actorFactory.create fluidFeatures, renderer
   actor.position position
   actor
 
@@ -11,7 +17,7 @@ softbodyFeatures.mass 0.2
 
 softbodies = []
 softbody = (position, linearMomentum) ->
-  actor = actorFactory.create softbodyFeatures
+  actor = actorFactory.create softbodyFeatures, renderer
   actor.position position
   actor.linearMomentum linearMomentum
   softbodies.push actor
@@ -57,3 +63,6 @@ for z in [0...softbodySize]
         s = spring softbodies[i], vec3(0, 0, 1), softbodies[i + softbodySize * softbodySize], vec3(0, 0, -1)
         cube.add s
       i++
+
+
+renderer.setUpResources()

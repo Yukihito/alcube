@@ -23,6 +23,16 @@ vec3Zero = vec3(0, 0, 0)
 vec3Rand = () ->
   vec3 rand(), rand(), rand()
 
+Texture =
+  NONE: 0
+  CHECK: 1
+
+InstanceColorType =
+  NONE: 0
+  MANUAL: 1
+  RANDOM: 2
+  LINEAR_MOMENTUM: 3
+
 primitiveAccessor = (wrapper, name) ->
   accessor = (value) ->
     if value is undefined
@@ -101,16 +111,37 @@ class Actor
     quatAccessor this, 'rotation'
     vec3Accessor this, 'linearMomentum'
     vec3Accessor this, 'angularMomentum'
+    vec3Accessor this, 'color'
 
 class ActorFactory
   wrap: () =>
     @underlying = constructActorFactory()
 
-  create: (features) =>
+  create: (features, renderer) =>
     actor = new Actor
-    actor.wrap @underlying.create features.underlying
+    actor.wrap @underlying.create features.underlying, renderer.underlying
     actor
 
+class Renderer
+  wrap: (underlying) =>
+    @underlying = underlying
+    vec3Accessor this, 'diffuse'
+    vec3Accessor this, 'ambient'
+    vec3Accessor this, 'specular'
+    primitiveAccessor this, 'texture'
+    primitiveAccessor this, 'instanceColorType'
+
+  setUpResources: () =>
+    @underlying.setUpResources()
+
+class RendererFactory
+  wrap: () =>
+    @underlying = constructRendererFactory()
+
+  create: () =>
+    renderer = new Renderer
+    renderer.wrap @underlying.create()
+    renderer
 
 class Alcube
   wrap: () =>
@@ -134,6 +165,9 @@ actorFactory.wrap()
 
 springFactory = new SpringFactory()
 springFactory.wrap()
+
+rendererFactory = new RendererFactory()
+rendererFactory.wrap()
 
 cube = new Alcube()
 cube.wrap()
