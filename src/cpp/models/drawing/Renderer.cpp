@@ -85,10 +85,13 @@ namespace alcube::models::drawing {
       drawable->texture = new alcube::drawing::textures::CheckTexture(128, 128);
     }
     drawable->shape->instanceCount = childCount;
+    /*
     for (int i = 0; i < childCount; i++) {
       gpuAccessor->memories.hostRenderers.dto[i].instanceColorType = instanceColorType;
       gpuAccessor->memories.hostRenderers.dto[i].refersToRotations = refersToRotations();
     }
+     */
+    /*
     gpuAccessor->kernels.inputRenderers(
       childCount,
       gpuAccessor->memories.hostRenderers,
@@ -96,6 +99,7 @@ namespace alcube::models::drawing {
       gpuAccessor->memories.hostColors,
       gpuAccessor->memories.colors
     );
+     */
     drawer->add(drawable);
   }
 
@@ -135,6 +139,12 @@ namespace alcube::models::drawing {
     this->indexHolder = indexHolder;
     this->gpuAccessor = gpuAccessor;
     this->parent = parent;
+  }
+
+  void InstanceRenderer::setUp() {
+    unsigned int i = indexHolder->getIndex();
+    gpuAccessor->memories.hostRenderers.dto[i].instanceColorType = parent->getInstanceColorType();
+    gpuAccessor->memories.hostRenderers.dto[i].refersToRotations = parent->refersToRotations();
   }
 
   glm::vec3 InstanceRenderer::getColor() {

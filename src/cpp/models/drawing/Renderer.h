@@ -89,6 +89,7 @@ namespace alcube::models::drawing {
       Renderer* getParent();
       glm::vec3 getColor();
       void setColor(glm::vec3 v);
+      void setUp();
 
     private:
       IndexHolder* indexHolder;

@@ -1,4 +1,4 @@
-var fluid, fluidFeatures, i, j, k, l, linearMomentum, m, n, o, p, pos, q, r, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, renderer, s, softbodies, softbody, softbodyEdgeLength, softbodyFeatures, softbodySize, spring, t, u, w, x, y, z;
+var fluid, fluidFeatures, i, j, k, l, linearMomentum, m, n, o, p, pos, q, r, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, renderer, renderer2, s, softbodies, softbody, softbodyEdgeLength, softbodyFeatures, softbodySize, spring, t, u, w, x, y, z;
 
 renderer = rendererFactory.create();
 
@@ -10,11 +10,21 @@ renderer.specular(vec3(0.1, 0.1, 0.1));
 
 renderer.instanceColorType(InstanceColorType.LINEAR_MOMENTUM);
 
+renderer2 = rendererFactory.create();
+
+renderer2.diffuse(vec3(1.0, 1.0, 1.0));
+
+renderer2.ambient(vec3(0.3, 0.3, 0.3));
+
+renderer2.specular(vec3(0.1, 0.1, 0.1));
+
+renderer2.instanceColorType(InstanceColorType.NONE);
+
 fluidFeatures = fluidFeaturesFactory.create();
 
 fluid = function(position) {
   var actor;
-  actor = actorFactory.create(fluidFeatures, renderer);
+  actor = actorFactory.create(fluidFeatures, renderer2);
   actor.position(position);
   return actor;
 };
@@ -90,3 +100,5 @@ for (z = r = 0, ref5 = softbodySize; undefined !== 0 && (0 <= ref5 ? 0 <= r && r
 }
 
 renderer.setUpResources();
+
+renderer2.setUpResources();

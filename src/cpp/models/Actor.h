@@ -34,6 +34,7 @@ namespace alcube::models {
 
       alcube::physics::Actor* getPhysicsActor();
       unsigned int getIndex() override;
+      void setUpRenderers();
     private:
       alcube::physics::Actor* physicsActor = nullptr;
       alcube::models::drawing::InstanceRenderer* instanceRenderer = nullptr;

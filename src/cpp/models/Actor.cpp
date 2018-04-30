@@ -63,6 +63,10 @@ namespace alcube::models {
     return physicsActor->index;
   }
 
+  void Actor::setUpRenderers() {
+    instanceRenderer->setUp();
+  }
+
   ActorFactory::ActorFactory(
     utils::MemoryPool<Actor> *memoryPool,
     drawing::InstanceRendererFactory* instanceRendererFactory

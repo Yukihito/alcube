@@ -61,6 +61,14 @@ namespace alcube::samples {
       loadBasicLibraries();
       loadSettings();
       initServices();
+      gpuAccessor->kernels.inputRenderers(
+        physicsSimulator->actorCount,
+        gpuAccessor->memories.hostRenderers,
+        gpuAccessor->memories.renderers,
+        gpuAccessor->memories.hostColors,
+        gpuAccessor->memories.colors
+      );
+      cube->setUpRenderers();
       //glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
       /*
       glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);

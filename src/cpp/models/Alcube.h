@@ -18,8 +18,10 @@ namespace alcube::models {
       void add(Actor* actor);
       void add(physics::softbody::Spring* spring);
       unsigned int getActorCount();
+      void setUpRenderers();
 
     private:
+      std::vector<Actor*> actors;
       alcube::physics::fluid::Simulator* fluidSimulator;
       alcube::physics::softbody::Simulator* softbodySimulator;
       alcube::physics::Simulator* physicsSimulator;

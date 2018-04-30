@@ -4,10 +4,16 @@ renderer.ambient vec3 0.3, 0.3, 0.3
 renderer.specular vec3 0.1, 0.1, 0.1
 renderer.instanceColorType InstanceColorType.LINEAR_MOMENTUM
 
+renderer2 = rendererFactory.create()
+renderer2.diffuse vec3 1.0, 1.0, 1.0
+renderer2.ambient vec3 0.3, 0.3, 0.3
+renderer2.specular vec3 0.1, 0.1, 0.1
+renderer2.instanceColorType InstanceColorType.NONE
+
 fluidFeatures = fluidFeaturesFactory.create()
 
 fluid = (position) ->
-  actor = actorFactory.create fluidFeatures, renderer
+  actor = actorFactory.create fluidFeatures, renderer2
   actor.position position
   actor
 
@@ -66,3 +72,4 @@ for z in [0...softbodySize]
 
 
 renderer.setUpResources()
+renderer2.setUpResources()
