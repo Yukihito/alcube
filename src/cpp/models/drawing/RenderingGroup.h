@@ -30,7 +30,7 @@ namespace alcube::models::drawing {
       virtual unsigned int getIndex() = 0;
   };
 
-  class Renderer {
+  class RenderingGroup {
     public:
       void init(
         gpu::GPUAccessor* gpuAccessor,
@@ -64,48 +64,23 @@ namespace alcube::models::drawing {
       unsigned int childCount = 0;
   };
 
-  class RendererFactory {
+  class RenderingGroupFactory {
     public:
-      explicit RendererFactory(
-        utils::MemoryPool<Renderer>* memoryPool,
+      explicit RenderingGroupFactory(
+        utils::MemoryPool<RenderingGroup>* memoryPool,
         gpu::GPUAccessor* gpuAccessor,
         alcube::drawing::shaders::Shaders* shaders,
         alcube::drawing::Drawer* drawer,
         Settings* settings
       );
-      Renderer* create();
+      RenderingGroup* create();
 
     private:
-      utils::MemoryPool<Renderer>* memoryPool;
+      utils::MemoryPool<RenderingGroup>* memoryPool;
       gpu::GPUAccessor* gpuAccessor;
       alcube::drawing::shaders::Shaders* shaders;
       alcube::drawing::Drawer* drawer;
       Settings* settings;
-  };
-
-  class InstanceRenderer {
-    public:
-      void init(IndexHolder* indexHolder, gpu::GPUAccessor* gpuAccessor, Renderer* parent);
-      Renderer* getParent();
-      glm::vec3 getColor();
-      void setColor(glm::vec3 v);
-      void setUp();
-
-    private:
-      IndexHolder* indexHolder;
-      gpu::GPUAccessor* gpuAccessor;
-      Renderer* parent;
-  };
-
-  class InstanceRendererFactory {
-    public:
-      explicit InstanceRendererFactory(utils::MemoryPool<InstanceRenderer>* memoryPool, gpu::GPUAccessor* gpuAccessor);
-      InstanceRenderer* create(IndexHolder* indexHolder, Renderer* parent);
-
-    private:
-      utils::MemoryPool<InstanceRenderer>* memoryPool;
-      gpu::GPUAccessor* gpuAccessor;
-
   };
 }
 

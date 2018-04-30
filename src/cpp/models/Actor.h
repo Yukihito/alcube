@@ -9,8 +9,9 @@
 #include "../physics/Simulator.h"
 #include "../utils/opencl/conversions.h"
 #include "../utils/MemoryPool.h"
-#include "drawing/Renderer.h"
+#include "drawing/RenderingGroup.h"
 #include "v8.h"
+#include "drawing/Model3D.h"
 
 namespace alcube::models {
   class Actor : public physics::Accessors, public drawing::IndexHolder {
@@ -29,7 +30,7 @@ namespace alcube::models {
       void init(
         int id,
         alcube::physics::Actor* physicsActor,
-        alcube::models::drawing::InstanceRenderer* instanceRenderer
+        alcube::models::drawing::Model3D* instanceRenderer
       );
 
       alcube::physics::Actor* getPhysicsActor();
@@ -37,7 +38,7 @@ namespace alcube::models {
       void setUpRenderers();
     private:
       alcube::physics::Actor* physicsActor = nullptr;
-      alcube::models::drawing::InstanceRenderer* instanceRenderer = nullptr;
+      alcube::models::drawing::Model3D* instanceRenderer = nullptr;
       int id = 0;
   };
 
@@ -45,17 +46,17 @@ namespace alcube::models {
     public:
       explicit ActorFactory(
         utils::MemoryPool<Actor>* memoryPool,
-        drawing::InstanceRendererFactory* instanceRendererFactory
+        drawing::Model3DFactory* instanceRendererFactory
       );
       Actor* create(
         physics::Features* feature,
-        models::drawing::Renderer* renderer
+        models::drawing::RenderingGroup* renderer
       );
 
     private:
       int instanceCount = 0;
       utils::MemoryPool<Actor>* memoryPool;
-      drawing::InstanceRendererFactory* instanceRendererFactory;
+      drawing::Model3DFactory* instanceRendererFactory;
   };
 }
 

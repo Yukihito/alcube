@@ -242,7 +242,7 @@ RendererFactory = class RendererFactory {
   }
 
   wrap() {
-    return this.underlying = constructRendererFactory();
+    return this.underlying = constructRenderingGroupFactory();
   }
 
   create() {

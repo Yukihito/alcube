@@ -6,7 +6,7 @@ namespace alcube::models {
   void Actor::init(
     int id,
     alcube::physics::Actor *physicsActor,
-    models::drawing::InstanceRenderer* instanceRenderer
+    models::drawing::Model3D* instanceRenderer
   ) {
     this->id = id;
     this->physicsActor = nullptr;
@@ -69,7 +69,7 @@ namespace alcube::models {
 
   ActorFactory::ActorFactory(
     utils::MemoryPool<Actor> *memoryPool,
-    drawing::InstanceRendererFactory* instanceRendererFactory
+    drawing::Model3DFactory* instanceRendererFactory
   ) {
     this->memoryPool = memoryPool;
     this->instanceRendererFactory = instanceRendererFactory;
@@ -77,7 +77,7 @@ namespace alcube::models {
 
   Actor* ActorFactory::create(
     physics::Features *feature,
-    models::drawing::Renderer* renderer
+    models::drawing::RenderingGroup* renderer
   ) {
     auto physicsActor = feature->createPhysicsActor();
     auto actor = memoryPool->get();

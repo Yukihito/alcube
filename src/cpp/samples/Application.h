@@ -94,8 +94,8 @@ namespace alcube::samples {
       models::physics::softbody::SpringFactory* springFactory;
       models::physics::fluid::FeaturesFactory* fluidFeaturesFactory;
       models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory;
-      models::drawing::RendererFactory* rendererFactory;
-      models::drawing::InstanceRendererFactory* instanceRendererFactory;
+      models::drawing::RenderingGroupFactory* rendererFactory;
+      models::drawing::Model3DFactory* instanceRendererFactory;
       scripting::Evaluator* evaluator;
       Profilers profilers;
       Mappings mappings;

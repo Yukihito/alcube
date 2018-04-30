@@ -182,8 +182,8 @@ namespace alcube::samples {
     mappings.services.cube->setUnderlying(cube);
 
     // Factories
-    instanceRendererFactory = new models::drawing::InstanceRendererFactory(new utils::MemoryPool<models::drawing::InstanceRenderer>(settings->world.maxActorCount), gpuAccessor);
-    rendererFactory = new models::drawing::RendererFactory(new utils::MemoryPool<models::drawing::Renderer>(settings->world.maxActorCount), gpuAccessor, shaders, drawer, settings);
+    instanceRendererFactory = new models::drawing::Model3DFactory(new utils::MemoryPool<models::drawing::Model3D>(settings->world.maxActorCount), gpuAccessor);
+    rendererFactory = new models::drawing::RenderingGroupFactory(new utils::MemoryPool<models::drawing::RenderingGroup>(settings->world.maxActorCount), gpuAccessor, shaders, drawer, settings);
     mappings.services.rendererFactory->setUnderlying(rendererFactory);
 
     actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(settings->world.maxActorCount), instanceRendererFactory);

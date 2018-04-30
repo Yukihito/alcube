@@ -1,7 +1,7 @@
-#include "Renderer.h"
+#include "RenderingGroup.h"
 
 namespace alcube::models::drawing {
-  void Renderer::init(
+  void RenderingGroup::init(
     gpu::GPUAccessor* gpuAccessor,
     alcube::drawing::shaders::Shaders* shaders,
     alcube::drawing::Drawer* drawer,
@@ -19,47 +19,47 @@ namespace alcube::models::drawing {
     instanceColorType = INSTANCE_COLOR_TYPE_NONE;
   }
 
-  glm::vec3 Renderer::getDiffuse() {
+  glm::vec3 RenderingGroup::getDiffuse() {
     return material.diffuse;
   }
 
-  void Renderer::setDiffuse(glm::vec3 v) {
+  void RenderingGroup::setDiffuse(glm::vec3 v) {
     material.diffuse = v;
   }
 
-  glm::vec3 Renderer::getAmbient() {
+  glm::vec3 RenderingGroup::getAmbient() {
     return material.ambient;
   }
 
-  void Renderer::setAmbient(glm::vec3 v) {
+  void RenderingGroup::setAmbient(glm::vec3 v) {
     material.ambient = v;
   }
 
-  glm::vec3 Renderer::getSpecular() {
+  glm::vec3 RenderingGroup::getSpecular() {
     return material.specular;
   }
 
-  void Renderer::setSpecular(glm::vec3 v) {
+  void RenderingGroup::setSpecular(glm::vec3 v) {
     material.specular = v;
   }
 
-  Texture Renderer::getTexture() {
+  Texture RenderingGroup::getTexture() {
     return texture;
   }
 
-  void Renderer::setTexture(alcube::models::drawing::Texture v) {
+  void RenderingGroup::setTexture(alcube::models::drawing::Texture v) {
     texture = v;
   }
 
-  InstanceColorType Renderer::getInstanceColorType() {
+  InstanceColorType RenderingGroup::getInstanceColorType() {
     return instanceColorType;
   }
 
-  void Renderer::setInstanceColorType(alcube::models::drawing::InstanceColorType v) {
+  void RenderingGroup::setInstanceColorType(alcube::models::drawing::InstanceColorType v) {
     instanceColorType = v;
   }
 
-  void Renderer::setUpResources() {
+  void RenderingGroup::setUpResources() {
     alcube::drawing::Shader* shader = nullptr;
     if (instanceColorType == INSTANCE_COLOR_TYPE_NONE) {
       if (texture == TEXTURE_CHECK) {
@@ -103,16 +103,16 @@ namespace alcube::models::drawing {
     drawer->add(drawable);
   }
 
-  bool Renderer::refersToRotations() {
+  bool RenderingGroup::refersToRotations() {
     return texture != TEXTURE_NONE;
   }
 
-  void Renderer::incrementChildCount() {
+  void RenderingGroup::incrementChildCount() {
     childCount++;
   }
 
-  RendererFactory::RendererFactory(
-    alcube::utils::MemoryPool<alcube::models::drawing::Renderer> *memoryPool,
+  RenderingGroupFactory::RenderingGroupFactory(
+    alcube::utils::MemoryPool<alcube::models::drawing::RenderingGroup> *memoryPool,
     alcube::gpu::GPUAccessor *gpuAccessor,
     alcube::drawing::shaders::Shaders *shaders,
     alcube::drawing::Drawer* drawer,
@@ -125,55 +125,9 @@ namespace alcube::models::drawing {
     this->drawer = drawer;
   }
 
-  Renderer* RendererFactory::create() {
+  RenderingGroup* RenderingGroupFactory::create() {
     auto renderer = memoryPool->get();
     renderer->init(gpuAccessor, shaders, drawer, settings);
-    return renderer;
-  }
-
-  void InstanceRenderer::init(
-    alcube::models::drawing::IndexHolder *indexHolder,
-    alcube::gpu::GPUAccessor *gpuAccessor,
-    alcube::models::drawing::Renderer *parent
-  ) {
-    this->indexHolder = indexHolder;
-    this->gpuAccessor = gpuAccessor;
-    this->parent = parent;
-  }
-
-  void InstanceRenderer::setUp() {
-    unsigned int i = indexHolder->getIndex();
-    gpuAccessor->memories.hostRenderers.dto[i].instanceColorType = parent->getInstanceColorType();
-    gpuAccessor->memories.hostRenderers.dto[i].refersToRotations = parent->refersToRotations();
-  }
-
-  glm::vec3 InstanceRenderer::getColor() {
-    cl_float3 v = *gpuAccessor->memories.hostColors.at(indexHolder->getIndex());
-    return glm::vec3(v.x, v.y, v.z);
-  }
-
-  void InstanceRenderer::setColor(glm::vec3 v) {
-    gpuAccessor->memories.hostColors.at(indexHolder->getIndex())[0] = {v.x, v.y, v.z};
-  }
-
-  Renderer* InstanceRenderer::getParent() {
-    return parent;
-  }
-
-  InstanceRendererFactory::InstanceRendererFactory(
-    alcube::utils::MemoryPool<alcube::models::drawing::InstanceRenderer>* memoryPool,
-    alcube::gpu::GPUAccessor *gpuAccessor
-  ) {
-    this->memoryPool = memoryPool;
-    this->gpuAccessor = gpuAccessor;
-  }
-
-  InstanceRenderer* InstanceRendererFactory::create(
-    alcube::models::drawing::IndexHolder *indexHolder,
-    alcube::models::drawing::Renderer *parent) {
-    auto renderer = memoryPool->get();
-    renderer->init(indexHolder, gpuAccessor, parent);
-    parent->incrementChildCount();
     return renderer;
   }
 }

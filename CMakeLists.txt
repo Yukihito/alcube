@@ -71,7 +71,7 @@ set(ALCUBE_ALCUBE_SOURCE_FILES
         src/cpp/models/physics/Accessors.cpp src/cpp/models/physics/Accessors.h
         src/cpp/models/physics/Features.cpp src/cpp/models/physics/Features.h
         src/cpp/models/drawing/SphereDrawable.cpp src/cpp/models/drawing/SphereDrawable.h
-        src/cpp/models/Alcube.cpp src/cpp/models/Alcube.h src/cpp/models/physics/fluid/Features.cpp src/cpp/models/physics/fluid/Features.h src/cpp/models/physics/softbody/Features.cpp src/cpp/models/physics/softbody/Features.h src/cpp/models/physics/softbody/Spring.cpp src/cpp/models/physics/softbody/Spring.h src/cpp/models/Settings.cpp src/cpp/models/Settings.h src/cpp/models/drawing/Renderer.cpp src/cpp/models/drawing/Renderer.h)
+        src/cpp/models/Alcube.cpp src/cpp/models/Alcube.h src/cpp/models/physics/fluid/Features.cpp src/cpp/models/physics/fluid/Features.h src/cpp/models/physics/softbody/Features.cpp src/cpp/models/physics/softbody/Features.h src/cpp/models/physics/softbody/Spring.cpp src/cpp/models/physics/softbody/Spring.h src/cpp/models/Settings.cpp src/cpp/models/Settings.h src/cpp/models/drawing/RenderingGroup.cpp src/cpp/models/drawing/RenderingGroup.h src/cpp/models/drawing/Model3D.cpp src/cpp/models/drawing/Model3D.h)
 add_library(alcube_models_lib STATIC ${ALCUBE_ALCUBE_SOURCE_FILES})
 target_link_libraries(alcube_models_lib
         alcube_utils_lib

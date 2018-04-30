@@ -25,7 +25,7 @@ namespace alcube::scripting::mappings {
       return;
     }
     auto features = getUnderlying<models::physics::fluid::Features>(info[0]);
-    auto renderer = getUnderlying<models::drawing::Renderer>(info[1]);
+    auto renderer = getUnderlying<models::drawing::RenderingGroup>(info[1]);
     auto underlying = self(info)->create(features, renderer);
     auto actor = Actor::instance->objectTemplate->NewInstance();
     actor->SetInternalField(0, v8::External::New(isolate, underlying));

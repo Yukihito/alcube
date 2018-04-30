@@ -136,7 +136,7 @@ class Renderer
 
 class RendererFactory
   wrap: () =>
-    @underlying = constructRendererFactory()
+    @underlying = constructRenderingGroupFactory()
 
   create: () =>
     renderer = new Renderer
