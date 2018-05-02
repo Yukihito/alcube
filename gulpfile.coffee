@@ -91,6 +91,6 @@ gulp.task 'watch', ->
   ], ['build']
 
 gulp.task 'watch-coffee', ->
-  gulp.watch ['src/coffee/*.coffee'], ['compile-coffee']
+  gulp.watch ['src/coffee/**/*.coffee'], ['compile-coffee']
 
 gulp.task 'default', ['build']
