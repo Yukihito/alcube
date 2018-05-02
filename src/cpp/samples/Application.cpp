@@ -101,7 +101,7 @@ namespace alcube::samples {
     mappings.settings.physics->setUnderlying(&settings->physics);
     mappings.settings.world->setUnderlying(&settings->world);
     mappings.settings.root->setUnderlying(settings);
-    evaluator->evaluate("../src/js/init-settings.js");
+    evaluator->evaluate("../src/js/libs/init-settings.js");
     evaluator->evaluate("../src/js/settings.js");
   }
 
@@ -178,8 +178,8 @@ namespace alcube::samples {
     mappings.services.softbodyFeaturesFactory->setUnderlying(softbodyFeaturesFactory);
 
     // Load initial cube states
-    evaluator->evaluate("../src/js/init-services.js");
-    evaluator->evaluate("../src/js/test.js");
+    evaluator->evaluate("../src/js/libs/init-services.js");
+    evaluator->evaluate("../src/js/samples/fluid-and-softbody.js");
 
     // Profiler
     profiler->setShowInterval(1000);

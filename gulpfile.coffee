@@ -67,7 +67,7 @@ gulp.task 'clean', (callback) ->
   del ['dist'], callback
 
 gulp.task 'compile-coffee', () ->
-  gulp.src 'src/coffee/*.coffee'
+  gulp.src 'src/coffee/**/*.coffee'
     .pipe coffee
       bare: true
     .pipe gulp.dest 'src/js'
