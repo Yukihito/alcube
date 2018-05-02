@@ -211,10 +211,6 @@ target_link_libraries(alcube_samples
 ### Kernel compiler executable
 target_link_libraries(kernel_compiler alcube_lib)
 
-### Simple v8 sample
-add_executable(v8_sample src/cpp/samples/v8/main.cpp)
-target_link_libraries(v8_sample alcube_lib)
-
 ### Tests executable
 # gtest
 # Download and unpack googletest at configure time
