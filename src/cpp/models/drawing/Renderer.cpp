@@ -3,12 +3,12 @@
 namespace alcube::models::drawing {
   Renderer::Renderer(
     alcube::gpu::GPUAccessor *gpuAccessor,
-    alcube::drawing::Drawer* drawer,
+    alcube::drawing::Canvas* canvas,
     unsigned int size
   ) {
     this->gpuAccessor = gpuAccessor;
     this->allocationRange = new utils::AllocationRange(0, size);
-    this->drawer = drawer;
+    this->canvas = canvas;
     renderingGroups = {};
   }
 
@@ -19,7 +19,7 @@ namespace alcube::models::drawing {
   void Renderer::setUp() {
     this->allocate();
     this->update();
-    this->registerInDrawer();
+    this->registerInCanvas();
   }
 
   void Renderer::allocate() {
@@ -34,9 +34,9 @@ namespace alcube::models::drawing {
     }
   }
 
-  void Renderer::registerInDrawer() {
+  void Renderer::registerInCanvas() {
     for (auto renderingGroup : renderingGroups) {
-      drawer->add(renderingGroup->getDrawable());
+      canvas->add(renderingGroup->getDrawable());
     }
   }
 }

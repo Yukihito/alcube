@@ -36,8 +36,8 @@ set(ALCUBE_DRAWING_SOURCE_FILES
         src/cpp/drawing/Camera.cpp src/cpp/drawing/Camera.h
         src/cpp/drawing/Shape.cpp src/cpp/drawing/Shape.h
         src/cpp/drawing/Drawable.cpp src/cpp/drawing/Drawable.h
-        src/cpp/drawing/DrawerWithProfiler.cpp src/cpp/drawing/DrawerWithProfiler.h
-        src/cpp/drawing/Drawer.cpp src/cpp/drawing/Drawer.h
+        src/cpp/drawing/CanvasWithProfiler.cpp src/cpp/drawing/CanvasWithProfiler.h
+        src/cpp/drawing/Canvas.cpp src/cpp/drawing/Canvas.h
         src/cpp/drawing/Context.cpp src/cpp/drawing/Context.h
         src/cpp/drawing/Material.cpp src/cpp/drawing/Material.h
         src/cpp/drawing/shaders/Shaders.cpp src/cpp/drawing/shaders/Shaders.h

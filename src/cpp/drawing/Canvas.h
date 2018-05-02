@@ -1,5 +1,5 @@
-#ifndef ALCUBE_DRAWER_H
-#define ALCUBE_DRAWER_H
+#ifndef ALCUBE_DRAWING_CANVAS_H
+#define ALCUBE_DRAWING_CANVAS_H
 
 #include "Camera.h"
 #include "Drawable.h"
@@ -11,9 +11,9 @@
 #include <mutex>
 
 namespace alcube::drawing {
-  class Drawer {
+  class Canvas {
     public:
-      explicit Drawer(Camera* camera);
+      explicit Canvas(Camera* camera);
       void add(Drawable* drawable);
       virtual void draw();
       Context context;
@@ -31,4 +31,4 @@ namespace alcube::drawing {
   };
 }
 
-#endif //ALCUBE_DRAWER_H
+#endif //ALCUBE_DRAWING_CANVAS_H

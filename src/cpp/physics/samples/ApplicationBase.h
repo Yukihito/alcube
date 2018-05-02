@@ -6,8 +6,8 @@
 #include "../../utils/Profiler.h"
 #include "../../drawing/shaders/Shaders.h"
 #include "../../drawing/Camera.h"
-#include "../../drawing/Drawer.h"
-#include "../../drawing/DrawerWithProfiler.h"
+#include "../../drawing/Canvas.h"
+#include "../../drawing/CanvasWithProfiler.h"
 
 namespace alcube::physics::samples {
   class Profilers {

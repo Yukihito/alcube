@@ -2,11 +2,11 @@
 #define ALCUBE_SAMPLES_APPLICATIONBASE_H
 #include "../utils/app/OpenGLWindow.h"
 #include "../gpu/GPUAccessor.h"
-#include "../drawing/Drawer.h"
+#include "../drawing/Canvas.h"
 #include "../drawing/shaders/Shaders.h"
 #include "../utils/Profiler.h"
 #include "../physics/Simulator.h"
-#include "../drawing/DrawerWithProfiler.h"
+#include "../drawing/CanvasWithProfiler.h"
 #include "../drawing/textures/CheckTexture.h"
 #include "../physics/fluid/Simulator.h"
 #include "../physics/softbody/Simulator.h"
@@ -80,7 +80,7 @@ namespace alcube::samples {
       utils::app::OpenGLWindow* window;
       models::Settings* settings;
       gpu::GPUAccessor* gpuAccessor;
-      drawing::Drawer *drawer;
+      drawing::Canvas *canvas;
       drawing::Camera *camera;
       drawing::shaders::Shaders *shaders;
       utils::opencl::ResourcesProvider *resourcesProvider;

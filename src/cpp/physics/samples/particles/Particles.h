@@ -6,7 +6,7 @@
 #include "../../../drawing/shapes/Shapes.h"
 #include "../../../drawing/shaders/Shaders.h"
 #include "../../SoftBodyActor.h"
-#include "../../../drawing/Drawer.h"
+#include "../../../drawing/Canvas.h"
 #include "../../../utils/opencl/Resources.h"
 #include "../../../utils/Profiler.h"
 #include "../../Simulator.h"

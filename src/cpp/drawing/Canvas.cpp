@@ -1,24 +1,24 @@
-#include "Drawer.h"
+#include "Canvas.h"
 
 namespace alcube::drawing {
-  void Drawer::addInternal(Drawable* drawable) {
+  void Canvas::addInternal(Drawable* drawable) {
     if (shaderToDrawables[drawable->shader] == nullptr) {
       shaderToDrawables[drawable->shader] = new std::vector<Drawable*>();
     }
     shaderToDrawables[drawable->shader]->push_back(drawable);
   }
 
-  void Drawer::add(Drawable* drawable) {
+  void Canvas::add(Drawable* drawable) {
     drawablesQueueMutex.lock();
     drawablesQueue.push_back(drawable);
     drawablesQueueMutex.unlock();
   }
 
-  void Drawer::waitVSync() {
+  void Canvas::waitVSync() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   }
 
-  void Drawer::addWaitingDrawables() {
+  void Canvas::addWaitingDrawables() {
     drawablesQueueMutex.lock();
     for (Drawable* drawable: drawablesQueue) {
       addInternal(drawable);
@@ -27,7 +27,7 @@ namespace alcube::drawing {
     drawablesQueueMutex.unlock();
   }
 
-  void Drawer::initContext() {
+  void Canvas::initContext() {
     glm::mat4 projection =
       glm::perspective(
         camera->angleOfView,
@@ -43,7 +43,7 @@ namespace alcube::drawing {
     context.vp = vp;
   }
 
-  void Drawer::drawAllDrawables() {
+  void Canvas::drawAllDrawables() {
     for (auto kv : shaderToDrawables) {
       auto shader = kv.first;
       auto drawables = *kv.second;
@@ -54,14 +54,14 @@ namespace alcube::drawing {
     }
   }
 
-  void Drawer::draw() {
+  void Canvas::draw() {
     waitVSync();
     addWaitingDrawables();
     initContext();
     drawAllDrawables();
   }
 
-  Drawer::Drawer(Camera* camera) {
+  Canvas::Canvas(Camera* camera) {
     this->camera = camera;
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glEnable(GL_DEPTH_TEST);

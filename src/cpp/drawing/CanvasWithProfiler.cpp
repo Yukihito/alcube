@@ -1,28 +1,28 @@
-#include "DrawerWithProfiler.h"
+#include "CanvasWithProfiler.h"
 
 namespace alcube::drawing {
-  DrawerWithProfiler::DrawerWithProfiler(Camera *camera, utils::Profiler *profiler) : Drawer(camera) {
+  CanvasWithProfiler::CanvasWithProfiler(Camera *camera, utils::Profiler *profiler) : Canvas(camera) {
     this->profiler = profiler;
     profilers.draw = profiler->create("draw");
     profilers.drawAllDrawables = profiler->create("drawAllDrawables");
     profilers.waitVSync = profiler->create("waitVSync");
   }
 
-  void DrawerWithProfiler::draw() {
+  void CanvasWithProfiler::draw() {
     profiler->start(profilers.draw);
-    Drawer::draw();
+    Canvas::draw();
     profiler->stop(profilers.draw);
   }
 
-  void DrawerWithProfiler::waitVSync() {
+  void CanvasWithProfiler::waitVSync() {
     profiler->start(profilers.waitVSync);
-    Drawer::waitVSync();
+    Canvas::waitVSync();
     profiler->stop(profilers.waitVSync);
   }
 
-  void DrawerWithProfiler::drawAllDrawables() {
+  void CanvasWithProfiler::drawAllDrawables() {
     profiler->start(profilers.drawAllDrawables);
-    Drawer::drawAllDrawables();
+    Canvas::drawAllDrawables();
     glFinish();
     profiler->stop(profilers.drawAllDrawables);
   }

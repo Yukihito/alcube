@@ -1,7 +1,7 @@
-#ifndef ALCUBE_DRAWERWITHPROFILER_H
-#define ALCUBE_DRAWERWITHPROFILER_H
+#ifndef ALCUBE_DRAWING_CANVAS_WITH_PROFILER_H
+#define ALCUBE_DRAWING_CANVAS_WITH_PROFILER_H
 
-#include "Drawer.h"
+#include "Canvas.h"
 #include "../utils/Profiler.h"
 
 namespace alcube::drawing {
@@ -12,9 +12,9 @@ namespace alcube::drawing {
       int drawAllDrawables;
   };
 
-  class DrawerWithProfiler : public Drawer {
+  class CanvasWithProfiler : public Canvas {
     public:
-      explicit DrawerWithProfiler(Camera* camera, utils::Profiler *profiler);
+      explicit CanvasWithProfiler(Camera* camera, utils::Profiler *profiler);
       void draw() override;
       void waitVSync() override;
 
@@ -28,4 +28,4 @@ namespace alcube::drawing {
 }
 
 
-#endif //ALCUBE_DRAWERWITHPROFILER_H
+#endif //ALCUBE_DRAWING_CANVAS_WITH_PROFILER_H

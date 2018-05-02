@@ -110,7 +110,7 @@ namespace alcube::samples {
     window = new utils::app::OpenGLWindow([&]() { onDraw(); });
     window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
 
-    // Drawer
+    // Drawing
     camera = new drawing::Camera(
       glm::vec3(0.0f, 0.0f, settings->world.size * 2.0f),
       glm::quat(),
@@ -120,8 +120,8 @@ namespace alcube::samples {
       0.1f, // near
       settings->world.size * 4.0f // far
     );
-    drawer = new drawing::DrawerWithProfiler(camera, profiler);
-    shaders = new drawing::shaders::Shaders(new utils::FileUtil(), drawer->context);
+    canvas = new drawing::CanvasWithProfiler(camera, profiler);
+    shaders = new drawing::shaders::Shaders(new utils::FileUtil(), canvas->context);
 
     // Grid
     grid = new Grid((unsigned int)settings->world.size);
@@ -151,7 +151,7 @@ namespace alcube::samples {
     physicsSimulator->gravity = settings->physics.gravity;
 
     // Cube
-    renderer = new models::drawing::Renderer(gpuAccessor, drawer, 65536 * 4);
+    renderer = new models::drawing::Renderer(gpuAccessor, canvas, 65536 * 4);
     cube = new models::Alcube(
       fluidSimulator,
       softBodySimulator,
@@ -205,7 +205,7 @@ namespace alcube::samples {
     gpuAccessor->memories.colors.setCount(physicsSimulator->actorCount);
     gpuAccessor->memories.colors.read();
     profiler->stop(profilers.updateDrawable);
-    drawer->draw();
+    canvas->draw();
   }
 
   void Application::onUpdate() {

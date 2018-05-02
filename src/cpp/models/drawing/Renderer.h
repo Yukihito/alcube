@@ -3,14 +3,14 @@
 
 #include "RenderingGroup.h"
 #include "../../utils/ResourceAllocation.h"
-#include "../../drawing/Drawer.h"
+#include "../../drawing/Canvas.h"
 
 namespace alcube::models::drawing {
   class Renderer {
     public:
       explicit Renderer(
         gpu::GPUAccessor* gpuAccessor,
-        alcube::drawing::Drawer* drawer,
+        alcube::drawing::Canvas* canvas,
         unsigned int size
       );
       void add(RenderingGroup* renderingGroup);
@@ -19,10 +19,10 @@ namespace alcube::models::drawing {
     private:
       void allocate();
       void update();
-      void registerInDrawer();
+      void registerInCanvas();
       utils::AllocationRange* allocationRange;
       gpu::GPUAccessor* gpuAccessor;
-      alcube::drawing::Drawer* drawer;
+      alcube::drawing::Canvas* canvas;
       std::vector<RenderingGroup*> renderingGroups;
   };
 }

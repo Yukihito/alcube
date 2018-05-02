@@ -4,7 +4,7 @@
 #include "../../../drawing/Drawable.h"
 #include "../../SoftBodyActor.h"
 #include "../../Simulator.h"
-#include "../../../drawing/Drawer.h"
+#include "../../../drawing/Canvas.h"
 #include "../../../drawing/shapes/Shapes.h"
 #include "../../../drawing/shaders/Shaders.h"
 #include "../../../utils/app/OpenGLWindow.h"
