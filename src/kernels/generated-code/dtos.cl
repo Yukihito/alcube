@@ -59,6 +59,8 @@ typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
 } PhysicalQuantity;
 
 typedef struct __attribute__ ((packed)) RendererStruct {
+  ushort actorIndex;
+  char _padding0[2];
   int refersToRotations;
   uint instanceColorType;
 } Renderer;

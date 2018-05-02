@@ -1,4 +1,4 @@
-var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, InstanceColorType, Renderer, RendererFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, Texture, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, rendererFactory, softbodyFeaturesFactory, springFactory, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
+var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, InstanceColorType, RenderingGroup, RenderingGroupFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, Texture, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, renderingGroupFactory, softbodyFeaturesFactory, springFactory, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
 
 vec3 = function(x, y, z) {
   return new THREE.Vector3(parseFloat(x), parseFloat(y), parseFloat(z));
@@ -205,19 +205,19 @@ ActorFactory = class ActorFactory {
     return this.underlying = constructActorFactory();
   }
 
-  create(features, renderer) {
+  create(features) {
     var actor;
     actor = new Actor;
-    actor.wrap(this.underlying.create(features.underlying, renderer.underlying));
+    actor.wrap(this.underlying.create(features.underlying));
     return actor;
   }
 
 };
 
-Renderer = class Renderer {
+RenderingGroup = class RenderingGroup {
   constructor() {
     this.wrap = this.wrap.bind(this);
-    this.setUpResources = this.setUpResources.bind(this);
+    this.add = this.add.bind(this);
   }
 
   wrap(underlying) {
@@ -229,13 +229,13 @@ Renderer = class Renderer {
     return primitiveAccessor(this, 'instanceColorType');
   }
 
-  setUpResources() {
-    return this.underlying.setUpResources();
+  add(actor) {
+    return this.underlying.add(actor.underlying);
   }
 
 };
 
-RendererFactory = class RendererFactory {
+RenderingGroupFactory = class RenderingGroupFactory {
   constructor() {
     this.wrap = this.wrap.bind(this);
     this.create = this.create.bind(this);
@@ -246,10 +246,10 @@ RendererFactory = class RendererFactory {
   }
 
   create() {
-    var renderer;
-    renderer = new Renderer;
-    renderer.wrap(this.underlying.create());
-    return renderer;
+    var entity;
+    entity = new RenderingGroup;
+    entity.wrap(this.underlying.create());
+    return entity;
   }
 
 };
@@ -270,6 +270,8 @@ Alcube = class Alcube {
       return this.underlying.addActor(obj.underlying);
     } else if (obj.constructor.name === 'Spring') {
       return this.underlying.addSpring(obj.underlying);
+    } else if (obj.constructor.name === 'RenderingGroup') {
+      return this.underlying.addRenderingGroup(obj.underlying);
     }
   }
 
@@ -291,9 +293,9 @@ springFactory = new SpringFactory();
 
 springFactory.wrap();
 
-rendererFactory = new RendererFactory();
+renderingGroupFactory = new RenderingGroupFactory();
 
-rendererFactory.wrap();
+renderingGroupFactory.wrap();
 
 cube = new Alcube();
 

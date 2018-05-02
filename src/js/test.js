@@ -1,31 +1,32 @@
-var fluid, fluidFeatures, i, j, k, l, linearMomentum, m, n, o, p, pos, q, r, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, renderer, renderer2, s, softbodies, softbody, softbodyEdgeLength, softbodyFeatures, softbodySize, spring, t, u, w, x, y, z;
+var fluid, fluidFeatures, i, j, k, l, linearMomentum, m, n, o, p, pos, q, r, ref, ref1, ref2, ref3, ref4, ref5, ref6, ref7, renderingGroup, renderingGroup2, s, softbodies, softbody, softbodyEdgeLength, softbodyFeatures, softbodySize, spring, t, u, w, x, y, z;
 
-renderer = rendererFactory.create();
+renderingGroup = renderingGroupFactory.create();
 
-renderer.diffuse(vec3(1.0, 1.0, 1.0));
+renderingGroup.diffuse(vec3(1.0, 1.0, 1.0));
 
-renderer.ambient(vec3(0.3, 0.3, 0.3));
+renderingGroup.ambient(vec3(0.3, 0.3, 0.3));
 
-renderer.specular(vec3(0.1, 0.1, 0.1));
+renderingGroup.specular(vec3(0.1, 0.1, 0.1));
 
-renderer.instanceColorType(InstanceColorType.LINEAR_MOMENTUM);
+renderingGroup.instanceColorType(InstanceColorType.NONE);
 
-renderer2 = rendererFactory.create();
+renderingGroup2 = renderingGroupFactory.create();
 
-renderer2.diffuse(vec3(1.0, 1.0, 1.0));
+renderingGroup2.diffuse(vec3(1.0, 1.0, 1.0));
 
-renderer2.ambient(vec3(0.3, 0.3, 0.3));
+renderingGroup2.ambient(vec3(0.3, 0.3, 0.3));
 
-renderer2.specular(vec3(0.1, 0.1, 0.1));
+renderingGroup2.specular(vec3(0.1, 0.1, 0.1));
 
-renderer2.instanceColorType(InstanceColorType.NONE);
+renderingGroup2.instanceColorType(InstanceColorType.LINEAR_MOMENTUM);
 
 fluidFeatures = fluidFeaturesFactory.create();
 
 fluid = function(position) {
   var actor;
-  actor = actorFactory.create(fluidFeatures, renderer2);
+  actor = actorFactory.create(fluidFeatures);
   actor.position(position);
+  renderingGroup.add(actor);
   return actor;
 };
 
@@ -39,10 +40,11 @@ softbodies = [];
 
 softbody = function(position, linearMomentum) {
   var actor;
-  actor = actorFactory.create(softbodyFeatures, renderer);
+  actor = actorFactory.create(softbodyFeatures);
   actor.position(position);
   actor.linearMomentum(linearMomentum);
   softbodies.push(actor);
+  renderingGroup2.add(actor);
   return actor;
 };
 
@@ -99,6 +101,6 @@ for (z = r = 0, ref5 = softbodySize; undefined !== 0 && (0 <= ref5 ? 0 <= r && r
   }
 }
 
-renderer.setUpResources();
+cube.add(renderingGroup);
 
-renderer2.setUpResources();
+cube.add(renderingGroup2);

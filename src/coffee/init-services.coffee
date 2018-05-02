@@ -117,12 +117,12 @@ class ActorFactory
   wrap: () =>
     @underlying = constructActorFactory()
 
-  create: (features, renderer) =>
+  create: (features) =>
     actor = new Actor
-    actor.wrap @underlying.create features.underlying, renderer.underlying
+    actor.wrap @underlying.create features.underlying
     actor
 
-class Renderer
+class RenderingGroup
   wrap: (underlying) =>
     @underlying = underlying
     vec3Accessor this, 'diffuse'
@@ -131,17 +131,17 @@ class Renderer
     primitiveAccessor this, 'texture'
     primitiveAccessor this, 'instanceColorType'
 
-  setUpResources: () =>
-    @underlying.setUpResources()
+  add: (actor) =>
+    @underlying.add actor.underlying
 
-class RendererFactory
+class RenderingGroupFactory
   wrap: () =>
     @underlying = constructRenderingGroupFactory()
 
   create: () =>
-    renderer = new Renderer
-    renderer.wrap @underlying.create()
-    renderer
+    entity = new RenderingGroup
+    entity.wrap @underlying.create()
+    entity
 
 class Alcube
   wrap: () =>
@@ -153,6 +153,8 @@ class Alcube
       @underlying.addActor obj.underlying
     else if obj.constructor.name == 'Spring'
       @underlying.addSpring obj.underlying
+    else if obj.constructor.name == 'RenderingGroup'
+      @underlying.addRenderingGroup obj.underlying
 
 fluidFeaturesFactory = new FluidFeaturesFactory()
 fluidFeaturesFactory.wrap()
@@ -166,8 +168,8 @@ actorFactory.wrap()
 springFactory = new SpringFactory()
 springFactory.wrap()
 
-rendererFactory = new RendererFactory()
-rendererFactory.wrap()
+renderingGroupFactory = new RenderingGroupFactory()
+renderingGroupFactory.wrap()
 
 cube = new Alcube()
 cube.wrap()

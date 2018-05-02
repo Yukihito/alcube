@@ -11,14 +11,14 @@ namespace alcube::samples {
     services.softbodyFeaturesFactory = new alcube::scripting::mappings::physics::softbody::FeaturesFactory();
     services.fluidFeaturesFactory = new alcube::scripting::mappings::physics::fluid::FeaturesFactory();
     services.springFactory = new alcube::scripting::mappings::physics::softbody::SpringFactory();
-    services.rendererFactory = new alcube::scripting::mappings::drawing::RendererFactory();
+    services.renderingGroupFactory = new alcube::scripting::mappings::drawing::RenderingGroupFactory();
     services.cube = new alcube::scripting::mappings::Alcube();
 
     entities.actor = new alcube::scripting::mappings::Actor();
     entities.fluidFeatures = new alcube::scripting::mappings::physics::fluid::Features();
     entities.softbodyFeatures = new alcube::scripting::mappings::physics::softbody::Features();
     entities.spring = new alcube::scripting::mappings::physics::softbody::Spring();
-    entities.renderer = new alcube::scripting::mappings::drawing::Renderer();
+    entities.renderer = new alcube::scripting::mappings::drawing::RenderingGroup();
 
     all = {
       entities.actor,
@@ -29,7 +29,7 @@ namespace alcube::samples {
       services.springFactory,
       entities.softbodyFeatures,
       services.softbodyFeaturesFactory,
-      services.rendererFactory,
+      services.renderingGroupFactory,
       entities.renderer,
       settings.physics,
       settings.world,
@@ -61,6 +61,7 @@ namespace alcube::samples {
       loadBasicLibraries();
       loadSettings();
       initServices();
+      cube->setUpRenderer();
       gpuAccessor->kernels.inputRenderers(
         physicsSimulator->actorCount,
         gpuAccessor->memories.hostRenderers,
@@ -68,7 +69,6 @@ namespace alcube::samples {
         gpuAccessor->memories.hostColors,
         gpuAccessor->memories.colors
       );
-      cube->setUpRenderers();
       //glm::vec3 color = glm::vec3(0.4f, 0.4f, 1.0f);
       /*
       glm::vec3 color = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -174,19 +174,21 @@ namespace alcube::samples {
     physicsSimulator->gravity = settings->physics.gravity;
 
     // Cube
+    renderer = new models::drawing::Renderer(gpuAccessor, drawer, 65536 * 4);
     cube = new models::Alcube(
       fluidSimulator,
       softBodySimulator,
-      physicsSimulator
+      physicsSimulator,
+      renderer
     );
     mappings.services.cube->setUnderlying(cube);
 
     // Factories
-    instanceRendererFactory = new models::drawing::Model3DFactory(new utils::MemoryPool<models::drawing::Model3D>(settings->world.maxActorCount), gpuAccessor);
-    rendererFactory = new models::drawing::RenderingGroupFactory(new utils::MemoryPool<models::drawing::RenderingGroup>(settings->world.maxActorCount), gpuAccessor, shaders, drawer, settings);
-    mappings.services.rendererFactory->setUnderlying(rendererFactory);
+    model3DFactory = new models::drawing::Model3DFactory(new utils::MemoryPool<models::drawing::Model3D>(settings->world.maxActorCount));
+    renderingGroupFactory = new models::drawing::RenderingGroupFactory(new utils::MemoryPool<models::drawing::RenderingGroup>(settings->world.maxActorCount), shaders, settings);
+    mappings.services.renderingGroupFactory->setUnderlying(renderingGroupFactory);
 
-    actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(settings->world.maxActorCount), instanceRendererFactory);
+    actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(settings->world.maxActorCount), model3DFactory);
     mappings.services.actorFactory->setUnderlying(actorFactory);
 
     springFactory = new models::physics::softbody::SpringFactory(new utils::MemoryPool<models::physics::softbody::Spring>(settings->world.maxActorCount));
@@ -232,24 +234,6 @@ namespace alcube::samples {
   void Application::onUpdate() {
     profiler->start(profilers.update);
     physicsSimulator->update();
-    /*
-    gpuAccessor->kernels.updateDrawingBuffer_Texture_SingleColor(
-      physicsSimulator->actorCount,
-      gpuAccessor->memories.positions,
-      gpuAccessor->memories.rotations0,
-      gpuAccessor->memories.rotations1,
-      gpuAccessor->memories.rotations2,
-      gpuAccessor->memories.rotations3,
-      gpuAccessor->memories.physicalQuantities
-    );
-
-    gpuAccessor->kernels.updateDrawingBuffer_InstanceColor(
-      physicsSimulator->actorCount,
-      gpuAccessor->memories.positions,
-      gpuAccessor->memories.colors,
-      gpuAccessor->memories.physicalQuantities
-    );
-          */
     gpuAccessor->kernels.updateDrawingBuffer(
       physicsSimulator->actorCount,
       gpuAccessor->memories.positions,

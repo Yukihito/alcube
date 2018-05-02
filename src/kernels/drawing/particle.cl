@@ -20,14 +20,15 @@ __kernel void updateDrawingBuffer(
   __global Renderer* renderers
 ) {
   size_t i = get_global_id(0);
-  positions[i] = physicalQuantities[i].position;
+  unsigned short actorIndex = renderers[i].actorIndex;
+  positions[i] = physicalQuantities[actorIndex].position;
 
   if (renderers[i].instanceColorType == 3) {
-    colors[i] = fabs(physicalQuantities[i].linearMomentum);
+    colors[i] = fabs(physicalQuantities[actorIndex].linearMomentum);
   }
 
   if (renderers[i].refersToRotations) {
-    __global float4* r = &physicalQuantities[i].rotation;
+    __global float4* r = &physicalQuantities[actorIndex].rotation;
     float x = r->x;
     float y = r->y;
     float z = r->z;

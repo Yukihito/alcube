@@ -1,20 +1,21 @@
-renderer = rendererFactory.create()
-renderer.diffuse vec3 1.0, 1.0, 1.0
-renderer.ambient vec3 0.3, 0.3, 0.3
-renderer.specular vec3 0.1, 0.1, 0.1
-renderer.instanceColorType InstanceColorType.LINEAR_MOMENTUM
+renderingGroup = renderingGroupFactory.create()
+renderingGroup.diffuse vec3 1.0, 1.0, 1.0
+renderingGroup.ambient vec3 0.3, 0.3, 0.3
+renderingGroup.specular vec3 0.1, 0.1, 0.1
+renderingGroup.instanceColorType InstanceColorType.NONE
 
-renderer2 = rendererFactory.create()
-renderer2.diffuse vec3 1.0, 1.0, 1.0
-renderer2.ambient vec3 0.3, 0.3, 0.3
-renderer2.specular vec3 0.1, 0.1, 0.1
-renderer2.instanceColorType InstanceColorType.NONE
+renderingGroup2 = renderingGroupFactory.create()
+renderingGroup2.diffuse vec3 1.0, 1.0, 1.0
+renderingGroup2.ambient vec3 0.3, 0.3, 0.3
+renderingGroup2.specular vec3 0.1, 0.1, 0.1
+renderingGroup2.instanceColorType InstanceColorType.LINEAR_MOMENTUM
 
 fluidFeatures = fluidFeaturesFactory.create()
 
 fluid = (position) ->
-  actor = actorFactory.create fluidFeatures, renderer2
+  actor = actorFactory.create fluidFeatures
   actor.position position
+  renderingGroup.add actor
   actor
 
 softbodyFeatures = softbodyFeaturesFactory.create()
@@ -23,10 +24,11 @@ softbodyFeatures.mass 0.2
 
 softbodies = []
 softbody = (position, linearMomentum) ->
-  actor = actorFactory.create softbodyFeatures, renderer
+  actor = actorFactory.create softbodyFeatures
   actor.position position
   actor.linearMomentum linearMomentum
   softbodies.push actor
+  renderingGroup2.add actor
   actor
 
 springFactory.k 64
@@ -70,6 +72,5 @@ for z in [0...softbodySize]
         cube.add s
       i++
 
-
-renderer.setUpResources()
-renderer2.setUpResources()
+cube.add renderingGroup
+cube.add renderingGroup2

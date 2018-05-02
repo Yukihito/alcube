@@ -2,21 +2,19 @@
 
 namespace alcube::models::drawing {
   void RenderingGroup::init(
-    gpu::GPUAccessor* gpuAccessor,
     alcube::drawing::shaders::Shaders* shaders,
-    alcube::drawing::Drawer* drawer,
     Settings* settings
   ) {
-    this->gpuAccessor = gpuAccessor;
     this->shaders = shaders;
-    this->drawer = drawer;
     this->settings = settings;
     material.ambient = glm::vec3();
     material.diffuse = glm::vec3();
     material.specular = glm::vec3();
+    model3Ds = {};
     drawable = nullptr;
     texture = TEXTURE_NONE;
     instanceColorType = INSTANCE_COLOR_TYPE_NONE;
+    allocations = {};
   }
 
   glm::vec3 RenderingGroup::getDiffuse() {
@@ -59,7 +57,53 @@ namespace alcube::models::drawing {
     instanceColorType = v;
   }
 
-  void RenderingGroup::setUpResources() {
+  alcube::drawing::Drawable* RenderingGroup::getDrawable() {
+    return drawable;
+  }
+
+  void RenderingGroup::allocate(
+    alcube::utils::AllocationRange *rendererAllocationRange,
+    alcube::gpu::GPUAccessor *gpuAccessor
+  ) {
+    allocationRange = rendererAllocationRange->allocate((unsigned int)model3Ds.size());
+    for (auto model3D : model3Ds) {
+      model3D->allocate(this, allocationRange, gpuAccessor);
+    }
+    allocations.colors = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.colors);
+    allocations.positions = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.positions);
+    allocations.rotations0 = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.rotations0);
+    allocations.rotations1 = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.rotations1);
+    allocations.rotations2 = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.rotations2);
+    allocations.rotations3 = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.rotations3);
+  }
+
+  void RenderingGroup::update() {
+    for (auto model3D : model3Ds) {
+      model3D->update();
+    }
+    auto shader = selectShader();
+    drawable = new SphereDrawable(
+      *shader,
+      material,
+      settings->world.maxActorCount,
+      (GLfloat*)allocations.positions->getPtr(),
+      (GLfloat*)allocations.rotations0->getPtr(),
+      (GLfloat*)allocations.rotations1->getPtr(),
+      (GLfloat*)allocations.rotations2->getPtr(),
+      (GLfloat*)allocations.rotations3->getPtr(),
+      (GLfloat*)allocations.colors->getPtr()
+    );
+    if (texture == TEXTURE_CHECK) {
+      drawable->texture = new alcube::drawing::textures::CheckTexture(128, 128);
+    }
+    drawable->shape->instanceCount = allocationRange->getLength();
+  }
+
+  void RenderingGroup::add(alcube::models::drawing::Model3D *model3D) {
+    model3Ds.push_back(model3D);
+  }
+
+  alcube::drawing::Shader* RenderingGroup::selectShader() {
     alcube::drawing::Shader* shader = nullptr;
     if (instanceColorType == INSTANCE_COLOR_TYPE_NONE) {
       if (texture == TEXTURE_CHECK) {
@@ -70,64 +114,26 @@ namespace alcube::models::drawing {
     } else {
       shader = &shaders->directionalLight.instanceColor;
     }
-    drawable = new SphereDrawable(
-      *shader,
-      material,
-      settings->world.maxActorCount,
-      (GLfloat*)gpuAccessor->memories.positions.dto,
-      (GLfloat*)gpuAccessor->memories.rotations0.dto,
-      (GLfloat*)gpuAccessor->memories.rotations1.dto,
-      (GLfloat*)gpuAccessor->memories.rotations2.dto,
-      (GLfloat*)gpuAccessor->memories.rotations3.dto,
-      (GLfloat*)gpuAccessor->memories.colors.dto
-    );
-    if (texture == TEXTURE_CHECK) {
-      drawable->texture = new alcube::drawing::textures::CheckTexture(128, 128);
-    }
-    drawable->shape->instanceCount = childCount;
-    /*
-    for (int i = 0; i < childCount; i++) {
-      gpuAccessor->memories.hostRenderers.dto[i].instanceColorType = instanceColorType;
-      gpuAccessor->memories.hostRenderers.dto[i].refersToRotations = refersToRotations();
-    }
-     */
-    /*
-    gpuAccessor->kernels.inputRenderers(
-      childCount,
-      gpuAccessor->memories.hostRenderers,
-      gpuAccessor->memories.renderers,
-      gpuAccessor->memories.hostColors,
-      gpuAccessor->memories.colors
-    );
-     */
-    drawer->add(drawable);
+    return shader;
   }
 
   bool RenderingGroup::refersToRotations() {
     return texture != TEXTURE_NONE;
   }
 
-  void RenderingGroup::incrementChildCount() {
-    childCount++;
-  }
-
   RenderingGroupFactory::RenderingGroupFactory(
     alcube::utils::MemoryPool<alcube::models::drawing::RenderingGroup> *memoryPool,
-    alcube::gpu::GPUAccessor *gpuAccessor,
     alcube::drawing::shaders::Shaders *shaders,
-    alcube::drawing::Drawer* drawer,
     alcube::models::Settings *settings
   ) {
     this->memoryPool = memoryPool;
-    this->gpuAccessor = gpuAccessor;
     this->shaders = shaders;
     this->settings = settings;
-    this->drawer = drawer;
   }
 
   RenderingGroup* RenderingGroupFactory::create() {
     auto renderer = memoryPool->get();
-    renderer->init(gpuAccessor, shaders, drawer, settings);
+    renderer->init(shaders, settings);
     return renderer;
   }
 }

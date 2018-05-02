@@ -11,6 +11,7 @@ namespace alcube::scripting::mappings {
       void init() override;
       static void addActor(const v8::FunctionCallbackInfo<v8::Value>& info);
       static void addSpring(const v8::FunctionCallbackInfo<v8::Value>& info);
+      static void addRenderingGroup(const v8::FunctionCallbackInfo<v8::Value>& info);
   };
 }
 

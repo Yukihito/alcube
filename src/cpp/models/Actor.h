@@ -30,15 +30,16 @@ namespace alcube::models {
       void init(
         int id,
         alcube::physics::Actor* physicsActor,
-        alcube::models::drawing::Model3D* instanceRenderer
+        alcube::models::drawing::Model3D* model3D
       );
 
       alcube::physics::Actor* getPhysicsActor();
       unsigned int getIndex() override;
-      void setUpRenderers();
+      alcube::models::drawing::Model3D* getModel3D();
+
     private:
       alcube::physics::Actor* physicsActor = nullptr;
-      alcube::models::drawing::Model3D* instanceRenderer = nullptr;
+      alcube::models::drawing::Model3D* model3D = nullptr;
       int id = 0;
   };
 
@@ -46,17 +47,14 @@ namespace alcube::models {
     public:
       explicit ActorFactory(
         utils::MemoryPool<Actor>* memoryPool,
-        drawing::Model3DFactory* instanceRendererFactory
+        drawing::Model3DFactory* model3DFactory
       );
-      Actor* create(
-        physics::Features* feature,
-        models::drawing::RenderingGroup* renderer
-      );
+      Actor* create(physics::Features* feature);
 
     private:
       int instanceCount = 0;
       utils::MemoryPool<Actor>* memoryPool;
-      drawing::Model3DFactory* instanceRendererFactory;
+      drawing::Model3DFactory* model3DFactory;
   };
 }
 

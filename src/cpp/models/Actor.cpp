@@ -6,12 +6,12 @@ namespace alcube::models {
   void Actor::init(
     int id,
     alcube::physics::Actor *physicsActor,
-    models::drawing::Model3D* instanceRenderer
+    models::drawing::Model3D* model3D
   ) {
     this->id = id;
     this->physicsActor = nullptr;
     this->physicsActor = physicsActor;
-    this->instanceRenderer = instanceRenderer;
+    this->model3D = model3D;
   }
 
   int Actor::getId() {
@@ -52,38 +52,35 @@ namespace alcube::models {
   }
 
   glm::vec3 Actor::getColor() {
-    return instanceRenderer->getColor();
+    return model3D->getColor();
   }
 
   void Actor::setColor(glm::vec3 arg) {
-    instanceRenderer->setColor(arg);
+    model3D->setColor(arg);
   }
 
   unsigned int Actor::getIndex() {
     return physicsActor->index;
   }
 
-  void Actor::setUpRenderers() {
-    instanceRenderer->setUp();
+  alcube::models::drawing::Model3D* Actor::getModel3D() {
+    return model3D;
   }
 
   ActorFactory::ActorFactory(
     utils::MemoryPool<Actor> *memoryPool,
-    drawing::Model3DFactory* instanceRendererFactory
+    drawing::Model3DFactory* model3DFactory
   ) {
     this->memoryPool = memoryPool;
-    this->instanceRendererFactory = instanceRendererFactory;
+    this->model3DFactory = model3DFactory;
   }
 
-  Actor* ActorFactory::create(
-    physics::Features *feature,
-    models::drawing::RenderingGroup* renderer
-  ) {
+  Actor* ActorFactory::create(physics::Features *feature) {
     auto physicsActor = feature->createPhysicsActor();
     auto actor = memoryPool->get();
-    auto instanceRenderer = instanceRendererFactory->create(actor, renderer);
+    auto entity = model3DFactory->create(actor);
     int nextId = instanceCount;
-    actor->init(nextId, physicsActor, instanceRenderer);
+    actor->init(nextId, physicsActor, entity);
     instanceCount++;
     return actor;
   }

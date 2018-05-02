@@ -14,7 +14,7 @@
 #include "../scripting/Evaluator.h"
 #include "../models/Settings.h"
 #include "../models/drawing/SphereDrawable.h"
-#include "../scripting/mappings/drawing/Renderer.h"
+#include "../scripting/mappings/drawing/RenderingGroup.h"
 
 namespace alcube::samples {
   class Profilers {
@@ -42,7 +42,7 @@ namespace alcube::samples {
     alcube::scripting::mappings::physics::fluid::FeaturesFactory* fluidFeaturesFactory;
     alcube::scripting::mappings::physics::softbody::SpringFactory* springFactory;
     alcube::scripting::mappings::physics::softbody::FeaturesFactory* softbodyFeaturesFactory;
-    alcube::scripting::mappings::drawing::RendererFactory* rendererFactory;
+    alcube::scripting::mappings::drawing::RenderingGroupFactory* renderingGroupFactory;
     alcube::scripting::mappings::Alcube* cube;
   };
 
@@ -51,7 +51,7 @@ namespace alcube::samples {
     alcube::scripting::mappings::physics::fluid::Features* fluidFeatures;
     alcube::scripting::mappings::physics::softbody::Spring* spring;
     alcube::scripting::mappings::physics::softbody::Features* softbodyFeatures;
-    alcube::scripting::mappings::drawing::Renderer* renderer;
+    alcube::scripting::mappings::drawing::RenderingGroup* renderer;
   };
 
   struct Mappings {
@@ -94,8 +94,9 @@ namespace alcube::samples {
       models::physics::softbody::SpringFactory* springFactory;
       models::physics::fluid::FeaturesFactory* fluidFeaturesFactory;
       models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory;
-      models::drawing::RenderingGroupFactory* rendererFactory;
-      models::drawing::Model3DFactory* instanceRendererFactory;
+      models::drawing::RenderingGroupFactory* renderingGroupFactory;
+      models::drawing::Model3DFactory* model3DFactory;
+      models::drawing::Renderer* renderer;
       scripting::Evaluator* evaluator;
       Profilers profilers;
       Mappings mappings;

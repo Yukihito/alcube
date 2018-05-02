@@ -1,49 +1,48 @@
 #include "Model3D.h"
 
+
 namespace alcube::models::drawing {
-  void Model3D::init(
-    alcube::models::drawing::IndexHolder *indexHolder,
-    alcube::gpu::GPUAccessor *gpuAccessor,
-    alcube::models::drawing::RenderingGroup *parent
-  ) {
-    this->indexHolder = indexHolder;
-    this->gpuAccessor = gpuAccessor;
-    this->parent = parent;
+  void Model3D::init(alcube::models::drawing::IndexHolder *actorIndexHolder) {
+    this->actorIndexHolder = actorIndexHolder;
+    color = glm::vec3();
+    allocationRange = nullptr;
+    allocations = {};
+    groupSettings = nullptr;
   }
 
-  void Model3D::setUp() {
-    unsigned int i = indexHolder->getIndex();
-    gpuAccessor->memories.hostRenderers.dto[i].instanceColorType = parent->getInstanceColorType();
-    gpuAccessor->memories.hostRenderers.dto[i].refersToRotations = parent->refersToRotations();
+  void Model3D::allocate(
+    alcube::models::drawing::RenderingGroupSettings *groupSettings,
+    alcube::utils::AllocationRange *groupAllocationRange,
+    alcube::gpu::GPUAccessor *gpuAccessor
+  ) {
+    allocationRange = groupAllocationRange->allocate(1);
+    allocations.colors = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.hostColors);
+    allocations.features = new utils::ResourceAllocation<gpu::dtos::Renderer>(allocationRange, gpuAccessor->dtos.hostRenderers);
+    this->groupSettings = groupSettings;
+  }
+
+  void Model3D::update() {
+    allocations.colors->getPtr()[0] = {color.r, color.y, color.z};
+    allocations.features->getPtr()->refersToRotations = groupSettings->refersToRotations();
+    allocations.features->getPtr()->instanceColorType = groupSettings->getInstanceColorType();
+    allocations.features->getPtr()->actorIndex = (unsigned short)actorIndexHolder->getIndex();
   }
 
   glm::vec3 Model3D::getColor() {
-    cl_float3 v = *gpuAccessor->memories.hostColors.at(indexHolder->getIndex());
-    return glm::vec3(v.x, v.y, v.z);
+    return color;
   }
 
   void Model3D::setColor(glm::vec3 v) {
-    gpuAccessor->memories.hostColors.at(indexHolder->getIndex())[0] = {v.x, v.y, v.z};
+    color = v;
   }
 
-  RenderingGroup* Model3D::getParent() {
-    return parent;
-  }
-
-  Model3DFactory::Model3DFactory(
-    alcube::utils::MemoryPool<alcube::models::drawing::Model3D>* memoryPool,
-    alcube::gpu::GPUAccessor *gpuAccessor
-  ) {
+  Model3DFactory::Model3DFactory(alcube::utils::MemoryPool<alcube::models::drawing::Model3D>* memoryPool) {
     this->memoryPool = memoryPool;
-    this->gpuAccessor = gpuAccessor;
   }
 
-  Model3D* Model3DFactory::create(
-    alcube::models::drawing::IndexHolder *indexHolder,
-    alcube::models::drawing::RenderingGroup *parent) {
-    auto renderer = memoryPool->get();
-    renderer->init(indexHolder, gpuAccessor, parent);
-    parent->incrementChildCount();
-    return renderer;
+  Model3D* Model3DFactory::create(alcube::models::drawing::IndexHolder *actorIndexHolder) {
+    auto entity = memoryPool->get();
+    entity->init(actorIndexHolder);
+    return entity;
   }
 }

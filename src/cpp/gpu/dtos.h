@@ -87,6 +87,8 @@ namespace alcube::gpu::dtos {
 #pragma pack(push, 1)
   class Renderer {
     public:
+      unsigned short actorIndex;
+      char _padding0[2];
       int refersToRotations;
       unsigned int instanceColorType;
   };

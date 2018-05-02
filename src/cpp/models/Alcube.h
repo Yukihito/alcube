@@ -6,6 +6,7 @@
 #include "Alcube.h"
 #include "../physics/fluid/Simulator.h"
 #include "../physics/softbody/Simulator.h"
+#include "drawing/Renderer.h"
 
 namespace alcube::models {
   class Alcube {
@@ -13,18 +14,21 @@ namespace alcube::models {
       explicit Alcube(
         alcube::physics::fluid::Simulator* fluidSimulator,
         alcube::physics::softbody::Simulator* softbodySimulator,
-        alcube::physics::Simulator* physicsSimulator
+        alcube::physics::Simulator* physicsSimulator,
+        alcube::models::drawing::Renderer* renderer
       );
       void add(Actor* actor);
       void add(physics::softbody::Spring* spring);
+      void add(models::drawing::RenderingGroup* renderingGroup);
       unsigned int getActorCount();
-      void setUpRenderers();
+      void setUpRenderer();
 
     private:
       std::vector<Actor*> actors;
       alcube::physics::fluid::Simulator* fluidSimulator;
       alcube::physics::softbody::Simulator* softbodySimulator;
       alcube::physics::Simulator* physicsSimulator;
+      alcube::models::drawing::Renderer* renderer;
   };
 }
 

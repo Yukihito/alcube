@@ -105,6 +105,7 @@ dto-structs:
     - ushort actorIndex
 
   Renderer:
+    - ushort actorIndex
     - int refersToRotations
     - uint instanceColorType
 

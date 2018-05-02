@@ -1,5 +1,5 @@
-#ifndef ALCUBE_DRAWING_FEATURES_H
-#define ALCUBE_DRAWING_FEATURES_H
+#ifndef ALCUBE_DRAWING_RENDERING_GROUP_H
+#define ALCUBE_DRAWING_RENDERING_GROUP_H
 
 #include <glm/vec3.hpp>
 #include <CL/cl_platform.h>
@@ -8,34 +8,24 @@
 #include "../../gpu/GPUAccessor.h"
 #include "SphereDrawable.h"
 #include "../Settings.h"
-#include "../../drawing/Drawer.h"
 #include <CL/cl_platform.h>
 #include "../../drawing/textures/CheckTexture.h"
+#include "Model3D.h"
 
 namespace alcube::models::drawing {
-  enum Texture {
-    TEXTURE_NONE = 0,
-    TEXTURE_CHECK
+  struct RenderingGroupAllocations {
+    utils::ResourceAllocation<cl_float3>* positions;
+    utils::ResourceAllocation<cl_float4>* rotations0;
+    utils::ResourceAllocation<cl_float4>* rotations1;
+    utils::ResourceAllocation<cl_float4>* rotations2;
+    utils::ResourceAllocation<cl_float4>* rotations3;
+    utils::ResourceAllocation<cl_float3>* colors;
   };
 
-  enum InstanceColorType {
-    INSTANCE_COLOR_TYPE_NONE = 0,
-    INSTANCE_COLOR_TYPE_MANUAL,
-    INSTANCE_COLOR_TYPE_RANDOM,
-    INSTANCE_COLOR_TYPE_LINEAR_MOMENTUM
-  };
-
-  class IndexHolder {
-    public:
-      virtual unsigned int getIndex() = 0;
-  };
-
-  class RenderingGroup {
+  class RenderingGroup : public RenderingGroupSettings {
     public:
       void init(
-        gpu::GPUAccessor* gpuAccessor,
         alcube::drawing::shaders::Shaders* shaders,
-        alcube::drawing::Drawer* drawer,
         Settings* settings
       );
       glm::vec3 getDiffuse();
@@ -46,42 +36,44 @@ namespace alcube::models::drawing {
       void setSpecular(glm::vec3 v);
       Texture getTexture();
       void setTexture(Texture v);
-      InstanceColorType  getInstanceColorType();
+
+      InstanceColorType  getInstanceColorType() override;
       void setInstanceColorType(InstanceColorType v);
-      void setUpResources();
-      bool refersToRotations();
-      void incrementChildCount();
+      bool refersToRotations() override;
+
+      alcube::drawing::Drawable* getDrawable();
+      void allocate(utils::AllocationRange* rendererAllocationRange, gpu::GPUAccessor* gpuAccessor);
+      void update();
+      void add(Model3D* model3D);
 
     private:
       alcube::drawing::Material material = {};
       alcube::drawing::Drawable* drawable = nullptr;
       Texture texture = TEXTURE_NONE;
       InstanceColorType instanceColorType = INSTANCE_COLOR_TYPE_NONE;
-      gpu::GPUAccessor* gpuAccessor = nullptr;
       alcube::drawing::shaders::Shaders* shaders = nullptr;
       Settings* settings = nullptr;
-      alcube::drawing::Drawer* drawer = nullptr;
-      unsigned int childCount = 0;
+      std::vector<Model3D*> model3Ds = {};
+      utils::AllocationRange* allocationRange;
+      RenderingGroupAllocations allocations;
+
+      alcube::drawing::Shader* selectShader();
   };
 
   class RenderingGroupFactory {
     public:
       explicit RenderingGroupFactory(
         utils::MemoryPool<RenderingGroup>* memoryPool,
-        gpu::GPUAccessor* gpuAccessor,
         alcube::drawing::shaders::Shaders* shaders,
-        alcube::drawing::Drawer* drawer,
         Settings* settings
       );
       RenderingGroup* create();
 
     private:
       utils::MemoryPool<RenderingGroup>* memoryPool;
-      gpu::GPUAccessor* gpuAccessor;
       alcube::drawing::shaders::Shaders* shaders;
-      alcube::drawing::Drawer* drawer;
       Settings* settings;
   };
 }
 
-#endif //ALCUBE_DRAWING_FEATURES_H
+#endif //ALCUBE_DRAWING_RENDERING_GROUP_H
