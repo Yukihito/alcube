@@ -1,27 +1,12 @@
 renderingGroups =
-  fluid: renderingGroupFactory.create()
   softbody: renderingGroupFactory.create()
-
-renderingGroups.fluid.diffuse vec3 0.5, 0.5, 1.0
-renderingGroups.fluid.ambient vec3 0.1, 0.1, 0.3
-renderingGroups.fluid.specular vec3 0.1, 0.1, 0.1
-renderingGroups.fluid.instanceColorType InstanceColorType.NONE
 
 renderingGroups.softbody.diffuse vec3 1.0, 1.0, 1.0
 renderingGroups.softbody.ambient vec3 0.3, 0.3, 0.3
 renderingGroups.softbody.specular vec3 0.1, 0.1, 0.1
 renderingGroups.softbody.instanceColorType InstanceColorType.LINEAR_MOMENTUM
 
-cube.add renderingGroups.fluid
 cube.add renderingGroups.softbody
-
-fluidFeatures = fluidFeaturesFactory.create()
-
-fluid = (position) ->
-  actor = actorFactory.create fluidFeatures
-  actor.position position
-  renderingGroups.fluid.add actor
-  actor
 
 softbodyFeatures = softbodyFeaturesFactory.create()
 softbodyFeatures.elasticity 0.0
@@ -41,15 +26,6 @@ spring = (actor0, position0, actor1, position1) ->
   springFactory.create actor0, position0, actor1, position1
 
 w = 64
-
-for i in [0...32]
-  for j in [0...i]
-    for k in [0...i]
-      pos = vec3(i, j, k).multiplyScalar(2)
-        .add vec3(1, 1, 1).multiplyScalar(1 - w/2)
-        .add vec3Rand().multiplyScalar(0.01)
-      cube.add fluid pos
-
 
 softbodySize = 12
 softbodyEdgeLength = softbodySize * 2

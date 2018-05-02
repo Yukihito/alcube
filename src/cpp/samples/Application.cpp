@@ -56,11 +56,11 @@ namespace alcube::samples {
     evaluator->add(mappings.all);
   }
 
-  void Application::run() {
+  void Application::run(const char* settingsFilePath, const char* mainFilePath) {
     evaluator->withScope([&]() {
       loadBasicLibraries();
-      loadSettings();
-      initServices();
+      loadSettings(settingsFilePath);
+      initServices(mainFilePath);
       cube->setUpRenderer();
       gpuAccessor->kernels.inputRenderers(
         physicsSimulator->actorCount,
@@ -95,17 +95,17 @@ namespace alcube::samples {
     evaluator->evaluate("../src/js/three.min.js");
   }
 
-  void Application::loadSettings() {
+  void Application::loadSettings(const char* settingsFilePath) {
     settings = new models::Settings();
     mappings.settings.window->setUnderlying(&settings->window);
     mappings.settings.physics->setUnderlying(&settings->physics);
     mappings.settings.world->setUnderlying(&settings->world);
     mappings.settings.root->setUnderlying(settings);
     evaluator->evaluate("../src/js/libs/init-settings.js");
-    evaluator->evaluate("../src/js/settings.js");
+    evaluator->evaluate(settingsFilePath);
   }
 
-  void Application::initServices() {
+  void Application::initServices(const char* mainFilePath) {
     // Window
     window = new utils::app::OpenGLWindow([&]() { onDraw(); });
     window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
@@ -179,7 +179,7 @@ namespace alcube::samples {
 
     // Load initial cube states
     evaluator->evaluate("../src/js/libs/init-services.js");
-    evaluator->evaluate("../src/js/samples/fluid-and-softbody.js");
+    evaluator->evaluate(mainFilePath);
 
     // Profiler
     profiler->setShowInterval(1000);

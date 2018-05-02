@@ -74,7 +74,7 @@ namespace alcube::samples {
     public:
       static Application* instance;
       explicit Application(const char* programName);
-      void run();
+      void run(const char* settingsFilePath, const char* mainFilePath);
     private:
       ApplicationClosingStatus closingStatus;
       utils::app::OpenGLWindow* window;
@@ -102,13 +102,13 @@ namespace alcube::samples {
       Mappings mappings;
       Grid* grid;
 
-      void initServices();
+      void initServices(const char* mainFilePath);
       void onClose();
       void onUpdate();
       void onDraw();
       void waitCloseAllThreads();
       void loadBasicLibraries();
-      void loadSettings();
+      void loadSettings(const char* settingsFilePath);
       static void atexitCallback();
       static void updateLoopCallback();
   };
