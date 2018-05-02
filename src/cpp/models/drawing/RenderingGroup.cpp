@@ -112,7 +112,11 @@ namespace alcube::models::drawing {
         shader = &shaders->directionalLight.singleColor;
       }
     } else {
-      shader = &shaders->directionalLight.instanceColor;
+      if (texture == TEXTURE_CHECK) {
+        shader = &shaders->directionalLight.textureInstanceColorShader;
+      } else {
+        shader = &shaders->directionalLight.instanceColor;
+      }
     }
     return shader;
   }

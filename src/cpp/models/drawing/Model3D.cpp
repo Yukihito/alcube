@@ -22,7 +22,14 @@ namespace alcube::models::drawing {
   }
 
   void Model3D::update() {
-    allocations.colors->getPtr()[0] = {color.r, color.y, color.z};
+    if (groupSettings->getInstanceColorType() == INSTANCE_COLOR_TYPE_RANDOM) {
+      std::random_device rnd;
+      std::mt19937 mt(rnd());
+      std::uniform_real_distribution<float> randReal(0, 1);
+      allocations.colors->getPtr()[0] = {randReal(mt), randReal(mt), randReal(mt)};
+    } else {
+      allocations.colors->getPtr()[0] = {color.r, color.y, color.z};
+    }
     allocations.features->getPtr()->refersToRotations = groupSettings->refersToRotations();
     allocations.features->getPtr()->instanceColorType = groupSettings->getInstanceColorType();
     allocations.features->getPtr()->actorIndex = (unsigned short)actorIndexHolder->getIndex();

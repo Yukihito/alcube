@@ -15,9 +15,9 @@ namespace alcube::physics::softbody {
   }
 
   void Simulator::writeHostMemories() {
-    for (unsigned short i = 0; i < actorCount; i++) {
+    for (unsigned int i = 0; i < actorCount; i++) {
       auto actor = actors[i];
-      actor->actor.subPhysicalQuantityIndex = i;
+      actor->actor.subPhysicalQuantityIndex = (unsigned short)i;
       actor->subPhysicalQuantity.actorIndex = actor->index;
       memories.actors.dto[actor->index] = actor->actor;
       memories.hostPhysicalQuantities.dto[actor->index] = actor->physicalQuantity;

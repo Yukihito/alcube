@@ -5,6 +5,7 @@
 #include "../../utils/ResourceAllocation.h"
 #include "../../utils/MemoryPool.h"
 #include <glm/vec3.hpp>
+#include <random>
 
 namespace alcube::models::drawing {
   enum Texture {

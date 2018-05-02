@@ -23,9 +23,9 @@ namespace alcube::physics::fluid {
   }
 
   void Simulator::writeHostMemories() {
-    for (unsigned short i = 0; i < actorCount; i++) {
+    for (unsigned int i = 0; i < actorCount; i++) {
       auto actor = actors[i];
-      actor->actor.subPhysicalQuantityIndex = i;
+      actor->actor.subPhysicalQuantityIndex = (unsigned short)i;
       actor->subPhysicalQuantity.actorIndex = actor->index;
       actor->physicalQuantity.radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
       actor->physicalQuantity.mass = memories.fluidSettings.at(0)->particleMass;

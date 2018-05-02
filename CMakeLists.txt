@@ -50,7 +50,7 @@ set(ALCUBE_DRAWING_SOURCE_FILES
         src/cpp/drawing/textures/CheckTexture.cpp src/cpp/drawing/textures/CheckTexture.h
         src/cpp/drawing/shaders/directionallight/TextureSingleColorShader.cpp
         src/cpp/drawing/shaders/directionallight/TextureSingleColorShader.h
-        )
+        src/cpp/drawing/shaders/directionallight/TextureInstanceColorShader.cpp src/cpp/drawing/shaders/directionallight/TextureInstanceColorShader.h)
 add_library(alcube_drawing_lib STATIC ${ALCUBE_DRAWING_SOURCE_FILES})
 target_link_libraries(alcube_drawing_lib
         alcube_utils_lib

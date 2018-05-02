@@ -70,6 +70,7 @@ namespace alcube::samples {
         gpuAccessor->memories.colors
       );
       physicsSimulator->input();
+
       gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
       gpuAccessor->memories.rotations0.setCount(physicsSimulator->actorCount);
       gpuAccessor->memories.rotations1.setCount(physicsSimulator->actorCount);
@@ -151,7 +152,7 @@ namespace alcube::samples {
     physicsSimulator->gravity = settings->physics.gravity;
 
     // Cube
-    renderer = new models::drawing::Renderer(gpuAccessor, canvas, 65536 * 4);
+    renderer = new models::drawing::Renderer(gpuAccessor, canvas, settings->world.maxActorCount * 4);
     cube = new models::Alcube(
       fluidSimulator,
       softBodySimulator,

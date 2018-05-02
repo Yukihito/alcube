@@ -3,6 +3,7 @@
 
 #include <stack>
 #include <map>
+#include <iostream>
 
 namespace alcube::utils {
   template <class T>

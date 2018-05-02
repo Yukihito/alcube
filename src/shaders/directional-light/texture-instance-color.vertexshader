@@ -1,0 +1,27 @@
+#version 330 core
+
+layout(location = 0) in vec3 vertexPosition_instance;
+layout(location = 1) in vec3 vertexNormal_model;
+layout(location = 2) in vec4 instancePosition_model;
+layout(location = 3) in vec2 vertexUV;
+layout(location = 4) in mat4 instanceRotation_model; // 4, 5, 6, 7
+layout(location = 8) in vec4 instanceColor;
+
+out vec3 eyeDirection_camera;
+out vec3 normal_camera;
+out vec2 UV;
+out vec3 vertexColor;
+
+uniform mat4 VP;
+uniform mat4 V;
+
+void main() {
+  vec4 rotatedVertexPosition = instanceRotation_model * vec4(vertexPosition_instance, 1.0f);
+  vec4 vertexPosition_model = vec4(rotatedVertexPosition.xyz + instancePosition_model.xyz, 1.0f);
+  gl_Position = VP * vertexPosition_model;
+  vec3 vertexPosition_camera = (V * vertexPosition_model).xyz;
+  eyeDirection_camera = -vertexPosition_camera;
+  normal_camera = (V * instanceRotation_model * vec4(vertexNormal_model, 0)).xyz;
+  UV = vertexUV;
+  vertexColor = instanceColor.xyz;
+}
