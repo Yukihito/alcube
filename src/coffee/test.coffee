@@ -1,6 +1,6 @@
 renderingGroup = renderingGroupFactory.create()
-renderingGroup.diffuse vec3 1.0, 1.0, 1.0
-renderingGroup.ambient vec3 0.3, 0.3, 0.3
+renderingGroup.diffuse vec3 0.5, 0.5, 1.0
+renderingGroup.ambient vec3 0.1, 0.1, 0.3
 renderingGroup.specular vec3 0.1, 0.1, 0.1
 renderingGroup.instanceColorType InstanceColorType.NONE
 

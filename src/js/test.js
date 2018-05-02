@@ -2,9 +2,9 @@ var fluid, fluidFeatures, i, j, k, l, linearMomentum, m, n, o, p, pos, q, r, ref
 
 renderingGroup = renderingGroupFactory.create();
 
-renderingGroup.diffuse(vec3(1.0, 1.0, 1.0));
+renderingGroup.diffuse(vec3(0.5, 0.5, 1.0));
 
-renderingGroup.ambient(vec3(0.3, 0.3, 0.3));
+renderingGroup.ambient(vec3(0.1, 0.1, 0.3));
 
 renderingGroup.specular(vec3(0.1, 0.1, 0.1));
 
