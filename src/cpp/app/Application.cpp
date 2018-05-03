@@ -93,7 +93,7 @@ namespace alcube::app {
   }
 
   void Application::loadBasicLibraries() {
-    evaluator->evaluate("../src/js/three.min.js");
+    evaluator->evaluate("../src/js/ext/three.min.js");
   }
 
   void Application::loadSettings(const char* settingsFilePath) {
