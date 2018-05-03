@@ -2,6 +2,7 @@
 #define ALCUBE_DEPENDENCYINJECTOR_H
 
 #include <unordered_map>
+#include <unordered_set>
 #include <cxxabi.h>
 #include <string>
 #include <iostream>
@@ -30,13 +31,21 @@ namespace alcube::app {
       template <class T>
       T* inject();
       std::unordered_map<std::string, void*> instances;
+      std::unordered_set<std::string> injectionStartedKeys;
   };
 
   template <class T>
   T* DI::get() {
     int stat;
     std::string classTag = abi::__cxa_demangle(typeid(T).name(), nullptr, nullptr, &stat);
-    if (!instances.count(classTag)) {
+    bool started = injectionStartedKeys.count(classTag) > 0;
+    bool finished = instances.count(classTag) > 0;
+    if (started && !finished) {
+      std::cout << "Circular dependency: " << classTag << std::endl;
+      exit(1);
+    }
+    if (!started && !finished) {
+      injectionStartedKeys.emplace(classTag);
       instances[classTag] = inject<T>();
     }
     return (T*)instances[classTag];

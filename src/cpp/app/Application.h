@@ -72,34 +72,12 @@ namespace alcube::app {
     private:
       ApplicationClosingStatus closingStatus;
       utils::app::OpenGLWindow* window;
-
-      /*
-      models::Settings* settings;
-      gpu::GPUAccessor* gpuAccessor;
-      drawing::Canvas *canvas;
-      drawing::Camera *camera;
-      drawing::shaders::Shaders *shaders;
-      utils::opencl::ResourcesProvider *resourcesProvider;
-      utils::FileUtil *fileUtil;
-      utils::Profiler *profiler;
-      physics::Simulator *physicsSimulator;
-      physics::softbody::Simulator* softBodySimulator;
-      physics::fluid::Simulator* fluidSimulator;
-      models::Alcube* cube;
-      models::ActorFactory* actorFactory;
-      models::physics::softbody::SpringFactory* springFactory;
-      models::physics::fluid::FeaturesFactory* fluidFeaturesFactory;
-      models::physics::softbody::FeaturesFactory* softbodyFeaturesFactory;
-      models::drawing::RenderingGroupFactory* renderingGroupFactory;
-      models::drawing::Model3DFactory* model3DFactory;
-      models::drawing::Renderer* renderer;
-      Grid* grid;
-      */
       Profilers profilers;
       scripting::Evaluator* evaluator;
       Mappings mappings;
 
-      void initServices(const char* mainFilePath);
+      void initWindow();
+      void initServices();
       void onClose();
       void onUpdate();
       void onDraw();
