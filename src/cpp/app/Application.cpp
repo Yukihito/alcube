@@ -39,20 +39,14 @@ namespace alcube::app {
     };
   }
 
-  Grid::Grid(unsigned int worldSize) {
-    edgeLength = 8;
-    xCount = worldSize / edgeLength;
-    yCount = worldSize / edgeLength;
-    zCount = worldSize / edgeLength;
-  }
-
   Application* Application::instance;
   Application::Application(const char* programName) : mappings() {
     Application::instance = this;
     closingStatus = ApplicationClosingStatus::NONE;
-    fileUtil = new utils::FileUtil();
-    profiler = new utils::Profiler();
-    evaluator = new scripting::Evaluator(fileUtil, programName);
+    //fileUtil = new utils::FileUtil();
+    //profiler = new utils::Profiler();
+    di = new DI();
+    evaluator = new scripting::Evaluator(di->get<utils::FileUtil>(), programName);
     evaluator->add(mappings.all);
   }
 
@@ -61,7 +55,7 @@ namespace alcube::app {
       loadBasicLibraries();
       loadSettings(settingsFilePath);
       initServices(mainFilePath);
-      cube->setUp();
+      di->get<models::Alcube>()->setUp();
       atexit(atexitCallback);
       std::thread(updateLoopCallback).detach();
       window->run();
@@ -82,7 +76,7 @@ namespace alcube::app {
   }
 
   void Application::loadSettings(const char* settingsFilePath) {
-    settings = new models::Settings();
+    auto settings = di->get<models::Settings>();
     mappings.settings.window->setUnderlying(&settings->window);
     mappings.settings.physics->setUnderlying(&settings->physics);
     mappings.settings.world->setUnderlying(&settings->world);
@@ -92,11 +86,13 @@ namespace alcube::app {
   }
 
   void Application::initServices(const char* mainFilePath) {
+    auto settings = di->get<models::Settings>();
     // Window
     window = new utils::app::OpenGLWindow([&]() { onDraw(); });
     window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
 
     // Drawing
+    /*
     camera = new drawing::Camera(
       glm::vec3(0.0f, 0.0f, settings->world.size * 2.0f),
       glm::quat(),
@@ -134,9 +130,11 @@ namespace alcube::app {
       settings->physics.timeStepSize,
       gpuAccessor
     );
-    physicsSimulator->gravity = settings->physics.gravity;
+     */
+    di->get<physics::Simulator>()->gravity = settings->physics.gravity;
 
     // Cube
+    /*
     renderer = new models::drawing::Renderer(gpuAccessor, canvas, resourcesProvider, settings->world.maxActorCount * 4);
     cube = new models::Alcube(
       fluidSimulator,
@@ -144,30 +142,32 @@ namespace alcube::app {
       physicsSimulator,
       renderer
     );
-    mappings.services.cube->setUnderlying(cube);
+     */
+    mappings.services.cube->setUnderlying(di->get<models::Alcube>());
 
     // Factories
-    model3DFactory = new models::drawing::Model3DFactory(new utils::MemoryPool<models::drawing::Model3D>(settings->world.maxActorCount));
-    renderingGroupFactory = new models::drawing::RenderingGroupFactory(new utils::MemoryPool<models::drawing::RenderingGroup>(settings->world.maxActorCount), shaders, settings);
-    mappings.services.renderingGroupFactory->setUnderlying(renderingGroupFactory);
+    // model3DFactory = new models::drawing::Model3DFactory(new utils::MemoryPool<models::drawing::Model3D>(settings->world.maxActorCount));
+    // renderingGroupFactory = new models::drawing::RenderingGroupFactory(new utils::MemoryPool<models::drawing::RenderingGroup>(settings->world.maxActorCount), shaders, settings);
+    mappings.services.renderingGroupFactory->setUnderlying(di->get<models::drawing::RenderingGroupFactory>());
 
-    actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(settings->world.maxActorCount), model3DFactory);
-    mappings.services.actorFactory->setUnderlying(actorFactory);
+    // actorFactory = new models::ActorFactory(new utils::MemoryPool<models::Actor>(settings->world.maxActorCount), model3DFactory);
+    mappings.services.actorFactory->setUnderlying(di->get<models::ActorFactory>());
 
-    springFactory = new models::physics::softbody::SpringFactory(new utils::MemoryPool<models::physics::softbody::Spring>(settings->world.maxActorCount));
-    mappings.services.springFactory->setUnderlying(springFactory);
+    // springFactory = new models::physics::softbody::SpringFactory(new utils::MemoryPool<models::physics::softbody::Spring>(settings->world.maxActorCount));
+    mappings.services.springFactory->setUnderlying(di->get<models::physics::softbody::SpringFactory>());
 
-    fluidFeaturesFactory = new models::physics::fluid::FeaturesFactory(new utils::MemoryPool<models::physics::fluid::Features>(settings->world.maxActorCount));
-    mappings.services.fluidFeaturesFactory->setUnderlying(fluidFeaturesFactory);
+    // fluidFeaturesFactory = new models::physics::fluid::FeaturesFactory(new utils::MemoryPool<models::physics::fluid::Features>(settings->world.maxActorCount));
+    mappings.services.fluidFeaturesFactory->setUnderlying(di->get<models::physics::fluid::FeaturesFactory>());
 
-    softbodyFeaturesFactory = new models::physics::softbody::FeaturesFactory(new utils::MemoryPool<models::physics::softbody::Features>(settings->world.maxActorCount));
-    mappings.services.softbodyFeaturesFactory->setUnderlying(softbodyFeaturesFactory);
+    //softbodyFeaturesFactory = new models::physics::softbody::FeaturesFactory(new utils::MemoryPool<models::physics::softbody::Features>(settings->world.maxActorCount));
+    mappings.services.softbodyFeaturesFactory->setUnderlying(di->get<models::physics::softbody::FeaturesFactory>());
 
     // Load initial cube states
     evaluator->evaluate("../src/js/libs/init-services.js");
     evaluator->evaluate(mainFilePath);
 
     // Profiler
+    auto profiler = di->get<utils::Profiler>();
     profiler->setShowInterval(1000);
     profiler->enabled = true;
     profilers.update = profiler->create("update");
@@ -176,12 +176,13 @@ namespace alcube::app {
   }
 
   void Application::onDraw() {
-    cube->render();
+    di->get<models::Alcube>()->render();
   }
 
   void Application::onUpdate() {
+    auto profiler = di->get<utils::Profiler>();
     profiler->start(profilers.update);
-    cube->update();
+    di->get<models::Alcube>()->update();
     profiler->stop(profilers.update);
     profiler->stop(profilers.all);
     profiler->update();
@@ -194,7 +195,7 @@ namespace alcube::app {
       instance->onUpdate();
       std::chrono::system_clock::time_point updateEndTime = std::chrono::system_clock::now();
       int elapsedTime = (int) std::chrono::duration_cast<std::chrono::milliseconds>(updateEndTime - updateStartTime).count();
-      auto nextFlameInterval = (int)(instance->settings->physics.timeStepSize * 1000.0f - elapsedTime);
+      auto nextFlameInterval = (int)(instance->di->get<models::Settings>()->physics.timeStepSize * 1000.0f - elapsedTime);
       if (nextFlameInterval > 0) {
         std::chrono::milliseconds intervalMs(nextFlameInterval);
         std::this_thread::sleep_for(intervalMs);
@@ -204,7 +205,7 @@ namespace alcube::app {
   }
 
   void Application::onClose() {
-    resourcesProvider->resources->release();
+    di->get<utils::opencl::ResourcesProvider>()->resources->release();
     glfwTerminate();
   }
 

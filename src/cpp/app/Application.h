@@ -15,6 +15,8 @@
 #include "../models/Settings.h"
 #include "../models/drawing/SphereDrawable.h"
 #include "../scripting/mappings/drawing/RenderingGroup.h"
+#include "Grid.h"
+#include "DI.h"
 
 namespace alcube::app {
   class Profilers {
@@ -61,22 +63,17 @@ namespace alcube::app {
     explicit Mappings();
   };
 
-  struct Grid {
-    unsigned int xCount;
-    unsigned int yCount;
-    unsigned int zCount;
-    unsigned int edgeLength;
-    explicit Grid(unsigned int worldSize);
-  };
-
   class Application {
     public:
       static Application* instance;
+      DI* di;
       explicit Application(const char* programName);
       void run(const char* settingsFilePath, const char* mainFilePath);
     private:
       ApplicationClosingStatus closingStatus;
       utils::app::OpenGLWindow* window;
+
+      /*
       models::Settings* settings;
       gpu::GPUAccessor* gpuAccessor;
       drawing::Canvas *canvas;
@@ -96,10 +93,11 @@ namespace alcube::app {
       models::drawing::RenderingGroupFactory* renderingGroupFactory;
       models::drawing::Model3DFactory* model3DFactory;
       models::drawing::Renderer* renderer;
-      scripting::Evaluator* evaluator;
-      Profilers profilers;
-      Mappings mappings;
       Grid* grid;
+      */
+      Profilers profilers;
+      scripting::Evaluator* evaluator;
+      Mappings mappings;
 
       void initServices(const char* mainFilePath);
       void onClose();

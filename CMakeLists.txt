@@ -168,7 +168,7 @@ target_link_libraries(alcube_scripting_lib
 ### App
 set(ALCUBE_APP_SOURCE_FILES
         src/cpp/app/Application.cpp src/cpp/app/Application.h
-        )
+        src/cpp/app/DI.cpp src/cpp/app/DI.h src/cpp/app/Grid.cpp src/cpp/app/Grid.h)
 
 add_library(alcube_app_lib STATIC ${ALCUBE_APP_SOURCE_FILES})
 target_link_libraries(alcube_app_lib
