@@ -29,8 +29,18 @@ namespace alcube::models {
     renderer->add(renderingGroup);
   }
 
-  void Alcube::setUpRenderer() {
+  void Alcube::setUp() {
     renderer->setUp();
+    physicsSimulator->input();
+  }
+
+  void Alcube::render() {
+    renderer->render();
+  }
+
+  void Alcube::update() {
+    physicsSimulator->update();
+    renderer->update();
   }
 
   unsigned int Alcube::getActorCount() {

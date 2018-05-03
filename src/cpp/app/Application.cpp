@@ -61,22 +61,7 @@ namespace alcube::app {
       loadBasicLibraries();
       loadSettings(settingsFilePath);
       initServices(mainFilePath);
-      cube->setUpRenderer();
-      gpuAccessor->kernels.inputRenderers(
-        physicsSimulator->actorCount,
-        gpuAccessor->memories.hostRenderers,
-        gpuAccessor->memories.renderers,
-        gpuAccessor->memories.hostColors,
-        gpuAccessor->memories.colors
-      );
-      physicsSimulator->input();
-
-      gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
-      gpuAccessor->memories.rotations0.setCount(physicsSimulator->actorCount);
-      gpuAccessor->memories.rotations1.setCount(physicsSimulator->actorCount);
-      gpuAccessor->memories.rotations2.setCount(physicsSimulator->actorCount);
-      gpuAccessor->memories.rotations3.setCount(physicsSimulator->actorCount);
-      gpuAccessor->memories.colors.setCount(physicsSimulator->actorCount);
+      cube->setUp();
       atexit(atexitCallback);
       std::thread(updateLoopCallback).detach();
       window->run();
@@ -152,7 +137,7 @@ namespace alcube::app {
     physicsSimulator->gravity = settings->physics.gravity;
 
     // Cube
-    renderer = new models::drawing::Renderer(gpuAccessor, canvas, settings->world.maxActorCount * 4);
+    renderer = new models::drawing::Renderer(gpuAccessor, canvas, resourcesProvider, settings->world.maxActorCount * 4);
     cube = new models::Alcube(
       fluidSimulator,
       softBodySimulator,
@@ -187,44 +172,16 @@ namespace alcube::app {
     profiler->enabled = true;
     profilers.update = profiler->create("update");
     profilers.all = profiler->create("all");
-    profilers.updateDrawable = profiler->create("updateDrawable");
     profiler->start(profilers.all);
   }
 
   void Application::onDraw() {
-    profiler->start(profilers.updateDrawable);
-    gpuAccessor->memories.positions.setCount(physicsSimulator->actorCount);
-    gpuAccessor->memories.positions.read();
-    gpuAccessor->memories.rotations0.setCount(physicsSimulator->actorCount);
-    gpuAccessor->memories.rotations0.read();
-    gpuAccessor->memories.rotations1.setCount(physicsSimulator->actorCount);
-    gpuAccessor->memories.rotations1.read();
-    gpuAccessor->memories.rotations2.setCount(physicsSimulator->actorCount);
-    gpuAccessor->memories.rotations2.read();
-    gpuAccessor->memories.rotations3.setCount(physicsSimulator->actorCount);
-    gpuAccessor->memories.rotations3.read();
-    gpuAccessor->memories.colors.setCount(physicsSimulator->actorCount);
-    gpuAccessor->memories.colors.read();
-    profiler->stop(profilers.updateDrawable);
-    canvas->draw();
+    cube->render();
   }
 
   void Application::onUpdate() {
     profiler->start(profilers.update);
-    physicsSimulator->update();
-    gpuAccessor->kernels.updateDrawingBuffer(
-      physicsSimulator->actorCount,
-      gpuAccessor->memories.positions,
-      gpuAccessor->memories.colors,
-      gpuAccessor->memories.rotations0,
-      gpuAccessor->memories.rotations1,
-      gpuAccessor->memories.rotations2,
-      gpuAccessor->memories.rotations3,
-      gpuAccessor->memories.physicalQuantities,
-      gpuAccessor->memories.renderers
-    );
-    clFinish(resourcesProvider->queue->queue);
-
+    cube->update();
     profiler->stop(profilers.update);
     profiler->stop(profilers.all);
     profiler->update();

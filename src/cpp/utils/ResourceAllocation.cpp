@@ -20,4 +20,8 @@ namespace alcube::utils {
   unsigned int AllocationRange::getLength() {
     return length;
   }
+
+  unsigned int AllocationRange::getAllocatedLength() {
+    return allocatedLength;
+  }
 }

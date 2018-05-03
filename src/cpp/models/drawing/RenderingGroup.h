@@ -43,7 +43,7 @@ namespace alcube::models::drawing {
 
       alcube::drawing::Drawable* getDrawable();
       void allocate(utils::AllocationRange* rendererAllocationRange, gpu::GPUAccessor* gpuAccessor);
-      void update();
+      void initialize();
       void add(Model3D* model3D);
 
     private:

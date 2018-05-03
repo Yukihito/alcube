@@ -46,7 +46,7 @@ namespace alcube::models::drawing {
         utils::AllocationRange* groupAllocationRange,
         gpu::GPUAccessor* gpuAccessor
       );
-      void update();
+      void initialize();
 
     private:
       glm::vec3 color;

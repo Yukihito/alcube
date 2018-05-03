@@ -11,19 +11,23 @@ namespace alcube::models::drawing {
       explicit Renderer(
         gpu::GPUAccessor* gpuAccessor,
         alcube::drawing::Canvas* canvas,
+        utils::opencl::ResourcesProvider* resourcesProvider,
         unsigned int size
       );
       void add(RenderingGroup* renderingGroup);
       void setUp();
+      void update();
+      void render();
 
     private:
       void allocate();
-      void update();
+      void initialize();
       void registerInCanvas();
       utils::AllocationRange* allocationRange;
       gpu::GPUAccessor* gpuAccessor;
       alcube::drawing::Canvas* canvas;
       std::vector<RenderingGroup*> renderingGroups;
+      utils::opencl::ResourcesProvider* resourcesProvider;
   };
 }
 

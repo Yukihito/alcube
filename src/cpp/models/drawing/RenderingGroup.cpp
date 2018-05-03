@@ -77,9 +77,9 @@ namespace alcube::models::drawing {
     allocations.rotations3 = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.rotations3);
   }
 
-  void RenderingGroup::update() {
+  void RenderingGroup::initialize() {
     for (auto model3D : model3Ds) {
-      model3D->update();
+      model3D->initialize();
     }
     auto shader = selectShader();
     drawable = new SphereDrawable(

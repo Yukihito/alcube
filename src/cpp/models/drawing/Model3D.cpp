@@ -21,7 +21,7 @@ namespace alcube::models::drawing {
     this->groupSettings = groupSettings;
   }
 
-  void Model3D::update() {
+  void Model3D::initialize() {
     if (groupSettings->getInstanceColorType() == INSTANCE_COLOR_TYPE_RANDOM) {
       std::random_device rnd;
       std::mt19937 mt(rnd());

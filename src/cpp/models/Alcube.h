@@ -21,7 +21,9 @@ namespace alcube::models {
       void add(physics::softbody::Spring* spring);
       void add(models::drawing::RenderingGroup* renderingGroup);
       unsigned int getActorCount();
-      void setUpRenderer();
+      void setUp();
+      void render();
+      void update();
 
     private:
       std::vector<Actor*> actors;

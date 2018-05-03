@@ -1,5 +1,5 @@
-#ifndef ALCUBE_SAMPLES_APPLICATIONBASE_H
-#define ALCUBE_SAMPLES_APPLICATIONBASE_H
+#ifndef ALCUBE_APPLICATION_H
+#define ALCUBE_APPLICATION_H
 #include "../utils/app/OpenGLWindow.h"
 #include "../gpu/GPUAccessor.h"
 #include "../drawing/Canvas.h"
@@ -21,7 +21,6 @@ namespace alcube::app {
     public:
       int update;
       int all;
-      int updateDrawable;
   };
 
   enum ApplicationClosingStatus {
@@ -114,4 +113,4 @@ namespace alcube::app {
   };
 }
 
-#endif //ALCUBE_SAMPLES_APPLICATIONBASE_H
+#endif //ALCUBE_APPLICATION_H

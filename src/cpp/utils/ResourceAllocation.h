@@ -8,6 +8,7 @@ namespace alcube::utils {
       AllocationRange* allocate(unsigned int length);
       unsigned int getIndex();
       unsigned int getLength();
+      unsigned int getAllocatedLength();
 
     private:
       unsigned int minIndex;
