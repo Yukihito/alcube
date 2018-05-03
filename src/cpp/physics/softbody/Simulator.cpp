@@ -21,7 +21,7 @@ namespace alcube::physics::softbody {
       actor->subPhysicalQuantity.actorIndex = actor->index;
       memories.actors.dto[actor->index] = actor->actor;
       memories.hostPhysicalQuantities.dto[actor->index] = actor->physicalQuantity;
-      memories.hostSoftBodys.dto[i] = actor->subPhysicalQuantity;
+      memories.hostSoftBodies.dto[i] = actor->subPhysicalQuantity;
     }
 
     for (unsigned int i = 0; i < springCount; i++) {
@@ -32,16 +32,16 @@ namespace alcube::physics::softbody {
   }
 
   void Simulator::setUpMemories() {
-    memories.hostSoftBodys.setCount(actorCount);
-    memories.softBodys.setCount(actorCount);
+    memories.hostSoftBodies.setCount(actorCount);
+    memories.softBodies.setCount(actorCount);
     memories.springs.setCount(springCount);
     memories.springStates.setCount(springCount);
-    memories.hostSoftBodys.write();
+    memories.hostSoftBodies.write();
     memories.springs.write();
-    kernels.inputSoftBodys(
+    kernels.inputSoftBodies(
       actorCount,
-      memories.hostSoftBodys,
-      memories.softBodys
+      memories.hostSoftBodies,
+      memories.softBodies
     );
 
     kernels.inputSprings(
@@ -55,7 +55,7 @@ namespace alcube::physics::softbody {
     kernels.updateByPenaltyImpulse(
       actorCount,
       memories.actorStates,
-      memories.softBodys,
+      memories.softBodies,
       memories.constants
     );
 
@@ -63,20 +63,20 @@ namespace alcube::physics::softbody {
       kernels.collectCollisions(
         actorCount,
         memories.actorStates,
-        memories.softBodys
+        memories.softBodies
       );
 
       kernels.updateByConstraintImpulse(
         actorCount,
         memories.actorStates,
-        memories.softBodys
+        memories.softBodies
       );
     }
 
     kernels.updateByFrictionalImpulse(
       actorCount,
       memories.actorStates,
-      memories.softBodys
+      memories.softBodies
     );
   }
 
@@ -93,7 +93,7 @@ namespace alcube::physics::softbody {
       kernels.updateBySpringImpulse(
         actorCount,
         memories.constants,
-        memories.softBodys,
+        memories.softBodies,
         memories.actorStates,
         memories.physicalQuantities,
         memories.springStates
@@ -116,7 +116,7 @@ namespace alcube::physics::softbody {
     memories.springs.at(springIndex)->nodePositionsModelSpace[nodeIndex] = toCl(springs[springIndex]->nodes[nodeIndex].position);
 
     unsigned short softBodyIndex = memories.actors.at(actorIndex)->subPhysicalQuantityIndex;
-    auto hostSoftBodyState = memories.hostSoftBodys.at(softBodyIndex);
+    auto hostSoftBodyState = memories.hostSoftBodies.at(softBodyIndex);
     hostSoftBodyState->springIndices[hostSoftBodyState->springCount] = springIndex;
     hostSoftBodyState->springNodeIndices[hostSoftBodyState->springCount] = nodeIndex;
     hostSoftBodyState->springCount++;

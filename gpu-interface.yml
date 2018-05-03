@@ -142,12 +142,12 @@ dto-instances:
     length: maxActorCount
 
   # Variables for soft body actors
-  - name: hostSoftBodys
+  - name: hostSoftBodies
     type: SoftBody
     length: maxActorCount
     host-ptr: true
 
-  - name: softBodys
+  - name: softBodies
     type: SoftBody
     length: maxActorCount
 

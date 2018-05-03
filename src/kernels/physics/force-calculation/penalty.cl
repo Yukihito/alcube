@@ -9,11 +9,11 @@ void accumulatePenaltyImpulse(
 
 __kernel void updateByPenaltyImpulse(
   __global ActorState* actorStates,
-  __global SoftBody* softBodys,
+  __global SoftBody* softBodies,
   __global Constants* constants
 ) {
   size_t subIndex = get_global_id(0);
-  ushort actorIndex = softBodys[subIndex].actorIndex;
+  ushort actorIndex = softBodies[subIndex].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = actorState->intersectionCount;
   if (count == 0) {

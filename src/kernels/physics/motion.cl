@@ -37,13 +37,13 @@ __kernel void calcSpringImpulses(
 
 __kernel void updateBySpringImpulse(
   __global Constants* constants,
-  __global SoftBody* softBodys,
+  __global SoftBody* softBodies,
   __global ActorState* actorStates,
   __global PhysicalQuantity* physicalQuantities,
   __global SpringState* springStates
 ) {
   size_t softBodyIndex = get_global_id(0);
-  __global SoftBody* softBody = &softBodys[softBodyIndex];
+  __global SoftBody* softBody = &softBodies[softBodyIndex];
   size_t actorIndex = softBody->actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   uchar count = softBody->springCount;

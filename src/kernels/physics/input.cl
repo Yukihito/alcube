@@ -28,12 +28,12 @@ __kernel void inputActors(
   actorStates[i].mass = physicalQuantities[i].mass;
 }
 
-__kernel void inputSoftBodys(
-  __global const SoftBody* hostSoftBodys,
-  __global SoftBody* softBodys
+__kernel void inputSoftBodies(
+  __global const SoftBody* hostSoftBodies,
+  __global SoftBody* softBodies
 ) {
   size_t i = get_global_id(0);
-  softBodys[i] = hostSoftBodys[i];
+  softBodies[i] = hostSoftBodies[i];
 }
 
 __kernel void inputSprings(
