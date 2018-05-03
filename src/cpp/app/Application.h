@@ -16,7 +16,7 @@
 #include "../models/drawing/SphereDrawable.h"
 #include "../scripting/mappings/drawing/RenderingGroup.h"
 
-namespace alcube::samples {
+namespace alcube::app {
   class Profilers {
     public:
       int update;

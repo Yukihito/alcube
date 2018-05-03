@@ -1,6 +1,6 @@
 #include "Application.h"
 
-namespace alcube::samples {
+namespace alcube::app {
   Mappings::Mappings() {
     settings.window = new alcube::scripting::mappings::WindowSettings();
     settings.physics = new alcube::scripting::mappings::PhysicsSettings();

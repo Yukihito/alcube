@@ -165,13 +165,13 @@ target_link_libraries(alcube_scripting_lib
         alcube_models_lib
         )
 
-### Samples
-set(ALCUBE_SAMPLES_SOURCE_FILES
-        src/cpp/samples/Application.cpp src/cpp/samples/Application.h
+### App
+set(ALCUBE_APP_SOURCE_FILES
+        src/cpp/app/Application.cpp src/cpp/app/Application.h
         )
 
-add_library(alcube_samples_lib STATIC ${ALCUBE_SAMPLES_SOURCE_FILES})
-target_link_libraries(alcube_samples_lib
+add_library(alcube_app_lib STATIC ${ALCUBE_APP_SOURCE_FILES})
+target_link_libraries(alcube_app_lib
         alcube_physics_lib
         alcube_utils_lib
         alcube_gpu_accessor_lib
@@ -201,11 +201,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -Wno-deprecated-declarations 
 # add_executable(alcube src/cpp/main.cpp)
 # target_link_libraries(alcube alcube_lib)
 
-### Sample executable
-add_executable(alcube_samples src/cpp/samples/main.cpp)
-target_link_libraries(alcube_samples
+### App executable
+add_executable(alcube_app src/cpp/app/main.cpp)
+target_link_libraries(alcube_app
         alcube_lib
-        alcube_samples_lib
+        alcube_app_lib
         )
 
 ### Kernel compiler executable
