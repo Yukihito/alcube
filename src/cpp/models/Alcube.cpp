@@ -44,6 +44,6 @@ namespace alcube::models {
   }
 
   unsigned int Alcube::getActorCount() {
-    return physicsSimulator->actorCount;
+    return physicsSimulator->getActorCount();
   }
 }

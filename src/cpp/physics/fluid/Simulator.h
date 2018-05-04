@@ -19,7 +19,7 @@ namespace alcube::physics::fluid {
 
     private:
       ActorResources* actorResources;
-      unsigned int actorCount = 0;
+      // unsigned int actorCount = 0;
       std::vector<Actor*> actors = {};
       gpu::Kernels kernels = {};
       gpu::Memories memories = {};

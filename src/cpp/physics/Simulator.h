@@ -24,7 +24,6 @@ namespace alcube::physics {
     public:
       float gravity;
       float sphericalShellRadius;
-      unsigned int actorCount;
 
       explicit Simulator(
         unsigned int maxActorCount,
@@ -40,6 +39,7 @@ namespace alcube::physics {
       void add(SubSimulator* subSimulator);
       void setUp();
       void update();
+      unsigned short getActorCount();
 
     private:
       unsigned int gridEdgeLength;
@@ -55,7 +55,7 @@ namespace alcube::physics {
 
       unsigned int allGridCount;
       unsigned int maxActorCount;
-      unsigned int actorCountForBitonicSort;
+      //unsigned int actorCountForBitonicSort;
       float deltaTime;
 
       void setUpConstants();

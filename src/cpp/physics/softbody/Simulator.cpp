@@ -12,7 +12,6 @@ namespace alcube::physics::softbody {
 
   void Simulator::setUpComputingSize() {
     springCount = (unsigned int)springs.size();
-    actorCount = (unsigned int)actors.size();
   }
 
   void Simulator::writeHostMemories() {
@@ -24,6 +23,7 @@ namespace alcube::physics::softbody {
   }
 
   void Simulator::setUpMemories() {
+    unsigned int actorCount = actorResources->softbodyResource->subAllocationRange->getAllocatedLength();
     memories.hostSoftBodies.setCount(actorCount);
     memories.softBodies.setCount(actorCount);
     memories.springs.setCount(springCount);
@@ -44,6 +44,7 @@ namespace alcube::physics::softbody {
   }
 
   void Simulator::updateForce() {
+    unsigned int actorCount = actorResources->softbodyResource->subAllocationRange->getAllocatedLength();
     kernels.updateByPenaltyImpulse(
       actorCount,
       memories.actorStates,
@@ -73,6 +74,7 @@ namespace alcube::physics::softbody {
   }
 
   void Simulator::motion() {
+    unsigned int actorCount = actorResources->softbodyResource->subAllocationRange->getAllocatedLength();
     for (int i = 0; i < motionIterationCount; i++) {
       if (springCount > 0) {
         kernels.calcSpringImpulses(

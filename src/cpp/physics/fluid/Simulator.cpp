@@ -20,10 +20,11 @@ namespace alcube::physics::fluid {
   }
 
   void Simulator::setUpComputingSize() {
-    actorCount = (unsigned int)actors.size();
+    // actorCount = (unsigned int)actors.size();
   }
 
   void Simulator::writeHostMemories() {
+    unsigned int actorCount = actorResources->fluidResource->subAllocationRange->getAllocatedLength();
     for (unsigned int i = 0; i < actorCount; i++) {
       auto actor = actors[i];
       actor->getPhysicalQuantityDto()->radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
@@ -32,6 +33,7 @@ namespace alcube::physics::fluid {
   }
 
   void Simulator::setUpMemories() {
+    unsigned int actorCount = actorResources->fluidResource->subAllocationRange->getAllocatedLength();
     memories.hostFluids.setCount(actorCount);
     memories.fluids.setCount(actorCount);
     memories.hostFluids.write();
@@ -43,6 +45,7 @@ namespace alcube::physics::fluid {
   }
 
   void Simulator::updateForce() {
+    unsigned int actorCount = actorResources->fluidResource->subAllocationRange->getAllocatedLength();
     kernels.updateDensityAndPressure(
       actorCount,
       memories.actorStates,
@@ -59,6 +62,7 @@ namespace alcube::physics::fluid {
   }
 
   void Simulator::motion() {
+    unsigned int actorCount = actorResources->fluidResource->subAllocationRange->getAllocatedLength();
     kernels.moveFluid(
       actorCount,
       memories.fluids,

@@ -29,6 +29,10 @@ namespace alcube::physics {
     sphericalShellRadius = 100000.0f;
   }
 
+  unsigned short Simulator::getActorCount() {
+    return (unsigned short)actorResources->allocationRange->getAllocatedLength();
+  }
+
   void Simulator::setUpConstants() {
     auto grid = memories.grid.at(0);
     grid->edgeLength = gridEdgeLength;
@@ -57,8 +61,8 @@ namespace alcube::physics {
   }
 
   void Simulator::setUpComputingSize() {
-    actorCount = (unsigned int)actors.size();
-    actorCountForBitonicSort = utils::math::powerOf2(actorCount);
+    //actorCount = (unsigned int)actors.size();
+    //actorCountForBitonicSort = utils::math::powerOf2(actorCount);
     for (auto subSimulator : subSimulators) {
       subSimulator->setUpComputingSize();
     }
@@ -71,6 +75,8 @@ namespace alcube::physics {
   }
 
   void Simulator::setUpMemories() {
+    unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
+    unsigned int actorCountForBitonicSort = utils::math::powerOf2(actorCount);
     memories.actors.setCount(actorCount);
     memories.hostPhysicalQuantities.setCount(actorCount);
 
@@ -107,6 +113,8 @@ namespace alcube::physics {
   }
 
   void Simulator::computeBroadPhase() {
+    unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
+    unsigned int actorCountForBitonicSort = utils::math::powerOf2(actorCount);
     auto maxActorCountShort = (unsigned short)maxActorCount;
     // Initialize grid and actor relations
     kernels.initGridAndActorRelations(
@@ -163,6 +171,7 @@ namespace alcube::physics {
   }
 
   void Simulator::computeNarrowPhase() {
+    unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
     kernels.collectIntersections(
       actorCount,
       memories.actorStates,
@@ -175,6 +184,7 @@ namespace alcube::physics {
   }
 
   void Simulator::updateForce() {
+    unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
     kernels.initStepVariables(
       actorCount,
       memories.actorStates,
@@ -188,6 +198,7 @@ namespace alcube::physics {
   }
 
   void Simulator::motion() {
+    unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
     for (auto subSimulator : subSimulators) {
       subSimulator->motion();
     }
@@ -216,7 +227,6 @@ namespace alcube::physics {
 
   void Simulator::add(Actor *actor) {
     actors.push_back(actor);
-    actorCount = (unsigned int)actors.size();
     for (auto subSimulator : subSimulators) {
       if (subSimulator->add(actor)) {
         return;

@@ -25,7 +25,7 @@ namespace alcube::physics::softbody {
       ActorResources* actorResources;
       gpu::Kernels kernels = {};
       gpu::Memories memories = {};
-      unsigned int actorCount = 0;
+      //unsigned int actorCount = 0;
       unsigned int springCount = 0;
       unsigned int motionIterationCount = 8;
       unsigned int constraintResolvingIterationCount = 16;
