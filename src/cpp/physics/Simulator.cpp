@@ -72,6 +72,9 @@ namespace alcube::physics {
     for (auto subSimulator : subSimulators) {
       subSimulator->writeHostMemories();
     }
+    for (auto actor: actors) {
+      actor->beforeWrite();
+    }
   }
 
   void Simulator::setUpMemories() {

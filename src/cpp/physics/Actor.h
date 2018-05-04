@@ -18,6 +18,7 @@ namespace alcube::physics {
       gpu::dtos::PhysicalQuantity* getPhysicalQuantityDto();
       virtual unsigned short getIndex() = 0;
       virtual ~Actor() = default;
+      virtual void beforeWrite() = 0;
     protected:
       utils::ResourceAllocation<gpu::dtos::Actor>* actor = nullptr;
       utils::ResourceAllocation<gpu::dtos::PhysicalQuantity>* hostPhysicalQuantity = nullptr;

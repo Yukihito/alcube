@@ -1,9 +1,12 @@
 #ifndef ALCUBE_RESOURCEALLOCATION_H
 #define ALCUBE_RESOURCEALLOCATION_H
 
+#include "EventEmitter.h"
+
 namespace alcube::utils {
   class AllocationRange {
     public:
+      EventEmitter onAllocationLengthChanged;
       explicit AllocationRange(unsigned int minIndex, unsigned int length);
       AllocationRange* allocate(unsigned int length);
       unsigned int getIndex();

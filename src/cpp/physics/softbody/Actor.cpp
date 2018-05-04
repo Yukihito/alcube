@@ -25,6 +25,8 @@ namespace alcube::physics::softbody {
     return hostSubPhysicalQuantity->getPtr()->actorIndex;
   }
 
+  void Actor::beforeWrite() {}
+
   void Actor::updateIndex() {
     this->actor->getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
     this->hostSubPhysicalQuantity->getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();

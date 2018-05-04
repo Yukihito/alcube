@@ -10,6 +10,7 @@ namespace alcube::utils {
   AllocationRange* AllocationRange::allocate(unsigned int length) {
     unsigned int nextMinIndex = minIndex + allocatedLength;
     allocatedLength += length;
+    onAllocationLengthChanged.emit();
     return new AllocationRange(nextMinIndex, length);
   }
 

@@ -11,9 +11,8 @@ namespace alcube::physics::fluid {
     this->actor->getPtr()->type = FLUID;
     this->hostSubPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::Fluid>(subAllocationRange, gpuAccessor->dtos.hostFluids);
     this->subPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::Fluid>(subAllocationRange, gpuAccessor->dtos.fluids);
-
+    this->gpuAccessor = gpuAccessor;
     updateIndex();
-    Actor::instances[this]= this;
   }
 
   gpu::dtos::Fluid* Actor::getSubPhysicalQuantity() {
@@ -24,12 +23,16 @@ namespace alcube::physics::fluid {
     return hostSubPhysicalQuantity->getPtr()->actorIndex;
   }
 
+  void Actor::beforeWrite() {
+    getPhysicalQuantityDto()->radius = gpuAccessor->memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
+    getPhysicalQuantityDto()->mass = gpuAccessor->memories.fluidSettings.at(0)->particleMass;
+  }
+
   void Actor::updateIndex() {
     this->actor->getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
     this->hostSubPhysicalQuantity->getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
   }
 
-  std::map<physics::Actor*, Actor*> Actor::instances = {};
   float Actor::stiffness = 64.0f;
   float Actor::density = 0.02f;
   float Actor::viscosity = 8.0f;

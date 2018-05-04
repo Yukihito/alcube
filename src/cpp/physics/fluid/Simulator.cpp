@@ -5,37 +5,31 @@ namespace alcube::physics::fluid {
     kernels = gpuAccessor->kernels;
     memories = gpuAccessor->memories;
     this->actorResources = actorResources;
+    actorResources->fluidResource->subAllocationRange->onAllocationLengthChanged.subscribe([&](){
+      unsigned int actorCount = this->actorResources->fluidResource->subAllocationRange->getAllocatedLength();
+      memories.hostFluids.setCount(actorCount);
+      memories.fluids.setCount(actorCount);
+    });
   }
 
   void Simulator::setUpConstants() {
     auto fluidSettings = memories.fluidSettings.at(0);
-    fluidSettings->stiffness = Actor::stiffness; //64.0f;
-    fluidSettings->density = Actor::density; //0.02f;
-    fluidSettings->viscosity = Actor::viscosity; //8.0f;
-    fluidSettings->particleMass = Actor::mass; //(4.0f / 3.0f) * CL_M_PI_F * CL_M_PI_F * CL_M_PI_F * fluidSettings->density;
+    fluidSettings->stiffness = Actor::stiffness;
+    fluidSettings->density = Actor::density;
+    fluidSettings->viscosity = Actor::viscosity;
+    fluidSettings->particleMass = Actor::mass;
     fluidSettings->effectiveRadius = 2.0f;
     fluidSettings->poly6Constant = 315.0f / (64.0f * CL_M_PI_F * powf(fluidSettings->effectiveRadius, 9));
     fluidSettings->spikyGradientConstant = 45.0f / (CL_M_PI_F * powf(fluidSettings->effectiveRadius, 6));
     fluidSettings->viscosityLaplacianConstant = 45.0f / (CL_M_PI_F * powf(fluidSettings->effectiveRadius, 6));
   }
 
-  void Simulator::setUpComputingSize() {
-    // actorCount = (unsigned int)actors.size();
-  }
+  void Simulator::setUpComputingSize() {}
 
-  void Simulator::writeHostMemories() {
-    unsigned int actorCount = actorResources->fluidResource->subAllocationRange->getAllocatedLength();
-    for (unsigned int i = 0; i < actorCount; i++) {
-      auto actor = actors[i];
-      actor->getPhysicalQuantityDto()->radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
-      actor->getPhysicalQuantityDto()->mass = memories.fluidSettings.at(0)->particleMass;
-    }
-  }
+  void Simulator::writeHostMemories() {}
 
   void Simulator::setUpMemories() {
     unsigned int actorCount = actorResources->fluidResource->subAllocationRange->getAllocatedLength();
-    memories.hostFluids.setCount(actorCount);
-    memories.fluids.setCount(actorCount);
     memories.hostFluids.write();
     kernels.inputFluids(
       (unsigned short)actorCount,
@@ -73,11 +67,6 @@ namespace alcube::physics::fluid {
   }
 
   bool Simulator::add(physics::Actor *actor) {
-    if (Actor::instances.count(actor) > 0) {
-      actors.push_back(Actor::instances[actor]);
-      return true;
-    } else {
-      return false;
-    }
+    return false;
   }
 }
