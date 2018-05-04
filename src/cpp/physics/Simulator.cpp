@@ -11,9 +11,11 @@ namespace alcube::physics {
     unsigned int yGridCount,
     unsigned int zGridCount,
     float deltaTime,
-    gpu::GPUAccessor* gpuAccessor
+    gpu::GPUAccessor* gpuAccessor,
+    ActorResources* actorResources
   ) {
     this->gpuAccessor = gpuAccessor;
+    this->actorResources = actorResources;
     kernels = gpuAccessor->kernels;
     memories = gpuAccessor->memories;
     this->deltaTime = deltaTime;

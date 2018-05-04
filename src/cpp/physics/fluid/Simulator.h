@@ -2,13 +2,13 @@
 #define ALCUBE_FLUIDSIMULATOR_H
 
 #include "../SubSimulator.h"
+#include "../ActorResources.h"
 #include "Actor.h"
 
 namespace alcube::physics::fluid {
   class Simulator : public SubSimulator {
     public:
-      explicit Simulator(gpu::GPUAccessor* gpuAccessor);
-      //void set(gpu::GPUAccessor* gpuAccessor) override;
+      explicit Simulator(gpu::GPUAccessor* gpuAccessor, ActorResources* actorResources);
       void setUpConstants() override;
       void setUpComputingSize() override;
       void writeHostMemories() override;
@@ -18,6 +18,7 @@ namespace alcube::physics::fluid {
       bool add(physics::Actor* actor) override;
 
     private:
+      ActorResources* actorResources;
       unsigned int actorCount = 0;
       std::vector<Actor*> actors = {};
       gpu::Kernels kernels = {};

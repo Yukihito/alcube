@@ -5,11 +5,12 @@
 #include "Actor.h"
 #include "Spring.h"
 #include "../../utils/opencl/conversions.h"
+#include "../ActorResources.h"
 
 namespace alcube::physics::softbody {
   class Simulator : public SubSimulator {
     public:
-      explicit Simulator(gpu::GPUAccessor* gpuAccessor);
+      explicit Simulator(gpu::GPUAccessor* gpuAccessor, ActorResources* actorResources);
       void setUpConstants() override;
       void setUpComputingSize() override;
       void writeHostMemories() override;
@@ -21,6 +22,7 @@ namespace alcube::physics::softbody {
 
     private:
       void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);
+      ActorResources* actorResources;
       gpu::Kernels kernels = {};
       gpu::Memories memories = {};
       unsigned int actorCount = 0;

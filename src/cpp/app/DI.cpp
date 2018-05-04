@@ -70,12 +70,12 @@ namespace alcube::app {
   
   template <>
   physics::softbody::Simulator* DI::inject() {
-    return new physics::softbody::Simulator(get<gpu::GPUAccessor>());
+    return new physics::softbody::Simulator(get<gpu::GPUAccessor>(), get<alcube::physics::ActorResources>());
   }
 
   template <>
   physics::fluid::Simulator* DI::inject() {
-    return new physics::fluid::Simulator(get<gpu::GPUAccessor>());
+    return new physics::fluid::Simulator(get<gpu::GPUAccessor>(), get<alcube::physics::ActorResources>());
   }
 
   template <>
@@ -89,7 +89,8 @@ namespace alcube::app {
       grid->yCount,
       grid->zCount,
       settings->physics.timeStepSize,
-      get<gpu::GPUAccessor>()
+      get<gpu::GPUAccessor>(),
+      get<alcube::physics::ActorResources>()
     );
   }
 

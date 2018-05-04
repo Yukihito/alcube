@@ -1,9 +1,10 @@
 #include "Simulator.h"
 
 namespace alcube::physics::fluid {
-  Simulator::Simulator(gpu::GPUAccessor *gpuAccessor) {
+  Simulator::Simulator(gpu::GPUAccessor *gpuAccessor, ActorResources* actorResources) {
     kernels = gpuAccessor->kernels;
     memories = gpuAccessor->memories;
+    this->actorResources = actorResources;
   }
 
   void Simulator::setUpConstants() {

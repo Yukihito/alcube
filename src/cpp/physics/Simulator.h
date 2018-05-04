@@ -15,6 +15,7 @@
 #include "../gpu/GPUAccessor.h"
 #include "../utils/opencl/ResourcesProvider.h"
 #include "SubSimulator.h"
+#include "ActorResources.h"
 
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
@@ -32,7 +33,8 @@ namespace alcube::physics {
         unsigned int yGridCount,
         unsigned int zGridCount,
         float deltaTime,
-        gpu::GPUAccessor* gpuAccessor
+        gpu::GPUAccessor* gpuAccessor,
+        ActorResources* actorResources
       );
       void add(Actor* actor);
       void add(SubSimulator* subSimulator);
@@ -45,6 +47,7 @@ namespace alcube::physics {
       unsigned int yGridCount;
       unsigned int zGridCount;
       gpu::GPUAccessor* gpuAccessor;
+      ActorResources* actorResources;
       gpu::Kernels kernels;
       gpu::Memories memories;
       std::vector<Actor*> actors;
