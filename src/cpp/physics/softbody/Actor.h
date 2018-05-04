@@ -7,7 +7,6 @@
 namespace alcube::physics::softbody {
   class Actor : public physics::Actor {
     public:
-      static std::map<physics::Actor*, Actor*> instances;
       explicit Actor() = default;
       void init(
         gpu::GPUAccessor* gpuAccessor,
