@@ -163,6 +163,11 @@ namespace alcube::app {
 
   template <>
   alcube::physics::ActorFactory* DI::inject() {
-    return new alcube::physics::ActorFactory(get<models::Settings>()->world.maxActorCount, get<gpu::GPUAccessor>());
+    return new alcube::physics::ActorFactory(get<alcube::physics::ActorResources>(), get<gpu::GPUAccessor>());
+  }
+
+  template <>
+  alcube::physics::ActorResources* DI::inject() {
+    return new alcube::physics::ActorResources(get<models::Settings>()->world.maxActorCount);
   }
 }
