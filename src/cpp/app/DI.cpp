@@ -70,12 +70,12 @@ namespace alcube::app {
   
   template <>
   physics::softbody::Simulator* DI::inject() {
-    return new physics::softbody::Simulator();
+    return new physics::softbody::Simulator(get<gpu::GPUAccessor>());
   }
 
   template <>
   physics::fluid::Simulator* DI::inject() {
-    return new physics::fluid::Simulator();
+    return new physics::fluid::Simulator(get<gpu::GPUAccessor>());
   }
 
   template <>

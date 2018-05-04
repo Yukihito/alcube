@@ -2,7 +2,7 @@
 
 namespace alcube::physics::softbody {
   using namespace utils::opencl::conversions;
-  void Simulator::set(gpu::GPUAccessor *gpuAccessor) {
+  Simulator::Simulator(gpu::GPUAccessor *gpuAccessor) {
     kernels = gpuAccessor->kernels;
     memories = gpuAccessor->memories;
   }

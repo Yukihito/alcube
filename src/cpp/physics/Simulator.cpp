@@ -223,7 +223,6 @@ namespace alcube::physics {
   }
 
   void Simulator::add(SubSimulator *subSimulator) {
-    subSimulator->set(gpuAccessor);
     subSimulators.push_back(subSimulator);
   }
 }

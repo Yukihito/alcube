@@ -7,7 +7,8 @@
 namespace alcube::physics::fluid {
   class Simulator : public SubSimulator {
     public:
-      void set(gpu::GPUAccessor* gpuAccessor) override;
+      explicit Simulator(gpu::GPUAccessor* gpuAccessor);
+      //void set(gpu::GPUAccessor* gpuAccessor) override;
       void setUpConstants() override;
       void setUpComputingSize() override;
       void writeHostMemories() override;

@@ -21,6 +21,10 @@ namespace alcube::physics {
 
   class Simulator {
     public:
+      float gravity;
+      float sphericalShellRadius;
+      unsigned int actorCount;
+
       explicit Simulator(
         unsigned int maxActorCount,
         unsigned int gridEdgeLength,
@@ -34,9 +38,7 @@ namespace alcube::physics {
       void add(SubSimulator* subSimulator);
       void setUp();
       void update();
-      float gravity;
-      float sphericalShellRadius;
-      unsigned int actorCount;
+
     private:
       unsigned int gridEdgeLength;
       unsigned int xGridCount;
