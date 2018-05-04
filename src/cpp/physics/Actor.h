@@ -15,14 +15,9 @@ namespace alcube::physics {
 
   class Actor {
     public:
-      //gpu::dtos::Actor actor;
-      //gpu::dtos::PhysicalQuantity physicalQuantity;
       gpu::dtos::Actor* getActorDto();
       gpu::dtos::PhysicalQuantity* getPhysicalQuantityDto();
       virtual unsigned short getIndex() = 0;
-      virtual void setIndex(unsigned short index) = 0;
-      unsigned short getSubIndex();
-      void setSubIndex(unsigned short index);
       virtual ~Actor() = default;
     protected:
       explicit Actor() = default;

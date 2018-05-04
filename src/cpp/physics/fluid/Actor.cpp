@@ -10,6 +10,9 @@ namespace alcube::physics::fluid {
     this->actor->getPtr()->type = FLUID;
     this->hostSubPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::Fluid>(subAllocationRange, gpuAccessor->dtos.hostFluids);
     this->subPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::Fluid>(subAllocationRange, gpuAccessor->dtos.fluids);
+
+    this->actor->getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
+    this->hostSubPhysicalQuantity->getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
     Actor::instances[this]= this;
   }
 
@@ -19,10 +22,6 @@ namespace alcube::physics::fluid {
 
   unsigned short Actor::getIndex() {
     return hostSubPhysicalQuantity->getPtr()->actorIndex;
-  }
-
-  void Actor::setIndex(unsigned short index) {
-    hostSubPhysicalQuantity->getPtr()->actorIndex = index;
   }
 
   std::map<physics::Actor*, Actor*> Actor::instances = {};

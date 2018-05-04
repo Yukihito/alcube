@@ -94,7 +94,6 @@ namespace alcube::physics::softbody {
 
   bool Simulator::add(physics::Actor *actor) {
     if (Actor::instances.count(actor) > 0) {
-      actor->setSubIndex((unsigned short)actors.size());
       actors.push_back(Actor::instances[actor]);
       return true;
     } else {

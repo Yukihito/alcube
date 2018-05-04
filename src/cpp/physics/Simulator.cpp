@@ -213,7 +213,6 @@ namespace alcube::physics {
   }
 
   void Simulator::add(Actor *actor) {
-    actor->setIndex((unsigned short)actors.size());
     actors.push_back(actor);
     actorCount = (unsigned int)actors.size();
     for (auto subSimulator : subSimulators) {

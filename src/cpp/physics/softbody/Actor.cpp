@@ -12,6 +12,9 @@ namespace alcube::physics::softbody {
     this->hostSubPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::SoftBody>(subAllocationRange, gpuAccessor->dtos.hostSoftBodies);
     this->subPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::SoftBody>(subAllocationRange, gpuAccessor->dtos.softBodies);
     this->hostSubPhysicalQuantity->getPtr()->elasticity = 1.0f;
+
+    this->actor->getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
+    this->hostSubPhysicalQuantity->getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
     Actor::instances[this]= this;
   }
 
@@ -21,10 +24,6 @@ namespace alcube::physics::softbody {
 
   unsigned short Actor::getIndex() {
     return hostSubPhysicalQuantity->getPtr()->actorIndex;
-  }
-
-  void Actor::setIndex(unsigned short index) {
-    hostSubPhysicalQuantity->getPtr()->actorIndex = index;
   }
 
   std::map<physics::Actor*, Actor*> Actor::instances = {};
