@@ -27,6 +27,16 @@ namespace alcube::physics {
     this->zGridCount = zGridCount;
     gravity = 0.0f;
     sphericalShellRadius = 100000.0f;
+
+    actorResources->allocationRange->onAllocationLengthChanged.subscribe([&](){
+      unsigned int actorCount = this->actorResources->allocationRange->getAllocatedLength();
+      unsigned int actorCountForBitonicSort = utils::math::powerOf2(actorCount);
+      memories.actors.setCount(actorCount);
+      memories.actorStates.setCount(actorCount);
+      memories.hostPhysicalQuantities.setCount(actorCount);
+      memories.physicalQuantities.setCount(actorCount);
+      memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
+    });
   }
 
   unsigned short Simulator::getActorCount() {
@@ -61,8 +71,6 @@ namespace alcube::physics {
   }
 
   void Simulator::setUpComputingSize() {
-    //actorCount = (unsigned int)actors.size();
-    //actorCountForBitonicSort = utils::math::powerOf2(actorCount);
     for (auto subSimulator : subSimulators) {
       subSimulator->setUpComputingSize();
     }
@@ -79,14 +87,6 @@ namespace alcube::physics {
 
   void Simulator::setUpMemories() {
     unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
-    unsigned int actorCountForBitonicSort = utils::math::powerOf2(actorCount);
-    memories.actors.setCount(actorCount);
-    memories.hostPhysicalQuantities.setCount(actorCount);
-
-    memories.actorStates.setCount(actorCount);
-    memories.physicalQuantities.setCount(actorCount);
-    memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
-
     memories.actors.write();
     memories.hostPhysicalQuantities.write();
 
