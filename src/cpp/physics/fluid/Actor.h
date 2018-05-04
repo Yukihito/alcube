@@ -28,6 +28,8 @@ namespace alcube::physics::fluid {
     private:
       utils::ResourceAllocation<gpu::dtos::Fluid>* hostSubPhysicalQuantity;
       utils::ResourceAllocation<gpu::dtos::Fluid>* subPhysicalQuantity;
+      utils::AllocationRange* subAllocationRange = nullptr;
+      void updateIndex() override;
   };
 }
 

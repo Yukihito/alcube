@@ -20,6 +20,7 @@ namespace alcube::physics::softbody {
       utils::ResourceAllocation<gpu::dtos::SoftBody>* hostSubPhysicalQuantity = nullptr;
       utils::ResourceAllocation<gpu::dtos::SoftBody>* subPhysicalQuantity = nullptr;
       utils::AllocationRange* subAllocationRange = nullptr;
+      void updateIndex() override;
   };
 }
 

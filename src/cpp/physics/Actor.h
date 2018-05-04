@@ -19,13 +19,14 @@ namespace alcube::physics {
       virtual unsigned short getIndex() = 0;
       virtual ~Actor() = default;
     protected:
-      explicit Actor() = default;
-      void init(gpu::GPUAccessor* gpuAccessor, utils::AllocationRange* allocationRange);
       utils::ResourceAllocation<gpu::dtos::Actor>* actor = nullptr;
       utils::ResourceAllocation<gpu::dtos::PhysicalQuantity>* hostPhysicalQuantity = nullptr;
       utils::ResourceAllocation<gpu::dtos::ActorState>* actorState = nullptr;
       utils::ResourceAllocation<gpu::dtos::PhysicalQuantity>* physicalQuantity = nullptr;
-    private:
+
+      explicit Actor() = default;
+      void init(gpu::GPUAccessor* gpuAccessor, utils::AllocationRange* allocationRange);
+      virtual void updateIndex() = 0;
       utils::AllocationRange* allocationRange = nullptr;
   };
 }
