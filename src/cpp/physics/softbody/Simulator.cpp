@@ -17,7 +17,7 @@ namespace alcube::physics::softbody {
   void Simulator::writeHostMemories() {
     for (unsigned int i = 0; i < actorCount; i++) {
       auto actor = actors[i];
-      actor->actor.subPhysicalQuantityIndex = (unsigned short)i;
+      //actor->actor.subPhysicalQuantityIndex = (unsigned short)i;
       actor->subPhysicalQuantity.actorIndex = actor->index;
       memories.actors.dto[actor->index] = actor->actor;
       memories.hostPhysicalQuantities.dto[actor->index] = actor->physicalQuantity;
@@ -103,6 +103,7 @@ namespace alcube::physics::softbody {
 
   bool Simulator::add(physics::Actor *actor) {
     if (Actor::instances.count(actor) > 0) {
+      actor->actor.subPhysicalQuantityIndex = (unsigned short)actors.size();
       actors.push_back(Actor::instances[actor]);
       return true;
     } else {
