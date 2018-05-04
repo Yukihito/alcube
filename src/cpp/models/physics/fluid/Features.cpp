@@ -31,19 +31,24 @@ namespace alcube::models::physics::fluid {
   }
 
   alcube::physics::Actor* Features::createPhysicsActor() {
-    auto actor = new alcube::physics::fluid::Actor(); // TODO: Use memory pool
-    actor->physicalQuantity.mass = alcube::physics::fluid::Actor::mass;
+    auto actor = actorFactory->createFluid();
+    actor->getPhysicalQuantityDto()->mass = alcube::physics::fluid::Actor::mass;
     return actor;
   }
 
-  FeaturesFactory::FeaturesFactory(utils::MemoryPool<Features> *memoryPool) {
+  FeaturesFactory::FeaturesFactory(
+    utils::MemoryPool<Features> *memoryPool,
+    alcube::physics::ActorFactory* actorFactory
+  ) {
     this->memoryPool = memoryPool;
+    this->actorFactory = actorFactory;
   }
 
   Features* FeaturesFactory::create() {
     auto features = memoryPool->get();
     int nextId = instanceCount;
-    features->init(nextId);
+    instanceCount++;
+    features->init(nextId, actorFactory);
     return features;
   }
 }

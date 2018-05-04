@@ -4,6 +4,7 @@
 #include "../../../physics/fluid/Actor.h"
 #include "../Features.h"
 #include "../../../utils/MemoryPool.h"
+#include "../../../physics/ActorFactory.h"
 
 namespace alcube::models::physics::fluid {
   class Features : public models::physics::Features {
@@ -20,12 +21,16 @@ namespace alcube::models::physics::fluid {
 
   class FeaturesFactory {
     public:
-      explicit FeaturesFactory(utils::MemoryPool<Features>* memoryPool);
+      explicit FeaturesFactory(
+        utils::MemoryPool<Features>* memoryPool,
+        alcube::physics::ActorFactory* actorFactory
+      );
       Features* create();
 
     private:
       int instanceCount = 0;
       utils::MemoryPool<Features>* memoryPool;
+      alcube::physics::ActorFactory* actorFactory;
   };
 }
 

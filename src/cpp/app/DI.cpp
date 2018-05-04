@@ -148,14 +148,21 @@ namespace alcube::app {
   template <>
   models::physics::fluid::FeaturesFactory* DI::inject() {
     return new models::physics::fluid::FeaturesFactory(
-      new utils::MemoryPool<models::physics::fluid::Features>(get<models::Settings>()->world.maxActorCount)
+      new utils::MemoryPool<models::physics::fluid::Features>(get<models::Settings>()->world.maxActorCount),
+      get<alcube::physics::ActorFactory>()
     );
   }
 
   template <>
   models::physics::softbody::FeaturesFactory* DI::inject() {
     return new models::physics::softbody::FeaturesFactory(
-      new utils::MemoryPool<models::physics::softbody::Features>(get<models::Settings>()->world.maxActorCount)
+      new utils::MemoryPool<models::physics::softbody::Features>(get<models::Settings>()->world.maxActorCount),
+      get<alcube::physics::ActorFactory>()
     );
+  }
+
+  template <>
+  alcube::physics::ActorFactory* DI::inject() {
+    return new alcube::physics::ActorFactory(get<models::Settings>()->world.maxActorCount, get<gpu::GPUAccessor>());
   }
 }

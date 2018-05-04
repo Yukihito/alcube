@@ -25,13 +25,8 @@ namespace alcube::physics::fluid {
   void Simulator::writeHostMemories() {
     for (unsigned int i = 0; i < actorCount; i++) {
       auto actor = actors[i];
-      //actor->actor.subPhysicalQuantityIndex = (unsigned short)i;
-      actor->subPhysicalQuantity.actorIndex = actor->index;
-      actor->physicalQuantity.radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
-      actor->physicalQuantity.mass = memories.fluidSettings.at(0)->particleMass;
-      memories.actors.dto[actor->index] = actor->actor;
-      memories.hostPhysicalQuantities.dto[actor->index] = actor->physicalQuantity;
-      memories.hostFluids.dto[i] = actor->subPhysicalQuantity;
+      actor->getPhysicalQuantityDto()->radius = memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
+      actor->getPhysicalQuantityDto()->mass = memories.fluidSettings.at(0)->particleMass;
     }
   }
 
@@ -74,7 +69,7 @@ namespace alcube::physics::fluid {
 
   bool Simulator::add(physics::Actor *actor) {
     if (Actor::instances.count(actor) > 0) {
-      actor->actor.subPhysicalQuantityIndex = (unsigned short)actors.size();
+      actor->setSubIndex((unsigned short)actors.size());
       actors.push_back(Actor::instances[actor]);
       return true;
     } else {

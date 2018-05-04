@@ -15,15 +15,6 @@ namespace alcube::physics::softbody {
   }
 
   void Simulator::writeHostMemories() {
-    for (unsigned int i = 0; i < actorCount; i++) {
-      auto actor = actors[i];
-      //actor->actor.subPhysicalQuantityIndex = (unsigned short)i;
-      actor->subPhysicalQuantity.actorIndex = actor->index;
-      memories.actors.dto[actor->index] = actor->actor;
-      memories.hostPhysicalQuantities.dto[actor->index] = actor->physicalQuantity;
-      memories.hostSoftBodies.dto[i] = actor->subPhysicalQuantity;
-    }
-
     for (unsigned int i = 0; i < springCount; i++) {
       memories.springs.at(i)->k = springs[i]->k;
       setUpSpring(i, 0);
@@ -103,7 +94,7 @@ namespace alcube::physics::softbody {
 
   bool Simulator::add(physics::Actor *actor) {
     if (Actor::instances.count(actor) > 0) {
-      actor->actor.subPhysicalQuantityIndex = (unsigned short)actors.size();
+      actor->setSubIndex((unsigned short)actors.size());
       actors.push_back(Actor::instances[actor]);
       return true;
     } else {
@@ -112,7 +103,7 @@ namespace alcube::physics::softbody {
   }
 
   void Simulator::setUpSpring(unsigned int springIndex, unsigned char nodeIndex) {
-    unsigned short actorIndex = springs[springIndex]->nodes[nodeIndex].actor->index;
+    unsigned short actorIndex = springs[springIndex]->nodes[nodeIndex].actor->getIndex();
     memories.springs.at(springIndex)->actorIndices[nodeIndex] = actorIndex;
     memories.springs.at(springIndex)->nodePositionsModelSpace[nodeIndex] = toCl(springs[springIndex]->nodes[nodeIndex].position);
 

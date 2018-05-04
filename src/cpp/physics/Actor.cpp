@@ -1,15 +1,36 @@
 #include "Actor.h"
 
 namespace alcube::physics {
-  Actor::Actor() {
-    this->index = 0;
-    this->actor = {};
-    this->physicalQuantity = {};
-    this->physicalQuantity.radius = 1.0f;
-    this->physicalQuantity.mass = 1.0f;
-    this->physicalQuantity.rotation = {0.0f, 0.0f, 0.0f, 1.0f};
-    this->physicalQuantity.angularMomentum = {0.0f, 0.0f, 0.0f};
-    this->physicalQuantity.linearMomentum = {0.0f, 0.0f, 0.0f};
-    this->physicalQuantity.position = {0.0f, 0.0f, 0.0f};
+  void Actor::init(
+    alcube::gpu::GPUAccessor *gpuAccessor,
+    alcube::utils::AllocationRange *allocationRange
+  ) {
+    this->allocationRange = allocationRange;
+    this->actor = new utils::ResourceAllocation<gpu::dtos::Actor>(allocationRange, gpuAccessor->dtos.actors);
+    this->hostPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::PhysicalQuantity>(allocationRange, gpuAccessor->dtos.hostPhysicalQuantities);
+    this->actorState = new utils::ResourceAllocation<gpu::dtos::ActorState>(allocationRange, gpuAccessor->dtos.actorStates);
+    this->physicalQuantity = new utils::ResourceAllocation<gpu::dtos::PhysicalQuantity>(allocationRange, gpuAccessor->dtos.physicalQuantities);
+    this->hostPhysicalQuantity->getPtr()->radius = 1.0f;
+    this->hostPhysicalQuantity->getPtr()->mass = 1.0f;
+    this->hostPhysicalQuantity->getPtr()->rotation = {0.0f, 0.0f, 0.0f, 1.0f};
+    this->hostPhysicalQuantity->getPtr()->angularMomentum = {0.0f, 0.0f, 0.0f};
+    this->hostPhysicalQuantity->getPtr()->linearMomentum = {0.0f, 0.0f, 0.0f};
+    this->hostPhysicalQuantity->getPtr()->position = {0.0f, 0.0f, 0.0f};
+  }
+
+  unsigned short Actor::getSubIndex() {
+    return actor->getPtr()->subPhysicalQuantityIndex;
+  }
+
+  void Actor::setSubIndex(unsigned short index) {
+    actor->getPtr()->subPhysicalQuantityIndex = index;
+  }
+
+  gpu::dtos::Actor* Actor::getActorDto() {
+    return this->actor->getPtr();
+  }
+
+  gpu::dtos::PhysicalQuantity* Actor::getPhysicalQuantityDto() {
+    return this->hostPhysicalQuantity->getPtr();
   }
 }

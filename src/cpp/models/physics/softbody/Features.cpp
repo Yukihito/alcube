@@ -18,24 +18,31 @@ namespace alcube::models::physics::softbody {
   }
 
   alcube::physics::Actor* Features::createPhysicsActor() {
-    auto actor = new alcube::physics::softbody::Actor();
-    actor->subPhysicalQuantity.elasticity = elasticity;
-    actor->physicalQuantity.mass = mass;
+    auto actor = actorFactory->createSoftbody();
+    actor->getSubPhysicalQuantity()->elasticity = elasticity;
+    actor->getPhysicalQuantityDto()->mass = mass;
     return actor;
   }
 
-  void Features::init(int id) {
-    physics::Features::init(id);
+  void Features::init(int id, alcube::physics::ActorFactory* actorFactory) {
+    physics::Features::init(id, actorFactory);
     elasticity = 1.0f;
     mass = 1.0f;
   }
 
   FeaturesFactory::FeaturesFactory(
-    alcube::utils::MemoryPool<alcube::models::physics::softbody::Features> *memoryPool) {
+    alcube::utils::MemoryPool<alcube::models::physics::softbody::Features> *memoryPool,
+    alcube::physics::ActorFactory* actorFactory
+  ) {
     this->memoryPool = memoryPool;
+    this->actorFactory = actorFactory;
   }
 
   Features* FeaturesFactory::create() {
-    return memoryPool->get();
+    auto features = memoryPool->get();
+    int nextId = instanceCount;
+    instanceCount++;
+    features->init(nextId, actorFactory);
+    return features;
   }
 }

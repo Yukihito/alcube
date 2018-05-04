@@ -19,36 +19,36 @@ namespace alcube::models {
   }
 
   glm::vec3 Actor::getPosition() {
-    return toGlm(physicsActor->physicalQuantity.position);
+    return toGlm(physicsActor->getPhysicalQuantityDto()->position);
   }
 
   void Actor::setPosition(glm::vec3 arg) {
-    physicsActor->physicalQuantity.position = toCl(arg);
+    physicsActor->getPhysicalQuantityDto()->position = toCl(arg);
 
   }
 
   glm::quat Actor::getRotation() {
-    return toGlmQuat(physicsActor->physicalQuantity.rotation);
+    return toGlmQuat(physicsActor->getPhysicalQuantityDto()->rotation);
   }
 
   void Actor::setRotation(glm::quat arg) {
-    physicsActor->physicalQuantity.rotation = toCl(arg);
+    physicsActor->getPhysicalQuantityDto()->rotation = toCl(arg);
   }
 
   glm::vec3 Actor::getLinearMomentum() {
-    return toGlm(physicsActor->physicalQuantity.linearMomentum);
+    return toGlm(physicsActor->getPhysicalQuantityDto()->linearMomentum);
   }
 
   void Actor::setLinearMomentum(glm::vec3 arg) {
-    physicsActor->physicalQuantity.linearMomentum = toCl(arg);
+    physicsActor->getPhysicalQuantityDto()->linearMomentum = toCl(arg);
   }
 
   glm::vec3 Actor::getAngularMomentum() {
-    return toGlm(physicsActor->physicalQuantity.angularMomentum);
+    return toGlm(physicsActor->getPhysicalQuantityDto()->angularMomentum);
   }
 
   void Actor::setAngularMomentum(glm::vec3 arg) {
-    physicsActor->physicalQuantity.angularMomentum = toCl(arg);
+    physicsActor->getPhysicalQuantityDto()->angularMomentum = toCl(arg);
   }
 
   glm::vec3 Actor::getColor() {
@@ -60,7 +60,7 @@ namespace alcube::models {
   }
 
   unsigned int Actor::getIndex() {
-    return physicsActor->index;
+    return physicsActor->getIndex();
   }
 
   alcube::models::drawing::Model3D* Actor::getModel3D() {

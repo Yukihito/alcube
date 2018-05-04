@@ -13,7 +13,7 @@ namespace alcube::models::physics::softbody {
       float getMass();
       void setMass(float arg);
       alcube::physics::Actor* createPhysicsActor() override;
-      void init(int id) override;
+      void init(int id, alcube::physics::ActorFactory* actorFactory) override;
 
     private:
       float elasticity = 1.0f;
@@ -22,11 +22,13 @@ namespace alcube::models::physics::softbody {
 
   class FeaturesFactory {
     public:
-      explicit FeaturesFactory(utils::MemoryPool<Features>* memoryPool);
+      explicit FeaturesFactory(utils::MemoryPool<Features>* memoryPool, alcube::physics::ActorFactory* actorFactory);
       Features* create();
 
     private:
       utils::MemoryPool<Features>* memoryPool;
+      alcube::physics::ActorFactory* actorFactory;
+      int instanceCount = 0;
   };
 }
 

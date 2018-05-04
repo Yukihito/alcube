@@ -66,7 +66,7 @@ set(ALCUBE_PHYSICS_SOURCE_FILES
         src/cpp/physics/SubSimulator.cpp src/cpp/physics/SubSimulator.h
         src/cpp/physics/fluid/Simulator.cpp src/cpp/physics/fluid/Simulator.h
         src/cpp/physics/softbody/Simulator.cpp src/cpp/physics/softbody/Simulator.h
-        )
+        src/cpp/physics/ActorFactory.cpp src/cpp/physics/ActorFactory.h)
 add_library(alcube_physics_lib STATIC ${ALCUBE_PHYSICS_SOURCE_FILES})
 target_link_libraries(alcube_physics_lib
         alcube_utils_lib

@@ -10,13 +10,26 @@
 namespace alcube::physics::fluid {
   class Actor: public physics::Actor {
     public:
-      explicit Actor();
       static std::map<physics::Actor*, Actor*> instances;
+      explicit Actor() = default;
       static float density;
       static float stiffness;
       static float viscosity;
       static float mass;
-      gpu::dtos::Fluid subPhysicalQuantity;
+
+      void init(
+        gpu::GPUAccessor* gpuAccessor,
+        utils::AllocationRange* allocationRange,
+        utils::AllocationRange* subAllocationRange
+      );
+
+      gpu::dtos::Fluid* getSubPhysicalQuantity();
+      unsigned short getIndex() override;
+      void setIndex(unsigned short index) override;
+    private:
+      utils::ResourceAllocation<gpu::dtos::Fluid>* hostSubPhysicalQuantity;
+      utils::ResourceAllocation<gpu::dtos::Fluid>* subPhysicalQuantity;
+      // gpu::dtos::Fluid subPhysicalQuantity;
   };
 }
 
