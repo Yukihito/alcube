@@ -18,10 +18,6 @@ namespace alcube::physics {
     this->hostPhysicalQuantity->getPtr()->position = {0.0f, 0.0f, 0.0f};
   }
 
-  gpu::dtos::Actor* Actor::getActorDto() {
-    return this->actor->getPtr();
-  }
-
   gpu::dtos::PhysicalQuantity* Actor::getPhysicalQuantityDto() {
     return this->hostPhysicalQuantity->getPtr();
   }
