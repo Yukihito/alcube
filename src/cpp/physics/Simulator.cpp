@@ -34,9 +34,9 @@ namespace alcube::physics {
     grid->yCount = yGridCount;
     grid->zCount = zGridCount;
     grid->origin = {
-      -(float)((xGridCount * gridEdgeLength) / 2),
-      -(float)((yGridCount * gridEdgeLength) / 2),
-      -(float)((zGridCount * gridEdgeLength) / 2)
+      -(xGridCount * gridEdgeLength / 2.0f),
+      -(yGridCount * gridEdgeLength / 2.0f),
+      -(zGridCount * gridEdgeLength / 2.0f)
     };
 
     for (int i = 0; i < 3; i++) {
@@ -125,10 +125,10 @@ namespace alcube::physics {
     // Sort grid and actor relations (Bitonic sort)
     auto stageCount = (int)log2(actorCountForBitonicSort);
     int passCount = 0;
-    for (int i = 0; i < stageCount - 1; i++) {
-      for (int j = 0; j < passCount + 1; j++) {
-        auto distance = (unsigned int)(1 << (i - j));
-        auto stageDistance = (unsigned int)(1 << i);
+    for (unsigned int i = 0; i < stageCount - 1; i++) {
+      for (unsigned int j = 0; j < passCount + 1; j++) {
+        auto distance = 1u << (i - j);
+        auto stageDistance = 1u << i;
         kernels.bitonic(
           actorCountForBitonicSort,
           memories.gridAndActorRelations,
@@ -139,8 +139,8 @@ namespace alcube::physics {
       passCount++;
     }
     passCount = stageCount;
-    for (int i = 0; i < passCount; i++) {
-      auto distance = (unsigned int)(1 << (stageCount - (i + 1)));
+    for (unsigned int i = 0; i < passCount; i++) {
+      auto distance = 1u << (stageCount - (i + 1));
       kernels.merge(
         actorCountForBitonicSort,
         memories.gridAndActorRelations,
@@ -198,7 +198,7 @@ namespace alcube::physics {
     );
   }
 
-  void Simulator::input() {
+  void Simulator::setUp() {
     setUpConstants();
     setUpComputingSize();
     writeHostMemories();

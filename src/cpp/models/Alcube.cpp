@@ -31,7 +31,7 @@ namespace alcube::models {
 
   void Alcube::setUp() {
     renderer->setUp();
-    physicsSimulator->input();
+    physicsSimulator->setUp();
   }
 
   void Alcube::render() {

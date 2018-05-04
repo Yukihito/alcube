@@ -32,7 +32,7 @@ namespace alcube::physics {
       );
       void add(Actor* actor);
       void add(SubSimulator* subSimulator);
-      void input();
+      void setUp();
       void update();
       float gravity;
       float sphericalShellRadius;
