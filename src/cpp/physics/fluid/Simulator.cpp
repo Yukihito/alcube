@@ -5,11 +5,8 @@ namespace alcube::physics::fluid {
     kernels = gpuAccessor->kernels;
     memories = gpuAccessor->memories;
     this->actorResources = actorResources;
-    actorResources->fluidResource->allocationRange->onAllocationLengthChanged.subscribe([&]{
-      unsigned int actorCount = this->actorResources->fluidResource->allocationRange->getAllocatedLength();
-      memories.hostFluids.setCount(actorCount);
-      memories.fluids.setCount(actorCount);
-    });
+    activeActorCount = 0;
+    allActorCount = 0;
   }
 
   void Simulator::setUpConstants() {
@@ -25,14 +22,21 @@ namespace alcube::physics::fluid {
   }
 
   void Simulator::input() {
-    unsigned int actorCount = actorResources->fluidResource->allocationRange->getAllocatedLength();
-    memories.hostFluids.write();
+    allActorCount = actorResources->fluidResource->allocationRange->getAllocatedLength();
+    auto updateCount = allActorCount - activeActorCount;
+    if (updateCount == 0) {
+      return;
+    }
+    memories.hostFluids.setCount(allActorCount);
+    memories.fluids.setCount(allActorCount);
+    memories.hostFluids.write(activeActorCount);
     kernels.inputFluids(
-      (unsigned short)actorCount,
+      updateCount,
       memories.hostFluids,
       memories.fluids,
-      0
+      (unsigned short)activeActorCount
     );
+    activeActorCount = allActorCount;
   }
 
   void Simulator::updateForce() {

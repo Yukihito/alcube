@@ -18,6 +18,8 @@ namespace alcube::physics::fluid {
       ActorResources* actorResources;
       gpu::Kernels kernels;
       gpu::Memories memories;
+      unsigned int activeActorCount;
+      unsigned int allActorCount;
   };
 }
 

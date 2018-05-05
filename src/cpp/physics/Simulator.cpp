@@ -32,7 +32,7 @@ namespace alcube::physics {
   }
 
   unsigned short Simulator::getActorCount() {
-    return activeActorCount;
+    return (unsigned short)activeActorCount;
   }
 
   void Simulator::setUpConstants() {
@@ -76,23 +76,25 @@ namespace alcube::physics {
 
   void Simulator::input() {
     allActorCount = (unsigned short)actorResources->allocationRange->getAllocatedLength();
+    auto updateCount = allActorCount - activeActorCount;
+    if (updateCount == 0) {
+      return;
+    }
+
     for (auto i = activeActorCount; i < allActorCount; i++) {
       actorResources->entities[i]->beforeWrite();
     }
     updateGPUResourcesCount();
     memories.actors.write(activeActorCount);
     memories.hostPhysicalQuantities.write(activeActorCount);
-    auto updateCount = allActorCount - activeActorCount;
-    if (updateCount > 0) {
-      kernels.inputActors(
-        updateCount,
-        memories.actors,
-        memories.actorStates,
-        memories.hostPhysicalQuantities,
-        memories.physicalQuantities,
-        (unsigned short)activeActorCount
-      );
-    }
+    kernels.inputActors(
+      updateCount,
+      memories.actors,
+      memories.actorStates,
+      memories.hostPhysicalQuantities,
+      memories.physicalQuantities,
+      (unsigned short)activeActorCount
+    );
     activeActorCount = allActorCount;
 
     for (auto subSimulator: subSimulators) {
