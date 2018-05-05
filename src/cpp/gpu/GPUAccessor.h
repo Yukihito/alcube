@@ -452,7 +452,7 @@ namespace alcube::gpu {
       void inputConstants(unsigned int workSize, memories::Constants& constants, memories::Grid& grid, memories::FluidSettings& fluidSettings, float gravityAcceleration, float deltaTime, float splitDeltaTime, float sphericalShellRadius);
       void inputActors(unsigned int workSize, memories::Actor& actors, memories::ActorState& actorStates, memories::PhysicalQuantity& hostPhysicalQuantities, memories::PhysicalQuantity& physicalQuantities, unsigned short offset);
       void inputSoftBodies(unsigned int workSize, memories::SoftBody& hostSoftBodies, memories::SoftBody& softBodies, unsigned short offset);
-      void inputSprings(unsigned int workSize, memories::Spring& springs, memories::SpringState& springStates, unsigned short offset);
+      void inputSprings(unsigned int workSize, memories::Spring& springs, memories::SpringState& springStates, unsigned int offset);
       void inputFluids(unsigned int workSize, memories::Fluid& hostFluids, memories::Fluid& fluids, unsigned short offset);
       void moveFluid(unsigned int workSize, memories::Fluid& fluids, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
       void calcSpringImpulses(unsigned int workSize, memories::Constants& constants, memories::SpringState& springStates, memories::PhysicalQuantity& physicalQuantities);

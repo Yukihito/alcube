@@ -748,12 +748,12 @@ namespace alcube::gpu {
     unsigned int workSize,
     memories::Spring& springs,
     memories::SpringState& springStates,
-    unsigned short offset
+    unsigned int offset
   ) {
     queue->push(rawKernels.inputSprings, {workSize}, {
       memArg(springs.memory),
       memArg(springStates.memory),
-      ushortArg(offset)
+      uintArg(offset)
     });
   }
 

@@ -41,7 +41,7 @@ __kernel void inputSoftBodies(
 __kernel void inputSprings(
   __global const Spring* springs,
   __global SpringState* springStates,
-  unsigned short offset
+  unsigned int offset
 ) {
   size_t i = get_global_id(0) + offset;
   springStates[i].constants = springs[i];

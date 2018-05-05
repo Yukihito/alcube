@@ -6,17 +6,6 @@ namespace alcube::physics::softbody {
     kernels = gpuAccessor->kernels;
     memories = gpuAccessor->memories;
     this->actorResources = actorResources;
-    actorResources->softbodyResource->allocationRange->onAllocationLengthChanged.subscribe([&]{
-      unsigned int actorCount = this->actorResources->softbodyResource->allocationRange->getAllocatedLength();
-      memories.hostSoftBodies.setCount(actorCount);
-      memories.softBodies.setCount(actorCount);
-    });
-
-    actorResources->springResource->allocationRange->onAllocationLengthChanged.subscribe([&]{
-      unsigned int springCount = this->actorResources->springResource->allocationRange->getAllocatedLength();
-      memories.springs.setCount(springCount);
-      memories.springStates.setCount(springCount);
-    });
     activeActorCount = 0;
     allActorCount = 0;
     activeSpringCount = 0;
@@ -31,25 +20,39 @@ namespace alcube::physics::softbody {
   }
 
   void Simulator::inputActors() {
-    unsigned int actorCount = actorResources->softbodyResource->allocationRange->getAllocatedLength();
-    memories.hostSoftBodies.write();
+    allActorCount = actorResources->softbodyResource->allocationRange->getAllocatedLength();
+    auto updateCount = allActorCount - activeActorCount;
+    if (updateCount == 0) {
+      return;
+    }
+    memories.hostSoftBodies.setCount(allActorCount);
+    memories.softBodies.setCount(allActorCount);
+    memories.hostSoftBodies.write(activeActorCount);
     kernels.inputSoftBodies(
-      actorCount,
+      updateCount,
       memories.hostSoftBodies,
       memories.softBodies,
-      0
+      (unsigned short)activeActorCount
     );
+    activeActorCount = allActorCount;
   }
 
   void Simulator::inputSprings() {
-    unsigned int springCount = actorResources->springResource->allocationRange->getAllocatedLength();
-    memories.springs.write();
+    allSpringCount = actorResources->springResource->allocationRange->getAllocatedLength();
+    auto updateCount = allSpringCount - activeSpringCount;
+    if (updateCount == 0) {
+      return;
+    }
+    memories.springs.setCount(allSpringCount);
+    memories.springStates.setCount(allSpringCount);
+    memories.springs.write(activeSpringCount);
     kernels.inputSprings(
-      springCount,
+      updateCount,
       memories.springs,
       memories.springStates,
-      0
+      activeSpringCount
     );
+    activeSpringCount = allSpringCount;
   }
 
   void Simulator::updateForce() {
