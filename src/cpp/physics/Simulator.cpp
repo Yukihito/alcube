@@ -96,7 +96,8 @@ namespace alcube::physics {
       memories.actors,
       memories.actorStates,
       memories.hostPhysicalQuantities,
-      memories.physicalQuantities
+      memories.physicalQuantities,
+      0
     );
 
     for (auto subSimulator : subSimulators) {

@@ -29,13 +29,15 @@ namespace alcube::physics::softbody {
     kernels.inputSoftBodies(
       actorCount,
       memories.hostSoftBodies,
-      memories.softBodies
+      memories.softBodies,
+      0
     );
 
     kernels.inputSprings(
       springCount,
       memories.springs,
-      memories.springStates
+      memories.springStates,
+      0
     );
   }
 

@@ -719,46 +719,54 @@ namespace alcube::gpu {
     memories::Actor& actors,
     memories::ActorState& actorStates,
     memories::PhysicalQuantity& hostPhysicalQuantities,
-    memories::PhysicalQuantity& physicalQuantities
+    memories::PhysicalQuantity& physicalQuantities,
+    unsigned short offset
   ) {
     queue->push(rawKernels.inputActors, {workSize}, {
       memArg(actors.memory),
       memArg(actorStates.memory),
       memArg(hostPhysicalQuantities.memory),
-      memArg(physicalQuantities.memory)
+      memArg(physicalQuantities.memory),
+      ushortArg(offset)
     });
   }
 
   void Kernels::inputSoftBodies(
     unsigned int workSize,
     memories::SoftBody& hostSoftBodies,
-    memories::SoftBody& softBodies
+    memories::SoftBody& softBodies,
+    unsigned short offset
   ) {
     queue->push(rawKernels.inputSoftBodies, {workSize}, {
       memArg(hostSoftBodies.memory),
-      memArg(softBodies.memory)
+      memArg(softBodies.memory),
+      ushortArg(offset)
     });
   }
 
   void Kernels::inputSprings(
     unsigned int workSize,
     memories::Spring& springs,
-    memories::SpringState& springStates
+    memories::SpringState& springStates,
+    unsigned short offset
   ) {
     queue->push(rawKernels.inputSprings, {workSize}, {
       memArg(springs.memory),
-      memArg(springStates.memory)
+      memArg(springStates.memory),
+      ushortArg(offset)
     });
   }
 
   void Kernels::inputFluids(
     unsigned int workSize,
     memories::Fluid& hostFluids,
-    memories::Fluid& fluids
+    memories::Fluid& fluids,
+    unsigned short offset
   ) {
     queue->push(rawKernels.inputFluids, {workSize}, {
       memArg(hostFluids.memory),
-      memArg(fluids.memory)
+      memArg(fluids.memory),
+      ushortArg(offset)
     });
   }
 

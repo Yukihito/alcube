@@ -21,10 +21,10 @@ namespace alcube::physics {
       virtual ~Actor() = default;
       virtual void beforeWrite() = 0;
     protected:
-      utils::ResourceAllocation<gpu::dtos::Actor> actor;
-      utils::ResourceAllocation<gpu::dtos::PhysicalQuantity> hostPhysicalQuantity;
-      utils::ResourceAllocation<gpu::dtos::ActorState> actorState;
-      utils::ResourceAllocation<gpu::dtos::PhysicalQuantity> physicalQuantity;
+      utils::ResourceAllocation<gpu::dtos::Actor> actor = {};
+      utils::ResourceAllocation<gpu::dtos::PhysicalQuantity> hostPhysicalQuantity = {};
+      utils::ResourceAllocation<gpu::dtos::ActorState> actorState = {};
+      utils::ResourceAllocation<gpu::dtos::PhysicalQuantity> physicalQuantity = {};
 
       explicit Actor() = default;
       void init(gpu::GPUAccessor* gpuAccessor, utils::AllocationRange* allocationRange);

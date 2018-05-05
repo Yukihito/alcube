@@ -30,7 +30,8 @@ namespace alcube::physics::fluid {
     kernels.inputFluids(
       (unsigned short)actorCount,
       memories.hostFluids,
-      memories.fluids
+      memories.fluids,
+      0
     );
   }
 
