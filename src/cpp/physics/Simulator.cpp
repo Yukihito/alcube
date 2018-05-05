@@ -27,20 +27,12 @@ namespace alcube::physics {
     this->zGridCount = zGridCount;
     gravity = 0.0f;
     sphericalShellRadius = 100000.0f;
-
-    actorResources->allocationRange->onAllocationLengthChanged.subscribe([&]{
-      unsigned int actorCount = this->actorResources->allocationRange->getAllocatedLength();
-      unsigned int actorCountForBitonicSort = utils::math::powerOf2(actorCount);
-      memories.actors.setCount(actorCount);
-      memories.actorStates.setCount(actorCount);
-      memories.hostPhysicalQuantities.setCount(actorCount);
-      memories.physicalQuantities.setCount(actorCount);
-      memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
-    });
+    activeActorCount = 0;
+    allActorCount = 0;
   }
 
   unsigned short Simulator::getActorCount() {
-    return (unsigned short)actorResources->allocationRange->getAllocatedLength();
+    return activeActorCount;
   }
 
   void Simulator::setUpConstants() {
@@ -65,20 +57,6 @@ namespace alcube::physics {
       grid->normals[i].s[i - 3] = -1.0f;
     }
 
-    for (auto subSimulator : subSimulators) {
-      subSimulator->setUpConstants();
-    }
-  }
-
-  void Simulator::setUpMemories() {
-    unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
-    for (unsigned short i = 0; i < actorCount; i++) {
-      actorResources->entities[i]->beforeWrite();
-    }
-
-    memories.actors.write(0);
-    memories.hostPhysicalQuantities.write(0);
-
     float splitDeltaTime = deltaTime / /*motionIterationCount*/8;
     kernels.inputConstants(
       1,
@@ -91,18 +69,44 @@ namespace alcube::physics {
       sphericalShellRadius
     );
 
-    kernels.inputActors(
-      actorCount,
-      memories.actors,
-      memories.actorStates,
-      memories.hostPhysicalQuantities,
-      memories.physicalQuantities,
-      0
-    );
-
     for (auto subSimulator : subSimulators) {
+      subSimulator->setUpConstants();
+    }
+  }
+
+  void Simulator::input() {
+    allActorCount = (unsigned short)actorResources->allocationRange->getAllocatedLength();
+    for (unsigned short i = activeActorCount; i < allActorCount; i++) {
+      actorResources->entities[i]->beforeWrite();
+    }
+    updateGPUResourcesCount();
+    memories.actors.write(activeActorCount);
+    memories.hostPhysicalQuantities.write(activeActorCount);
+    unsigned short updateCount = allActorCount - activeActorCount;
+    if (updateCount > 0) {
+      kernels.inputActors(
+        updateCount,
+        memories.actors,
+        memories.actorStates,
+        memories.hostPhysicalQuantities,
+        memories.physicalQuantities,
+        activeActorCount
+      );
+    }
+    activeActorCount = allActorCount;
+
+    for (auto subSimulator: subSimulators) {
       subSimulator->setUpMemories();
     }
+  }
+
+  void Simulator::updateGPUResourcesCount() {
+    unsigned int actorCountForBitonicSort = utils::math::powerOf2(allActorCount);
+    memories.actors.setCount(allActorCount);
+    memories.actorStates.setCount(allActorCount);
+    memories.hostPhysicalQuantities.setCount(allActorCount);
+    memories.physicalQuantities.setCount(allActorCount);
+    memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
   }
 
   void Simulator::computeBroadPhase() {
@@ -206,7 +210,7 @@ namespace alcube::physics {
 
   void Simulator::setUp() {
     setUpConstants();
-    setUpMemories();
+    input();
   }
 
   void Simulator::update() {

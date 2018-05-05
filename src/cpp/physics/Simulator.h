@@ -49,15 +49,17 @@ namespace alcube::physics {
       ActorResources* actorResources;
       gpu::Kernels kernels;
       gpu::Memories memories;
-      std::vector<Actor*> actors;
       std::vector<SubSimulator*> subSimulators;
 
       unsigned int allGridCount;
       unsigned int maxActorCount;
+      unsigned short activeActorCount;
+      unsigned short allActorCount;
       float deltaTime;
 
       void setUpConstants();
-      void setUpMemories();
+      void input();
+      void updateGPUResourcesCount();
       void computeBroadPhase();
       void computeNarrowPhase();
       void updateForce();
