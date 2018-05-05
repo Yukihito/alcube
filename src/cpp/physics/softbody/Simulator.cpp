@@ -26,17 +26,24 @@ namespace alcube::physics::softbody {
   void Simulator::setUpConstants() {}
 
   void Simulator::input() {
+    inputActors();
+    inputSprings();
+  }
+
+  void Simulator::inputActors() {
     unsigned int actorCount = actorResources->softbodyResource->allocationRange->getAllocatedLength();
-    unsigned int springCount = actorResources->springResource->allocationRange->getAllocatedLength();
     memories.hostSoftBodies.write();
-    memories.springs.write();
     kernels.inputSoftBodies(
       actorCount,
       memories.hostSoftBodies,
       memories.softBodies,
       0
     );
+  }
 
+  void Simulator::inputSprings() {
+    unsigned int springCount = actorResources->springResource->allocationRange->getAllocatedLength();
+    memories.springs.write();
     kernels.inputSprings(
       springCount,
       memories.springs,

@@ -26,6 +26,8 @@ namespace alcube::physics::softbody {
       unsigned int allActorCount;
       unsigned int activeSpringCount;
       unsigned int allSpringCount;
+      void inputActors();
+      void inputSprings();
   };
 }
 
