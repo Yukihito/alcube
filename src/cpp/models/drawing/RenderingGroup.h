@@ -14,12 +14,12 @@
 
 namespace alcube::models::drawing {
   struct RenderingGroupAllocations {
-    utils::ResourceAllocation<cl_float3>* positions;
-    utils::ResourceAllocation<cl_float4>* rotations0;
-    utils::ResourceAllocation<cl_float4>* rotations1;
-    utils::ResourceAllocation<cl_float4>* rotations2;
-    utils::ResourceAllocation<cl_float4>* rotations3;
-    utils::ResourceAllocation<cl_float3>* colors;
+    utils::ResourceAllocation<cl_float3> positions;
+    utils::ResourceAllocation<cl_float4> rotations0;
+    utils::ResourceAllocation<cl_float4> rotations1;
+    utils::ResourceAllocation<cl_float4> rotations2;
+    utils::ResourceAllocation<cl_float4> rotations3;
+    utils::ResourceAllocation<cl_float3> colors;
   };
 
   class RenderingGroup : public RenderingGroupSettings {

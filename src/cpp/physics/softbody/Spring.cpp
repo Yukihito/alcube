@@ -26,13 +26,13 @@ namespace alcube::physics::softbody {
   }
 
   void Spring::setK(float k) {
-    spring->getPtr()->k = k;
+    spring.getPtr()->k = k;
   }
 
   void Spring::init(gpu::GPUAccessor *gpuAccessor, utils::AllocationRange *allocationRange) {
-    spring = new utils::ResourceAllocation<gpu::dtos::Spring>(allocationRange, gpuAccessor->dtos.springs);
+    spring.init(allocationRange, gpuAccessor->dtos.springs);
     for (unsigned char i = 0; i < 2; i++) {
-      nodes[i].init(allocationRange, spring, i);
+      nodes[i].init(allocationRange, &spring, i);
     }
   }
 

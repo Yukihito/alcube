@@ -32,8 +32,8 @@ namespace alcube::models::drawing {
   };
 
   struct Model3DAllocations {
-    utils::ResourceAllocation<cl_float3>* colors;
-    utils::ResourceAllocation<gpu::dtos::Renderer>* features;
+    utils::ResourceAllocation<cl_float3> colors;
+    utils::ResourceAllocation<gpu::dtos::Renderer> features;
   };
 
   class Model3D {

@@ -31,7 +31,7 @@ namespace alcube::physics::softbody {
       SpringNode* getNode(unsigned int index);
     private:
       utils::AllocationRange* allocationRange;
-      utils::ResourceAllocation<gpu::dtos::Spring>* spring;
+      utils::ResourceAllocation<gpu::dtos::Spring> spring;
       SpringNode nodes[2];
   };
 }

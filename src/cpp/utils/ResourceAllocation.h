@@ -22,9 +22,10 @@ namespace alcube::utils {
   template <class T>
   class ResourceAllocation {
     public:
-      explicit ResourceAllocation(AllocationRange* range, T* values);
+      //explicit ResourceAllocation(AllocationRange* range, T* values);
       T get();
       T* getPtr();
+      void init(AllocationRange* range, T* values);
 
     private:
       AllocationRange* range;
@@ -32,7 +33,7 @@ namespace alcube::utils {
   };
 
   template <class T>
-  ResourceAllocation<T>::ResourceAllocation(alcube::utils::AllocationRange *range, T *values) {
+  void ResourceAllocation<T>::init(alcube::utils::AllocationRange *range, T *values) {
     this->range = range;
     this->values = values;
   }

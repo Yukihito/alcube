@@ -8,26 +8,26 @@ namespace alcube::physics::softbody {
   ) {
     physics::Actor::init(gpuAccessor, allocationRange);
     this->subAllocationRange = subAllocationRange;
-    this->actor->getPtr()->type = SOFT_BODY;
-    this->hostSubPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::SoftBody>(subAllocationRange, gpuAccessor->dtos.hostSoftBodies);
-    this->subPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::SoftBody>(subAllocationRange, gpuAccessor->dtos.softBodies);
-    this->hostSubPhysicalQuantity->getPtr()->elasticity = 1.0f;
+    this->actor.getPtr()->type = SOFT_BODY;
+    this->hostSubPhysicalQuantity.init(subAllocationRange, gpuAccessor->dtos.hostSoftBodies);
+    this->subPhysicalQuantity.init(subAllocationRange, gpuAccessor->dtos.softBodies);
+    this->hostSubPhysicalQuantity.getPtr()->elasticity = 1.0f;
 
     updateIndex();
   }
 
   gpu::dtos::SoftBody* Actor::getSubPhysicalQuantity() {
-    return hostSubPhysicalQuantity->getPtr();
+    return hostSubPhysicalQuantity.getPtr();
   }
 
   unsigned short Actor::getIndex() {
-    return hostSubPhysicalQuantity->getPtr()->actorIndex;
+    return hostSubPhysicalQuantity.getPtr()->actorIndex;
   }
 
   void Actor::beforeWrite() {}
 
   void Actor::updateIndex() {
-    this->actor->getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
-    this->hostSubPhysicalQuantity->getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
+    this->actor.getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
+    this->hostSubPhysicalQuantity.getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
   }
 }

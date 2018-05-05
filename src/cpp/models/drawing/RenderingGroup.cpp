@@ -69,12 +69,12 @@ namespace alcube::models::drawing {
     for (auto model3D : model3Ds) {
       model3D->allocate(this, allocationRange, gpuAccessor);
     }
-    allocations.colors = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.colors);
-    allocations.positions = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.positions);
-    allocations.rotations0 = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.rotations0);
-    allocations.rotations1 = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.rotations1);
-    allocations.rotations2 = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.rotations2);
-    allocations.rotations3 = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.rotations3);
+    allocations.colors.init(allocationRange, gpuAccessor->dtos.colors);
+    allocations.positions.init(allocationRange, gpuAccessor->dtos.positions);
+    allocations.rotations0.init(allocationRange, gpuAccessor->dtos.rotations0);
+    allocations.rotations1.init(allocationRange, gpuAccessor->dtos.rotations1);
+    allocations.rotations2.init(allocationRange, gpuAccessor->dtos.rotations2);
+    allocations.rotations3.init(allocationRange, gpuAccessor->dtos.rotations3);
   }
 
   void RenderingGroup::initialize() {
@@ -86,12 +86,12 @@ namespace alcube::models::drawing {
       *shader,
       material,
       settings->world.maxActorCount,
-      (GLfloat*)allocations.positions->getPtr(),
-      (GLfloat*)allocations.rotations0->getPtr(),
-      (GLfloat*)allocations.rotations1->getPtr(),
-      (GLfloat*)allocations.rotations2->getPtr(),
-      (GLfloat*)allocations.rotations3->getPtr(),
-      (GLfloat*)allocations.colors->getPtr()
+      (GLfloat*)allocations.positions.getPtr(),
+      (GLfloat*)allocations.rotations0.getPtr(),
+      (GLfloat*)allocations.rotations1.getPtr(),
+      (GLfloat*)allocations.rotations2.getPtr(),
+      (GLfloat*)allocations.rotations3.getPtr(),
+      (GLfloat*)allocations.colors.getPtr()
     );
     if (texture == TEXTURE_CHECK) {
       drawable->texture = new alcube::drawing::textures::CheckTexture(128, 128);

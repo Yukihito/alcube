@@ -16,8 +16,8 @@ namespace alcube::models::drawing {
     alcube::gpu::GPUAccessor *gpuAccessor
   ) {
     allocationRange = groupAllocationRange->allocate(1);
-    allocations.colors = new utils::ResourceAllocation<cl_float3>(allocationRange, gpuAccessor->dtos.hostColors);
-    allocations.features = new utils::ResourceAllocation<gpu::dtos::Renderer>(allocationRange, gpuAccessor->dtos.hostRenderers);
+    allocations.colors.init(allocationRange, gpuAccessor->dtos.hostColors);
+    allocations.features.init(allocationRange, gpuAccessor->dtos.hostRenderers);
     this->groupSettings = groupSettings;
   }
 
@@ -26,13 +26,13 @@ namespace alcube::models::drawing {
       std::random_device rnd;
       std::mt19937 mt(rnd());
       std::uniform_real_distribution<float> randReal(0, 1);
-      allocations.colors->getPtr()[0] = {randReal(mt), randReal(mt), randReal(mt)};
+      allocations.colors.getPtr()[0] = {randReal(mt), randReal(mt), randReal(mt)};
     } else {
-      allocations.colors->getPtr()[0] = {color.r, color.y, color.z};
+      allocations.colors.getPtr()[0] = {color.r, color.y, color.z};
     }
-    allocations.features->getPtr()->refersToRotations = groupSettings->refersToRotations();
-    allocations.features->getPtr()->instanceColorType = groupSettings->getInstanceColorType();
-    allocations.features->getPtr()->actorIndex = (unsigned short)actorIndexHolder->getIndex();
+    allocations.features.getPtr()->refersToRotations = groupSettings->refersToRotations();
+    allocations.features.getPtr()->instanceColorType = groupSettings->getInstanceColorType();
+    allocations.features.getPtr()->actorIndex = (unsigned short)actorIndexHolder->getIndex();
   }
 
   glm::vec3 Model3D::getColor() {

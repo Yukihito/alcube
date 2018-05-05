@@ -8,19 +8,19 @@ namespace alcube::physics::fluid {
   ){
     physics::Actor::init(gpuAccessor, allocationRange);
     this->subAllocationRange = subAllocationRange;
-    this->actor->getPtr()->type = FLUID;
-    this->hostSubPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::Fluid>(subAllocationRange, gpuAccessor->dtos.hostFluids);
-    this->subPhysicalQuantity = new utils::ResourceAllocation<gpu::dtos::Fluid>(subAllocationRange, gpuAccessor->dtos.fluids);
+    this->actor.getPtr()->type = FLUID;
+    this->hostSubPhysicalQuantity.init(subAllocationRange, gpuAccessor->dtos.hostFluids);
+    this->subPhysicalQuantity.init(subAllocationRange, gpuAccessor->dtos.fluids);
     this->gpuAccessor = gpuAccessor;
     updateIndex();
   }
 
   gpu::dtos::Fluid* Actor::getSubPhysicalQuantity() {
-    return this->hostSubPhysicalQuantity->getPtr();
+    return this->hostSubPhysicalQuantity.getPtr();
   }
 
   unsigned short Actor::getIndex() {
-    return hostSubPhysicalQuantity->getPtr()->actorIndex;
+    return hostSubPhysicalQuantity.getPtr()->actorIndex;
   }
 
   void Actor::beforeWrite() {
@@ -29,8 +29,8 @@ namespace alcube::physics::fluid {
   }
 
   void Actor::updateIndex() {
-    this->actor->getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
-    this->hostSubPhysicalQuantity->getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
+    this->actor.getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
+    this->hostSubPhysicalQuantity.getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
   }
 
   float Actor::stiffness = 64.0f;

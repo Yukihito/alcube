@@ -26,8 +26,8 @@ namespace alcube::physics::fluid {
       unsigned short getIndex() override;
       void beforeWrite() override;
     private:
-      utils::ResourceAllocation<gpu::dtos::Fluid>* hostSubPhysicalQuantity;
-      utils::ResourceAllocation<gpu::dtos::Fluid>* subPhysicalQuantity;
+      utils::ResourceAllocation<gpu::dtos::Fluid> hostSubPhysicalQuantity;
+      utils::ResourceAllocation<gpu::dtos::Fluid> subPhysicalQuantity;
       utils::AllocationRange* subAllocationRange = nullptr;
       gpu::GPUAccessor* gpuAccessor;
       void updateIndex() override;
