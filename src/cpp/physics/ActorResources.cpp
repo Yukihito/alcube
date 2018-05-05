@@ -6,5 +6,6 @@ namespace alcube::physics {
     fluidResource = new ActorResource<fluid::Actor>(size);
     softbodyResource = new ActorResource<softbody::Actor>(size);
     springResource = new ActorResource<softbody::Spring>(size * 4);
+    entities = new Actor*[size];
   }
 }

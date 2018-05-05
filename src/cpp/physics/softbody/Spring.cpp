@@ -31,6 +31,7 @@ namespace alcube::physics::softbody {
 
   void Spring::init(gpu::GPUAccessor *gpuAccessor, utils::AllocationRange *allocationRange) {
     spring.init(allocationRange, gpuAccessor->dtos.springs);
+    this->allocationRange = allocationRange;
     for (unsigned char i = 0; i < 2; i++) {
       nodes[i].init(allocationRange, &spring, i);
     }
@@ -38,5 +39,9 @@ namespace alcube::physics::softbody {
 
   SpringNode* Spring::getNode(unsigned int index) {
     return &nodes[index];
+  }
+
+  unsigned int Spring::getIndex() {
+    return allocationRange->getIndex();
   }
 }

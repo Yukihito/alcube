@@ -17,6 +17,7 @@ namespace alcube::physics {
     public:
       gpu::dtos::PhysicalQuantity* getPhysicalQuantityDto();
       virtual unsigned short getIndex() = 0;
+      unsigned short getSubIndex();
       virtual ~Actor() = default;
       virtual void beforeWrite() = 0;
     protected:

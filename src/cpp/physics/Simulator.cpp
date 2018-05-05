@@ -71,10 +71,11 @@ namespace alcube::physics {
   }
 
   void Simulator::setUpMemories() {
-    for (auto actor: actors) {
-      actor->beforeWrite();
-    }
     unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
+    for (unsigned short i = 0; i < actorCount; i++) {
+      actorResources->entities[i]->beforeWrite();
+    }
+
     memories.actors.write();
     memories.hostPhysicalQuantities.write();
 

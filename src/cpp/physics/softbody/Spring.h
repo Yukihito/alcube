@@ -28,6 +28,7 @@ namespace alcube::physics::softbody {
     public:
       void init(gpu::GPUAccessor* gpuAccessor, utils::AllocationRange* allocationRange);
       void setK(float k);
+      unsigned int getIndex();
       SpringNode* getNode(unsigned int index);
     private:
       utils::AllocationRange* allocationRange;

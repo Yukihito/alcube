@@ -18,6 +18,10 @@ namespace alcube::physics {
     this->hostPhysicalQuantity.getPtr()->position = {0.0f, 0.0f, 0.0f};
   }
 
+  unsigned short Actor::getSubIndex() {
+    return actor.getPtr()->subPhysicalQuantityIndex;
+  }
+
   gpu::dtos::PhysicalQuantity* Actor::getPhysicalQuantityDto() {
     return this->hostPhysicalQuantity.getPtr();
   }

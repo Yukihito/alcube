@@ -12,7 +12,7 @@ namespace alcube::physics {
   struct ActorResource {
     utils::AllocationRange *allocationRange;
     utils::MemoryPool <T> *memoryPool;
-
+    T** entities;
     explicit ActorResource(unsigned int size);
   };
 
@@ -20,10 +20,12 @@ namespace alcube::physics {
   ActorResource<T>::ActorResource(unsigned int size) {
     allocationRange = new utils::AllocationRange(0, size);
     memoryPool = new utils::MemoryPool<T>(size);
+    entities = new T*[size];
   }
 
   struct ActorResources {
     utils::AllocationRange* allocationRange;
+    Actor** entities;
     ActorResource<fluid::Actor>* fluidResource;
     ActorResource<softbody::Actor>* softbodyResource;
     ActorResource<softbody::Spring>* springResource;
