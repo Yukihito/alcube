@@ -5,8 +5,8 @@ namespace alcube::physics::fluid {
     kernels = gpuAccessor->kernels;
     memories = gpuAccessor->memories;
     this->actorResources = actorResources;
-    actorResources->fluidResource->subAllocationRange->onAllocationLengthChanged.subscribe([&](){
-      unsigned int actorCount = this->actorResources->fluidResource->subAllocationRange->getAllocatedLength();
+    actorResources->fluidResource->allocationRange->onAllocationLengthChanged.subscribe([&](){
+      unsigned int actorCount = this->actorResources->fluidResource->allocationRange->getAllocatedLength();
       memories.hostFluids.setCount(actorCount);
       memories.fluids.setCount(actorCount);
     });
@@ -29,7 +29,7 @@ namespace alcube::physics::fluid {
   void Simulator::writeHostMemories() {}
 
   void Simulator::setUpMemories() {
-    unsigned int actorCount = actorResources->fluidResource->subAllocationRange->getAllocatedLength();
+    unsigned int actorCount = actorResources->fluidResource->allocationRange->getAllocatedLength();
     memories.hostFluids.write();
     kernels.inputFluids(
       (unsigned short)actorCount,
@@ -39,7 +39,7 @@ namespace alcube::physics::fluid {
   }
 
   void Simulator::updateForce() {
-    unsigned int actorCount = actorResources->fluidResource->subAllocationRange->getAllocatedLength();
+    unsigned int actorCount = actorResources->fluidResource->allocationRange->getAllocatedLength();
     kernels.updateDensityAndPressure(
       actorCount,
       memories.actorStates,
@@ -56,7 +56,7 @@ namespace alcube::physics::fluid {
   }
 
   void Simulator::motion() {
-    unsigned int actorCount = actorResources->fluidResource->subAllocationRange->getAllocatedLength();
+    unsigned int actorCount = actorResources->fluidResource->allocationRange->getAllocatedLength();
     kernels.moveFluid(
       actorCount,
       memories.fluids,

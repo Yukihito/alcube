@@ -21,15 +21,15 @@ namespace alcube::physics::softbody {
       void add(Spring* spring);
 
     private:
-      void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);
+      //void setUpSpring(unsigned int springIndex, unsigned char nodeIndex);
       ActorResources* actorResources;
       gpu::Kernels kernels = {};
       gpu::Memories memories = {};
-      unsigned int springCount = 0;
+      //unsigned int springCount = 0;
       unsigned int motionIterationCount = 8;
       unsigned int constraintResolvingIterationCount = 16;
-      std::vector<softbody::Actor*> actors = {};
-      std::vector<softbody::Spring*> springs = {};
+      //std::vector<softbody::Actor*> actors = {};
+      //std::vector<softbody::Spring*> springs = {};
   };
 }
 

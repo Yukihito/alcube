@@ -18,7 +18,7 @@ namespace alcube::models::physics::softbody {
 
   class SpringFactory {
     public:
-      explicit SpringFactory(utils::MemoryPool<Spring>* memoryPool);
+      explicit SpringFactory(utils::MemoryPool<Spring>* memoryPool, alcube::physics::ActorFactory* actorFactory);
       float getK();
       void setK(float k);
       Spring* create(
@@ -29,6 +29,7 @@ namespace alcube::models::physics::softbody {
     private:
       float k;
       utils::MemoryPool<Spring>* memoryPool;
+      alcube::physics::ActorFactory* actorFactory;
   };
 }
 

@@ -55,7 +55,6 @@ namespace alcube::physics {
 
       unsigned int allGridCount;
       unsigned int maxActorCount;
-      //unsigned int actorCountForBitonicSort;
       float deltaTime;
 
       void setUpConstants();

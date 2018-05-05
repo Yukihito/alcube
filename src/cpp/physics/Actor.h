@@ -32,5 +32,4 @@ namespace alcube::physics {
   };
 }
 
-
 #endif //ALCUBE_PHYSICS_ACTOR_H

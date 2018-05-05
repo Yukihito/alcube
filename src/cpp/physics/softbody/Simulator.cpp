@@ -6,8 +6,8 @@ namespace alcube::physics::softbody {
     kernels = gpuAccessor->kernels;
     memories = gpuAccessor->memories;
     this->actorResources = actorResources;
-    actorResources->softbodyResource->subAllocationRange->onAllocationLengthChanged.subscribe([&](){
-      unsigned int actorCount = this->actorResources->softbodyResource->subAllocationRange->getAllocatedLength();
+    actorResources->softbodyResource->allocationRange->onAllocationLengthChanged.subscribe([&](){
+      unsigned int actorCount = this->actorResources->softbodyResource->allocationRange->getAllocatedLength();
       memories.hostSoftBodies.setCount(actorCount);
       memories.softBodies.setCount(actorCount);
     });
@@ -16,19 +16,22 @@ namespace alcube::physics::softbody {
   void Simulator::setUpConstants() {}
 
   void Simulator::setUpComputingSize() {
-    springCount = (unsigned int)springs.size();
+    //springCount = (unsigned int)springs.size();
   }
 
   void Simulator::writeHostMemories() {
+    /*
     for (unsigned int i = 0; i < springCount; i++) {
       memories.springs.at(i)->k = springs[i]->k;
       setUpSpring(i, 0);
       setUpSpring(i, 1);
     }
+     */
   }
 
   void Simulator::setUpMemories() {
-    unsigned int actorCount = actorResources->softbodyResource->subAllocationRange->getAllocatedLength();
+    unsigned int actorCount = actorResources->softbodyResource->allocationRange->getAllocatedLength();
+    unsigned int springCount = actorResources->springResource->allocationRange->getAllocatedLength();
     memories.springs.setCount(springCount);
     memories.springStates.setCount(springCount);
     memories.hostSoftBodies.write();
@@ -47,7 +50,7 @@ namespace alcube::physics::softbody {
   }
 
   void Simulator::updateForce() {
-    unsigned int actorCount = actorResources->softbodyResource->subAllocationRange->getAllocatedLength();
+    unsigned int actorCount = actorResources->softbodyResource->allocationRange->getAllocatedLength();
     kernels.updateByPenaltyImpulse(
       actorCount,
       memories.actorStates,
@@ -77,7 +80,8 @@ namespace alcube::physics::softbody {
   }
 
   void Simulator::motion() {
-    unsigned int actorCount = actorResources->softbodyResource->subAllocationRange->getAllocatedLength();
+    unsigned int actorCount = actorResources->softbodyResource->allocationRange->getAllocatedLength();
+    unsigned int springCount = actorResources->springResource->allocationRange->getAllocatedLength();
     for (int i = 0; i < motionIterationCount; i++) {
       if (springCount > 0) {
         kernels.calcSpringImpulses(
@@ -102,19 +106,7 @@ namespace alcube::physics::softbody {
     return false;
   }
 
-  void Simulator::setUpSpring(unsigned int springIndex, unsigned char nodeIndex) {
-    unsigned short actorIndex = springs[springIndex]->nodes[nodeIndex].actor->getIndex();
-    memories.springs.at(springIndex)->actorIndices[nodeIndex] = actorIndex;
-    memories.springs.at(springIndex)->nodePositionsModelSpace[nodeIndex] = toCl(springs[springIndex]->nodes[nodeIndex].position);
-
-    unsigned short softBodyIndex = memories.actors.at(actorIndex)->subPhysicalQuantityIndex;
-    auto hostSoftBodyState = memories.hostSoftBodies.at(softBodyIndex);
-    hostSoftBodyState->springIndices[hostSoftBodyState->springCount] = springIndex;
-    hostSoftBodyState->springNodeIndices[hostSoftBodyState->springCount] = nodeIndex;
-    hostSoftBodyState->springCount++;
-  }
-
   void Simulator::add(Spring *spring) {
-    springs.push_back(spring);
+    //springs.push_back(spring);
   }
 }

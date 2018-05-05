@@ -142,7 +142,8 @@ namespace alcube::app {
   template <>
   models::physics::softbody::SpringFactory* DI::inject() {
     return new models::physics::softbody::SpringFactory(
-      new utils::MemoryPool<models::physics::softbody::Spring>(get<models::Settings>()->world.maxActorCount)
+      new utils::MemoryPool<models::physics::softbody::Spring>(get<models::Settings>()->world.maxActorCount),
+      get<physics::ActorFactory>()
     );
   }
 

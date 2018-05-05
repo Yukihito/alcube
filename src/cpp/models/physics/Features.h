@@ -13,7 +13,7 @@ namespace alcube::models::physics {
       virtual void init(int id, alcube::physics::ActorFactory* actorFactory);
 
     protected:
-      alcube::physics::ActorFactory* actorFactory;
+      alcube::physics::ActorFactory* actorFactory = nullptr;
     private:
       int id = 0;
   };
