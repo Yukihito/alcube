@@ -208,10 +208,10 @@ namespace alcube::physics {
 
   void Simulator::setUp() {
     setUpConstants();
-    input();
   }
 
   void Simulator::update() {
+    input();
     computeBroadPhase();
     computeNarrowPhase();
     updateForce();
