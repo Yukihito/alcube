@@ -7,7 +7,6 @@
 namespace alcube::physics::softbody {
   class Actor : public physics::Actor {
     public:
-      explicit Actor() = default;
       void init(
         gpu::GPUAccessor* gpuAccessor,
         utils::AllocationRange* allocationRange,
