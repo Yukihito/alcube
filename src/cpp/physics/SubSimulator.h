@@ -9,7 +9,7 @@ namespace alcube::physics {
   class SubSimulator {
     public:
       virtual void setUpConstants() = 0;
-      virtual void setUpMemories() = 0;
+      virtual void input() = 0;
       virtual void updateForce() = 0;
       virtual void motion() = 0;
   };

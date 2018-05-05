@@ -76,13 +76,13 @@ namespace alcube::physics {
 
   void Simulator::input() {
     allActorCount = (unsigned short)actorResources->allocationRange->getAllocatedLength();
-    for (unsigned short i = activeActorCount; i < allActorCount; i++) {
+    for (auto i = activeActorCount; i < allActorCount; i++) {
       actorResources->entities[i]->beforeWrite();
     }
     updateGPUResourcesCount();
     memories.actors.write(activeActorCount);
     memories.hostPhysicalQuantities.write(activeActorCount);
-    unsigned short updateCount = allActorCount - activeActorCount;
+    auto updateCount = allActorCount - activeActorCount;
     if (updateCount > 0) {
       kernels.inputActors(
         updateCount,
@@ -90,13 +90,13 @@ namespace alcube::physics {
         memories.actorStates,
         memories.hostPhysicalQuantities,
         memories.physicalQuantities,
-        activeActorCount
+        (unsigned short)activeActorCount
       );
     }
     activeActorCount = allActorCount;
 
     for (auto subSimulator: subSimulators) {
-      subSimulator->setUpMemories();
+      subSimulator->input();
     }
   }
 
@@ -110,8 +110,7 @@ namespace alcube::physics {
   }
 
   void Simulator::computeBroadPhase() {
-    unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
-    unsigned int actorCountForBitonicSort = utils::math::powerOf2(actorCount);
+    unsigned int actorCountForBitonicSort = utils::math::powerOf2(activeActorCount);
     auto maxActorCountShort = (unsigned short)maxActorCount;
     // Initialize grid and actor relations
     kernels.initGridAndActorRelations(
@@ -123,7 +122,7 @@ namespace alcube::physics {
 
     // Set grid index to rigid body state, and register grid and actor relations.
     kernels.fillGridIndex(
-      actorCount,
+      activeActorCount,
       memories.constants,
       memories.physicalQuantities,
       memories.gridAndActorRelations
@@ -159,18 +158,17 @@ namespace alcube::physics {
     memories.gridStartIndices.zeroFill();
     memories.gridEndIndices.zeroFill();
     kernels.setGridRelationIndexRange(
-      actorCount > 1 ? actorCount - 1 : 1,
+      activeActorCount > 1 ? activeActorCount - 1 : 1,
       memories.gridAndActorRelations,
       memories.gridStartIndices,
       memories.gridEndIndices,
-      actorCount
+      activeActorCount
     );
   }
 
   void Simulator::computeNarrowPhase() {
-    unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
     kernels.collectIntersections(
-      actorCount,
+      activeActorCount,
       memories.actorStates,
       memories.physicalQuantities,
       memories.gridAndActorRelations,
@@ -181,9 +179,8 @@ namespace alcube::physics {
   }
 
   void Simulator::updateForce() {
-    unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
     kernels.initStepVariables(
-      actorCount,
+      activeActorCount,
       memories.actorStates,
       memories.physicalQuantities,
       memories.constants
@@ -195,13 +192,12 @@ namespace alcube::physics {
   }
 
   void Simulator::motion() {
-    unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
     for (auto subSimulator : subSimulators) {
       subSimulator->motion();
     }
 
     kernels.postProcessing(
-      actorCount,
+      activeActorCount,
       memories.constants,
       memories.actorStates,
       memories.physicalQuantities

@@ -53,7 +53,7 @@ namespace alcube::physics {
 
       unsigned int allGridCount;
       unsigned int maxActorCount;
-      unsigned short activeActorCount;
+      unsigned int activeActorCount;
       unsigned short allActorCount;
       float deltaTime;
 

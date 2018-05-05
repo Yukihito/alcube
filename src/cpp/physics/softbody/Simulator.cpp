@@ -21,7 +21,7 @@ namespace alcube::physics::softbody {
 
   void Simulator::setUpConstants() {}
 
-  void Simulator::setUpMemories() {
+  void Simulator::input() {
     unsigned int actorCount = actorResources->softbodyResource->allocationRange->getAllocatedLength();
     unsigned int springCount = actorResources->springResource->allocationRange->getAllocatedLength();
     memories.hostSoftBodies.write();

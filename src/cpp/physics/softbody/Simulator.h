@@ -12,7 +12,7 @@ namespace alcube::physics::softbody {
     public:
       explicit Simulator(gpu::GPUAccessor* gpuAccessor, ActorResources* actorResources);
       void setUpConstants() override;
-      void setUpMemories() override;
+      void input() override;
       void updateForce() override;
       void motion() override;
 
