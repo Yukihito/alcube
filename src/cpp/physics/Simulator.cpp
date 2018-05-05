@@ -76,8 +76,8 @@ namespace alcube::physics {
       actorResources->entities[i]->beforeWrite();
     }
 
-    memories.actors.write();
-    memories.hostPhysicalQuantities.write();
+    memories.actors.write(0);
+    memories.hostPhysicalQuantities.write(0);
 
     float splitDeltaTime = deltaTime / /*motionIterationCount*/8;
     kernels.inputConstants(

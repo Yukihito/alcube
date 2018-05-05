@@ -119,6 +119,28 @@ namespace alcube::utils::opencl {
     }
   }
 
+  void CommandQueue::write(Memory *memory, size_t offset) {
+    if (memory->count == 0) {
+      return;
+    }
+    cl_int status;
+    auto hostPtr = (char*)memory->hostPtr;
+    status = clEnqueueWriteBuffer(
+      queue,
+      memory->mem,
+      CL_TRUE,
+      memory->size * offset,
+      memory->size * (memory->count - offset),
+      hostPtr + (memory->size * offset),
+      0,
+      nullptr,
+      nullptr
+    );
+    if (status != CL_SUCCESS) {
+      std::cout << memory->name << " clEnqueueWriteBuffer failure: " << status << std::endl;
+    }
+  }
+
   void CommandQueue::readAt(Memory *memory, void *hostPtr, unsigned int index) {
     cl_int status;
     status = clEnqueueReadBuffer(

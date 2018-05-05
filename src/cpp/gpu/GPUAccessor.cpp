@@ -11,6 +11,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void Actor::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void Actor::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -29,6 +33,10 @@ namespace alcube::gpu {
 
     void ActorState::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void ActorState::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void ActorState::zeroFill() {
@@ -51,6 +59,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void Constants::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void Constants::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -69,6 +81,10 @@ namespace alcube::gpu {
 
     void Fluid::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void Fluid::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void Fluid::zeroFill() {
@@ -91,6 +107,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void FluidSettings::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void FluidSettings::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -109,6 +129,10 @@ namespace alcube::gpu {
 
     void Grid::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void Grid::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void Grid::zeroFill() {
@@ -131,6 +155,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void GridAndActorRelation::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void GridAndActorRelation::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -149,6 +177,10 @@ namespace alcube::gpu {
 
     void Intersection::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void Intersection::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void Intersection::zeroFill() {
@@ -171,6 +203,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void PhysicalQuantity::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void PhysicalQuantity::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -189,6 +225,10 @@ namespace alcube::gpu {
 
     void Renderer::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void Renderer::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void Renderer::zeroFill() {
@@ -211,6 +251,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void SoftBody::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void SoftBody::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -229,6 +273,10 @@ namespace alcube::gpu {
 
     void Spring::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void Spring::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void Spring::zeroFill() {
@@ -251,6 +299,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void SpringState::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void SpringState::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -269,6 +321,10 @@ namespace alcube::gpu {
 
     void CharMemory::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void CharMemory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void CharMemory::zeroFill() {
@@ -291,6 +347,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void DoubleMemory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void DoubleMemory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -309,6 +369,10 @@ namespace alcube::gpu {
 
     void FloatMemory::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void FloatMemory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void FloatMemory::zeroFill() {
@@ -331,6 +395,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void Float16Memory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void Float16Memory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -349,6 +417,10 @@ namespace alcube::gpu {
 
     void Float3Memory::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void Float3Memory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void Float3Memory::zeroFill() {
@@ -371,6 +443,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void Float4Memory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void Float4Memory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -389,6 +465,10 @@ namespace alcube::gpu {
 
     void IntMemory::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void IntMemory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void IntMemory::zeroFill() {
@@ -411,6 +491,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void LongMemory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void LongMemory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -429,6 +513,10 @@ namespace alcube::gpu {
 
     void ShortMemory::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void ShortMemory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void ShortMemory::zeroFill() {
@@ -451,6 +539,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void UcharMemory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void UcharMemory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -469,6 +561,10 @@ namespace alcube::gpu {
 
     void UintMemory::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void UintMemory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void UintMemory::zeroFill() {
@@ -491,6 +587,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->write(this->memory);
     }
 
+    void UlongMemory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void UlongMemory::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
@@ -509,6 +609,10 @@ namespace alcube::gpu {
 
     void UshortMemory::write() {
       resourcesProvider->queue->write(this->memory);
+    }
+
+    void UshortMemory::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
     }
 
     void UshortMemory::zeroFill() {

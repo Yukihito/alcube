@@ -6,6 +6,10 @@
       resourcesProvider->queue->write(this->memory);
     }
 
+    void ${memory_type_name}::write(size_t offset) {
+      resourcesProvider->queue->write(this->memory, offset);
+    }
+
     void ${memory_type_name}::zeroFill() {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }

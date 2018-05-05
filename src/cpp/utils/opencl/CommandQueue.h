@@ -27,6 +27,7 @@ namespace alcube::utils::opencl {
       void pushZeroFill(Memory* mem);
       void read(Memory* memory, void* hostPtr);
       void write(Memory* memory);
+      void write(Memory* memory, size_t offset);
       void readAt(Memory* memory, void* hostPtr, unsigned int index);
     private:
       Resources* resources;
