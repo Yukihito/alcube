@@ -22,6 +22,10 @@ namespace alcube::physics::softbody {
       gpu::Memories memories;
       unsigned int motionIterationCount = 8;
       unsigned int constraintResolvingIterationCount = 16;
+      unsigned int activeActorCount;
+      unsigned int allActorCount;
+      unsigned int activeSpringCount;
+      unsigned int allSpringCount;
   };
 }
 

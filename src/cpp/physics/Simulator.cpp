@@ -58,6 +58,10 @@ namespace alcube::physics {
     }
 
     float splitDeltaTime = deltaTime / /*motionIterationCount*/8;
+    for (auto subSimulator : subSimulators) {
+      subSimulator->setUpConstants();
+    }
+
     kernels.inputConstants(
       1,
       memories.constants,
@@ -68,10 +72,6 @@ namespace alcube::physics {
       splitDeltaTime,
       sphericalShellRadius
     );
-
-    for (auto subSimulator : subSimulators) {
-      subSimulator->setUpConstants();
-    }
   }
 
   void Simulator::input() {

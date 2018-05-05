@@ -17,6 +17,10 @@ namespace alcube::physics::softbody {
       memories.springs.setCount(springCount);
       memories.springStates.setCount(springCount);
     });
+    activeActorCount = 0;
+    allActorCount = 0;
+    activeSpringCount = 0;
+    allSpringCount = 0;
   }
 
   void Simulator::setUpConstants() {}

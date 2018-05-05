@@ -40,16 +40,15 @@ namespace alcube::physics::fluid {
   }
 
   void Simulator::updateForce() {
-    unsigned int actorCount = actorResources->fluidResource->allocationRange->getAllocatedLength();
     kernels.updateDensityAndPressure(
-      actorCount,
+      activeActorCount,
       memories.actorStates,
       memories.fluids,
       memories.constants
     );
 
     kernels.updateFluidForce(
-      actorCount,
+      activeActorCount,
       memories.actorStates,
       memories.fluids,
       memories.constants
@@ -57,9 +56,8 @@ namespace alcube::physics::fluid {
   }
 
   void Simulator::motion() {
-    unsigned int actorCount = actorResources->fluidResource->allocationRange->getAllocatedLength();
     kernels.moveFluid(
-      actorCount,
+      activeActorCount,
       memories.fluids,
       memories.actorStates,
       memories.physicalQuantities,
