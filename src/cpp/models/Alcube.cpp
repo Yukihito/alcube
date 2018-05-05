@@ -12,17 +12,15 @@ namespace alcube::models {
     this->physicsSimulator = physicsSimulator;
     this->physicsSimulator->add(softbodySimulator);
     this->physicsSimulator->add(fluidSimulator);
-    this->actors = {};
     this->renderer = renderer;
   }
 
   void Alcube::add(Actor *actor) {
-    actors.push_back(actor);
-    physicsSimulator->add(actor->getPhysicsActor());
+    // TODO: Delete
   }
 
   void Alcube::add(physics::softbody::Spring *spring) {
-    softbodySimulator->add(spring->getUnderlying());
+    // TODO: Delete
   }
 
   void Alcube::add(alcube::models::drawing::RenderingGroup *renderingGroup) {

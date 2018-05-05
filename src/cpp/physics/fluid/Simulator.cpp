@@ -24,10 +24,6 @@ namespace alcube::physics::fluid {
     fluidSettings->viscosityLaplacianConstant = 45.0f / (CL_M_PI_F * powf(fluidSettings->effectiveRadius, 6));
   }
 
-  void Simulator::setUpComputingSize() {}
-
-  void Simulator::writeHostMemories() {}
-
   void Simulator::setUpMemories() {
     unsigned int actorCount = actorResources->fluidResource->allocationRange->getAllocatedLength();
     memories.hostFluids.write();
@@ -64,9 +60,5 @@ namespace alcube::physics::fluid {
       memories.physicalQuantities,
       memories.constants
     );
-  }
-
-  bool Simulator::add(physics::Actor *actor) {
-    return false;
   }
 }

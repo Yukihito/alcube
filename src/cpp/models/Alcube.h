@@ -26,7 +26,6 @@ namespace alcube::models {
       void update();
 
     private:
-      std::vector<Actor*> actors;
       alcube::physics::fluid::Simulator* fluidSimulator;
       alcube::physics::softbody::Simulator* softbodySimulator;
       alcube::physics::Simulator* physicsSimulator;

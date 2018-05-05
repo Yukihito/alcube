@@ -35,7 +35,6 @@ namespace alcube::physics {
         gpu::GPUAccessor* gpuAccessor,
         ActorResources* actorResources
       );
-      void add(Actor* actor);
       void add(SubSimulator* subSimulator);
       void setUp();
       void update();
@@ -58,9 +57,7 @@ namespace alcube::physics {
       float deltaTime;
 
       void setUpConstants();
-      void setUpComputingSize();
       void setUpMemories();
-      void writeHostMemories();
       void computeBroadPhase();
       void computeNarrowPhase();
       void updateForce();

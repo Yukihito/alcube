@@ -10,17 +10,14 @@ namespace alcube::physics::fluid {
     public:
       explicit Simulator(gpu::GPUAccessor* gpuAccessor, ActorResources* actorResources);
       void setUpConstants() override;
-      void setUpComputingSize() override;
-      void writeHostMemories() override;
       void setUpMemories() override;
       void updateForce() override;
       void motion() override;
-      bool add(physics::Actor* actor) override;
 
     private:
       ActorResources* actorResources;
-      gpu::Kernels kernels = {};
-      gpu::Memories memories = {};
+      gpu::Kernels kernels;
+      gpu::Memories memories;
   };
 }
 

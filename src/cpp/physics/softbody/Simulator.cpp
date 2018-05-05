@@ -15,20 +15,6 @@ namespace alcube::physics::softbody {
 
   void Simulator::setUpConstants() {}
 
-  void Simulator::setUpComputingSize() {
-    //springCount = (unsigned int)springs.size();
-  }
-
-  void Simulator::writeHostMemories() {
-    /*
-    for (unsigned int i = 0; i < springCount; i++) {
-      memories.springs.at(i)->k = springs[i]->k;
-      setUpSpring(i, 0);
-      setUpSpring(i, 1);
-    }
-     */
-  }
-
   void Simulator::setUpMemories() {
     unsigned int actorCount = actorResources->softbodyResource->allocationRange->getAllocatedLength();
     unsigned int springCount = actorResources->springResource->allocationRange->getAllocatedLength();
@@ -100,13 +86,5 @@ namespace alcube::physics::softbody {
         memories.springStates
       );
     }
-  }
-
-  bool Simulator::add(physics::Actor *actor) {
-    return false;
-  }
-
-  void Simulator::add(Spring *spring) {
-    //springs.push_back(spring);
   }
 }

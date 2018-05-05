@@ -70,22 +70,10 @@ namespace alcube::physics {
     }
   }
 
-  void Simulator::setUpComputingSize() {
-    for (auto subSimulator : subSimulators) {
-      subSimulator->setUpComputingSize();
-    }
-  }
-
-  void Simulator::writeHostMemories() {
-    for (auto subSimulator : subSimulators) {
-      subSimulator->writeHostMemories();
-    }
+  void Simulator::setUpMemories() {
     for (auto actor: actors) {
       actor->beforeWrite();
     }
-  }
-
-  void Simulator::setUpMemories() {
     unsigned int actorCount = actorResources->allocationRange->getAllocatedLength();
     memories.actors.write();
     memories.hostPhysicalQuantities.write();
@@ -216,8 +204,6 @@ namespace alcube::physics {
 
   void Simulator::setUp() {
     setUpConstants();
-    setUpComputingSize();
-    writeHostMemories();
     setUpMemories();
   }
 
@@ -226,15 +212,6 @@ namespace alcube::physics {
     computeNarrowPhase();
     updateForce();
     motion();
-  }
-
-  void Simulator::add(Actor *actor) {
-    actors.push_back(actor);
-    for (auto subSimulator : subSimulators) {
-      if (subSimulator->add(actor)) {
-        return;
-      }
-    }
   }
 
   void Simulator::add(SubSimulator *subSimulator) {
