@@ -5,7 +5,7 @@ namespace alcube::physics::fluid {
     kernels = gpuAccessor->kernels;
     memories = gpuAccessor->memories;
     this->actorResources = actorResources;
-    actorResources->fluidResource->allocationRange->onAllocationLengthChanged.subscribe([&](){
+    actorResources->fluidResource->allocationRange->onAllocationLengthChanged.subscribe([&]{
       unsigned int actorCount = this->actorResources->fluidResource->allocationRange->getAllocatedLength();
       memories.hostFluids.setCount(actorCount);
       memories.fluids.setCount(actorCount);

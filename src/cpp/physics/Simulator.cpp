@@ -28,7 +28,7 @@ namespace alcube::physics {
     gravity = 0.0f;
     sphericalShellRadius = 100000.0f;
 
-    actorResources->allocationRange->onAllocationLengthChanged.subscribe([&](){
+    actorResources->allocationRange->onAllocationLengthChanged.subscribe([&]{
       unsigned int actorCount = this->actorResources->allocationRange->getAllocatedLength();
       unsigned int actorCountForBitonicSort = utils::math::powerOf2(actorCount);
       memories.actors.setCount(actorCount);
