@@ -16,6 +16,7 @@
 #include "../utils/opencl/ResourcesProvider.h"
 #include "SubSimulator.h"
 #include "ActorResources.h"
+#include "Grid.h"
 
 namespace alcube::physics {
   using namespace utils::opencl::conversions;
@@ -27,10 +28,7 @@ namespace alcube::physics {
 
       explicit Simulator(
         unsigned int maxActorCount,
-        unsigned int gridEdgeLength,
-        unsigned int xGridCount,
-        unsigned int yGridCount,
-        unsigned int zGridCount,
+        Grid* grid,
         float deltaTime,
         gpu::GPUAccessor* gpuAccessor,
         ActorResources* actorResources
@@ -41,10 +39,7 @@ namespace alcube::physics {
       unsigned short getActorCount();
 
     private:
-      unsigned int gridEdgeLength;
-      unsigned int xGridCount;
-      unsigned int yGridCount;
-      unsigned int zGridCount;
+      Grid* grid;
       gpu::GPUAccessor* gpuAccessor;
       ActorResources* actorResources;
       gpu::Kernels kernels;

@@ -6,10 +6,7 @@ namespace alcube::physics {
 
   Simulator::Simulator(
     unsigned int maxActorCount,
-    unsigned int gridEdgeLength,
-    unsigned int xGridCount,
-    unsigned int yGridCount,
-    unsigned int zGridCount,
+    Grid* grid,
     float deltaTime,
     gpu::GPUAccessor* gpuAccessor,
     ActorResources* actorResources
@@ -20,11 +17,9 @@ namespace alcube::physics {
     memories = gpuAccessor->memories;
     this->deltaTime = deltaTime;
     this->maxActorCount = maxActorCount;
-    this->allGridCount = xGridCount * yGridCount * zGridCount;
-    this->gridEdgeLength = gridEdgeLength;
-    this->xGridCount = xGridCount;
-    this->yGridCount = yGridCount;
-    this->zGridCount = zGridCount;
+    this->grid = grid;
+    this->allGridCount = grid->xCount * grid->yCount * grid->zCount;
+    this->grid = grid;
     gravity = 0.0f;
     sphericalShellRadius = 100000.0f;
     activeActorCount = 0;
@@ -37,14 +32,14 @@ namespace alcube::physics {
 
   void Simulator::setUpConstants() {
     auto grid = memories.grid.at(0);
-    grid->edgeLength = gridEdgeLength;
-    grid->xCount = xGridCount;
-    grid->yCount = yGridCount;
-    grid->zCount = zGridCount;
+    grid->edgeLength = this->grid->edgeLength;
+    grid->xCount = this->grid->xCount;
+    grid->yCount = this->grid->yCount;
+    grid->zCount = this->grid->zCount;
     grid->origin = {
-      -(xGridCount * gridEdgeLength / 2.0f),
-      -(yGridCount * gridEdgeLength / 2.0f),
-      -(zGridCount * gridEdgeLength / 2.0f)
+      -(grid->xCount * grid->edgeLength / 2.0f),
+      -(grid->yCount * grid->edgeLength / 2.0f),
+      -(grid->zCount * grid->edgeLength / 2.0f)
     };
 
     for (int i = 0; i < 3; i++) {

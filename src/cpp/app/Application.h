@@ -15,7 +15,6 @@
 #include "../models/Settings.h"
 #include "../models/drawing/SphereDrawable.h"
 #include "../scripting/mappings/drawing/RenderingGroup.h"
-#include "Grid.h"
 #include "DI.h"
 #include "../scripting/mappings/drawing/Renderer.h"
 

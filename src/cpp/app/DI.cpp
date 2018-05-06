@@ -41,8 +41,8 @@ namespace alcube::app {
   }
 
   template <>
-  Grid* DI::inject() {
-    return new Grid((unsigned int)get<models::Settings>()->world.size);
+  physics::Grid* DI::inject() {
+    return new physics::Grid((unsigned int)get<models::Settings>()->world.size);
   }
 
   template <>
@@ -58,7 +58,7 @@ namespace alcube::app {
   template <>
   gpu::GPUAccessor* DI::inject() {
     auto settings = get<models::Settings>();
-    auto grid = get<Grid>();
+    auto grid = get<physics::Grid>();
     return new gpu::GPUAccessor(
       get<utils::opencl::ResourcesProvider>(),
       settings->world.maxActorCount,
@@ -82,13 +82,10 @@ namespace alcube::app {
   template <>
   physics::Simulator* DI::inject() {
     auto settings = get<models::Settings>();
-    auto grid = get<Grid>();
+    auto grid = get<physics::Grid>();
     return new physics::Simulator(
       settings->world.maxActorCount,
-      grid->edgeLength,
-      grid->xCount,
-      grid->yCount,
-      grid->zCount,
+      grid,
       settings->physics.timeStepSize,
       get<gpu::GPUAccessor>(),
       get<alcube::physics::ActorResources>()

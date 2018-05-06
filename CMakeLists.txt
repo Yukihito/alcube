@@ -58,6 +58,7 @@ target_link_libraries(alcube_drawing_lib
 
 ### Physics
 set(ALCUBE_PHYSICS_SOURCE_FILES
+        src/cpp/physics/Grid.cpp src/cpp/physics/Grid.h
         src/cpp/physics/softbody/Actor.cpp src/cpp/physics/softbody/Actor.h
         src/cpp/physics/Simulator.cpp src/cpp/physics/Simulator.h
         src/cpp/physics/softbody/Spring.cpp src/cpp/physics/softbody/Spring.h
@@ -168,7 +169,8 @@ target_link_libraries(alcube_scripting_lib
 ### App
 set(ALCUBE_APP_SOURCE_FILES
         src/cpp/app/Application.cpp src/cpp/app/Application.h
-        src/cpp/app/DI.cpp src/cpp/app/DI.h src/cpp/app/Grid.cpp src/cpp/app/Grid.h)
+        src/cpp/app/DI.cpp src/cpp/app/DI.h
+        )
 
 add_library(alcube_app_lib STATIC ${ALCUBE_APP_SOURCE_FILES})
 target_link_libraries(alcube_app_lib

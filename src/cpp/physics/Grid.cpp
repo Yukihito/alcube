@@ -1,6 +1,6 @@
 #include "Grid.h"
 
-namespace alcube::app {
+namespace alcube::physics {
   Grid::Grid(unsigned int worldSize) {
     edgeLength = 8;
     xCount = worldSize / edgeLength;
