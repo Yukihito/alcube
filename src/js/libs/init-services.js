@@ -1,4 +1,4 @@
-var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, InstanceColorType, RenderingGroup, RenderingGroupFactory, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, Texture, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, renderingGroupFactory, softbodyFeaturesFactory, springFactory, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
+var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, InstanceColorType, Renderer, RenderingGroup, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, Texture, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, renderer, softbodyFeaturesFactory, springFactory, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
 
 vec3 = function(x, y, z) {
   return new THREE.Vector3(parseFloat(x), parseFloat(y), parseFloat(z));
@@ -205,10 +205,10 @@ ActorFactory = class ActorFactory {
     return this.underlying = constructActorFactory();
   }
 
-  create(features) {
+  create(features, renderingGroup) {
     var actor;
     actor = new Actor;
-    actor.wrap(this.underlying.create(features.underlying));
+    actor.wrap(this.underlying.create(features.underlying, renderingGroup.underlying));
     return actor;
   }
 
@@ -235,20 +235,20 @@ RenderingGroup = class RenderingGroup {
 
 };
 
-RenderingGroupFactory = class RenderingGroupFactory {
+Renderer = class Renderer {
   constructor() {
     this.wrap = this.wrap.bind(this);
-    this.create = this.create.bind(this);
+    this.createGroup = this.createGroup.bind(this);
   }
 
   wrap() {
-    return this.underlying = constructRenderingGroupFactory();
+    return this.underlying = constructRenderer();
   }
 
-  create() {
+  createGroup() {
     var entity;
-    entity = new RenderingGroup;
-    entity.wrap(this.underlying.create());
+    entity = new RenderingGroup();
+    entity.wrap(this.underlying.createGroup());
     return entity;
   }
 
@@ -257,22 +257,11 @@ RenderingGroupFactory = class RenderingGroupFactory {
 Alcube = class Alcube {
   constructor() {
     this.wrap = this.wrap.bind(this);
-    this.add = this.add.bind(this);
   }
 
   wrap() {
     this.underlying = constructAlcube();
     return primitiveAccessor(this, 'actorCount');
-  }
-
-  add(obj) {
-    if (obj.constructor.name === 'Actor') {
-      return this.underlying.addActor(obj.underlying);
-    } else if (obj.constructor.name === 'Spring') {
-      return this.underlying.addSpring(obj.underlying);
-    } else if (obj.constructor.name === 'RenderingGroup') {
-      return this.underlying.addRenderingGroup(obj.underlying);
-    }
   }
 
 };
@@ -293,9 +282,9 @@ springFactory = new SpringFactory();
 
 springFactory.wrap();
 
-renderingGroupFactory = new RenderingGroupFactory();
+renderer = new Renderer();
 
-renderingGroupFactory.wrap();
+renderer.wrap();
 
 cube = new Alcube();
 

@@ -64,6 +64,7 @@ namespace alcube::app {
       settings->world.maxActorCount,
       utils::math::powerOf2(settings->world.maxActorCount),
       settings->world.maxActorCount * 16,
+      settings->world.maxActorCount * 4,
       grid->xCount * grid->yCount * grid->zCount
     );
   }
@@ -100,7 +101,9 @@ namespace alcube::app {
       get<gpu::GPUAccessor>(),
       get<drawing::Canvas>(),
       get<utils::opencl::ResourcesProvider>(),
-      get<models::Settings>()->world.maxActorCount * 4);
+      get<models::drawing::RenderingGroupFactory>(),
+      get<models::Settings>()->world.maxActorCount * 4
+    );
   }
 
   template <>
@@ -116,7 +119,8 @@ namespace alcube::app {
   template <>
   models::drawing::Model3DFactory* DI::inject() {
     return new models::drawing::Model3DFactory(
-      new utils::MemoryPool<models::drawing::Model3D>(get<models::Settings>()->world.maxActorCount)
+      new utils::MemoryPool<models::drawing::Model3D>(get<models::Settings>()->world.maxActorCount),
+      get<gpu::GPUAccessor>()
     );
   }
 
@@ -126,17 +130,16 @@ namespace alcube::app {
     return new models::drawing::RenderingGroupFactory(
       new utils::MemoryPool<models::drawing::RenderingGroup>(settings->world.maxActorCount),
       get<drawing::shaders::Shaders>(),
-      settings
+      settings,
+      get<gpu::GPUAccessor>(),
+      get<models::drawing::Model3DFactory>()
     );
   }
 
   template <>
   models::ActorFactory* DI::inject() {
     auto settings = get<models::Settings>();
-    return new models::ActorFactory(
-      new utils::MemoryPool<models::Actor>(settings->world.maxActorCount),
-      get<models::drawing::Model3DFactory>()
-    );
+    return new models::ActorFactory(new utils::MemoryPool<models::Actor>(settings->world.maxActorCount));
   }
 
   template <>

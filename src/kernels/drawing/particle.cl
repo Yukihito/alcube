@@ -2,9 +2,10 @@ __kernel void inputRenderers(
   __global const Renderer* hostRenderers,
   __global Renderer* renderers,
   __global const float3* hostColors,
-  __global float3* colors
+  __global float3* colors,
+  unsigned int offset
 ) {
-  size_t i = get_global_id(0);
+  size_t i = get_global_id(0) + offset;
   renderers[i] = hostRenderers[i];
   colors[i] = hostColors[i];
 }
@@ -17,9 +18,10 @@ __kernel void updateDrawingBuffer(
   __global float4* rotations2,
   __global float4* rotations3,
   __global PhysicalQuantity* physicalQuantities,
-  __global Renderer* renderers
+  __global Renderer* renderers,
+  unsigned int offset
 ) {
-  size_t i = get_global_id(0);
+  size_t i = get_global_id(0) + offset;
   unsigned short actorIndex = renderers[i].actorIndex;
   positions[i] = physicalQuantities[actorIndex].position;
 

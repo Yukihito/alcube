@@ -26,6 +26,7 @@ namespace alcube::utils::opencl {
       void push(cl_kernel op, std::vector<size_t> ranges, std::initializer_list<KernelArg> args);
       void pushZeroFill(Memory* mem);
       void read(Memory* memory, void* hostPtr);
+      void readRange(Memory* memory, void* hostPtr, size_t min, size_t length);
       void write(Memory* memory);
       void write(Memory* memory, size_t offset);
       void readAt(Memory* memory, void* hostPtr, unsigned int index);

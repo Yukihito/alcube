@@ -12,7 +12,6 @@ namespace alcube::models::drawing {
     public:
       SphereDrawable(
         alcube::drawing::Shader &shader,
-        alcube::drawing::Material material,
         unsigned int maxInstanceCount,
         GLfloat* positions,
         GLfloat* rotations0,

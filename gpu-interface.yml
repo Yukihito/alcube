@@ -7,6 +7,7 @@ variables:
   - maxActorCount
   - maxActorCountForBitonicSort
   - maxSpringCount
+  - drawingBufferSize
   - allGridCount
 
 dto-structs:
@@ -186,39 +187,39 @@ dto-instances:
   # Variables for drawing
   - name: positions
     type: float3
-    length: maxActorCount
+    length: drawingBufferSize
 
   - name: rotations0
     type: float4
-    length: maxActorCount
+    length: drawingBufferSize
 
   - name: rotations1
     type: float4
-    length: maxActorCount
+    length: drawingBufferSize
 
   - name: rotations2
     type: float4
-    length: maxActorCount
+    length: drawingBufferSize
 
   - name: rotations3
     type: float4
-    length: maxActorCount
+    length: drawingBufferSize
 
   - name: hostColors
     type: float3
-    length: maxActorCount
+    length: drawingBufferSize
     host-ptr: true
 
   - name: colors
     type: float3
-    length: maxActorCount
+    length: drawingBufferSize
 
   - name: hostRenderers
     type: Renderer
-    length: maxActorCount
+    length: drawingBufferSize
     host-ptr: true
 
   - name: renderers
     type: Renderer
-    length: maxActorCount
+    length: drawingBufferSize
 

@@ -20,12 +20,13 @@ namespace alcube::scripting::mappings {
   void ActorFactory::create(const v8::FunctionCallbackInfo<v8::Value> &info) {
     v8::Isolate* isolate = v8::Isolate::GetCurrent();
     v8::HandleScope scope(isolate);
-    if (info.Length() < 1) {
+    if (info.Length() < 2) {
       info.GetReturnValue().Set(v8::Undefined(isolate));
       return;
     }
     auto features = getUnderlying<models::physics::fluid::Features>(info[0]);
-    auto underlying = self(info)->create(features);
+    auto renderingGroup = getUnderlying<models::drawing::RenderingGroup>(info[1]);
+    auto underlying = self(info)->create(features, renderingGroup);
     auto actor = Actor::instance->objectTemplate->NewInstance();
     actor->SetInternalField(0, v8::External::New(isolate, underlying));
     info.GetReturnValue().Set(actor);

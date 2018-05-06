@@ -17,6 +17,7 @@
 #include "../scripting/mappings/drawing/RenderingGroup.h"
 #include "Grid.h"
 #include "DI.h"
+#include "../scripting/mappings/drawing/Renderer.h"
 
 namespace alcube::app {
   class Profilers {
@@ -43,7 +44,7 @@ namespace alcube::app {
     alcube::scripting::mappings::physics::fluid::FeaturesFactory* fluidFeaturesFactory;
     alcube::scripting::mappings::physics::softbody::SpringFactory* springFactory;
     alcube::scripting::mappings::physics::softbody::FeaturesFactory* softbodyFeaturesFactory;
-    alcube::scripting::mappings::drawing::RenderingGroupFactory* renderingGroupFactory;
+    alcube::scripting::mappings::drawing::Renderer* renderer;
     alcube::scripting::mappings::Alcube* cube;
   };
 

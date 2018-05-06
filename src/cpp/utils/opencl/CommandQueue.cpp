@@ -98,6 +98,25 @@ namespace alcube::utils::opencl {
     }
   }
 
+  void CommandQueue::readRange(Memory *memory, void *hostPtrVoid, size_t min, size_t length) {
+    auto hostPtr = (char*)hostPtrVoid;
+    cl_int status;
+    status = clEnqueueReadBuffer(
+      queue,
+      memory->mem,
+      CL_TRUE,
+      memory->size * min,
+      memory->size * length,
+      hostPtr + (memory->size * min),
+      0,
+      nullptr,
+      nullptr
+    );
+    if (status != CL_SUCCESS) {
+      std::cout << memory->name << " clEnqueueReadBuffer failure: " << status << std::endl;
+    }
+  }
+
   void CommandQueue::write(Memory *memory) {
     if (memory->count == 0) {
       return;

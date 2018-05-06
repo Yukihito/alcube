@@ -18,6 +18,10 @@
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void ${memory_type_name}::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void ${memory_type_name}::setCount(size_t count) {
       this->memory->count = count;
     }

@@ -3,7 +3,6 @@
 namespace alcube::models::drawing {
   SphereDrawable::SphereDrawable(
     alcube::drawing::Shader &shader,
-    alcube::drawing::Material material,
     unsigned int maxInstanceCount,
     GLfloat* positions,
     GLfloat* rotations0,
@@ -23,11 +22,8 @@ namespace alcube::models::drawing {
       colors
     );
     this->shader = &shader;
-    this->material = material;
-    /*
-    material.diffuse = diffuse;
-    material.ambient = diffuse / 2.0f;
-    material.specular = glm::vec3(0.1f, 0.1f, 0.1f);
-     */
+    this->material.ambient = glm::vec3();
+    this->material.specular = glm::vec3();
+    this->material.diffuse = glm::vec3();
   }
 }

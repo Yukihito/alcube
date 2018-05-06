@@ -26,7 +26,10 @@ namespace alcube::models::drawing {
     public:
       void init(
         alcube::drawing::shaders::Shaders* shaders,
-        Settings* settings
+        Settings* settings,
+        gpu::GPUAccessor* gpuAccessor,
+        utils::AllocationRange* allocationRange,
+        Model3DFactory* model3DFactory
       );
       glm::vec3 getDiffuse();
       void setDiffuse(glm::vec3 v);
@@ -41,23 +44,28 @@ namespace alcube::models::drawing {
       void setInstanceColorType(InstanceColorType v);
       bool refersToRotations() override;
 
+      Model3D* createModel3D(IndexHolder *indexHolder);
       alcube::drawing::Drawable* getDrawable();
-      void allocate(utils::AllocationRange* rendererAllocationRange, gpu::GPUAccessor* gpuAccessor);
-      void initialize();
-      void add(Model3D* model3D);
-
+      void input();
+      void updateGPU();
+      void updateHost();
     private:
-      alcube::drawing::Material material = {};
       alcube::drawing::Drawable* drawable = nullptr;
       Texture texture = TEXTURE_NONE;
       InstanceColorType instanceColorType = INSTANCE_COLOR_TYPE_NONE;
       alcube::drawing::shaders::Shaders* shaders = nullptr;
       Settings* settings = nullptr;
-      std::vector<Model3D*> model3Ds = {};
-      utils::AllocationRange* allocationRange;
-      RenderingGroupAllocations allocations;
+      utils::AllocationRange* allocationRange = nullptr;
+      RenderingGroupAllocations allocations = {};
+      gpu::GPUAccessor* gpuAccessor = nullptr;
+      Model3DFactory* model3DFactory = nullptr;
+      unsigned int allModel3DCount = 0;
+      unsigned int activeModel3DCount = 0;
 
       alcube::drawing::Shader* selectShader();
+      void setUpAllocations();
+      void setUpDrawable();
+      void updateDrawable();
   };
 
   class RenderingGroupFactory {
@@ -65,14 +73,18 @@ namespace alcube::models::drawing {
       explicit RenderingGroupFactory(
         utils::MemoryPool<RenderingGroup>* memoryPool,
         alcube::drawing::shaders::Shaders* shaders,
-        Settings* settings
+        Settings* settings,
+        gpu::GPUAccessor* gpuAccessor,
+        Model3DFactory* model3DFactory
       );
-      RenderingGroup* create();
+      RenderingGroup* create(utils::AllocationRange* rendererAllocationRange);
 
     private:
       utils::MemoryPool<RenderingGroup>* memoryPool;
       alcube::drawing::shaders::Shaders* shaders;
       Settings* settings;
+      gpu::GPUAccessor* gpuAccessor;
+      Model3DFactory* model3DFactory;
   };
 }
 

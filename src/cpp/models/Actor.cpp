@@ -3,14 +3,17 @@
 namespace alcube::models {
   using namespace utils::opencl::conversions;
 
-  void Actor::init(
-    int id,
-    alcube::physics::Actor *physicsActor,
-    models::drawing::Model3D* model3D
-  ) {
+  void Actor::init(int id) {
     this->id = id;
     this->physicsActor = nullptr;
+    this->model3D = nullptr;
+  }
+
+  void Actor::setPhysicsActor(alcube::physics::Actor *physicsActor) {
     this->physicsActor = physicsActor;
+  }
+
+  void Actor::setModel3D(alcube::models::drawing::Model3D *model3D) {
     this->model3D = model3D;
   }
 
@@ -67,20 +70,18 @@ namespace alcube::models {
     return model3D;
   }
 
-  ActorFactory::ActorFactory(
-    utils::MemoryPool<Actor> *memoryPool,
-    drawing::Model3DFactory* model3DFactory
-  ) {
+  ActorFactory::ActorFactory(utils::MemoryPool<Actor> *memoryPool) {
     this->memoryPool = memoryPool;
-    this->model3DFactory = model3DFactory;
   }
 
-  Actor* ActorFactory::create(physics::Features *feature) {
+  Actor* ActorFactory::create(physics::Features *feature, drawing::RenderingGroup* renderingGroup) {
     auto physicsActor = feature->createPhysicsActor();
     auto actor = memoryPool->get();
-    auto entity = model3DFactory->create(actor);
     int nextId = instanceCount;
-    actor->init(nextId, physicsActor, entity);
+    actor->init(nextId);
+    actor->setPhysicsActor(physicsActor);
+    auto m = renderingGroup->createModel3D(actor);
+    //actor->setModel3D();
     instanceCount++;
     return actor;
   }

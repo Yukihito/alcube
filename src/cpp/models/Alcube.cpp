@@ -15,20 +15,7 @@ namespace alcube::models {
     this->renderer = renderer;
   }
 
-  void Alcube::add(Actor *actor) {
-    // TODO: Delete
-  }
-
-  void Alcube::add(physics::softbody::Spring *spring) {
-    // TODO: Delete
-  }
-
-  void Alcube::add(alcube::models::drawing::RenderingGroup *renderingGroup) {
-    renderer->add(renderingGroup);
-  }
-
   void Alcube::setUp() {
-    renderer->setUp();
     physicsSimulator->setUp();
   }
 

@@ -23,6 +23,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void Actor::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void Actor::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -45,6 +49,10 @@ namespace alcube::gpu {
 
     void ActorState::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void ActorState::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void ActorState::setCount(size_t count) {
@@ -71,6 +79,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void Constants::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void Constants::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -93,6 +105,10 @@ namespace alcube::gpu {
 
     void Fluid::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Fluid::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void Fluid::setCount(size_t count) {
@@ -119,6 +135,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void FluidSettings::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void FluidSettings::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -141,6 +161,10 @@ namespace alcube::gpu {
 
     void Grid::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Grid::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void Grid::setCount(size_t count) {
@@ -167,6 +191,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void GridAndActorRelation::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void GridAndActorRelation::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -189,6 +217,10 @@ namespace alcube::gpu {
 
     void Intersection::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Intersection::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void Intersection::setCount(size_t count) {
@@ -215,6 +247,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void PhysicalQuantity::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void PhysicalQuantity::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -237,6 +273,10 @@ namespace alcube::gpu {
 
     void Renderer::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Renderer::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void Renderer::setCount(size_t count) {
@@ -263,6 +303,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void SoftBody::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void SoftBody::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -285,6 +329,10 @@ namespace alcube::gpu {
 
     void Spring::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Spring::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void Spring::setCount(size_t count) {
@@ -311,6 +359,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void SpringState::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void SpringState::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -333,6 +385,10 @@ namespace alcube::gpu {
 
     void CharMemory::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void CharMemory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void CharMemory::setCount(size_t count) {
@@ -359,6 +415,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void DoubleMemory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void DoubleMemory::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -381,6 +441,10 @@ namespace alcube::gpu {
 
     void FloatMemory::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void FloatMemory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void FloatMemory::setCount(size_t count) {
@@ -407,6 +471,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void Float16Memory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void Float16Memory::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -429,6 +497,10 @@ namespace alcube::gpu {
 
     void Float3Memory::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void Float3Memory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void Float3Memory::setCount(size_t count) {
@@ -455,6 +527,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void Float4Memory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void Float4Memory::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -477,6 +553,10 @@ namespace alcube::gpu {
 
     void IntMemory::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void IntMemory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void IntMemory::setCount(size_t count) {
@@ -503,6 +583,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void LongMemory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void LongMemory::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -525,6 +609,10 @@ namespace alcube::gpu {
 
     void ShortMemory::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void ShortMemory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void ShortMemory::setCount(size_t count) {
@@ -551,6 +639,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void UcharMemory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void UcharMemory::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -573,6 +665,10 @@ namespace alcube::gpu {
 
     void UintMemory::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void UintMemory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void UintMemory::setCount(size_t count) {
@@ -599,6 +695,10 @@ namespace alcube::gpu {
       resourcesProvider->queue->read(this->memory, this->dto);
     }
 
+    void UlongMemory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
+    }
+
     void UlongMemory::setCount(size_t count) {
       this->memory->count = count;
     }
@@ -621,6 +721,10 @@ namespace alcube::gpu {
 
     void UshortMemory::read() {
       resourcesProvider->queue->read(this->memory, this->dto);
+    }
+
+    void UshortMemory::readRange(size_t min, size_t length) {
+      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
     }
 
     void UshortMemory::setCount(size_t count) {
@@ -937,13 +1041,15 @@ namespace alcube::gpu {
     memories::Renderer& hostRenderers,
     memories::Renderer& renderers,
     memories::Float3Memory& hostColors,
-    memories::Float3Memory& colors
+    memories::Float3Memory& colors,
+    unsigned int offset
   ) {
     queue->push(rawKernels.inputRenderers, {workSize}, {
       memArg(hostRenderers.memory),
       memArg(renderers.memory),
       memArg(hostColors.memory),
-      memArg(colors.memory)
+      memArg(colors.memory),
+      uintArg(offset)
     });
   }
 
@@ -956,7 +1062,8 @@ namespace alcube::gpu {
     memories::Float4Memory& rotations2,
     memories::Float4Memory& rotations3,
     memories::PhysicalQuantity& physicalQuantities,
-    memories::Renderer& renderers
+    memories::Renderer& renderers,
+    unsigned int offset
   ) {
     queue->push(rawKernels.updateDrawingBuffer, {workSize}, {
       memArg(positions.memory),
@@ -966,7 +1073,8 @@ namespace alcube::gpu {
       memArg(rotations2.memory),
       memArg(rotations3.memory),
       memArg(physicalQuantities.memory),
-      memArg(renderers.memory)
+      memArg(renderers.memory),
+      uintArg(offset)
     });
   }
 
@@ -1018,6 +1126,7 @@ namespace alcube::gpu {
     unsigned int maxActorCount,
     unsigned int maxActorCountForBitonicSort,
     unsigned int maxSpringCount,
+    unsigned int drawingBufferSize,
     unsigned int allGridCount
   ) {
     this->resourcesProvider = resourcesProvider;
@@ -1068,15 +1177,15 @@ namespace alcube::gpu {
     dtos.gridAndActorRelations = new dtos::GridAndActorRelation[maxActorCountForBitonicSort];
     dtos.gridStartIndices = new unsigned int[allGridCount];
     dtos.gridEndIndices = new unsigned int[allGridCount];
-    dtos.positions = new cl_float3[maxActorCount];
-    dtos.rotations0 = new cl_float4[maxActorCount];
-    dtos.rotations1 = new cl_float4[maxActorCount];
-    dtos.rotations2 = new cl_float4[maxActorCount];
-    dtos.rotations3 = new cl_float4[maxActorCount];
-    dtos.hostColors = new cl_float3[maxActorCount];
-    dtos.colors = new cl_float3[maxActorCount];
-    dtos.hostRenderers = new dtos::Renderer[maxActorCount];
-    dtos.renderers = new dtos::Renderer[maxActorCount];
+    dtos.positions = new cl_float3[drawingBufferSize];
+    dtos.rotations0 = new cl_float4[drawingBufferSize];
+    dtos.rotations1 = new cl_float4[drawingBufferSize];
+    dtos.rotations2 = new cl_float4[drawingBufferSize];
+    dtos.rotations3 = new cl_float4[drawingBufferSize];
+    dtos.hostColors = new cl_float3[drawingBufferSize];
+    dtos.colors = new cl_float3[drawingBufferSize];
+    dtos.hostRenderers = new dtos::Renderer[drawingBufferSize];
+    dtos.renderers = new dtos::Renderer[drawingBufferSize];
 
     memories.grid.memory = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);
     memories.fluidSettings.memory = defineHostMemory("fluidSettings", sizeof(dtos::FluidSettings), dtos.fluidSettings, 1);
@@ -1094,15 +1203,15 @@ namespace alcube::gpu {
     memories.gridAndActorRelations.memory = defineGPUMemory("gridAndActorRelations", sizeof(dtos::GridAndActorRelation), maxActorCountForBitonicSort);
     memories.gridStartIndices.memory = defineGPUMemory("gridStartIndices", sizeof(unsigned int), allGridCount);
     memories.gridEndIndices.memory = defineGPUMemory("gridEndIndices", sizeof(unsigned int), allGridCount);
-    memories.positions.memory = defineGPUMemory("positions", sizeof(cl_float3), maxActorCount);
-    memories.rotations0.memory = defineGPUMemory("rotations0", sizeof(cl_float4), maxActorCount);
-    memories.rotations1.memory = defineGPUMemory("rotations1", sizeof(cl_float4), maxActorCount);
-    memories.rotations2.memory = defineGPUMemory("rotations2", sizeof(cl_float4), maxActorCount);
-    memories.rotations3.memory = defineGPUMemory("rotations3", sizeof(cl_float4), maxActorCount);
-    memories.hostColors.memory = defineHostMemory("hostColors", sizeof(cl_float3), dtos.hostColors, maxActorCount);
-    memories.colors.memory = defineGPUMemory("colors", sizeof(cl_float3), maxActorCount);
-    memories.hostRenderers.memory = defineHostMemory("hostRenderers", sizeof(dtos::Renderer), dtos.hostRenderers, maxActorCount);
-    memories.renderers.memory = defineGPUMemory("renderers", sizeof(dtos::Renderer), maxActorCount);
+    memories.positions.memory = defineGPUMemory("positions", sizeof(cl_float3), drawingBufferSize);
+    memories.rotations0.memory = defineGPUMemory("rotations0", sizeof(cl_float4), drawingBufferSize);
+    memories.rotations1.memory = defineGPUMemory("rotations1", sizeof(cl_float4), drawingBufferSize);
+    memories.rotations2.memory = defineGPUMemory("rotations2", sizeof(cl_float4), drawingBufferSize);
+    memories.rotations3.memory = defineGPUMemory("rotations3", sizeof(cl_float4), drawingBufferSize);
+    memories.hostColors.memory = defineHostMemory("hostColors", sizeof(cl_float3), dtos.hostColors, drawingBufferSize);
+    memories.colors.memory = defineGPUMemory("colors", sizeof(cl_float3), drawingBufferSize);
+    memories.hostRenderers.memory = defineHostMemory("hostRenderers", sizeof(dtos::Renderer), dtos.hostRenderers, drawingBufferSize);
+    memories.renderers.memory = defineGPUMemory("renderers", sizeof(dtos::Renderer), drawingBufferSize);
 
     memories.grid.dto = dtos.grid;
     memories.fluidSettings.dto = dtos.fluidSettings;

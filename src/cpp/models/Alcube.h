@@ -17,9 +17,6 @@ namespace alcube::models {
         alcube::physics::Simulator* physicsSimulator,
         alcube::models::drawing::Renderer* renderer
       );
-      void add(Actor* actor);
-      void add(physics::softbody::Spring* spring);
-      void add(models::drawing::RenderingGroup* renderingGroup);
       unsigned int getActorCount();
       void setUp();
       void render();

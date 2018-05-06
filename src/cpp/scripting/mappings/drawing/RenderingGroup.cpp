@@ -10,34 +10,7 @@ namespace alcube::scripting::mappings::drawing {
     define<glm::vec3, Specular>();
     define<models::drawing::Texture, Texture>();
     define<models::drawing::InstanceColorType, InstanceColorType>();
-    DEFMETHOD(add);
   }
-
-  void RenderingGroup::add(const v8::FunctionCallbackInfo<v8::Value> &info) {
-    v8::Isolate *isolate = v8::Isolate::GetCurrent();
-    if (info.Length() < 1) {
-      info.GetReturnValue().Set(v8::Undefined(isolate));
-      return;
-    }
-    auto actor = getUnderlying<alcube::models::Actor>(info[0]);
-    self(info)->add(actor->getModel3D());
-    info.GetReturnValue().Set(v8::Undefined(isolate));
-  }
-
-  void RenderingGroupFactory::init() {
-    Prototype::init();
-    DEFMETHOD(create);
-  }
-
-  void RenderingGroupFactory::create(const v8::FunctionCallbackInfo<v8::Value> &info) {
-    v8::Isolate* isolate = v8::Isolate::GetCurrent();
-    v8::HandleScope scope(isolate);
-    auto underlying = self(info)->create();
-    auto renderer = RenderingGroup::instance->objectTemplate->NewInstance();
-    renderer->SetInternalField(0, v8::External::New(isolate, underlying));
-    info.GetReturnValue().Set(renderer);
-  }
-
 }
 
 namespace alcube::scripting::utils {

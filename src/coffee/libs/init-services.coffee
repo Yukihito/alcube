@@ -117,9 +117,9 @@ class ActorFactory
   wrap: () =>
     @underlying = constructActorFactory()
 
-  create: (features) =>
+  create: (features, renderingGroup) =>
     actor = new Actor
-    actor.wrap @underlying.create features.underlying
+    actor.wrap(@underlying.create features.underlying, renderingGroup.underlying)
     actor
 
 class RenderingGroup
@@ -134,27 +134,19 @@ class RenderingGroup
   add: (actor) =>
     @underlying.add actor.underlying
 
-class RenderingGroupFactory
+class Renderer
   wrap: () =>
-    @underlying = constructRenderingGroupFactory()
+    @underlying = constructRenderer()
 
-  create: () =>
-    entity = new RenderingGroup
-    entity.wrap @underlying.create()
+  createGroup: () =>
+    entity = new RenderingGroup()
+    entity.wrap @underlying.createGroup()
     entity
 
 class Alcube
   wrap: () =>
     @underlying = constructAlcube()
     primitiveAccessor this, 'actorCount'
-
-  add: (obj) =>
-    if obj.constructor.name == 'Actor'
-      @underlying.addActor obj.underlying
-    else if obj.constructor.name == 'Spring'
-      @underlying.addSpring obj.underlying
-    else if obj.constructor.name == 'RenderingGroup'
-      @underlying.addRenderingGroup obj.underlying
 
 fluidFeaturesFactory = new FluidFeaturesFactory()
 fluidFeaturesFactory.wrap()
@@ -168,8 +160,8 @@ actorFactory.wrap()
 springFactory = new SpringFactory()
 springFactory.wrap()
 
-renderingGroupFactory = new RenderingGroupFactory()
-renderingGroupFactory.wrap()
+renderer = new Renderer()
+renderer.wrap()
 
 cube = new Alcube()
 cube.wrap()

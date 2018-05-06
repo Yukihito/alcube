@@ -14,7 +14,6 @@ namespace alcube::drawing {
       Shape* shape = nullptr;
       Shader* shader = nullptr;
       Texture* texture = nullptr;
-    protected:
       Material material;
   };
 }

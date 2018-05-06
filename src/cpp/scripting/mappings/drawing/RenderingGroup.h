@@ -1,5 +1,5 @@
-#ifndef ALCUBE_SCRIPTING_MAPPINGS_RENDERER_H
-#define ALCUBE_SCRIPTING_MAPPINGS_RENDERER_H
+#ifndef ALCUBE_SCRIPTING_MAPPINGS_RENDERING_GROUP_H
+#define ALCUBE_SCRIPTING_MAPPINGS_RENDERING_GROUP_H
 
 #include "../../utils.h"
 #include "../../../models/drawing/RenderingGroup.h"
@@ -15,13 +15,6 @@ namespace alcube::scripting::mappings::drawing {
       DEFACCESSOR(models::drawing::RenderingGroup, glm::vec3, Specular);
       DEFACCESSOR(models::drawing::RenderingGroup, models::drawing::Texture, Texture);
       DEFACCESSOR(models::drawing::RenderingGroup, models::drawing::InstanceColorType, InstanceColorType);
-      static void add(const v8::FunctionCallbackInfo<v8::Value>&);
-  };
-
-  class RenderingGroupFactory : public utils::SingletonPrototype<models::drawing::RenderingGroupFactory> {
-    public:
-      void init() override;
-      static void create(const v8::FunctionCallbackInfo<v8::Value>&);
   };
 }
 

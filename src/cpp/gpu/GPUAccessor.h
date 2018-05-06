@@ -20,6 +20,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -33,6 +34,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -46,6 +48,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -59,6 +62,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -72,6 +76,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -85,6 +90,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -98,6 +104,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -111,6 +118,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -124,6 +132,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -137,6 +146,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -150,6 +160,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -163,6 +174,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -176,6 +188,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -189,6 +202,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -202,6 +216,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -215,6 +230,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -228,6 +244,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -241,6 +258,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -254,6 +272,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -267,6 +286,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -280,6 +300,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -293,6 +314,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -306,6 +328,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -319,6 +342,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -332,6 +356,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -345,6 +370,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
         utils::opencl::ResourcesProvider* resourcesProvider;
@@ -466,8 +492,8 @@ namespace alcube::gpu {
       void updateByFrictionalImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodies);
       void initStepVariables(unsigned int workSize, memories::ActorState& actorStates, memories::PhysicalQuantity& physicalQuantities, memories::Constants& constants);
       void updateByPenaltyImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodies, memories::Constants& constants);
-      void inputRenderers(unsigned int workSize, memories::Renderer& hostRenderers, memories::Renderer& renderers, memories::Float3Memory& hostColors, memories::Float3Memory& colors);
-      void updateDrawingBuffer(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::Float4Memory& rotations0, memories::Float4Memory& rotations1, memories::Float4Memory& rotations2, memories::Float4Memory& rotations3, memories::PhysicalQuantity& physicalQuantities, memories::Renderer& renderers);
+      void inputRenderers(unsigned int workSize, memories::Renderer& hostRenderers, memories::Renderer& renderers, memories::Float3Memory& hostColors, memories::Float3Memory& colors, unsigned int offset);
+      void updateDrawingBuffer(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::Float4Memory& rotations0, memories::Float4Memory& rotations1, memories::Float4Memory& rotations2, memories::Float4Memory& rotations3, memories::PhysicalQuantity& physicalQuantities, memories::Renderer& renderers, unsigned int offset);
       void updateDrawingBuffer_SingleColor(unsigned int workSize, memories::Float3Memory& positions, memories::PhysicalQuantity& physicalQuantities);
       void updateDrawingBuffer_InstanceColor(unsigned int workSize, memories::Float3Memory& positions, memories::Float3Memory& colors, memories::PhysicalQuantity& physicalQuantities);
       void updateDrawingBuffer_Texture_SingleColor(unsigned int workSize, memories::Float3Memory& positions, memories::Float4Memory& rotations0, memories::Float4Memory& rotations1, memories::Float4Memory& rotations2, memories::Float4Memory& rotations3, memories::PhysicalQuantity& physicalQuantities);
@@ -484,6 +510,7 @@ namespace alcube::gpu {
         unsigned int maxActorCount,
         unsigned int maxActorCountForBitonicSort,
         unsigned int maxSpringCount,
+        unsigned int drawingBufferSize,
         unsigned int allGridCount
       );
     private:

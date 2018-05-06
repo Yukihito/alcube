@@ -11,7 +11,6 @@
 #include "../utils/MemoryPool.h"
 #include "drawing/RenderingGroup.h"
 #include "v8.h"
-#include "drawing/Model3D.h"
 
 namespace alcube::models {
   class Actor : public physics::Accessors, public drawing::IndexHolder {
@@ -27,11 +26,9 @@ namespace alcube::models {
       void setAngularMomentum(glm::vec3 arg) override;
       glm::vec3 getColor();
       void setColor(glm::vec3 arg);
-      void init(
-        int id,
-        alcube::physics::Actor* physicsActor,
-        alcube::models::drawing::Model3D* model3D
-      );
+      void init(int id);
+      void setPhysicsActor(alcube::physics::Actor* physicsActor);
+      void setModel3D(alcube::models::drawing::Model3D* model3D);
 
       alcube::physics::Actor* getPhysicsActor();
       unsigned int getIndex() override;
@@ -46,15 +43,13 @@ namespace alcube::models {
   class ActorFactory {
     public:
       explicit ActorFactory(
-        utils::MemoryPool<Actor>* memoryPool,
-        drawing::Model3DFactory* model3DFactory
+        utils::MemoryPool<Actor>* memoryPool
       );
-      Actor* create(physics::Features* feature);
+      Actor* create(physics::Features* feature, drawing::RenderingGroup* renderingGroup);
 
     private:
       int instanceCount = 0;
       utils::MemoryPool<Actor>* memoryPool;
-      drawing::Model3DFactory* model3DFactory;
   };
 }
 

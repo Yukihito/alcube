@@ -155,7 +155,7 @@ set(ALCUBE_SCRIPTING_SOURCE_FILES
         src/cpp/scripting/mappings/Alcube.cpp src/cpp/scripting/mappings/Alcube.h
         src/cpp/scripting/mappings/Settings.cpp src/cpp/scripting/mappings/Settings.h
         src/cpp/scripting/mappings/drawing/RenderingGroup.cpp src/cpp/scripting/mappings/drawing/RenderingGroup.h
-        )
+        src/cpp/scripting/mappings/drawing/Renderer.cpp src/cpp/scripting/mappings/drawing/Renderer.h)
 add_library(alcube_scripting_lib STATIC ${ALCUBE_SCRIPTING_SOURCE_FILES})
 target_link_libraries(alcube_scripting_lib
         ${EXTRA_LIBS}

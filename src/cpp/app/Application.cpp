@@ -11,7 +11,7 @@ namespace alcube::app {
     services.softbodyFeaturesFactory = new alcube::scripting::mappings::physics::softbody::FeaturesFactory();
     services.fluidFeaturesFactory = new alcube::scripting::mappings::physics::fluid::FeaturesFactory();
     services.springFactory = new alcube::scripting::mappings::physics::softbody::SpringFactory();
-    services.renderingGroupFactory = new alcube::scripting::mappings::drawing::RenderingGroupFactory();
+    services.renderer = new alcube::scripting::mappings::drawing::Renderer();
     services.cube = new alcube::scripting::mappings::Alcube();
 
     entities.actor = new alcube::scripting::mappings::Actor();
@@ -29,7 +29,7 @@ namespace alcube::app {
       services.springFactory,
       entities.softbodyFeatures,
       services.softbodyFeaturesFactory,
-      services.renderingGroupFactory,
+      services.renderer,
       entities.renderer,
       settings.physics,
       settings.world,
@@ -95,7 +95,7 @@ namespace alcube::app {
     auto settings = di->get<models::Settings>();
     di->get<physics::Simulator>()->gravity = settings->physics.gravity;
     mappings.services.cube->setUnderlying(di->get<models::Alcube>());
-    mappings.services.renderingGroupFactory->setUnderlying(di->get<models::drawing::RenderingGroupFactory>());
+    mappings.services.renderer->setUnderlying(di->get<models::drawing::Renderer>());
     mappings.services.actorFactory->setUnderlying(di->get<models::ActorFactory>());
     mappings.services.springFactory->setUnderlying(di->get<models::physics::softbody::SpringFactory>());
     mappings.services.fluidFeaturesFactory->setUnderlying(di->get<models::physics::fluid::FeaturesFactory>());

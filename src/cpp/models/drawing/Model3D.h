@@ -27,7 +27,7 @@ namespace alcube::models::drawing {
 
   class RenderingGroupSettings {
     public:
-      virtual InstanceColorType  getInstanceColorType() = 0;
+      virtual InstanceColorType getInstanceColorType() = 0;
       virtual bool refersToRotations() = 0;
   };
 
@@ -38,31 +38,31 @@ namespace alcube::models::drawing {
 
   class Model3D {
     public:
-      void init(IndexHolder* actorIndexHolder);
-      glm::vec3 getColor();
-      void setColor(glm::vec3 v);
-      void allocate(
+      void init(
+        IndexHolder* actorIndexHolder,
+        utils::AllocationRange* allocationRange,
         RenderingGroupSettings* groupSettings,
-        utils::AllocationRange* groupAllocationRange,
         gpu::GPUAccessor* gpuAccessor
       );
-      void initialize();
+      glm::vec3 getColor();
+      void setColor(glm::vec3 v);
 
     private:
-      glm::vec3 color;
       IndexHolder* actorIndexHolder;
       utils::AllocationRange* allocationRange;
       Model3DAllocations allocations;
       models::drawing::RenderingGroupSettings* groupSettings;
+      void setUpAllocations(gpu::GPUAccessor* gpuAccessor);
   };
 
   class Model3DFactory {
     public:
-      explicit Model3DFactory(utils::MemoryPool<Model3D>* memoryPool);
-      Model3D* create(IndexHolder* actorIndexHolder);
+      explicit Model3DFactory(utils::MemoryPool<Model3D>* memoryPool, gpu::GPUAccessor* gpuAccessor);
+      Model3D* create(IndexHolder* actorIndexHolder, utils::AllocationRange* groupAllocationRange, RenderingGroupSettings* groupSettings);
 
     private:
       utils::MemoryPool<Model3D>* memoryPool;
+      gpu::GPUAccessor* gpuAccessor;
   };
 }
 
