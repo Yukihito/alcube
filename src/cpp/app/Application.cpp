@@ -82,7 +82,7 @@ namespace alcube::app {
       settings->window.width,
       settings->window.height,
       settings->fps,
-      di->get<models::Settings>()->physics.timeStepSize,
+      settings->physics.timeStepSize,
       "alcube"
     );
   }
