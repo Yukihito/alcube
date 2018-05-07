@@ -2,10 +2,17 @@
 
 namespace alcube::utils::app {
   OpenGLWindow* OpenGLWindow::instance;
-  OpenGLWindow::OpenGLWindow(std::function<void()> draw) {
+  OpenGLWindow::OpenGLWindow(
+    std::function<void()> drawCallback,
+    std::function<void()> updateCallback,
+    std::function<void()> closeCallback
+  ) {
     OpenGLWindow::instance = this;
     fps = 30;
-    this->draw = std::move(draw);
+    updateInterval = 1.0f / fps;
+    this->drawCallback = std::move(drawCallback);
+    this->updateCallback = std::move(updateCallback);
+    this->closeCallback = std::move(closeCallback);
     keyboard = new Keyboard();
     closingStatus = WindowClosingStatus::NONE;
   }
@@ -34,9 +41,11 @@ namespace alcube::utils::app {
     unsigned int width,
     unsigned int height,
     unsigned int fps,
+    float updateInterval,
     std::string name
   ) {
     this->fps = fps;
+    this->updateInterval = updateInterval;
     if (!glfwInit()) {
       std::cout << "glfwInit failed." << std::endl;
       exit(1);
@@ -61,10 +70,10 @@ namespace alcube::utils::app {
 
   void OpenGLWindow::run() {
     glfwSetKeyCallback(window, keyEvent);
-
+    auto th = std::thread([&]{ updateLoop(); });
     while (closingStatus == WindowClosingStatus::NONE) {
       std::chrono::system_clock::time_point drawingStartTime = std::chrono::system_clock::now();
-      draw();
+      drawCallback();
       glfwSwapBuffers(window);
       glfwPollEvents();
 
@@ -80,6 +89,23 @@ namespace alcube::utils::app {
         closingStatus = WindowClosingStatus::PROCESSING;
       }
     }
+    glfwTerminate();
     closingStatus = WindowClosingStatus::FINISHED;
+    th.join();
+    closeCallback();
+  }
+
+  void OpenGLWindow::updateLoop() {
+    while (!isClosed()) {
+      std::chrono::system_clock::time_point updateStartTime = std::chrono::system_clock::now();
+      updateCallback();
+      std::chrono::system_clock::time_point updateEndTime = std::chrono::system_clock::now();
+      int elapsedTime = (int) std::chrono::duration_cast<std::chrono::milliseconds>(updateEndTime - updateStartTime).count();
+      auto nextFlameInterval = (int)(updateInterval * 1000.0f - elapsedTime);
+      if (nextFlameInterval > 0) {
+        std::chrono::milliseconds intervalMs(nextFlameInterval);
+        std::this_thread::sleep_for(intervalMs);
+      }
+    }
   }
 }

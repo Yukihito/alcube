@@ -39,10 +39,7 @@ namespace alcube::app {
     };
   }
 
-  Application* Application::instance;
   Application::Application(const char* programName) : mappings() {
-    Application::instance = this;
-    closingStatus = ApplicationClosingStatus::NONE;
     di = new DI();
     evaluator = new scripting::Evaluator(di->get<utils::FileUtil>(), programName);
     evaluator->add(mappings.all);
@@ -56,19 +53,8 @@ namespace alcube::app {
       initServices();
       evaluator->evaluate(mainFilePath);
       di->get<models::Alcube>()->setUp();
-      atexit(atexitCallback);
-      std::thread(updateLoopCallback).detach();
       window->run();
-      waitCloseAllThreads();
-      closingStatus = ApplicationClosingStatus::FINISHED;
     });
-  }
-
-  void Application::waitCloseAllThreads() {
-    while (closingStatus == NONE) {
-      std::chrono::milliseconds intervalMs(100);
-      std::this_thread::sleep_for(intervalMs);
-    }
   }
 
   void Application::loadBasicLibraries() {
@@ -87,8 +73,18 @@ namespace alcube::app {
 
   void Application::initWindow() {
     auto settings = di->get<models::Settings>();
-    window = new utils::app::OpenGLWindow([&]() { onDraw(); });
-    window->setup(settings->window.width, settings->window.height, settings->fps, "alcube");
+    window = new utils::app::OpenGLWindow(
+      [&]() { onDraw(); },
+      [&]() { onUpdate(); },
+      [&]() { onClose(); }
+    );
+    window->setup(
+      settings->window.width,
+      settings->window.height,
+      settings->fps,
+      di->get<models::Settings>()->physics.timeStepSize,
+      "alcube"
+    );
   }
 
   void Application::initServices() {
@@ -123,27 +119,7 @@ namespace alcube::app {
     profiler->start(profilers.all);
   }
 
-  void Application::updateLoopCallback() {
-    while (!utils::app::OpenGLWindow::instance->isClosed()) {
-      std::chrono::system_clock::time_point updateStartTime = std::chrono::system_clock::now();
-      instance->onUpdate();
-      std::chrono::system_clock::time_point updateEndTime = std::chrono::system_clock::now();
-      int elapsedTime = (int) std::chrono::duration_cast<std::chrono::milliseconds>(updateEndTime - updateStartTime).count();
-      auto nextFlameInterval = (int)(instance->di->get<models::Settings>()->physics.timeStepSize * 1000.0f - elapsedTime);
-      if (nextFlameInterval > 0) {
-        std::chrono::milliseconds intervalMs(nextFlameInterval);
-        std::this_thread::sleep_for(intervalMs);
-      }
-    }
-    instance->closingStatus = ApplicationClosingStatus::PROCESSING;
-  }
-
   void Application::onClose() {
     di->get<utils::opencl::ResourcesProvider>()->resources->release();
-    glfwTerminate();
-  }
-
-  void Application::atexitCallback() {
-    instance->onClose();
   }
 }

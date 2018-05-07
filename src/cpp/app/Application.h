@@ -25,12 +25,6 @@ namespace alcube::app {
       int all;
   };
 
-  enum ApplicationClosingStatus {
-    NONE,
-    PROCESSING,
-    FINISHED
-  };
-
   struct SettingMappings {
     alcube::scripting::mappings::PhysicsSettings* physics;
     alcube::scripting::mappings::WorldSettings* world;
@@ -65,12 +59,10 @@ namespace alcube::app {
 
   class Application {
     public:
-      static Application* instance;
       DI* di;
       explicit Application(const char* programName);
       void run(const char* settingsFilePath, const char* mainFilePath);
     private:
-      ApplicationClosingStatus closingStatus;
       utils::app::OpenGLWindow* window;
       Profilers profilers;
       scripting::Evaluator* evaluator;
@@ -81,11 +73,9 @@ namespace alcube::app {
       void onClose();
       void onUpdate();
       void onDraw();
-      void waitCloseAllThreads();
       void loadBasicLibraries();
       void loadSettings(const char* settingsFilePath);
-      static void atexitCallback();
-      static void updateLoopCallback();
+      //void updateLoopCallback();
   };
 }
 

@@ -20,11 +20,16 @@ namespace alcube::utils::app {
   class OpenGLWindow {
     public:
       static OpenGLWindow* instance;
-      explicit OpenGLWindow(std::function<void()> draw);
+      explicit OpenGLWindow(
+        std::function<void()> drawCallback,
+        std::function<void()> updateCallback,
+        std::function<void()> closeCallback
+      );
       void setup(
         unsigned int width,
         unsigned int height,
         unsigned int fps,
+        float updateInterval,
         std::string name
       );
       void run();
@@ -35,10 +40,15 @@ namespace alcube::utils::app {
     private:
       Keyboard* keyboard = nullptr;
       unsigned int fps;
-      std::function<void()> draw;
+      float updateInterval;
+      std::function<void()> drawCallback;
+      std::function<void()> updateCallback;
+      std::function<void()> closeCallback;
+
       static void keyEvent(GLFWwindow* window, int key, int scancode, int action, int mods);
       WindowClosingStatus closingStatus;
       GLFWwindow* window;
+      void updateLoop();
   };
 }
 

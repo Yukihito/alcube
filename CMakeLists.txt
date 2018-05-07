@@ -22,7 +22,8 @@ set(ALCUBE_UTILS_SOURCE_FILES
         src/cpp/utils/opencl/ResourcesProvider.cpp src/cpp/utils/opencl/ResourcesProvider.h
         src/cpp/utils/MemoryPool.cpp src/cpp/utils/MemoryPool.h
         src/cpp/utils/ResourceAllocation.cpp src/cpp/utils/ResourceAllocation.h
-        src/cpp/utils/EventEmitter.cpp src/cpp/utils/EventEmitter.h)
+        src/cpp/utils/EventEmitter.cpp src/cpp/utils/EventEmitter.h
+        )
 add_library(alcube_utils_lib STATIC ${ALCUBE_UTILS_SOURCE_FILES})
 
 ### GPU Accessor
