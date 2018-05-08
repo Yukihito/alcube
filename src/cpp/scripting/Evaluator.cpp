@@ -5,10 +5,11 @@ namespace alcube::scripting {
   using namespace utils;
   Evaluator::Evaluator(
     alcube::utils::FileUtil* fileUtil,
-    const char* programName
+    const char* programName,
+    std::vector<utils::Prototype *> prototypes
   ) {
     this->programName = programName;
-    prototypes = {};
+    this->prototypes = std::move(prototypes);
     this->fileUtil = fileUtil;
   }
 
@@ -52,10 +53,6 @@ namespace alcube::scripting {
     v8::V8::ShutdownPlatform();
     delete platform;
     delete createParams.array_buffer_allocator;
-  }
-
-  void Evaluator::add(std::vector<alcube::scripting::utils::Prototype *> prototypes) {
-    this->prototypes = std::move(prototypes);
   }
 
   void Evaluator::initPrototypes() {

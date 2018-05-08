@@ -18,11 +18,11 @@ namespace alcube::scripting {
     public:
       explicit Evaluator(
         alcube::utils::FileUtil* fileUtil,
-        const char* programName
+        const char* programName,
+        std::vector<utils::Prototype*> prototypes
       );
       void evaluate(const char* path);
       void withScope(std::function<void()> f);
-      void add(std::vector<utils::Prototype*> prototypes);
     private:
       const char* programName;
       alcube::utils::FileUtil* fileUtil;

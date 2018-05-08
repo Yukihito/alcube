@@ -41,8 +41,7 @@ namespace alcube::app {
 
   Application::Application(const char* programName) : mappings() {
     di = new DI();
-    evaluator = new scripting::Evaluator(di->get<utils::FileUtil>(), programName);
-    evaluator->add(mappings.all);
+    evaluator = new scripting::Evaluator(di->get<utils::FileUtil>(), programName, mappings.all);
   }
 
   void Application::run(const char* settingsFilePath, const char* mainFilePath) {
@@ -76,9 +75,7 @@ namespace alcube::app {
     window = new utils::app::OpenGLWindow(
       [&]() { onDraw(); },
       [&]() { onUpdate(); },
-      [&]() { onClose(); }
-    );
-    window->setup(
+      [&]() { onClose(); },
       settings->window.width,
       settings->window.height,
       settings->fps,

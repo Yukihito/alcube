@@ -11,21 +11,13 @@
 #include <GLFW/glfw3.h>
 
 namespace alcube::utils::app {
-  enum WindowClosingStatus {
-    NONE,
-    PROCESSING,
-    FINISHED
-  };
-
   class OpenGLWindow {
     public:
       static OpenGLWindow* instance;
       explicit OpenGLWindow(
         std::function<void()> drawCallback,
         std::function<void()> updateCallback,
-        std::function<void()> closeCallback
-      );
-      void setup(
+        std::function<void()> closeCallback,
         unsigned int width,
         unsigned int height,
         unsigned int fps,
@@ -33,22 +25,16 @@ namespace alcube::utils::app {
         std::string name
       );
       void run();
-      bool isClosed();
-    protected:
-      void close();
-      void printSystemInfo();
     private:
       Keyboard* keyboard = nullptr;
       unsigned int fps;
       float updateInterval;
+      GLFWwindow* window;
       std::function<void()> drawCallback;
       std::function<void()> updateCallback;
       std::function<void()> closeCallback;
-
+      void callPeriodically(std::function<void()> f, float interval);
       static void keyEvent(GLFWwindow* window, int key, int scancode, int action, int mods);
-      WindowClosingStatus closingStatus;
-      GLFWwindow* window;
-      void updateLoop();
   };
 }
 

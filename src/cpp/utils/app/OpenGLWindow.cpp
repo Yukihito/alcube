@@ -5,45 +5,18 @@ namespace alcube::utils::app {
   OpenGLWindow::OpenGLWindow(
     std::function<void()> drawCallback,
     std::function<void()> updateCallback,
-    std::function<void()> closeCallback
-  ) {
-    OpenGLWindow::instance = this;
-    fps = 30;
-    updateInterval = 1.0f / fps;
-    this->drawCallback = std::move(drawCallback);
-    this->updateCallback = std::move(updateCallback);
-    this->closeCallback = std::move(closeCallback);
-    keyboard = new Keyboard();
-    closingStatus = WindowClosingStatus::NONE;
-  }
-
-  bool OpenGLWindow::isClosed() {
-    return closingStatus == WindowClosingStatus::FINISHED;
-  }
-
-  void OpenGLWindow::close() {
-    closingStatus = WindowClosingStatus::PROCESSING;
-  }
-
-  void OpenGLWindow::keyEvent(GLFWwindow *window, int key, int scancode, int action, int mods) {
-    if (action == GLFW_PRESS) {
-      OpenGLWindow::instance->keyboard->onKeyDown(key);
-      int esc = 256;
-      if (key == esc) {
-        OpenGLWindow::instance->close();
-      }
-    } else if (action == GLFW_RELEASE) {
-      OpenGLWindow::instance->keyboard->onKeyUp(key);
-    }
-  }
-
-  void OpenGLWindow::setup(
+    std::function<void()> closeCallback,
     unsigned int width,
     unsigned int height,
     unsigned int fps,
     float updateInterval,
     std::string name
   ) {
+    OpenGLWindow::instance = this;
+    this->drawCallback = std::move(drawCallback);
+    this->updateCallback = std::move(updateCallback);
+    this->closeCallback = std::move(closeCallback);
+    this->keyboard = new Keyboard();
     this->fps = fps;
     this->updateInterval = updateInterval;
     if (!glfwInit()) {
@@ -64,48 +37,40 @@ namespace alcube::utils::app {
     }
   }
 
-  void OpenGLWindow::printSystemInfo() {
-    std::cout << "OpenGL ver. " << glGetString(GL_VERSION) << std::endl;
-  }
-
   void OpenGLWindow::run() {
     glfwSetKeyCallback(window, keyEvent);
-    auto th = std::thread([&]{ updateLoop(); });
-    while (closingStatus == WindowClosingStatus::NONE) {
-      std::chrono::system_clock::time_point drawingStartTime = std::chrono::system_clock::now();
+    auto th = std::thread([&]{
+      callPeriodically(updateCallback, updateInterval * 1000.0f);
+    });
+    callPeriodically([&] {
       drawCallback();
       glfwSwapBuffers(window);
       glfwPollEvents();
-
-      std::chrono::system_clock::time_point drawingEndTime = std::chrono::system_clock::now();
-      int elapsedTime = (int) std::chrono::duration_cast<std::chrono::milliseconds>(drawingEndTime - drawingStartTime).count();
-      int nextFlameInterval = (1000 / fps) - elapsedTime;
-      if (nextFlameInterval > 0) {
-        std::chrono::milliseconds intervalMs(nextFlameInterval);
-        std::this_thread::sleep_for(intervalMs);
-      }
-
-      if (glfwWindowShouldClose(window)) {
-        closingStatus = WindowClosingStatus::PROCESSING;
-      }
-    }
+    }, 1000.0f / fps);
     glfwTerminate();
-    closingStatus = WindowClosingStatus::FINISHED;
     th.join();
     closeCallback();
   }
 
-  void OpenGLWindow::updateLoop() {
-    while (!isClosed()) {
-      std::chrono::system_clock::time_point updateStartTime = std::chrono::system_clock::now();
-      updateCallback();
-      std::chrono::system_clock::time_point updateEndTime = std::chrono::system_clock::now();
-      int elapsedTime = (int) std::chrono::duration_cast<std::chrono::milliseconds>(updateEndTime - updateStartTime).count();
-      auto nextFlameInterval = (int)(updateInterval * 1000.0f - elapsedTime);
+  void OpenGLWindow::callPeriodically(std::function<void()> f, float interval) {
+    while (!glfwWindowShouldClose(window)) {
+      auto beginTime = std::chrono::system_clock::now();
+      f();
+      auto endTime = std::chrono::system_clock::now();
+      auto elapsedTime = std::chrono::duration_cast<std::chrono::milliseconds>(endTime - beginTime).count();
+      auto nextFlameInterval = (int)(interval - elapsedTime);
       if (nextFlameInterval > 0) {
         std::chrono::milliseconds intervalMs(nextFlameInterval);
         std::this_thread::sleep_for(intervalMs);
       }
+    }
+  }
+
+  void OpenGLWindow::keyEvent(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    if (action == GLFW_PRESS) {
+      OpenGLWindow::instance->keyboard->onKeyDown(key);
+    } else if (action == GLFW_RELEASE) {
+      OpenGLWindow::instance->keyboard->onKeyUp(key);
     }
   }
 }
