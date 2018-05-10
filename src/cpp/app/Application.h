@@ -17,6 +17,7 @@
 #include "../scripting/mappings/drawing/RenderingGroup.h"
 #include "DI.h"
 #include "../scripting/mappings/drawing/Renderer.h"
+#include "../utils/PeriodicScheduler.h"
 
 namespace alcube::app {
   class Profilers {
@@ -67,6 +68,7 @@ namespace alcube::app {
       Profilers profilers;
       scripting::Evaluator* evaluator;
       Mappings mappings;
+      utils::PeriodicScheduler scheduler;
 
       void initWindow();
       void initServices();

@@ -54,7 +54,27 @@ namespace alcube::app {
       evaluator->evaluate(mainFilePath);
     });
     di->get<models::Alcube>()->setUp();
-    window->run();
+    auto settings = di->get<models::Settings>();
+    auto th = scheduler.scheduleAsync(
+      settings->physics.timeStepSize * 1000.0f,
+      [&]{ return window->shouldClose(); },
+      [&]{
+        onUpdate();
+        window->getKeyboard()->update();
+      }
+    );
+    scheduler.schedule(
+      1000.0f / settings->fps,
+      [&]{ return window->shouldClose(); },
+      [&]{
+        onDraw();
+        window->update();
+      }
+    );
+    window->close();
+    th.join();
+    onClose();
+    //window->run();
     evaluator->finalizeV8();
   }
 
@@ -75,13 +95,8 @@ namespace alcube::app {
   void Application::initWindow() {
     auto settings = di->get<models::Settings>();
     window = new utils::OpenGLWindow(
-      [&]() { onDraw(); },
-      [&]() { onUpdate(); },
-      [&]() { onClose(); },
       settings->window.width,
       settings->window.height,
-      settings->fps,
-      settings->physics.timeStepSize,
       "alcube"
     );
     window->getKeyboard()->addKeyDownEventHandler([&](int key){onKeyDown(key);});

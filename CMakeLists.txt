@@ -23,7 +23,7 @@ set(ALCUBE_UTILS_SOURCE_FILES
         src/cpp/utils/MemoryPool.cpp src/cpp/utils/MemoryPool.h
         src/cpp/utils/ResourceAllocation.cpp src/cpp/utils/ResourceAllocation.h
         src/cpp/utils/EventEmitter.cpp src/cpp/utils/EventEmitter.h
-        )
+        src/cpp/utils/PeriodicScheduler.cpp src/cpp/utils/PeriodicScheduler.h)
 add_library(alcube_utils_lib STATIC ${ALCUBE_UTILS_SOURCE_FILES})
 
 ### GPU Accessor
