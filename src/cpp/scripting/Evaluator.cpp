@@ -14,15 +14,16 @@ namespace alcube::scripting {
   }
 
   void Evaluator::evaluate(const char *path) {
+    v8::Isolate* isolate = v8::Isolate::GetCurrent();
     v8::HandleScope scope(isolate);
     v8::Local<v8::String> source =
       v8::String::NewFromUtf8(isolate, (fileUtil->readFile(path)).c_str(), v8::NewStringType::kNormal).ToLocalChecked();
     v8::Local<v8::Script> script = v8::Script::Compile(context, source).ToLocalChecked();
-    script->Run(context).ToLocalChecked();
+    script->Run(context).IsEmpty();
   }
 
   void Evaluator::withScope(std::function<void()> f) {
-    initV8();
+    auto isolate = v8::Isolate::New(createParams);
     {
       v8::Isolate::Scope isolate_scope(isolate);
       v8::HandleScope scope(isolate);
@@ -33,7 +34,7 @@ namespace alcube::scripting {
       v8::Context::Scope context_scope(context);
       f();
     }
-    finalizeV8();
+    isolate->Dispose();
   }
 
   void Evaluator::initV8() {
@@ -44,11 +45,9 @@ namespace alcube::scripting {
     v8::V8::Initialize();
     createParams.array_buffer_allocator =
       v8::ArrayBuffer::Allocator::NewDefaultAllocator();
-    isolate = v8::Isolate::New(createParams);
   }
 
   void Evaluator::finalizeV8() {
-    isolate->Dispose();
     v8::V8::Dispose();
     v8::V8::ShutdownPlatform();
     delete platform;
@@ -63,6 +62,7 @@ namespace alcube::scripting {
   }
 
   void Evaluator::registerFunction(const char *name, v8::FunctionCallback f) {
+    v8::Isolate* isolate = v8::Isolate::GetCurrent();
     global->Set(v8::String::NewFromUtf8(isolate, name), v8::FunctionTemplate::New(isolate, f));
   }
 

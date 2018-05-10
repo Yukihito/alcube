@@ -16,7 +16,7 @@ set(ALCUBE_UTILS_SOURCE_FILES
         src/cpp/utils/opencl/ProgramFactory.cpp src/cpp/utils/opencl/ProgramFactory.h
         src/cpp/utils/opencl/KernelFactory.cpp src/cpp/utils/opencl/KernelFactory.h
         src/cpp/utils/alcubemath.h src/cpp/utils/alcubemath.cpp
-        src/cpp/utils/app/OpenGLWindow.cpp src/cpp/utils/app/OpenGLWindow.h
+        src/cpp/utils/OpenGLWindow.cpp src/cpp/utils/OpenGLWindow.h
         src/cpp/utils/Mouse.cpp src/cpp/utils/Mouse.h
         src/cpp/utils/Keyboard.cpp src/cpp/utils/Keyboard.h
         src/cpp/utils/opencl/ResourcesProvider.cpp src/cpp/utils/opencl/ResourcesProvider.h

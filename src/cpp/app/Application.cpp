@@ -45,15 +45,17 @@ namespace alcube::app {
   }
 
   void Application::run(const char* settingsFilePath, const char* mainFilePath) {
+    evaluator->initV8();
     evaluator->withScope([&]() {
       loadBasicLibraries();
       loadSettings(settingsFilePath);
       initWindow();
       initServices();
       evaluator->evaluate(mainFilePath);
-      di->get<models::Alcube>()->setUp();
-      window->run();
     });
+    di->get<models::Alcube>()->setUp();
+    window->run();
+    evaluator->finalizeV8();
   }
 
   void Application::loadBasicLibraries() {
@@ -72,7 +74,7 @@ namespace alcube::app {
 
   void Application::initWindow() {
     auto settings = di->get<models::Settings>();
-    window = new utils::app::OpenGLWindow(
+    window = new utils::OpenGLWindow(
       [&]() { onDraw(); },
       [&]() { onUpdate(); },
       [&]() { onClose(); },
@@ -82,6 +84,7 @@ namespace alcube::app {
       settings->physics.timeStepSize,
       "alcube"
     );
+    window->getKeyboard()->addKeyDownEventHandler([&](int key){onKeyDown(key);});
   }
 
   void Application::initServices() {
@@ -116,7 +119,19 @@ namespace alcube::app {
     profiler->start(profilers.all);
   }
 
+  void Application::onKeyDown(int key) {
+    if (key == 69) { // e
+      evaluateScratch();
+    }
+  }
+
   void Application::onClose() {
     di->get<utils::opencl::ResourcesProvider>()->resources->release();
+  }
+
+  void Application::evaluateScratch() {
+    evaluator->withScope([&]() {
+      evaluator->evaluate("../src/js/scratch.js");
+    });
   }
 }

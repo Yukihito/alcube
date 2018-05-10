@@ -23,10 +23,12 @@ namespace alcube::scripting {
       );
       void evaluate(const char* path);
       void withScope(std::function<void()> f);
+      void initV8();
+      void finalizeV8();
     private:
       const char* programName;
       alcube::utils::FileUtil* fileUtil;
-      v8::Isolate* isolate;
+      //v8::Isolate* isolate;
       v8::Platform* platform;
       v8::Isolate::CreateParams createParams;
       v8::Local<v8::ObjectTemplate> global;
@@ -35,8 +37,7 @@ namespace alcube::scripting {
       static void print(const v8::FunctionCallbackInfo<v8::Value> &args);
       void registerFunction(const char* name, v8::FunctionCallback f);
       void initPrototypes();
-      void initV8();
-      void finalizeV8();
+
   };
 }
 

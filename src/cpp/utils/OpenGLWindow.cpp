@@ -1,6 +1,6 @@
 #include "OpenGLWindow.h"
 
-namespace alcube::utils::app {
+namespace alcube::utils {
   OpenGLWindow* OpenGLWindow::instance;
   OpenGLWindow::OpenGLWindow(
     std::function<void()> drawCallback,
@@ -35,21 +35,36 @@ namespace alcube::utils::app {
     if (err != GLEW_OK) {
       std::cout << "glewInit failed : " << glewGetErrorString(err) << std::endl;
     }
+    glfwSetKeyCallback(window, keyEvent);
+  }
+
+  void OpenGLWindow::update() {
+    glfwSwapBuffers(window);
+    glfwPollEvents();
+  }
+
+  void OpenGLWindow::close() {
+    glfwTerminate();
   }
 
   void OpenGLWindow::run() {
-    glfwSetKeyCallback(window, keyEvent);
     auto th = std::thread([&]{
-      callPeriodically(updateCallback, updateInterval * 1000.0f);
+      callPeriodically([&] {
+        updateCallback();
+        keyboard->update();
+      }, updateInterval * 1000.0f);
     });
     callPeriodically([&] {
       drawCallback();
-      glfwSwapBuffers(window);
-      glfwPollEvents();
+      update();
     }, 1000.0f / fps);
-    glfwTerminate();
+    close();
     th.join();
     closeCallback();
+  }
+
+  Keyboard* OpenGLWindow::getKeyboard() {
+    return keyboard;
   }
 
   void OpenGLWindow::callPeriodically(std::function<void()> f, float interval) {

@@ -165,3 +165,5 @@ renderer.wrap()
 
 cube = new Alcube()
 cube.wrap()
+
+testbuf = "tes"

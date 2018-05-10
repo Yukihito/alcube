@@ -6,14 +6,13 @@
 #include <string>
 #include <thread>
 #include <iostream>
-#include "../Mouse.h"
-#include "../Keyboard.h"
+#include "Mouse.h"
+#include "Keyboard.h"
 #include <GLFW/glfw3.h>
 
-namespace alcube::utils::app {
+namespace alcube::utils {
   class OpenGLWindow {
     public:
-      static OpenGLWindow* instance;
       explicit OpenGLWindow(
         std::function<void()> drawCallback,
         std::function<void()> updateCallback,
@@ -25,7 +24,11 @@ namespace alcube::utils::app {
         std::string name
       );
       void run();
+      void update();
+      void close();
+      Keyboard* getKeyboard();
     private:
+      static OpenGLWindow* instance;
       Keyboard* keyboard = nullptr;
       unsigned int fps;
       float updateInterval;
@@ -33,8 +36,8 @@ namespace alcube::utils::app {
       std::function<void()> drawCallback;
       std::function<void()> updateCallback;
       std::function<void()> closeCallback;
-      void callPeriodically(std::function<void()> f, float interval);
       static void keyEvent(GLFWwindow* window, int key, int scancode, int action, int mods);
+      void callPeriodically(std::function<void()> f, float interval);
   };
 }
 

@@ -1,6 +1,6 @@
 #ifndef ALCUBE_APPLICATION_H
 #define ALCUBE_APPLICATION_H
-#include "../utils/app/OpenGLWindow.h"
+#include "../utils/OpenGLWindow.h"
 #include "../gpu/GPUAccessor.h"
 #include "../drawing/Canvas.h"
 #include "../drawing/shaders/Shaders.h"
@@ -63,19 +63,20 @@ namespace alcube::app {
       explicit Application(const char* programName);
       void run(const char* settingsFilePath, const char* mainFilePath);
     private:
-      utils::app::OpenGLWindow* window;
+      utils::OpenGLWindow* window;
       Profilers profilers;
       scripting::Evaluator* evaluator;
       Mappings mappings;
 
       void initWindow();
       void initServices();
-      void onClose();
-      void onUpdate();
       void onDraw();
+      void onUpdate();
+      void onKeyDown(int key);
+      void onClose();
+      void evaluateScratch();
       void loadBasicLibraries();
       void loadSettings(const char* settingsFilePath);
-      //void updateLoopCallback();
   };
 }
 

@@ -1,4 +1,4 @@
-var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, InstanceColorType, Renderer, RenderingGroup, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, Texture, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, renderer, softbodyFeaturesFactory, springFactory, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
+var Actor, ActorFactory, Alcube, FluidFeatures, FluidFeaturesFactory, InstanceColorType, Renderer, RenderingGroup, SoftbodyFeatures, SoftbodyFeaturesFactory, Spring, SpringFactory, Texture, actorFactory, arrayToQuat, arrayToVec3, cube, fluidFeaturesFactory, primitiveAccessor, quat, quatAccessor, quatToArray, rand, renderer, softbodyFeaturesFactory, springFactory, testbuf, vec3, vec3Accessor, vec3Rand, vec3ToArray, vec3Zero;
 
 vec3 = function(x, y, z) {
   return new THREE.Vector3(parseFloat(x), parseFloat(y), parseFloat(z));
@@ -289,3 +289,5 @@ renderer.wrap();
 cube = new Alcube();
 
 cube.wrap();
+
+testbuf = "tes";
