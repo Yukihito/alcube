@@ -4,7 +4,6 @@
 #include <GL/glew.h>
 #include <cstdlib>
 #include <string>
-#include <thread>
 #include <iostream>
 #include "Mouse.h"
 #include "Keyboard.h"

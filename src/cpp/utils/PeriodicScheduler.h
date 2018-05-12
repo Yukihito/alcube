@@ -13,18 +13,6 @@ namespace alcube::utils {
         std::function<bool()> terminationCondition,
         std::function<void()> f
       );
-      std::thread scheduleAsync(
-        float intervalMs,
-        std::function<bool()> terminationCondition,
-        std::function<void()> f
-      );
-
-    private:
-      void callPeriodically(
-        float intervalMs,
-        std::function<bool()> terminationCondition,
-        std::function<void()> f
-      );
   };
 }
 

@@ -76,6 +76,7 @@ namespace alcube::models::drawing {
     if (updateCount == 0) {
       return;
     }
+
     gpuAccessor->kernels.inputRenderers(
       updateCount,
       gpuAccessor->memories.hostRenderers,

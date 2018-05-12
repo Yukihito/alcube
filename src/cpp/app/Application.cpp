@@ -46,36 +46,47 @@ namespace alcube::app {
 
   void Application::run(const char* settingsFilePath, const char* mainFilePath) {
     evaluator->initV8();
-    evaluator->withScope([&]() {
+    evaluator->withScope([&]{
       loadBasicLibraries();
       loadSettings(settingsFilePath);
       initWindow();
       initServices();
-      evaluator->evaluate(mainFilePath);
+      initProfiler();
     });
+
     di->get<models::Alcube>()->setUp();
+
     auto settings = di->get<models::Settings>();
-    auto th = scheduler.scheduleAsync(
-      settings->physics.timeStepSize * 1000.0f,
-      [&]{ return window->shouldClose(); },
-      [&]{
-        onUpdate();
-        window->getKeyboard()->update();
-      }
-    );
+    bool initialized = false;
+    auto th = std::thread([&]{
+      evaluator->withScope([&]{
+        loadBasicLibraries();
+        evaluator->evaluate("../src/js/libs/init-services.js");
+        evaluator->evaluate(mainFilePath);
+        return scheduler.schedule(
+          settings->physics.timeStepSize * 1000.0f,
+          [&] { return window->shouldClose(); },
+          [&] {
+            onUpdate();
+            window->getKeyboard()->update();
+            initialized = true;
+          }
+        );
+      });
+    });
     scheduler.schedule(
       1000.0f / settings->fps,
-      [&]{ return window->shouldClose(); },
-      [&]{
-        onDraw();
-        window->update();
+      [&] { return window->shouldClose(); },
+      [&] {
+        if (initialized) {
+          onDraw();
+          window->update();
+        }
       }
     );
     window->close();
     th.join();
     onClose();
-    //window->run();
-    evaluator->finalizeV8();
   }
 
   void Application::loadBasicLibraries() {
@@ -111,7 +122,9 @@ namespace alcube::app {
     mappings.services.springFactory->setUnderlying(di->get<models::physics::softbody::SpringFactory>());
     mappings.services.fluidFeaturesFactory->setUnderlying(di->get<models::physics::fluid::FeaturesFactory>());
     mappings.services.softbodyFeaturesFactory->setUnderlying(di->get<models::physics::softbody::FeaturesFactory>());
-    evaluator->evaluate("../src/js/libs/init-services.js");
+  }
+
+  void Application::initProfiler() {
     auto profiler = di->get<utils::Profiler>();
     profiler->setShowInterval(1000);
     profiler->enabled = true;
@@ -142,11 +155,10 @@ namespace alcube::app {
 
   void Application::onClose() {
     di->get<utils::opencl::ResourcesProvider>()->resources->release();
+    evaluator->finalizeV8();
   }
 
   void Application::evaluateScratch() {
-    evaluator->withScope([&]() {
-      evaluator->evaluate("../src/js/scratch.js");
-    });
+    evaluator->evaluate("../src/js/scratch.js");
   }
 }

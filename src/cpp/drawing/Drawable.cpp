@@ -2,6 +2,9 @@
 
 namespace alcube::drawing {
   void Drawable::draw(Context& context) {
+    if (!shape->isReady) {
+      shape->setUp();
+    }
     shape->update();
     context.material = material;
     if (texture != nullptr) {

@@ -60,5 +60,3 @@ pos = vec3(0, 0, 0);
 softbody(pos, linearMomentum);
 
 fluid(pos);
-
-print(testbuf);

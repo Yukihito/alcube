@@ -18,6 +18,7 @@
 #include "DI.h"
 #include "../scripting/mappings/drawing/Renderer.h"
 #include "../utils/PeriodicScheduler.h"
+#include <thread>
 
 namespace alcube::app {
   class Profilers {
@@ -72,6 +73,7 @@ namespace alcube::app {
 
       void initWindow();
       void initServices();
+      void initProfiler();
       void onDraw();
       void onUpdate();
       void onKeyDown(int key);

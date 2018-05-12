@@ -1,6 +1,7 @@
-//linearMomentum = vec3 3, 1, 0.5
-//pos = vec3 0, 0, 0
-// softbody pos, linearMomentum
-print("hoge");
+var linearMomentum, pos;
 
-print(testbuf);
+linearMomentum = vec3(3, 1, 0.5);
+
+pos = vec3(0, 0, 0);
+
+softbody(pos, linearMomentum);

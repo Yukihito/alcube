@@ -5,18 +5,7 @@ namespace alcube::drawing::shapes::triangles {
     glDrawElementsInstanced(GL_TRIANGLES, (int)this->indicesLength, GL_UNSIGNED_INT, nullptr, instanceCount);
   }
 
-  Sphere::Sphere(
-    size_t splitCount,
-    unsigned int maxInstanceCount,
-    GLfloat* positions,
-    GLfloat* rotations0,
-    GLfloat* rotations1,
-    GLfloat* rotations2,
-    GLfloat* rotations3,
-    GLfloat* colors
-  ) : Shape() {
-    this->instanceCount = 0;
-
+  void Sphere::setUp() {
     auto iSplitCount = (int)splitCount;
     auto verticesLength = (unsigned int)(splitCount * splitCount);
     size_t vertexElementsLength = verticesLength * 3;
@@ -72,5 +61,28 @@ namespace alcube::drawing::shapes::triangles {
     vertexBuffers[VERTICES]->update();
     vertexBuffers[NORMALS]->update();
     vertexBuffers[UVS]->update();
+    positionsBuf = positions;
+    isReady = true;
+  }
+
+  Sphere::Sphere(
+    size_t splitCount,
+    unsigned int maxInstanceCount,
+    GLfloat* positions,
+    GLfloat* rotations0,
+    GLfloat* rotations1,
+    GLfloat* rotations2,
+    GLfloat* rotations3,
+    GLfloat* colors
+  ) : Shape() {
+    this->instanceCount = 0;
+    this->maxInstanceCount = maxInstanceCount;
+    this->positions = positions;
+    this->rotations0 = rotations0;
+    this->rotations1 = rotations1;
+    this->rotations2 = rotations2;
+    this->rotations3 = rotations3;
+    this->colors = colors;
+    this->splitCount = splitCount;
   }
 }

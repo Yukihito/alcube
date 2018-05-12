@@ -24,10 +24,12 @@ namespace alcube::drawing {
     public:
       explicit Shape();
       virtual void draw() = 0;
+      virtual void setUp() = 0;
       unsigned int instanceCount = 0;
       IndexBuffer* indexBuffer;
       VertexBuffer* vertexBuffers[3];
       InstanceBuffer* instanceBuffers[6];
+      bool isReady = false;
       void update();
   };
 }

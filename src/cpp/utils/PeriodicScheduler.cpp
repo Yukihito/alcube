@@ -6,24 +6,6 @@ namespace alcube::utils {
     std::function<bool()> terminationCondition,
     std::function<void()> f
   ) {
-    callPeriodically(intervalMs, std::move(terminationCondition), std::move(f));
-  }
-
-  std::thread PeriodicScheduler::scheduleAsync(
-    float intervalMs,
-    std::function<bool()> terminationCondition,
-    std::function<void()> f
-  ) {
-    return std::thread([&]{
-      callPeriodically(intervalMs, std::move(terminationCondition), std::move(f));
-    });
-  }
-
-  void PeriodicScheduler::callPeriodically(
-    float intervalMs,
-    std::function<bool()> terminationCondition,
-    std::function<void()> f
-  ) {
     while (!terminationCondition()) {
       auto beginTime = std::chrono::system_clock::now();
       f();
