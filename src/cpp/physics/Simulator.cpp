@@ -107,6 +107,9 @@ namespace alcube::physics {
   }
 
   void Simulator::computeBroadPhase() {
+    if (activeActorCount < 2) {
+      return;
+    }
     unsigned int actorCountForBitonicSort = utils::math::powerOf2(activeActorCount);
     auto maxActorCountShort = (unsigned short)maxActorCount;
     // Initialize grid and actor relations

@@ -2,6 +2,9 @@
     unsigned int workSize,
 $parameters
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.${name}, {workSize}, {
 $assignments
     });

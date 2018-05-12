@@ -738,6 +738,9 @@ namespace alcube::gpu {
     unsigned int gridIndex,
     unsigned short actorIndex
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.initGridAndActorRelations, {workSize}, {
       memArg(relations.memory),
       uintArg(gridIndex),
@@ -751,6 +754,9 @@ namespace alcube::gpu {
     memories::PhysicalQuantity& physicalQuantities,
     memories::GridAndActorRelation& relations
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.fillGridIndex, {workSize}, {
       memArg(constants.memory),
       memArg(physicalQuantities.memory),
@@ -763,6 +769,9 @@ namespace alcube::gpu {
     memories::GridAndActorRelation& relations,
     unsigned int distance
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.merge, {workSize}, {
       memArg(relations.memory),
       uintArg(distance)
@@ -775,6 +784,9 @@ namespace alcube::gpu {
     unsigned int distance,
     unsigned int stageDistance
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.bitonic, {workSize}, {
       memArg(relations.memory),
       uintArg(distance),
@@ -789,6 +801,9 @@ namespace alcube::gpu {
     memories::UintMemory& gridEndIndices,
     unsigned int actorCount
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.setGridRelationIndexRange, {workSize}, {
       memArg(relations.memory),
       memArg(gridStartIndices.memory),
@@ -807,6 +822,9 @@ namespace alcube::gpu {
     float splitDeltaTime,
     float sphericalShellRadius
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.inputConstants, {workSize}, {
       memArg(constants.memory),
       memArg(grid.memory),
@@ -826,6 +844,9 @@ namespace alcube::gpu {
     memories::PhysicalQuantity& physicalQuantities,
     unsigned short offset
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.inputActors, {workSize}, {
       memArg(actors.memory),
       memArg(actorStates.memory),
@@ -841,6 +862,9 @@ namespace alcube::gpu {
     memories::SoftBody& softBodies,
     unsigned short offset
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.inputSoftBodies, {workSize}, {
       memArg(hostSoftBodies.memory),
       memArg(softBodies.memory),
@@ -854,6 +878,9 @@ namespace alcube::gpu {
     memories::SpringState& springStates,
     unsigned int offset
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.inputSprings, {workSize}, {
       memArg(springs.memory),
       memArg(springStates.memory),
@@ -867,6 +894,9 @@ namespace alcube::gpu {
     memories::Fluid& fluids,
     unsigned short offset
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.inputFluids, {workSize}, {
       memArg(hostFluids.memory),
       memArg(fluids.memory),
@@ -881,6 +911,9 @@ namespace alcube::gpu {
     memories::PhysicalQuantity& physicalQuantities,
     memories::Constants& constants
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.moveFluid, {workSize}, {
       memArg(fluids.memory),
       memArg(actorStates.memory),
@@ -895,6 +928,9 @@ namespace alcube::gpu {
     memories::SpringState& springStates,
     memories::PhysicalQuantity& physicalQuantities
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.calcSpringImpulses, {workSize}, {
       memArg(constants.memory),
       memArg(springStates.memory),
@@ -910,6 +946,9 @@ namespace alcube::gpu {
     memories::PhysicalQuantity& physicalQuantities,
     memories::SpringState& springStates
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.updateBySpringImpulse, {workSize}, {
       memArg(constants.memory),
       memArg(softBodies.memory),
@@ -925,6 +964,9 @@ namespace alcube::gpu {
     memories::ActorState& actorStates,
     memories::PhysicalQuantity& physicalQuantities
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.postProcessing, {workSize}, {
       memArg(constants.memory),
       memArg(actorStates.memory),
@@ -941,6 +983,9 @@ namespace alcube::gpu {
     memories::UintMemory& gridEndIndices,
     memories::Constants& constants
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.collectIntersections, {workSize}, {
       memArg(actorStates.memory),
       memArg(physicalQuantities.memory),
@@ -956,6 +1001,9 @@ namespace alcube::gpu {
     memories::ActorState& actorStates,
     memories::SoftBody& softBodies
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.collectCollisions, {workSize}, {
       memArg(actorStates.memory),
       memArg(softBodies.memory)
@@ -967,6 +1015,9 @@ namespace alcube::gpu {
     memories::ActorState& actorStates,
     memories::SoftBody& softBodies
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.updateByConstraintImpulse, {workSize}, {
       memArg(actorStates.memory),
       memArg(softBodies.memory)
@@ -979,6 +1030,9 @@ namespace alcube::gpu {
     memories::Fluid& fluids,
     memories::Constants& constants
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.updateDensityAndPressure, {workSize}, {
       memArg(actorStates.memory),
       memArg(fluids.memory),
@@ -992,6 +1046,9 @@ namespace alcube::gpu {
     memories::Fluid& fluids,
     memories::Constants& constants
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.updateFluidForce, {workSize}, {
       memArg(actorStates.memory),
       memArg(fluids.memory),
@@ -1004,6 +1061,9 @@ namespace alcube::gpu {
     memories::ActorState& actorStates,
     memories::SoftBody& softBodies
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.updateByFrictionalImpulse, {workSize}, {
       memArg(actorStates.memory),
       memArg(softBodies.memory)
@@ -1016,6 +1076,9 @@ namespace alcube::gpu {
     memories::PhysicalQuantity& physicalQuantities,
     memories::Constants& constants
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.initStepVariables, {workSize}, {
       memArg(actorStates.memory),
       memArg(physicalQuantities.memory),
@@ -1029,6 +1092,9 @@ namespace alcube::gpu {
     memories::SoftBody& softBodies,
     memories::Constants& constants
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.updateByPenaltyImpulse, {workSize}, {
       memArg(actorStates.memory),
       memArg(softBodies.memory),
@@ -1044,6 +1110,9 @@ namespace alcube::gpu {
     memories::Float3Memory& colors,
     unsigned int offset
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.inputRenderers, {workSize}, {
       memArg(hostRenderers.memory),
       memArg(renderers.memory),
@@ -1065,6 +1134,9 @@ namespace alcube::gpu {
     memories::Renderer& renderers,
     unsigned int offset
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.updateDrawingBuffer, {workSize}, {
       memArg(positions.memory),
       memArg(colors.memory),
@@ -1083,6 +1155,9 @@ namespace alcube::gpu {
     memories::Float3Memory& positions,
     memories::PhysicalQuantity& physicalQuantities
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.updateDrawingBuffer_SingleColor, {workSize}, {
       memArg(positions.memory),
       memArg(physicalQuantities.memory)
@@ -1095,6 +1170,9 @@ namespace alcube::gpu {
     memories::Float3Memory& colors,
     memories::PhysicalQuantity& physicalQuantities
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.updateDrawingBuffer_InstanceColor, {workSize}, {
       memArg(positions.memory),
       memArg(colors.memory),
@@ -1111,6 +1189,9 @@ namespace alcube::gpu {
     memories::Float4Memory& rotations3,
     memories::PhysicalQuantity& physicalQuantities
   ) {
+    if (workSize == 0) {
+        return;
+    }
     queue->push(rawKernels.updateDrawingBuffer_Texture_SingleColor, {workSize}, {
       memArg(positions.memory),
       memArg(rotations0.memory),

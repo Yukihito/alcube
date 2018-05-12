@@ -1,7 +1,6 @@
-var linearMomentum, pos;
+var i, j, pos;
 
-linearMomentum = vec3(3, 1, 0.5);
-
-pos = vec3(0, 0, 0);
-
-softbody(pos, linearMomentum);
+for (i = j = 0; j < 128; i = ++j) {
+  pos = vec3Rand().multiplyScalar(10);
+  fluid(pos);
+}

@@ -35,8 +35,8 @@ springFactory.k 64
 spring = (actor0, position0, actor1, position1) ->
   springFactory.create actor0, position0, actor1, position1
 
-linearMomentum = vec3 3, 1, 0.5
-pos = vec3 0, 0, 0
-softbody pos, linearMomentum
-
-fluid pos
+# linearMomentum = vec3 3, 1, 0.5
+# pos = vec3 0, 0, 0
+# softbody pos, linearMomentum
+#
+# fluid pos

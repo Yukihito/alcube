@@ -81,6 +81,9 @@ namespace alcube::utils::opencl {
   }
 
   void CommandQueue::read(Memory *memory, void *hostPtr) {
+    if (memory->count == 0) {
+      return;
+    }
     cl_int status;
     status = clEnqueueReadBuffer(
       queue,
@@ -99,6 +102,9 @@ namespace alcube::utils::opencl {
   }
 
   void CommandQueue::readRange(Memory *memory, void *hostPtrVoid, size_t min, size_t length) {
+    if (length == 0) {
+      return;
+    }
     auto hostPtr = (char*)hostPtrVoid;
     cl_int status;
     status = clEnqueueReadBuffer(
@@ -139,7 +145,7 @@ namespace alcube::utils::opencl {
   }
 
   void CommandQueue::write(Memory *memory, size_t offset) {
-    if (memory->count == 0) {
+    if (memory->count - offset <= 0) {
       return;
     }
     cl_int status;

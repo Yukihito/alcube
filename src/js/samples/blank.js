@@ -1,4 +1,4 @@
-var fluid, fluidFeatures, linearMomentum, pos, renderingGroups, softbodies, softbody, softbodyFeatures, spring;
+var fluid, fluidFeatures, renderingGroups, softbodies, softbody, softbodyFeatures, spring;
 
 renderingGroups = {
   fluid: renderer.createGroup(),
@@ -53,10 +53,8 @@ spring = function(actor0, position0, actor1, position1) {
   return springFactory.create(actor0, position0, actor1, position1);
 };
 
-linearMomentum = vec3(3, 1, 0.5);
+// linearMomentum = vec3 3, 1, 0.5
+// pos = vec3 0, 0, 0
+// softbody pos, linearMomentum
 
-pos = vec3(0, 0, 0);
-
-softbody(pos, linearMomentum);
-
-fluid(pos);
+// fluid pos
