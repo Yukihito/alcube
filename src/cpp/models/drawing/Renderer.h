@@ -26,6 +26,7 @@ namespace alcube::models::drawing {
       std::vector<RenderingGroup*> renderingGroups;
       utils::opencl::ResourcesProvider* resourcesProvider;
       RenderingGroupFactory* renderingGroupFactory;
+      utils::MemoryPool<utils::AllocationRange>* allocationRangeMemoryPool;
   };
 }
 

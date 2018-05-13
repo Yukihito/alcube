@@ -2,10 +2,12 @@
 
 namespace alcube::physics {
   ActorResources::ActorResources(unsigned int size) {
-    allocationRange = new utils::AllocationRange(0, size);
-    fluidResource = new ActorResource<fluid::Actor>(size);
-    softbodyResource = new ActorResource<softbody::Actor>(size);
-    springResource = new ActorResource<softbody::Spring>(size * 4);
+    allocationRangeMemoryPool = new utils::MemoryPool<utils::AllocationRange>(size * 8);
+    allocationRange = allocationRangeMemoryPool->get();
+    allocationRange->init(0, size, allocationRangeMemoryPool);
+    fluidResource = new ActorResource<fluid::Actor>(size, allocationRangeMemoryPool);
+    softbodyResource = new ActorResource<softbody::Actor>(size, allocationRangeMemoryPool);
+    springResource = new ActorResource<softbody::Spring>(size * 4, allocationRangeMemoryPool);
     entities = new Actor*[size];
   }
 }

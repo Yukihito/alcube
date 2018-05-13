@@ -1,17 +1,20 @@
 #include "ResourceAllocation.h"
 
 namespace alcube::utils {
-  AllocationRange::AllocationRange(unsigned int minIndex, unsigned int length) {
+  void AllocationRange::init(unsigned int minIndex, unsigned int length, MemoryPool<AllocationRange>* memoryPool) {
     this->minIndex = minIndex;
     this->allocatedLength = 0;
     this->length = length;
+    this->memoryPool = memoryPool;
   }
 
   AllocationRange* AllocationRange::allocate(unsigned int length) {
     unsigned int nextMinIndex = minIndex + allocatedLength;
     allocatedLength += length;
     onAllocationLengthChanged.emit();
-    return new AllocationRange(nextMinIndex, length);
+    auto range = memoryPool->get();
+    range->init(nextMinIndex, length, memoryPool);
+    return range;
   }
 
   unsigned int AllocationRange::getIndex() {

@@ -189,4 +189,8 @@ namespace alcube::physics {
   void Simulator::add(SubSimulator *subSimulator) {
     subSimulators.push_back(subSimulator);
   }
+
+  void Simulator::gc() {
+
+  }
 }

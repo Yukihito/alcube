@@ -2,27 +2,28 @@
 #define ALCUBE_RESOURCEALLOCATION_H
 
 #include "EventEmitter.h"
+#include "MemoryPool.h"
 
 namespace alcube::utils {
   class AllocationRange {
     public:
       EventEmitter onAllocationLengthChanged;
-      explicit AllocationRange(unsigned int minIndex, unsigned int length);
+      void init(unsigned int minIndex, unsigned int length, MemoryPool<AllocationRange>* memoryPool);
       AllocationRange* allocate(unsigned int length);
       unsigned int getIndex();
       unsigned int getLength();
       unsigned int getAllocatedLength();
 
     private:
-      unsigned int minIndex;
-      unsigned int length;
-      unsigned int allocatedLength;
+      unsigned int minIndex = 0;
+      unsigned int length = 0;
+      unsigned int allocatedLength = 0;
+      MemoryPool<AllocationRange>* memoryPool = nullptr;
   };
 
   template <class T>
   class ResourceAllocation {
     public:
-      //explicit ResourceAllocation(AllocationRange* range, T* values);
       T get();
       T* getPtr();
       void init(AllocationRange* range, T* values);

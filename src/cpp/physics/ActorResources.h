@@ -13,12 +13,13 @@ namespace alcube::physics {
     utils::AllocationRange *allocationRange;
     utils::MemoryPool <T> *memoryPool;
     T** entities;
-    explicit ActorResource(unsigned int size);
+    explicit ActorResource(unsigned int size, utils::MemoryPool<utils::AllocationRange>* allocationRangeMemoryPool);
   };
 
   template <class T>
-  ActorResource<T>::ActorResource(unsigned int size) {
-    allocationRange = new utils::AllocationRange(0, size);
+  ActorResource<T>::ActorResource(unsigned int size, utils::MemoryPool<utils::AllocationRange>* allocationRangeMemoryPool) {
+    allocationRange = allocationRangeMemoryPool->get();
+    allocationRange->init(0, size, allocationRangeMemoryPool);
     memoryPool = new utils::MemoryPool<T>(size);
     entities = new T*[size];
   }
@@ -29,6 +30,7 @@ namespace alcube::physics {
     ActorResource<fluid::Actor>* fluidResource;
     ActorResource<softbody::Actor>* softbodyResource;
     ActorResource<softbody::Spring>* springResource;
+    utils::MemoryPool<utils::AllocationRange>* allocationRangeMemoryPool;
 
     explicit ActorResources(unsigned int size);
   };

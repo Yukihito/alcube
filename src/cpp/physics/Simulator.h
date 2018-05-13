@@ -37,6 +37,7 @@ namespace alcube::physics {
       void add(SubSimulator* subSimulator);
       void setUp();
       void update();
+      void gc();
       unsigned short getActorCount();
 
     private:
