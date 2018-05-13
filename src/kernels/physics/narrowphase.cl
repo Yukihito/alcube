@@ -23,14 +23,17 @@ __kernel void collectIntersections(
   __global uint* gridEndIndices,
   __global Constants* constants
 ) {
+  size_t actorIndex = get_global_id(0);
+  __global ActorState* actorState = &actorStates[actorIndex];
+  __global Actor* actor = &(actorStates[actorIndex].constants);
+  if (!actor->isAlive) {
+    return;
+  }
   float sphericalShellRadius = constants->sphericalShellRadius;
   float deltaTime = constants->deltaTime;
   float gravityAcceleration = constants->gravityAcceleration;
   __global Grid* grid = &constants->grid;
-  size_t actorIndex = get_global_id(0);
   float edgeLength = (float)grid->edgeLength;
-  __global ActorState* actorState = &actorStates[actorIndex];
-  __global Actor* actor = &(actorStates[actorIndex].constants);
   float3 position = actor->position;
   float* positionPtr = (float*)&position;
   float radius = actorState->radius;

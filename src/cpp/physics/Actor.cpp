@@ -14,6 +14,7 @@ namespace alcube::physics {
     this->hostActor.getPtr()->angularMomentum = {0.0f, 0.0f, 0.0f};
     this->hostActor.getPtr()->linearMomentum = {0.0f, 0.0f, 0.0f};
     this->hostActor.getPtr()->position = {0.0f, 0.0f, 0.0f};
+    this->hostActor.getPtr()->isAlive = true;
   }
 
   unsigned short Actor::getSubIndex() {

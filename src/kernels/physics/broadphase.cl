@@ -23,7 +23,7 @@ __kernel void fillGridIndex(
   uint3 p = clamp(convert_uint3(positionGridSpace / edgeLength), gridCorner0, gridCorner1);
   uint gridIndex = (uint)p.x + (uint)p.y * grid->xCount + (uint)p.z * grid->xCount * grid->yCount;
   relations[actorIndex].actorIndex = actorIndex;
-  relations[actorIndex].gridIndex = gridIndex;
+  relations[actorIndex].gridIndex = actorStates[actorIndex].constants.isAlive ? gridIndex : 4294967295;
 }
 
 __kernel void merge(

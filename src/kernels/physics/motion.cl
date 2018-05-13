@@ -7,6 +7,9 @@ __kernel void moveFluid(
   ushort actorIndex = fluids[get_global_id(0)].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   __global Actor* actor = &actorState->constants;
+  if (!actor->isAlive) {
+    return;
+  }
   actorState->linearVelocity += (actorState->fluidForce * constants->deltaTime) / constants->fluidSettings.particleMass;
   actor->position += constants->deltaTime * actorState->linearVelocity;
 }
@@ -19,19 +22,22 @@ __kernel void calcSpringImpulses(
   size_t i = get_global_id(0);
   __global SpringState* springState = &springStates[i];
   __global Spring* spring = &springState->constants;
+  __global Actor* actor0 = &actorStates[spring->actorIndices[0]].constants;
+  __global Actor* actor1 = &actorStates[spring->actorIndices[1]].constants;
+  int enabled = actor0->isAlive && actor1->isAlive;
   float3 pm0 = spring->nodePositionsModelSpace[0];
   float4 rot0 = actorStates[spring->actorIndices[0]].constants.rotation;
   float3 pm1 = spring->nodePositionsModelSpace[1];
   float4 rot1 = actorStates[spring->actorIndices[1]].constants.rotation;
   float3 p0 = rotateByQuat(pm0, rot0);
   float3 p1 = rotateByQuat(pm1, rot1);
-  float3 impulse = ((p1 + actorStates[spring->actorIndices[1]].constants.position) - (p0 + actorStates[spring->actorIndices[0]].constants.position));
+  float3 impulse = ((p1 + actor1->position) - (p0 + actor0->position));
   float3 direction = normalize(impulse);
   float len = length(impulse);
-  springState->linearImpulses[0] = log2(1.0f + len) * constants->splitDeltaTime * spring->k * direction;
-  springState->linearImpulses[1] = -springState->linearImpulses[0];
-  springState->angularImpulses[0] = cross(p0, springState->linearImpulses[0]);
-  springState->angularImpulses[1] = cross(p1, springState->linearImpulses[1]);
+  springState->linearImpulses[0] = enabled ? log2(1.0f + len) * constants->splitDeltaTime * spring->k * direction : (float3)(0.0f);
+  springState->linearImpulses[1] = enabled ? -springState->linearImpulses[0] : (float3)(0.0f);
+  springState->angularImpulses[0] = enabled ? cross(p0, springState->linearImpulses[0]) : (float3)(0.0f);
+  springState->angularImpulses[1] = enabled ? cross(p1, springState->linearImpulses[1]) : (float3)(0.0f);
 }
 
 __kernel void updateBySpringImpulse(
@@ -45,6 +51,9 @@ __kernel void updateBySpringImpulse(
   size_t actorIndex = softBody->actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
   __global Actor* actor = &actorState->constants;
+  if (!actor->isAlive) {
+    return;
+  }
   uchar count = softBody->springCount;
   float3 linearImpulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
@@ -65,8 +74,11 @@ __kernel void postProcessing(
   __global ActorState* actorStates
 ) {
   size_t actorIndex = get_global_id(0);
-  float3 maxLinearMomentum = (float3)((2.0f * (1.0f / constants->deltaTime)) * actorStates[actorIndex].mass);
   __global Actor* actor = &actorStates[actorIndex].constants;
+  if (!actor->isAlive) {
+    return;
+  }
+  float3 maxLinearMomentum = (float3)((2.0f * (1.0f / constants->deltaTime)) * actorStates[actorIndex].mass);
   actor->angularMomentum = actorStates[actorIndex].angularVelocity * actorStates[actorIndex].momentOfInertia * 0.999f;
   actor->linearMomentum = clamp(actorStates[actorIndex].linearVelocity * actorStates[actorIndex].mass * 0.999f, -maxLinearMomentum, maxLinearMomentum);
 
