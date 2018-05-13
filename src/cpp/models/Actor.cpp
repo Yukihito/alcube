@@ -82,7 +82,6 @@ namespace alcube::models {
     actor->setPhysicsActor(physicsActor);
     auto m = renderingGroup->createModel3D(actor);
     actor->setModel3D(m);
-    //actor->setModel3D();
     instanceCount++;
     return actor;
   }
