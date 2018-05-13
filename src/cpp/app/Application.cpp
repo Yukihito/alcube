@@ -61,7 +61,7 @@ namespace alcube::app {
     auto th = std::thread([&]{
       evaluator->withScope([&]{
         loadBasicLibraries();
-        evaluator->evaluate("../src/js/libs/init-services.js");
+        evaluator->evaluate("../src/js/libs/services.js");
         evaluator->evaluate(mainFilePath);
         return scheduler.schedule(
           settings->physics.timeStepSize * 1000.0f,
@@ -99,7 +99,7 @@ namespace alcube::app {
     mappings.settings.physics->setUnderlying(&settings->physics);
     mappings.settings.world->setUnderlying(&settings->world);
     mappings.settings.root->setUnderlying(settings);
-    evaluator->evaluate("../src/js/libs/init-settings.js");
+    evaluator->evaluate("../src/js/libs/settings.js");
     evaluator->evaluate(settingsFilePath);
   }
 
@@ -114,8 +114,6 @@ namespace alcube::app {
   }
 
   void Application::initServices() {
-    auto settings = di->get<models::Settings>();
-    di->get<physics::Simulator>()->gravity = settings->physics.gravity;
     mappings.services.cube->setUnderlying(di->get<models::Alcube>());
     mappings.services.renderer->setUnderlying(di->get<models::drawing::Renderer>());
     mappings.services.actorFactory->setUnderlying(di->get<models::ActorFactory>());

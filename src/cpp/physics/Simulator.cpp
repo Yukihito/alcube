@@ -8,6 +8,7 @@ namespace alcube::physics {
     unsigned int maxActorCount,
     Grid* grid,
     float deltaTime,
+    float gravity,
     gpu::GPUAccessor* gpuAccessor,
     ActorResources* actorResources
   ) {
@@ -19,8 +20,7 @@ namespace alcube::physics {
     this->maxActorCount = maxActorCount;
     this->grid = grid;
     this->allGridCount = grid->xCount * grid->yCount * grid->zCount;
-    this->grid = grid;
-    gravity = 0.0f;
+    this->gravity = gravity;
     sphericalShellRadius = 100000.0f;
     activeActorCount = 0;
     allActorCount = 0;
@@ -31,32 +31,10 @@ namespace alcube::physics {
   }
 
   void Simulator::setUpConstants() {
-    auto grid = memories.grid.at(0);
-    grid->edgeLength = this->grid->edgeLength;
-    grid->xCount = this->grid->xCount;
-    grid->yCount = this->grid->yCount;
-    grid->zCount = this->grid->zCount;
-    grid->origin = {
-      -(grid->xCount * grid->edgeLength / 2.0f),
-      -(grid->yCount * grid->edgeLength / 2.0f),
-      -(grid->zCount * grid->edgeLength / 2.0f)
-    };
-
-    for (int i = 0; i < 3; i++) {
-      grid->normals[i] = {0.0f, 0.0f, 0.0f};
-      grid->normals[i].s[i] = 1.0f;
-    }
-
-    for (int i = 3; i < 6; i++) {
-      grid->normals[i] = {0.0f, 0.0f, 0.0f};
-      grid->normals[i].s[i - 3] = -1.0f;
-    }
-
-
+    memories.grid.dto[0] = grid->dto;
     for (auto subSimulator : subSimulators) {
       subSimulator->setUpConstants();
     }
-
     kernels.inputPhysicsConstants(
       1,
       memories.constants,

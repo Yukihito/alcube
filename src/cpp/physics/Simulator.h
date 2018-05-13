@@ -30,6 +30,7 @@ namespace alcube::physics {
         unsigned int maxActorCount,
         Grid* grid,
         float deltaTime,
+        float gravity,
         gpu::GPUAccessor* gpuAccessor,
         ActorResources* actorResources
       );

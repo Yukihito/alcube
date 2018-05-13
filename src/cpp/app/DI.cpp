@@ -92,6 +92,7 @@ namespace alcube::app {
       settings->world.maxActorCount,
       grid,
       settings->physics.timeStepSize,
+      settings->physics.gravity,
       get<gpu::GPUAccessor>(),
       get<alcube::physics::ActorResources>()
     );
