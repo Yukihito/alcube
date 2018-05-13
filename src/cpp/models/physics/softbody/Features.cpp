@@ -20,7 +20,7 @@ namespace alcube::models::physics::softbody {
   alcube::physics::Actor* Features::createPhysicsActor() {
     auto actor = actorFactory->createSoftbody();
     actor->getSubPhysicalQuantity()->elasticity = elasticity;
-    actor->getPhysicalQuantityDto()->mass = mass;
+    actor->getDto()->mass = mass;
     return actor;
   }
 

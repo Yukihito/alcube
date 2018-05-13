@@ -18,7 +18,6 @@ void setIntersection(
 
 __kernel void collectIntersections(
   __global ActorState* actorStates,
-  __global PhysicalQuantity* physicalQuantities,
   __global GridAndActorRelation* relations,
   __global uint* gridStartIndices,
   __global uint* gridEndIndices,
@@ -30,10 +29,9 @@ __kernel void collectIntersections(
   __global Grid* grid = &constants->grid;
   size_t actorIndex = get_global_id(0);
   float edgeLength = (float)grid->edgeLength;
-  __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
   __global ActorState* actorState = &actorStates[actorIndex];
   __global Actor* actor = &(actorStates[actorIndex].constants);
-  float3 position = physicalQuantity->position;
+  float3 position = actor->position;
   float* positionPtr = (float*)&position;
   float radius = actorState->radius;
   float mass = actorState->mass;
@@ -60,7 +58,7 @@ __kernel void collectIntersections(
 	  }
 	  __global ActorState* otherActorState = &actorStates[otherActorIndex];
 	  __global Actor* otherActor = &(otherActorState->constants);
-	  float3 w = physicalQuantities[otherActorIndex].position - position;
+	  float3 w = otherActor->position - position;
 	  float r = radius + otherActorState->radius;
 	  float rr = r * r;
 	  float ww = dot(w, w);

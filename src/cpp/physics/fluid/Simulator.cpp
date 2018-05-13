@@ -60,7 +60,6 @@ namespace alcube::physics::fluid {
       activeActorCount,
       memories.fluids,
       memories.actorStates,
-      memories.physicalQuantities,
       memories.constants
     );
   }

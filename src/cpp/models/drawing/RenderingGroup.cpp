@@ -152,7 +152,7 @@ namespace alcube::models::drawing {
       gpuAccessor->memories.rotations1,
       gpuAccessor->memories.rotations2,
       gpuAccessor->memories.rotations3,
-      gpuAccessor->memories.physicalQuantities,
+      gpuAccessor->memories.actorStates,
       gpuAccessor->memories.renderers,
       allocationRange->getIndex()
     );

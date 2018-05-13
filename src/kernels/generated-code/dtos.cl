@@ -4,6 +4,13 @@ typedef struct __attribute__ ((packed)) ActorStruct {
   char _padding0[2];
   ushort subPhysicalQuantityIndex;
   char _padding1[2];
+  float radius;
+  float mass;
+  float3 position;
+  float4 rotation;
+  float3 linearMomentum;
+  float3 angularMomentum;
+  int isAlive;
 } Actor;
 
 typedef struct __attribute__ ((packed)) FluidStruct {
@@ -48,15 +55,6 @@ typedef struct __attribute__ ((packed)) IntersectionStruct {
   float3 relativePosition;
   float distance;
 } Intersection;
-
-typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
-  float radius;
-  float mass;
-  float3 position;
-  float4 rotation;
-  float3 linearMomentum;
-  float3 angularMomentum;
-} PhysicalQuantity;
 
 typedef struct __attribute__ ((packed)) RendererStruct {
   ushort actorIndex;

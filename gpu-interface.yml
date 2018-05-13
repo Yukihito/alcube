@@ -40,8 +40,15 @@ dto-structs:
 
   # Variables for all actors
   Actor:
-    - ushort    type
-    - ushort    subPhysicalQuantityIndex
+    - ushort type
+    - ushort subPhysicalQuantityIndex
+    - float  radius
+    - float  mass
+    - float3 position
+    - float4 rotation
+    - float3 linearMomentum
+    - float3 angularMomentum
+    - int    isAlive
 
   ActorState:
     - Actor            constants
@@ -61,13 +68,13 @@ dto-structs:
     - float            density
     - float3           fluidForce
 
-  PhysicalQuantity: # Basic physical quantities
-    - float  radius
-    - float  mass
-    - float3 position
-    - float4 rotation
-    - float3 linearMomentum
-    - float3 angularMomentum
+# PhysicalQuantity: # Basic physical quantities
+#   - float  radius
+#   - float  mass
+#   - float3 position
+#   - float4 rotation
+#   - float3 linearMomentum
+#   - float3 angularMomentum
 
   # Variables for soft body actors
   SoftBody: # Physical quantity 0
@@ -124,23 +131,27 @@ dto-instances:
     type: Constants
 
   # Variables for all actors
-  - name: actors
+  - name: hostActors
     type: Actor
     length: maxActorCount
     host-ptr: true
+
+  - name: actors
+    type: Actor
+    length: maxActorCount
 
   - name: actorStates
     type: ActorState
     length: maxActorCount
 
-  - name: hostPhysicalQuantities
-    type: PhysicalQuantity
-    length: maxActorCount
-    host-ptr: true
-
-  - name: physicalQuantities
-    type: PhysicalQuantity
-    length: maxActorCount
+#  - name: hostPhysicalQuantities
+#    type: PhysicalQuantity
+#    length: maxActorCount
+#    host-ptr: true
+#
+#  - name: physicalQuantities
+#    type: PhysicalQuantity
+#    length: maxActorCount
 
   # Variables for soft body actors
   - name: hostSoftBodies

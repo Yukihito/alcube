@@ -11,6 +11,13 @@ namespace alcube::gpu::dtos {
       char _padding0[2];
       unsigned short subPhysicalQuantityIndex;
       char _padding1[2];
+      float radius;
+      float mass;
+      cl_float3 position;
+      cl_float4 rotation;
+      cl_float3 linearMomentum;
+      cl_float3 angularMomentum;
+      int isAlive;
   };
 #pragma pack(pop)
 
@@ -69,18 +76,6 @@ namespace alcube::gpu::dtos {
       cl_float3 normal;
       cl_float3 relativePosition;
       float distance;
-  };
-#pragma pack(pop)
-
-#pragma pack(push, 1)
-  class PhysicalQuantity {
-    public:
-      float radius;
-      float mass;
-      cl_float3 position;
-      cl_float4 rotation;
-      cl_float3 linearMomentum;
-      cl_float3 angularMomentum;
   };
 #pragma pack(pop)
 

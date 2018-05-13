@@ -94,7 +94,7 @@ namespace alcube::physics::softbody {
           springCount,
           memories.constants,
           memories.springStates,
-          memories.physicalQuantities
+          memories.actorStates
         );
       }
       kernels.updateBySpringImpulse(
@@ -102,7 +102,6 @@ namespace alcube::physics::softbody {
         memories.constants,
         memories.softBodies,
         memories.actorStates,
-        memories.physicalQuantities,
         memories.springStates
       );
     }

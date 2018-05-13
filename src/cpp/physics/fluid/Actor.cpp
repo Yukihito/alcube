@@ -8,7 +8,7 @@ namespace alcube::physics::fluid {
   ){
     physics::Actor::init(gpuAccessor, allocationRange);
     this->subAllocationRange = subAllocationRange;
-    this->actor.getPtr()->type = FLUID;
+    this->hostActor.getPtr()->type = FLUID;
     this->hostSubPhysicalQuantity.init(subAllocationRange, gpuAccessor->dtos.hostFluids);
     this->subPhysicalQuantity.init(subAllocationRange, gpuAccessor->dtos.fluids);
     this->gpuAccessor = gpuAccessor;
@@ -24,12 +24,12 @@ namespace alcube::physics::fluid {
   }
 
   void Actor::beforeWrite() {
-    getPhysicalQuantityDto()->radius = gpuAccessor->memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
-    getPhysicalQuantityDto()->mass = gpuAccessor->memories.fluidSettings.at(0)->particleMass;
+    getDto()->radius = gpuAccessor->memories.fluidSettings.at(0)->effectiveRadius / 2.0f;
+    getDto()->mass = gpuAccessor->memories.fluidSettings.at(0)->particleMass;
   }
 
   void Actor::updateIndex() {
-    this->actor.getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
+    this->hostActor.getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
     this->hostSubPhysicalQuantity.getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
   }
 

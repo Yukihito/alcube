@@ -227,34 +227,6 @@ namespace alcube::gpu {
       this->memory->count = count;
     }
 
-    dtos::PhysicalQuantity* PhysicalQuantity::at(int i) {
-      return &dto[i];
-    }
-
-    void PhysicalQuantity::write() {
-      resourcesProvider->queue->write(this->memory);
-    }
-
-    void PhysicalQuantity::write(size_t offset) {
-      resourcesProvider->queue->write(this->memory, offset);
-    }
-
-    void PhysicalQuantity::zeroFill() {
-      resourcesProvider->queue->pushZeroFill(this->memory);
-    }
-
-    void PhysicalQuantity::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
-    }
-
-    void PhysicalQuantity::readRange(size_t min, size_t length) {
-      resourcesProvider->queue->readRange(this->memory, this->dto, min, length);
-    }
-
-    void PhysicalQuantity::setCount(size_t count) {
-      this->memory->count = count;
-    }
-
     dtos::Renderer* Renderer::at(int i) {
       return &dto[i];
     }
@@ -751,7 +723,7 @@ namespace alcube::gpu {
   void Kernels::fillGridIndex(
     unsigned int workSize,
     memories::Constants& constants,
-    memories::PhysicalQuantity& physicalQuantities,
+    memories::ActorState& actorStates,
     memories::GridAndActorRelation& relations
   ) {
     if (workSize == 0) {
@@ -759,7 +731,7 @@ namespace alcube::gpu {
     }
     queue->push(rawKernels.fillGridIndex, {workSize}, {
       memArg(constants.memory),
-      memArg(physicalQuantities.memory),
+      memArg(actorStates.memory),
       memArg(relations.memory)
     });
   }
@@ -838,20 +810,18 @@ namespace alcube::gpu {
 
   void Kernels::inputActors(
     unsigned int workSize,
+    memories::Actor& hostActors,
     memories::Actor& actors,
     memories::ActorState& actorStates,
-    memories::PhysicalQuantity& hostPhysicalQuantities,
-    memories::PhysicalQuantity& physicalQuantities,
     unsigned short offset
   ) {
     if (workSize == 0) {
         return;
     }
     queue->push(rawKernels.inputActors, {workSize}, {
+      memArg(hostActors.memory),
       memArg(actors.memory),
       memArg(actorStates.memory),
-      memArg(hostPhysicalQuantities.memory),
-      memArg(physicalQuantities.memory),
       ushortArg(offset)
     });
   }
@@ -908,7 +878,6 @@ namespace alcube::gpu {
     unsigned int workSize,
     memories::Fluid& fluids,
     memories::ActorState& actorStates,
-    memories::PhysicalQuantity& physicalQuantities,
     memories::Constants& constants
   ) {
     if (workSize == 0) {
@@ -917,7 +886,6 @@ namespace alcube::gpu {
     queue->push(rawKernels.moveFluid, {workSize}, {
       memArg(fluids.memory),
       memArg(actorStates.memory),
-      memArg(physicalQuantities.memory),
       memArg(constants.memory)
     });
   }
@@ -926,7 +894,7 @@ namespace alcube::gpu {
     unsigned int workSize,
     memories::Constants& constants,
     memories::SpringState& springStates,
-    memories::PhysicalQuantity& physicalQuantities
+    memories::ActorState& actorStates
   ) {
     if (workSize == 0) {
         return;
@@ -934,7 +902,7 @@ namespace alcube::gpu {
     queue->push(rawKernels.calcSpringImpulses, {workSize}, {
       memArg(constants.memory),
       memArg(springStates.memory),
-      memArg(physicalQuantities.memory)
+      memArg(actorStates.memory)
     });
   }
 
@@ -943,7 +911,6 @@ namespace alcube::gpu {
     memories::Constants& constants,
     memories::SoftBody& softBodies,
     memories::ActorState& actorStates,
-    memories::PhysicalQuantity& physicalQuantities,
     memories::SpringState& springStates
   ) {
     if (workSize == 0) {
@@ -953,7 +920,6 @@ namespace alcube::gpu {
       memArg(constants.memory),
       memArg(softBodies.memory),
       memArg(actorStates.memory),
-      memArg(physicalQuantities.memory),
       memArg(springStates.memory)
     });
   }
@@ -961,23 +927,20 @@ namespace alcube::gpu {
   void Kernels::postProcessing(
     unsigned int workSize,
     memories::Constants& constants,
-    memories::ActorState& actorStates,
-    memories::PhysicalQuantity& physicalQuantities
+    memories::ActorState& actorStates
   ) {
     if (workSize == 0) {
         return;
     }
     queue->push(rawKernels.postProcessing, {workSize}, {
       memArg(constants.memory),
-      memArg(actorStates.memory),
-      memArg(physicalQuantities.memory)
+      memArg(actorStates.memory)
     });
   }
 
   void Kernels::collectIntersections(
     unsigned int workSize,
     memories::ActorState& actorStates,
-    memories::PhysicalQuantity& physicalQuantities,
     memories::GridAndActorRelation& relations,
     memories::UintMemory& gridStartIndices,
     memories::UintMemory& gridEndIndices,
@@ -988,7 +951,6 @@ namespace alcube::gpu {
     }
     queue->push(rawKernels.collectIntersections, {workSize}, {
       memArg(actorStates.memory),
-      memArg(physicalQuantities.memory),
       memArg(relations.memory),
       memArg(gridStartIndices.memory),
       memArg(gridEndIndices.memory),
@@ -1073,7 +1035,6 @@ namespace alcube::gpu {
   void Kernels::initStepVariables(
     unsigned int workSize,
     memories::ActorState& actorStates,
-    memories::PhysicalQuantity& physicalQuantities,
     memories::Constants& constants
   ) {
     if (workSize == 0) {
@@ -1081,7 +1042,6 @@ namespace alcube::gpu {
     }
     queue->push(rawKernels.initStepVariables, {workSize}, {
       memArg(actorStates.memory),
-      memArg(physicalQuantities.memory),
       memArg(constants.memory)
     });
   }
@@ -1130,7 +1090,7 @@ namespace alcube::gpu {
     memories::Float4Memory& rotations1,
     memories::Float4Memory& rotations2,
     memories::Float4Memory& rotations3,
-    memories::PhysicalQuantity& physicalQuantities,
+    memories::ActorState& actorStates,
     memories::Renderer& renderers,
     unsigned int offset
   ) {
@@ -1144,61 +1104,9 @@ namespace alcube::gpu {
       memArg(rotations1.memory),
       memArg(rotations2.memory),
       memArg(rotations3.memory),
-      memArg(physicalQuantities.memory),
+      memArg(actorStates.memory),
       memArg(renderers.memory),
       uintArg(offset)
-    });
-  }
-
-  void Kernels::updateDrawingBuffer_SingleColor(
-    unsigned int workSize,
-    memories::Float3Memory& positions,
-    memories::PhysicalQuantity& physicalQuantities
-  ) {
-    if (workSize == 0) {
-        return;
-    }
-    queue->push(rawKernels.updateDrawingBuffer_SingleColor, {workSize}, {
-      memArg(positions.memory),
-      memArg(physicalQuantities.memory)
-    });
-  }
-
-  void Kernels::updateDrawingBuffer_InstanceColor(
-    unsigned int workSize,
-    memories::Float3Memory& positions,
-    memories::Float3Memory& colors,
-    memories::PhysicalQuantity& physicalQuantities
-  ) {
-    if (workSize == 0) {
-        return;
-    }
-    queue->push(rawKernels.updateDrawingBuffer_InstanceColor, {workSize}, {
-      memArg(positions.memory),
-      memArg(colors.memory),
-      memArg(physicalQuantities.memory)
-    });
-  }
-
-  void Kernels::updateDrawingBuffer_Texture_SingleColor(
-    unsigned int workSize,
-    memories::Float3Memory& positions,
-    memories::Float4Memory& rotations0,
-    memories::Float4Memory& rotations1,
-    memories::Float4Memory& rotations2,
-    memories::Float4Memory& rotations3,
-    memories::PhysicalQuantity& physicalQuantities
-  ) {
-    if (workSize == 0) {
-        return;
-    }
-    queue->push(rawKernels.updateDrawingBuffer_Texture_SingleColor, {workSize}, {
-      memArg(positions.memory),
-      memArg(rotations0.memory),
-      memArg(rotations1.memory),
-      memArg(rotations2.memory),
-      memArg(rotations3.memory),
-      memArg(physicalQuantities.memory)
     });
   }
 
@@ -1238,17 +1146,13 @@ namespace alcube::gpu {
     kernels.rawKernels.updateByPenaltyImpulse = resourcesProvider->kernelFactory->create(program, "updateByPenaltyImpulse");
     kernels.rawKernels.inputRenderers = resourcesProvider->kernelFactory->create(program, "inputRenderers");
     kernels.rawKernels.updateDrawingBuffer = resourcesProvider->kernelFactory->create(program, "updateDrawingBuffer");
-    kernels.rawKernels.updateDrawingBuffer_SingleColor = resourcesProvider->kernelFactory->create(program, "updateDrawingBuffer_SingleColor");
-    kernels.rawKernels.updateDrawingBuffer_InstanceColor = resourcesProvider->kernelFactory->create(program, "updateDrawingBuffer_InstanceColor");
-    kernels.rawKernels.updateDrawingBuffer_Texture_SingleColor = resourcesProvider->kernelFactory->create(program, "updateDrawingBuffer_Texture_SingleColor");
 
     dtos.grid = new dtos::Grid();
     dtos.fluidSettings = new dtos::FluidSettings();
     dtos.constants = new dtos::Constants();
+    dtos.hostActors = new dtos::Actor[maxActorCount];
     dtos.actors = new dtos::Actor[maxActorCount];
     dtos.actorStates = new dtos::ActorState[maxActorCount];
-    dtos.hostPhysicalQuantities = new dtos::PhysicalQuantity[maxActorCount];
-    dtos.physicalQuantities = new dtos::PhysicalQuantity[maxActorCount];
     dtos.hostSoftBodies = new dtos::SoftBody[maxActorCount];
     dtos.softBodies = new dtos::SoftBody[maxActorCount];
     dtos.springs = new dtos::Spring[maxSpringCount];
@@ -1271,10 +1175,9 @@ namespace alcube::gpu {
     memories.grid.memory = defineHostMemory("grid", sizeof(dtos::Grid), dtos.grid, 1);
     memories.fluidSettings.memory = defineHostMemory("fluidSettings", sizeof(dtos::FluidSettings), dtos.fluidSettings, 1);
     memories.constants.memory = defineGPUMemory("constants", sizeof(dtos::Constants), 1);
-    memories.actors.memory = defineHostMemory("actors", sizeof(dtos::Actor), dtos.actors, maxActorCount);
+    memories.hostActors.memory = defineHostMemory("hostActors", sizeof(dtos::Actor), dtos.hostActors, maxActorCount);
+    memories.actors.memory = defineGPUMemory("actors", sizeof(dtos::Actor), maxActorCount);
     memories.actorStates.memory = defineGPUMemory("actorStates", sizeof(dtos::ActorState), maxActorCount);
-    memories.hostPhysicalQuantities.memory = defineHostMemory("hostPhysicalQuantities", sizeof(dtos::PhysicalQuantity), dtos.hostPhysicalQuantities, maxActorCount);
-    memories.physicalQuantities.memory = defineGPUMemory("physicalQuantities", sizeof(dtos::PhysicalQuantity), maxActorCount);
     memories.hostSoftBodies.memory = defineHostMemory("hostSoftBodies", sizeof(dtos::SoftBody), dtos.hostSoftBodies, maxActorCount);
     memories.softBodies.memory = defineGPUMemory("softBodies", sizeof(dtos::SoftBody), maxActorCount);
     memories.springs.memory = defineHostMemory("springs", sizeof(dtos::Spring), dtos.springs, maxSpringCount);
@@ -1297,10 +1200,9 @@ namespace alcube::gpu {
     memories.grid.dto = dtos.grid;
     memories.fluidSettings.dto = dtos.fluidSettings;
     memories.constants.dto = dtos.constants;
+    memories.hostActors.dto = dtos.hostActors;
     memories.actors.dto = dtos.actors;
     memories.actorStates.dto = dtos.actorStates;
-    memories.hostPhysicalQuantities.dto = dtos.hostPhysicalQuantities;
-    memories.physicalQuantities.dto = dtos.physicalQuantities;
     memories.hostSoftBodies.dto = dtos.hostSoftBodies;
     memories.softBodies.dto = dtos.softBodies;
     memories.springs.dto = dtos.springs;
@@ -1323,10 +1225,9 @@ namespace alcube::gpu {
     memories.grid.resourcesProvider = resourcesProvider;
     memories.fluidSettings.resourcesProvider = resourcesProvider;
     memories.constants.resourcesProvider = resourcesProvider;
+    memories.hostActors.resourcesProvider = resourcesProvider;
     memories.actors.resourcesProvider = resourcesProvider;
     memories.actorStates.resourcesProvider = resourcesProvider;
-    memories.hostPhysicalQuantities.resourcesProvider = resourcesProvider;
-    memories.physicalQuantities.resourcesProvider = resourcesProvider;
     memories.hostSoftBodies.resourcesProvider = resourcesProvider;
     memories.softBodies.resourcesProvider = resourcesProvider;
     memories.springs.resourcesProvider = resourcesProvider;

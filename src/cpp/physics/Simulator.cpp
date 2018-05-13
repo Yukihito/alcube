@@ -80,14 +80,12 @@ namespace alcube::physics {
       actorResources->entities[i]->beforeWrite();
     }
     updateGPUResourcesCount();
-    memories.actors.write(activeActorCount);
-    memories.hostPhysicalQuantities.write(activeActorCount);
+    memories.hostActors.write(activeActorCount);
     kernels.inputActors(
       updateCount,
+      memories.hostActors,
       memories.actors,
       memories.actorStates,
-      memories.hostPhysicalQuantities,
-      memories.physicalQuantities,
       (unsigned short)activeActorCount
     );
     activeActorCount = allActorCount;
@@ -99,10 +97,9 @@ namespace alcube::physics {
 
   void Simulator::updateGPUResourcesCount() {
     unsigned int actorCountForBitonicSort = utils::math::powerOf2(allActorCount);
+    memories.hostActors.setCount(allActorCount);
     memories.actors.setCount(allActorCount);
     memories.actorStates.setCount(allActorCount);
-    memories.hostPhysicalQuantities.setCount(allActorCount);
-    memories.physicalQuantities.setCount(allActorCount);
     memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
   }
 
@@ -124,7 +121,7 @@ namespace alcube::physics {
     kernels.fillGridIndex(
       activeActorCount,
       memories.constants,
-      memories.physicalQuantities,
+      memories.actorStates,
       memories.gridAndActorRelations
     );
 
@@ -170,7 +167,6 @@ namespace alcube::physics {
     kernels.collectIntersections(
       activeActorCount,
       memories.actorStates,
-      memories.physicalQuantities,
       memories.gridAndActorRelations,
       memories.gridStartIndices,
       memories.gridEndIndices,
@@ -182,7 +178,6 @@ namespace alcube::physics {
     kernels.initStepVariables(
       activeActorCount,
       memories.actorStates,
-      memories.physicalQuantities,
       memories.constants
     );
 
@@ -199,8 +194,7 @@ namespace alcube::physics {
     kernels.postProcessing(
       activeActorCount,
       memories.constants,
-      memories.actorStates,
-      memories.physicalQuantities
+      memories.actorStates
     );
   }
 

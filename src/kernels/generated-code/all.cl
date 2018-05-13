@@ -4,6 +4,13 @@ typedef struct __attribute__ ((packed)) ActorStruct {
   char _padding0[2];
   ushort subPhysicalQuantityIndex;
   char _padding1[2];
+  float radius;
+  float mass;
+  float3 position;
+  float4 rotation;
+  float3 linearMomentum;
+  float3 angularMomentum;
+  int isAlive;
 } Actor;
 
 typedef struct __attribute__ ((packed)) FluidStruct {
@@ -48,15 +55,6 @@ typedef struct __attribute__ ((packed)) IntersectionStruct {
   float3 relativePosition;
   float distance;
 } Intersection;
-
-typedef struct __attribute__ ((packed)) PhysicalQuantityStruct {
-  float radius;
-  float mass;
-  float3 position;
-  float4 rotation;
-  float3 linearMomentum;
-  float3 angularMomentum;
-} PhysicalQuantity;
 
 typedef struct __attribute__ ((packed)) RendererStruct {
   ushort actorIndex;
@@ -172,17 +170,16 @@ __kernel void inputConstants(
 }
 
 __kernel void inputActors(
-  __global const Actor* actors,
+  __global const Actor* hostActors,
+  __global Actor* actors,
   __global ActorState* actorStates,
-  __global const PhysicalQuantity* hostPhysicalQuantities,
-  __global PhysicalQuantity* physicalQuantities,
   unsigned short offset
 ) {
   size_t i = get_global_id(0) + offset;
-  physicalQuantities[i] = hostPhysicalQuantities[i];
+  actors[i] = hostActors[i];
   actorStates[i].constants = actors[i];
-  actorStates[i].radius = physicalQuantities[i].radius;
-  actorStates[i].mass = physicalQuantities[i].mass;
+  actorStates[i].radius = actors[i].radius;
+  actorStates[i].mass = actors[i].mass;
 }
 
 __kernel void inputSoftBodies(
@@ -224,13 +221,13 @@ __kernel void initGridAndActorRelations(
 
 __kernel void fillGridIndex(
   __global Constants* constants,
-  __global PhysicalQuantity* physicalQuantities,
+  __global ActorState* actorStates,
   __global GridAndActorRelation* relations
 ) {
   __global Grid* grid = &constants->grid;
   size_t actorIndex = get_global_id(0);
   float edgeLength = grid->edgeLength;
-  float3 position = physicalQuantities[actorIndex].position;
+  float3 position = actorStates[actorIndex].constants.position;
   float3 positionGridSpace = position - grid->origin;
   uint3 gridCorner0 = (uint3)(0);
   uint3 gridCorner1 = (uint3)(grid->xCount - 1, grid->yCount - 1, grid->zCount - 1);
@@ -314,7 +311,6 @@ void setIntersection(
 
 __kernel void collectIntersections(
   __global ActorState* actorStates,
-  __global PhysicalQuantity* physicalQuantities,
   __global GridAndActorRelation* relations,
   __global uint* gridStartIndices,
   __global uint* gridEndIndices,
@@ -326,10 +322,9 @@ __kernel void collectIntersections(
   __global Grid* grid = &constants->grid;
   size_t actorIndex = get_global_id(0);
   float edgeLength = (float)grid->edgeLength;
-  __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
   __global ActorState* actorState = &actorStates[actorIndex];
   __global Actor* actor = &(actorStates[actorIndex].constants);
-  float3 position = physicalQuantity->position;
+  float3 position = actor->position;
   float* positionPtr = (float*)&position;
   float radius = actorState->radius;
   float mass = actorState->mass;
@@ -356,7 +351,7 @@ __kernel void collectIntersections(
 	  }
 	  __global ActorState* otherActorState = &actorStates[otherActorIndex];
 	  __global Actor* otherActor = &(otherActorState->constants);
-	  float3 w = physicalQuantities[otherActorIndex].position - position;
+	  float3 w = otherActor->position - position;
 	  float r = radius + otherActorState->radius;
 	  float rr = r * r;
 	  float ww = dot(w, w);
@@ -407,12 +402,11 @@ __kernel void collectIntersections(
 
 __kernel void initStepVariables(
   __global ActorState* actorStates,
-  __global PhysicalQuantity* physicalQuantities,
   __global Constants* constants
 ) {
   size_t actorIndex = get_global_id(0);
   __global ActorState* actorState = &actorStates[actorIndex];
-  __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
+  __global Actor* actor = &actorState->constants;
   float gravityAcceleration = constants->gravityAcceleration;
   float deltaTime = constants->deltaTime;
   float radius = actorState->radius;
@@ -422,12 +416,12 @@ __kernel void initStepVariables(
   actorState->momentOfInertia = momentOfInertia;
   float gravityTranslation = gravityAcceleration * deltaTime;
   float gravity = isFloating ? -gravityTranslation : 0.0f;
-  actorState->linearVelocity = physicalQuantity->linearMomentum / mass + (float3)(0.0f, gravity, 0.0f);
+  actorState->linearVelocity = actor->linearMomentum / mass + (float3)(0.0f, gravity, 0.0f);
   float ySpeed = actorState->linearVelocity.y;
   if (!isFloating && ySpeed * ySpeed < gravityTranslation * gravityTranslation * 16.0f) {
     actorState->linearVelocity.y = 0.0f;
   }
-  actorState->angularVelocity = physicalQuantity->angularMomentum / momentOfInertia;
+  actorState->angularVelocity = actor->angularMomentum / momentOfInertia;
   actorState->massForIntersection = mass / actorState->intersectionCount;
   actorState->massForCollision = mass;
   actorState->fluidForce = (float3)(0.0f);
@@ -639,32 +633,31 @@ __kernel void updateFluidForce(
 __kernel void moveFluid(
   __global Fluid* fluids,
   __global ActorState* actorStates,
-  __global PhysicalQuantity* physicalQuantities,
   __global Constants* constants
 ) {
   __global Grid* grid = &constants->grid;
   ushort actorIndex = fluids[get_global_id(0)].actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
-  __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
+  __global Actor* actor = &actorState->constants;
   actorState->linearVelocity += (actorState->fluidForce * constants->deltaTime) / constants->fluidSettings.particleMass;
-  physicalQuantity->position += constants->deltaTime * actorState->linearVelocity;
+  actor->position += constants->deltaTime * actorState->linearVelocity;
 }
 
 __kernel void calcSpringImpulses(
   __global Constants* constants,
   __global SpringState* springStates,
-  __global PhysicalQuantity* physicalQuantities
+  __global ActorState* actorStates
 ) {
   size_t i = get_global_id(0);
   __global SpringState* springState = &springStates[i];
   __global Spring* spring = &springState->constants;
   float3 pm0 = spring->nodePositionsModelSpace[0];
-  float4 rot0 = physicalQuantities[spring->actorIndices[0]].rotation;
+  float4 rot0 = actorStates[spring->actorIndices[0]].constants.rotation;
   float3 pm1 = spring->nodePositionsModelSpace[1];
-  float4 rot1 = physicalQuantities[spring->actorIndices[1]].rotation;
+  float4 rot1 = actorStates[spring->actorIndices[1]].constants.rotation;
   float3 p0 = rotateByQuat(pm0, rot0);
   float3 p1 = rotateByQuat(pm1, rot1);
-  float3 impulse = ((p1 + physicalQuantities[spring->actorIndices[1]].position) - (p0 + physicalQuantities[spring->actorIndices[0]].position));
+  float3 impulse = ((p1 + actorStates[spring->actorIndices[1]].constants.position) - (p0 + actorStates[spring->actorIndices[0]].constants.position));
   float3 direction = normalize(impulse);
   float len = length(impulse);
   springState->linearImpulses[0] = log2(1.0f + len) * constants->splitDeltaTime * spring->k * direction;
@@ -677,13 +670,13 @@ __kernel void updateBySpringImpulse(
   __global Constants* constants,
   __global SoftBody* softBodies,
   __global ActorState* actorStates,
-  __global PhysicalQuantity* physicalQuantities,
   __global SpringState* springStates
 ) {
   size_t softBodyIndex = get_global_id(0);
   __global SoftBody* softBody = &softBodies[softBodyIndex];
   size_t actorIndex = softBody->actorIndex;
   __global ActorState* actorState = &actorStates[actorIndex];
+  __global Actor* actor = &actorState->constants;
   uchar count = softBody->springCount;
   float3 linearImpulse = (float3)(0.0f);
   float3 angularImpulse = (float3)(0.0f);
@@ -695,32 +688,31 @@ __kernel void updateBySpringImpulse(
 
   actorState->linearVelocity += linearImpulse / actorState->mass;
   actorState->angularVelocity += angularImpulse / actorState->momentOfInertia;
-  physicalQuantities[actorIndex].position += actorState->linearVelocity * constants->splitDeltaTime;
-  physicalQuantities[actorIndex].rotation = mulQuat(createQuatFromDisplacement(actorState->angularVelocity * constants->splitDeltaTime), physicalQuantities[actorIndex].rotation);
+  actor->position += actorState->linearVelocity * constants->splitDeltaTime;
+  actor->rotation = mulQuat(createQuatFromDisplacement(actorState->angularVelocity * constants->splitDeltaTime), actor->rotation);
 }
 
 __kernel void postProcessing(
   __global Constants* constants,
-  __global ActorState* actorStates,
-  __global PhysicalQuantity* physicalQuantities
+  __global ActorState* actorStates
 ) {
   size_t actorIndex = get_global_id(0);
   float3 maxLinearMomentum = (float3)((2.0f * (1.0f / constants->deltaTime)) * actorStates[actorIndex].mass);
-  __global PhysicalQuantity* physicalQuantity = &physicalQuantities[actorIndex];
-  physicalQuantity->angularMomentum = actorStates[actorIndex].angularVelocity * actorStates[actorIndex].momentOfInertia * 0.999f;
-  physicalQuantity->linearMomentum = clamp(actorStates[actorIndex].linearVelocity * actorStates[actorIndex].mass * 0.999f, -maxLinearMomentum, maxLinearMomentum);
+  __global Actor* actor = &actorStates[actorIndex].constants;
+  actor->angularMomentum = actorStates[actorIndex].angularVelocity * actorStates[actorIndex].momentOfInertia * 0.999f;
+  actor->linearMomentum = clamp(actorStates[actorIndex].linearVelocity * actorStates[actorIndex].mass * 0.999f, -maxLinearMomentum, maxLinearMomentum);
 
-  if (length(physicalQuantity->linearMomentum) < 0.01f) {
-    physicalQuantity->linearMomentum = (float3)(0.0f);
+  if (length(actor->linearMomentum) < 0.01f) {
+    actor->linearMomentum = (float3)(0.0f);
   }
 
-  if (length(physicalQuantity->angularMomentum) < 0.01f) {
-    physicalQuantity->angularMomentum = (float3)(0.0f);
+  if (length(actor->angularMomentum) < 0.01f) {
+    actor->angularMomentum = (float3)(0.0f);
   }
 
   float3 corner = constants->grid.origin + (float3)(0.0001f);
 
-  physicalQuantity->position = clamp(physicalQuantity->position, corner, -corner);
+  actor->position = clamp(actor->position, corner, -corner);
 }
 
 __kernel void inputRenderers(
@@ -742,20 +734,21 @@ __kernel void updateDrawingBuffer(
   __global float4* rotations1,
   __global float4* rotations2,
   __global float4* rotations3,
-  __global PhysicalQuantity* physicalQuantities,
+  __global ActorState* actorStates,
   __global Renderer* renderers,
   unsigned int offset
 ) {
   size_t i = get_global_id(0) + offset;
   unsigned short actorIndex = renderers[i].actorIndex;
-  positions[i] = physicalQuantities[actorIndex].position;
+  __global Actor* actor = &actorStates[actorIndex].constants;
+  positions[i] = actor->position;
 
   if (renderers[i].instanceColorType == 3) {
-    colors[i] = fabs(physicalQuantities[actorIndex].linearMomentum);
+    colors[i] = fabs(actor->linearMomentum);
   }
 
   if (renderers[i].refersToRotations) {
-    __global float4* r = &physicalQuantities[actorIndex].rotation;
+    __global float4* r = &actor->rotation;
     float x = r->x;
     float y = r->y;
     float z = r->z;
@@ -765,44 +758,4 @@ __kernel void updateDrawingBuffer(
     rotations2[i] = (float4)(2.0f * (x*z + w*y), 2.0f * (y*z - w*x), 1.0f - 2.0f * (x*x + y*y), 0.0f);
     rotations3[i] = (float4)(0.0f, 0.0f, 0.0f, 1.0f);
   }
-}
-
-__kernel void updateDrawingBuffer_SingleColor(
-  __global float3* positions,
-  __global PhysicalQuantity* physicalQuantities
-) {
-  size_t i = get_global_id(0);
-  positions[i] = physicalQuantities[i].position;
-}
-
-__kernel void updateDrawingBuffer_InstanceColor(
-  __global float3* positions,
-  __global float3* colors,
-  __global PhysicalQuantity* physicalQuantities
-) {
-  size_t i = get_global_id(0);
-  positions[i] = physicalQuantities[i].position;
-  colors[i] = fabs(physicalQuantities[i].linearMomentum);
-}
-
-__kernel void updateDrawingBuffer_Texture_SingleColor(
-  __global float3* positions,
-  __global float4* rotations0,
-  __global float4* rotations1,
-  __global float4* rotations2,
-  __global float4* rotations3,
-  __global PhysicalQuantity* physicalQuantities
-) {
-  size_t i = get_global_id(0);
-  positions[i] = physicalQuantities[i].position;
-  __global float4* r = &physicalQuantities[i].rotation;
-  float x = r->x;
-  float y = r->y;
-  float z = r->z;
-  float w = r->w;
-
-  rotations0[i] = (float4)(1.0f - 2.0f * (y*y + z*z), 2.0f * (x*y + w*z), 2.0f * (x*z - w*y), 0.0f);
-  rotations1[i] = (float4)(2.0f * (x*y - w*z), 1.0f - 2.0f * (x*x + z*z), 2.0f * (y*z + w*x), 0.0f);
-  rotations2[i] = (float4)(2.0f * (x*z + w*y), 2.0f * (y*z - w*x), 1.0f - 2.0f * (x*x + y*y), 0.0f);
-  rotations3[i] = (float4)(0.0f, 0.0f, 0.0f, 1.0f);
 }

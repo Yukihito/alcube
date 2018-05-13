@@ -16,17 +16,16 @@ __kernel void inputConstants(
 }
 
 __kernel void inputActors(
-  __global const Actor* actors,
+  __global const Actor* hostActors,
+  __global Actor* actors,
   __global ActorState* actorStates,
-  __global const PhysicalQuantity* hostPhysicalQuantities,
-  __global PhysicalQuantity* physicalQuantities,
   unsigned short offset
 ) {
   size_t i = get_global_id(0) + offset;
-  physicalQuantities[i] = hostPhysicalQuantities[i];
+  actors[i] = hostActors[i];
   actorStates[i].constants = actors[i];
-  actorStates[i].radius = physicalQuantities[i].radius;
-  actorStates[i].mass = physicalQuantities[i].mass;
+  actorStates[i].radius = actors[i].radius;
+  actorStates[i].mass = actors[i].mass;
 }
 
 __kernel void inputSoftBodies(

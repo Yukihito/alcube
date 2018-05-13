@@ -32,7 +32,7 @@ namespace alcube::models::physics::fluid {
 
   alcube::physics::Actor* Features::createPhysicsActor() {
     auto actor = actorFactory->createFluid();
-    actor->getPhysicalQuantityDto()->mass = alcube::physics::fluid::Actor::mass;
+    actor->getDto()->mass = alcube::physics::fluid::Actor::mass;
     return actor;
   }
 
