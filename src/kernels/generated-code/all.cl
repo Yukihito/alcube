@@ -152,21 +152,31 @@ float4 createQuatFromDisplacement(float3 angularDisplacement) {
   return q;
 }
 
-__kernel void inputConstants(
+__kernel void inputPhysicsConstants(
   __global Constants* constants,
   __global const Grid* grid,
-  __global const FluidSettings* fluidSettings,
   const float gravityAcceleration,
   const float deltaTime,
-  const float splitDeltaTime,
   const float sphericalShellRadius
 ) {
   constants->grid = grid[0];
-  constants->fluidSettings = fluidSettings[0];
   constants->gravityAcceleration = gravityAcceleration;
   constants->deltaTime = deltaTime;
-  constants->splitDeltaTime = splitDeltaTime;
   constants->sphericalShellRadius = sphericalShellRadius;
+}
+
+__kernel void inputFluidConstants(
+  __global Constants* constants,
+  __global const FluidSettings* fluidSettings
+) {
+  constants->fluidSettings = fluidSettings[0];
+}
+
+__kernel void inputSoftbodyConstants(
+  __global Constants* constants,
+  const float splitDeltaTime
+) {
+  constants->splitDeltaTime = splitDeltaTime;
 }
 
 __kernel void inputActors(

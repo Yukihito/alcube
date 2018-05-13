@@ -19,6 +19,7 @@ namespace alcube::physics::fluid {
     fluidSettings->poly6Constant = 315.0f / (64.0f * CL_M_PI_F * powf(fluidSettings->effectiveRadius, 9));
     fluidSettings->spikyGradientConstant = 45.0f / (CL_M_PI_F * powf(fluidSettings->effectiveRadius, 6));
     fluidSettings->viscosityLaplacianConstant = 45.0f / (CL_M_PI_F * powf(fluidSettings->effectiveRadius, 6));
+    kernels.inputFluidConstants(1, memories.constants, memories.fluidSettings);
   }
 
   void Simulator::input() {

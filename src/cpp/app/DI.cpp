@@ -71,7 +71,12 @@ namespace alcube::app {
   
   template <>
   physics::softbody::Simulator* DI::inject() {
-    return new physics::softbody::Simulator(get<gpu::GPUAccessor>(), get<alcube::physics::ActorResources>());
+    auto settings = get<models::Settings>();
+    return new physics::softbody::Simulator(
+      get<gpu::GPUAccessor>(),
+      get<alcube::physics::ActorResources>(),
+      settings->physics.timeStepSize
+    );
   }
 
   template <>

@@ -52,19 +52,17 @@ namespace alcube::physics {
       grid->normals[i].s[i - 3] = -1.0f;
     }
 
-    float splitDeltaTime = deltaTime / /*motionIterationCount*/8;
+
     for (auto subSimulator : subSimulators) {
       subSimulator->setUpConstants();
     }
 
-    kernels.inputConstants(
+    kernels.inputPhysicsConstants(
       1,
       memories.constants,
       memories.grid,
-      memories.fluidSettings,
       gravity,
       deltaTime,
-      splitDeltaTime,
       sphericalShellRadius
     );
   }

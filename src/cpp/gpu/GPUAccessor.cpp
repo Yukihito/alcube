@@ -784,27 +784,51 @@ namespace alcube::gpu {
     });
   }
 
-  void Kernels::inputConstants(
+  void Kernels::inputPhysicsConstants(
     unsigned int workSize,
     memories::Constants& constants,
     memories::Grid& grid,
-    memories::FluidSettings& fluidSettings,
     float gravityAcceleration,
     float deltaTime,
-    float splitDeltaTime,
     float sphericalShellRadius
   ) {
     if (workSize == 0) {
         return;
     }
-    queue->push(rawKernels.inputConstants, {workSize}, {
+    queue->push(rawKernels.inputPhysicsConstants, {workSize}, {
       memArg(constants.memory),
       memArg(grid.memory),
-      memArg(fluidSettings.memory),
       floatArg(gravityAcceleration),
       floatArg(deltaTime),
-      floatArg(splitDeltaTime),
       floatArg(sphericalShellRadius)
+    });
+  }
+
+  void Kernels::inputFluidConstants(
+    unsigned int workSize,
+    memories::Constants& constants,
+    memories::FluidSettings& fluidSettings
+  ) {
+    if (workSize == 0) {
+        return;
+    }
+    queue->push(rawKernels.inputFluidConstants, {workSize}, {
+      memArg(constants.memory),
+      memArg(fluidSettings.memory)
+    });
+  }
+
+  void Kernels::inputSoftbodyConstants(
+    unsigned int workSize,
+    memories::Constants& constants,
+    float splitDeltaTime
+  ) {
+    if (workSize == 0) {
+        return;
+    }
+    queue->push(rawKernels.inputSoftbodyConstants, {workSize}, {
+      memArg(constants.memory),
+      floatArg(splitDeltaTime)
     });
   }
 
@@ -1127,7 +1151,9 @@ namespace alcube::gpu {
     kernels.rawKernels.merge = resourcesProvider->kernelFactory->create(program, "merge");
     kernels.rawKernels.bitonic = resourcesProvider->kernelFactory->create(program, "bitonic");
     kernels.rawKernels.setGridRelationIndexRange = resourcesProvider->kernelFactory->create(program, "setGridRelationIndexRange");
-    kernels.rawKernels.inputConstants = resourcesProvider->kernelFactory->create(program, "inputConstants");
+    kernels.rawKernels.inputPhysicsConstants = resourcesProvider->kernelFactory->create(program, "inputPhysicsConstants");
+    kernels.rawKernels.inputFluidConstants = resourcesProvider->kernelFactory->create(program, "inputFluidConstants");
+    kernels.rawKernels.inputSoftbodyConstants = resourcesProvider->kernelFactory->create(program, "inputSoftbodyConstants");
     kernels.rawKernels.inputActors = resourcesProvider->kernelFactory->create(program, "inputActors");
     kernels.rawKernels.inputSoftBodies = resourcesProvider->kernelFactory->create(program, "inputSoftBodies");
     kernels.rawKernels.inputSprings = resourcesProvider->kernelFactory->create(program, "inputSprings");

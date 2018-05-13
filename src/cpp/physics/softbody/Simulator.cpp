@@ -2,7 +2,7 @@
 
 namespace alcube::physics::softbody {
   using namespace utils::opencl::conversions;
-  Simulator::Simulator(gpu::GPUAccessor *gpuAccessor, ActorResources* actorResources) {
+  Simulator::Simulator(gpu::GPUAccessor *gpuAccessor, ActorResources* actorResources, float deltaTime) {
     kernels = gpuAccessor->kernels;
     memories = gpuAccessor->memories;
     this->actorResources = actorResources;
@@ -10,9 +10,13 @@ namespace alcube::physics::softbody {
     allActorCount = 0;
     activeSpringCount = 0;
     allSpringCount = 0;
+    this->deltaTime = deltaTime;
   }
 
-  void Simulator::setUpConstants() {}
+  void Simulator::setUpConstants() {
+    float splitDeltaTime = deltaTime / motionIterationCount;
+    kernels.inputSoftbodyConstants(1, memories.constants, splitDeltaTime);
+  }
 
   void Simulator::input() {
     inputActors();

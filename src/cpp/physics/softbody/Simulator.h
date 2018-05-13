@@ -10,7 +10,7 @@
 namespace alcube::physics::softbody {
   class Simulator : public SubSimulator {
     public:
-      explicit Simulator(gpu::GPUAccessor* gpuAccessor, ActorResources* actorResources);
+      explicit Simulator(gpu::GPUAccessor* gpuAccessor, ActorResources* actorResources, float deltaTime);
       void setUpConstants() override;
       void input() override;
       void updateForce() override;
@@ -26,6 +26,7 @@ namespace alcube::physics::softbody {
       unsigned int allActorCount;
       unsigned int activeSpringCount;
       unsigned int allSpringCount;
+      float deltaTime;
       void inputActors();
       void inputSprings();
   };
