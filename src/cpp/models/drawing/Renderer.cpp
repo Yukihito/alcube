@@ -10,7 +10,7 @@ namespace alcube::models::drawing {
   ) {
     this->gpuAccessor = gpuAccessor;
     this->allocationRangeMemoryPool = new utils::MemoryPool<utils::AllocationRange>(size * 4);
-    this->allocationRange = allocationRangeMemoryPool->get();
+    this->allocationRange = allocationRangeMemoryPool->allocate();
     this->allocationRange->init(0, size, allocationRangeMemoryPool);
     this->canvas = canvas;
     this->resourcesProvider = resourcesProvider;

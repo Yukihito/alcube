@@ -35,7 +35,7 @@ namespace alcube::models::physics::softbody {
     underlying->getNode(0)->setPosition(position0);
     underlying->getNode(1)->setActor((alcube::physics::softbody::Actor*)actor1->getPhysicsActor());
     underlying->getNode(1)->setPosition(position1);
-    auto spring = memoryPool->get();
+    auto spring = memoryPool->allocate();
     spring->init(underlying);
     return spring;
   }

@@ -10,6 +10,7 @@ namespace alcube::utils {
     public:
       void subscribe(std::function<void()> f);
       void emit();
+      void unbind();
     private:
       std::vector<std::function<void()>> callbacks = {};
   };

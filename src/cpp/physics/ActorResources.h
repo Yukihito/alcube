@@ -18,7 +18,7 @@ namespace alcube::physics {
 
   template <class T>
   ActorResource<T>::ActorResource(unsigned int size, utils::MemoryPool<utils::AllocationRange>* allocationRangeMemoryPool) {
-    allocationRange = allocationRangeMemoryPool->get();
+    allocationRange = allocationRangeMemoryPool->allocate();
     allocationRange->init(0, size, allocationRangeMemoryPool);
     memoryPool = new utils::MemoryPool<T>(size);
     entities = new T*[size];

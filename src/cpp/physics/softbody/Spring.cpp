@@ -19,7 +19,7 @@ namespace alcube::physics::softbody {
   void SpringNode::setActor(alcube::physics::softbody::Actor *actor) {
     this->actor = actor;
     spring->getPtr()->actorIndices[nodeIndex] = actor->getIndex();
-    auto subPhysicalQuantity = actor->getSubPhysicalQuantity();
+    auto subPhysicalQuantity = actor->getSubState();
     subPhysicalQuantity->springIndices[subPhysicalQuantity->springCount] = allocationRange->getIndex();
     subPhysicalQuantity->springNodeIndices[subPhysicalQuantity->springCount] = nodeIndex;
     subPhysicalQuantity->springCount++;

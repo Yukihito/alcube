@@ -10,4 +10,8 @@ namespace alcube::utils {
       f();
     }
   }
+
+  void EventEmitter::unbind() {
+    callbacks.clear();
+  }
 }

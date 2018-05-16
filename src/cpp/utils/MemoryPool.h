@@ -2,20 +2,22 @@
 #define ALCUBE_MEMORYPOOL_H
 
 #include <stack>
-#include <map>
 #include <iostream>
+#include <unordered_map>
 
 namespace alcube::utils {
   template <class T>
   class MemoryPool {
     public:
       explicit MemoryPool(int size);
-      T* get();
+      T* allocate();
+      void deallocate(T* ptr);
 
     private:
       int size;
       T* instances;
       std::stack<int> freeIndices;
+      std::unordered_map<T*, int> ptrToIndex;
   };
 
   template <class T>
@@ -23,16 +25,24 @@ namespace alcube::utils {
     this->size = size;
     instances = new T[size];
     freeIndices = {};
+    ptrToIndex = {};
     for (int i = 0; i < size; i++) {
       freeIndices.push(i);
     }
   }
 
   template <class T>
-  T* MemoryPool<T>::get() {
-    auto instance = &instances[freeIndices.top()];
+  T* MemoryPool<T>::allocate() {
+    int index = freeIndices.top();
+    auto instance = &instances[index];
+    ptrToIndex[instance] = index;
     freeIndices.pop();
     return instance;
+  }
+
+  template <class T>
+  void MemoryPool<T>::deallocate(T *ptr) {
+    freeIndices.push(ptrToIndex[ptr]);
   }
 }
 

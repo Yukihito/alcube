@@ -3,7 +3,7 @@
 namespace alcube::physics {
   ActorResources::ActorResources(unsigned int size) {
     allocationRangeMemoryPool = new utils::MemoryPool<utils::AllocationRange>(size * 8);
-    allocationRange = allocationRangeMemoryPool->get();
+    allocationRange = allocationRangeMemoryPool->allocate();
     allocationRange->init(0, size, allocationRangeMemoryPool);
     fluidResource = new ActorResource<fluid::Actor>(size, allocationRangeMemoryPool);
     softbodyResource = new ActorResource<softbody::Actor>(size, allocationRangeMemoryPool);

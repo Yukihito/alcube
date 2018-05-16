@@ -45,7 +45,7 @@ namespace alcube::models::physics::fluid {
   }
 
   Features* FeaturesFactory::create() {
-    auto features = memoryPool->get();
+    auto features = memoryPool->allocate();
     int nextId = instanceCount;
     instanceCount++;
     features->init(nextId, actorFactory);

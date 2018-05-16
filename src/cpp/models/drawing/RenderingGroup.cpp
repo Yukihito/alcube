@@ -186,7 +186,7 @@ namespace alcube::models::drawing {
 
   RenderingGroup* RenderingGroupFactory::create(utils::AllocationRange* rendererAllocationRange) {
     auto allocationRange = rendererAllocationRange->allocate(settings->world.maxActorCount);
-    auto entity = memoryPool->get();
+    auto entity = memoryPool->allocate();
     entity->init(shaders, settings, gpuAccessor, allocationRange, model3DFactory);
     return entity;
   }

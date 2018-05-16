@@ -22,12 +22,14 @@ namespace alcube::physics {
       virtual void beforeWrite() = 0;
     protected:
       utils::ResourceAllocation<gpu::dtos::Actor> hostActor = {};
+      utils::ResourceAllocation<gpu::dtos::Actor> actor = {};
       utils::ResourceAllocation<gpu::dtos::ActorState> actorState = {};
 
       explicit Actor() = default;
       void init(gpu::GPUAccessor* gpuAccessor, utils::AllocationRange* allocationRange);
       virtual void updateIndex() = 0;
       utils::AllocationRange* allocationRange = nullptr;
+      gpu::dtos::Actor temporal = {};
   };
 }
 

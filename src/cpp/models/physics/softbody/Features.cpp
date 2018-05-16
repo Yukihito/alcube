@@ -19,7 +19,7 @@ namespace alcube::models::physics::softbody {
 
   alcube::physics::Actor* Features::createPhysicsActor() {
     auto actor = actorFactory->createSoftbody();
-    actor->getSubPhysicalQuantity()->elasticity = elasticity;
+    actor->getSubState()->elasticity = elasticity;
     actor->getDto()->mass = mass;
     return actor;
   }
@@ -39,7 +39,7 @@ namespace alcube::models::physics::softbody {
   }
 
   Features* FeaturesFactory::create() {
-    auto features = memoryPool->get();
+    auto features = memoryPool->allocate();
     int nextId = instanceCount;
     instanceCount++;
     features->init(nextId, actorFactory);

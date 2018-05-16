@@ -54,7 +54,7 @@ namespace alcube::models::drawing {
     utils::AllocationRange* groupAllocationRange,
     RenderingGroupSettings* groupSettings
   ) {
-    auto entity = memoryPool->get();
+    auto entity = memoryPool->allocate();
     entity->init(
       actorIndexHolder,
       groupAllocationRange->allocate(1),

@@ -6,7 +6,19 @@ namespace alcube::physics {
     alcube::utils::AllocationRange *allocationRange
   ) {
     this->allocationRange = allocationRange;
+    this->allocationRange->onBeforeMove.subscribe([&]{
+      this->temporal = *this->actor.getPtr();
+    });
+    this->allocationRange->onAfterMove.subscribe([&]{
+      this->hostActor.getPtr()[0] = temporal;
+    });
+    this->allocationRange->onBeforeGc.subscribe([&]{
+      if (!this->actor.getPtr()->isAlive) {
+        this->allocationRange->deallocate();
+      }
+    });
     this->hostActor.init(allocationRange, gpuAccessor->dtos.hostActors);
+    this->actor.init(allocationRange, gpuAccessor->dtos.actors);
     this->actorState.init(allocationRange, gpuAccessor->dtos.actorStates);
     this->hostActor.getPtr()->radius = 1.0f;
     this->hostActor.getPtr()->mass = 1.0f;

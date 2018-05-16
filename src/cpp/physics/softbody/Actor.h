@@ -12,12 +12,12 @@ namespace alcube::physics::softbody {
         utils::AllocationRange* allocationRange,
         utils::AllocationRange* subAllocationRange
       );
-      gpu::dtos::SoftBody* getSubPhysicalQuantity();
+      gpu::dtos::SoftBody* getSubState();
       unsigned short getIndex() override;
       void beforeWrite() override;
     private:
-      utils::ResourceAllocation<gpu::dtos::SoftBody> hostSubPhysicalQuantity;
-      utils::ResourceAllocation<gpu::dtos::SoftBody> subPhysicalQuantity;
+      utils::ResourceAllocation<gpu::dtos::SoftBody> hostSubState;
+      utils::ResourceAllocation<gpu::dtos::SoftBody> subState;
       utils::AllocationRange* subAllocationRange = nullptr;
       void updateIndex() override;
   };

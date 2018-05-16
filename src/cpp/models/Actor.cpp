@@ -76,7 +76,7 @@ namespace alcube::models {
 
   Actor* ActorFactory::create(physics::Features *feature, drawing::RenderingGroup* renderingGroup) {
     auto physicsActor = feature->createPhysicsActor();
-    auto actor = memoryPool->get();
+    auto actor = memoryPool->allocate();
     int nextId = instanceCount;
     actor->init(nextId);
     actor->setPhysicsActor(physicsActor);
