@@ -20,16 +20,14 @@ namespace alcube::physics::fluid {
         gpu::GPUAccessor* gpuAccessor,
         utils::AllocationRange* allocationRange,
         utils::AllocationRange* subAllocationRange
-      );
+      ) override;
 
-      gpu::dtos::Fluid* getSubPhysicalQuantity();
-      unsigned short getIndex() override;
+      gpu::dtos::Fluid* getSubState();
       void beforeWrite() override;
     private:
-      utils::ResourceAllocation<gpu::dtos::Fluid> hostSubState;
-      utils::ResourceAllocation<gpu::dtos::Fluid> subState;
-      utils::AllocationRange* subAllocationRange = nullptr;
-      gpu::GPUAccessor* gpuAccessor;
+      utils::ResourceAllocation<gpu::dtos::Fluid> hostSubState = {};
+      utils::ResourceAllocation<gpu::dtos::Fluid> subState = {};
+      gpu::GPUAccessor* gpuAccessor = nullptr;
       void updateIndex() override;
   };
 }

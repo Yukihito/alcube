@@ -45,8 +45,8 @@ namespace alcube::utils {
   }
 
   bool AllocationRange::isFree() {
-    for (int i = 0; i < 4; i++) {
-      if (!linkedAllocationRanges[i]->isFree()) {
+    for (auto &linkedAllocationRange : linkedAllocationRanges) {
+      if (!linkedAllocationRange->isFree()) {
         return false;
       }
     }

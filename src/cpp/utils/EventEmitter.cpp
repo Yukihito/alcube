@@ -1,17 +1,21 @@
 #include "EventEmitter.h"
 
 namespace alcube::utils {
-  void EventEmitter::subscribe(std::function<void()> f) {
-    callbacks.push_back(f);
+  void EventEmitter::subscribe(alcube::utils::EventHandler *handler) {
+    handlers.emplace(handler);
+  }
+
+  void EventEmitter::unsubscribe(alcube::utils::EventHandler *handler) {
+    handlers.erase(handler);
   }
 
   void EventEmitter::emit() {
-    for (auto f : callbacks) {
-      f();
+    for (auto handler: handlers) {
+      handler->f();
     }
   }
 
   void EventEmitter::unbind() {
-    callbacks.clear();
+    handlers.clear();
   }
 }

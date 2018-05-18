@@ -11,14 +11,12 @@ namespace alcube::physics::softbody {
         gpu::GPUAccessor* gpuAccessor,
         utils::AllocationRange* allocationRange,
         utils::AllocationRange* subAllocationRange
-      );
+      ) override;
       gpu::dtos::SoftBody* getSubState();
-      unsigned short getIndex() override;
       void beforeWrite() override;
     private:
-      utils::ResourceAllocation<gpu::dtos::SoftBody> hostSubState;
-      utils::ResourceAllocation<gpu::dtos::SoftBody> subState;
-      utils::AllocationRange* subAllocationRange = nullptr;
+      utils::ResourceAllocation<gpu::dtos::SoftBody> hostSubState = {};
+      utils::ResourceAllocation<gpu::dtos::SoftBody> subState = {};
       void updateIndex() override;
   };
 }
