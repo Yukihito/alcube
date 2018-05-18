@@ -22,36 +22,36 @@ namespace alcube::models {
   }
 
   glm::vec3 Actor::getPosition() {
-    return toGlm(physicsActor->getDto()->position);
+    return toGlm(physicsActor->position.get());
   }
 
   void Actor::setPosition(glm::vec3 arg) {
-    physicsActor->getDto()->position = toCl(arg);
+    physicsActor->position.set(toCl(arg));
 
   }
 
   glm::quat Actor::getRotation() {
-    return toGlmQuat(physicsActor->getDto()->rotation);
+    return toGlmQuat(physicsActor->rotation.get());
   }
 
   void Actor::setRotation(glm::quat arg) {
-    physicsActor->getDto()->rotation = toCl(arg);
+    physicsActor->rotation.set(toCl(arg));
   }
 
   glm::vec3 Actor::getLinearMomentum() {
-    return toGlm(physicsActor->getDto()->linearMomentum);
+    return toGlm(physicsActor->linearMomentum.get());
   }
 
   void Actor::setLinearMomentum(glm::vec3 arg) {
-    physicsActor->getDto()->linearMomentum = toCl(arg);
+    physicsActor->linearMomentum.set(toCl(arg));
   }
 
   glm::vec3 Actor::getAngularMomentum() {
-    return toGlm(physicsActor->getDto()->angularMomentum);
+    return toGlm(physicsActor->angularMomentum.get());
   }
 
   void Actor::setAngularMomentum(glm::vec3 arg) {
-    physicsActor->getDto()->angularMomentum = toCl(arg);
+    physicsActor->angularMomentum.set(toCl(arg));
   }
 
   glm::vec3 Actor::getColor() {

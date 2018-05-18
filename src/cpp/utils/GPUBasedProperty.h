@@ -80,6 +80,7 @@ namespace alcube::utils {
           }
         };
         this->referenceAllocationRange->onAfterMove.subscribe(&afterMove);
+        this->set(referenceAllocationRange->getIndex());
       }
     private:
       AllocationRange* referenceAllocationRange = nullptr;

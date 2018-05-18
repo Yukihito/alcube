@@ -26,14 +26,10 @@ namespace alcube::physics {
       utils::GPUBasedProperty<gpu::dtos::Actor, cl_float3> angularMomentum = {};
       utils::GPUBasedProperty<gpu::dtos::Actor, int> isAlive = {};
       utils::GPUBasedReference<gpu::dtos::Actor> subIndex = {};
-      gpu::dtos::Actor* getDto();
       unsigned short getIndex();
       unsigned short getSubIndex();
       virtual void beforeWrite() = 0;
     protected:
-      utils::ResourceAllocation<gpu::dtos::Actor> hostActor = {};
-      utils::ResourceAllocation<gpu::dtos::Actor> actor = {};
-
       virtual void init(
         gpu::GPUAccessor* gpuAccessor,
         utils::AllocationRange* allocationRange,
@@ -48,6 +44,6 @@ namespace alcube::physics {
   };
 }
 
-#define INIT_GPU_BASED_ACTOR_PROPERTY(propName) { INIT_GPU_BASED_PROPERTY(gpu::dtos::Actor, actorStruct, propName); }
+#define INIT_GPU_BASED_ACTOR_PROPERTY(propName, value) { INIT_GPU_BASED_PROPERTY(gpu::dtos::Actor, actorStruct, propName); (propName).set(value);}
 
 #endif //ALCUBE_PHYSICS_ACTOR_H
