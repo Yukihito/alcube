@@ -8,6 +8,7 @@ namespace alcube::physics {
   ) {
     this->allocationRange = allocationRange;
     this->subAllocationRange = subAllocationRange;
+    subAllocationRange->syncDeallocation(allocationRange);
     beforeGc.f = [&]{
       if (!this->isAlive.get()) {
         this->allocationRange->deallocate();

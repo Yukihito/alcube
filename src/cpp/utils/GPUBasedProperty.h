@@ -55,6 +55,11 @@ namespace alcube::utils {
         return *ptr;
       };
 
+      U getArray() {
+        auto ptr = (U)((char*)owner->getInputPtr() + position);
+        return ptr;
+      }
+
       void set(U arg) {
         auto ptr = (U*)((char*)owner->getInputPtr() + position);
         ptr[0] = arg;

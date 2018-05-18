@@ -7,7 +7,6 @@ namespace alcube::physics::fluid {
     utils::AllocationRange* subAllocationRange
   ) {
     physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange);
-    subAllocationRange->syncDeallocation(allocationRange);
     type.set(FLUID);
     this->hostSubState.init(subAllocationRange, gpuAccessor->dtos.hostFluids);
     this->subState.init(subAllocationRange, gpuAccessor->dtos.fluids);

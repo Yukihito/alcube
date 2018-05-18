@@ -7,21 +7,18 @@ namespace alcube::physics::softbody {
     utils::AllocationRange* subAllocationRange
   ) {
     physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange);
-    subAllocationRange->syncDeallocation(allocationRange);
     type.set(SOFT_BODY);
-    this->hostSubState.init(subAllocationRange, gpuAccessor->dtos.hostSoftBodies);
-    this->subState.init(subAllocationRange, gpuAccessor->dtos.softBodies);
-    this->hostSubState.getPtr()->elasticity = 1.0f;
+    subStateStruct.init(gpuAccessor->dtos.hostSoftBodies, gpuAccessor->dtos.softBodies, subAllocationRange);
+    INIT_GPU_BASED_SOFTBODY_PROPERTY(elasticity, 1.0f);
+    INIT_GPU_BASED_SOFTBODY_ARRAY(springIndices);
+    INIT_GPU_BASED_SOFTBODY_ARRAY(springNodeIndices);
+    INIT_GPU_BASED_SOFTBODY_PROPERTY(springCount, 0);
+    INIT_GPU_BASED_REFERENCE(gpu::dtos::SoftBody, subStateStruct, actorIndex, allocationRange);
     updateIndex();
-  }
-
-  gpu::dtos::SoftBody* Actor::getSubState() {
-    return hostSubState.getPtr();
   }
 
   void Actor::beforeWrite() {}
 
   void Actor::updateIndex() {
-    this->hostSubState.getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
   }
 }

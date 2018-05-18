@@ -16,7 +16,6 @@ namespace alcube::physics {
 
   class Actor {
     public:
-      utils::GPUBasedStruct<gpu::dtos::Actor> actorStruct = {};
       utils::GPUBasedProperty<gpu::dtos::Actor, unsigned short> type = {};
       utils::GPUBasedProperty<gpu::dtos::Actor, float> radius = {};
       utils::GPUBasedProperty<gpu::dtos::Actor, float> mass = {};
@@ -40,6 +39,7 @@ namespace alcube::physics {
       utils::AllocationRange* subAllocationRange = nullptr;
 
     private:
+      utils::GPUBasedStruct<gpu::dtos::Actor> actorStruct = {};
       utils::EventHandler beforeGc;
   };
 }
