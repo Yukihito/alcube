@@ -30,7 +30,7 @@ namespace alcube::physics {
   }
 
   unsigned short Actor::getSubIndex() {
-    return hostActor.getPtr()->subPhysicalQuantityIndex;
+    return hostActor.getPtr()->subIndex;
   }
 
   gpu::dtos::Actor* Actor::getDto() {

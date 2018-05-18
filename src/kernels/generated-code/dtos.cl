@@ -2,7 +2,7 @@
 typedef struct __attribute__ ((packed)) ActorStruct {
   ushort type;
   char _padding0[2];
-  ushort subPhysicalQuantityIndex;
+  ushort subIndex;
   char _padding1[2];
   float radius;
   float mass;

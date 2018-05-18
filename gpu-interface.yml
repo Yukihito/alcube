@@ -41,7 +41,7 @@ dto-structs:
   # Variables for all actors
   Actor:
     - ushort type
-    - ushort subPhysicalQuantityIndex
+    - ushort subIndex
     - float  radius
     - float  mass
     - float3 position

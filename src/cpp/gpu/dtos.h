@@ -9,7 +9,7 @@ namespace alcube::gpu::dtos {
     public:
       unsigned short type;
       char _padding0[2];
-      unsigned short subPhysicalQuantityIndex;
+      unsigned short subIndex;
       char _padding1[2];
       float radius;
       float mass;

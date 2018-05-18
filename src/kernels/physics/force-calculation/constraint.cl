@@ -37,7 +37,7 @@ void accumulateConstraintImpulse(
   unsigned int intersectionType = intersection->type;
   ushort otherIndex = intersection->otherIndex;
   float mass = actorState->massForCollision;
-  float elasticity = intersectionType == ACTOR_TYPE_SOFT_BODY ? softBodies[actor->subPhysicalQuantityIndex].elasticity * softBodies[actorStates[otherIndex].constants.subPhysicalQuantityIndex].elasticity : softBodies[actor->subPhysicalQuantityIndex].elasticity;
+  float elasticity = intersectionType == ACTOR_TYPE_SOFT_BODY ? softBodies[actor->subIndex].elasticity * softBodies[actorStates[otherIndex].constants.subIndex].elasticity : softBodies[actor->subIndex].elasticity;
   float massRatio = intersectionType == ACTOR_TYPE_SOFT_BODY || intersectionType == ACTOR_TYPE_FLUID ? mass / actorStates[otherIndex].massForCollision : 0.0f;
   float3 intersectionNormal = intersection->normal;
   float speedOnIntersectionNormal = dot(actorState->linearVelocity, intersectionNormal);

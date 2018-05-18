@@ -30,7 +30,7 @@ namespace alcube::physics::fluid {
   }
 
   void Actor::updateIndex() {
-    this->hostActor.getPtr()->subPhysicalQuantityIndex = (unsigned short)subAllocationRange->getIndex();
+    this->hostActor.getPtr()->subIndex = (unsigned short)subAllocationRange->getIndex();
     this->hostSubState.getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
   }
 
