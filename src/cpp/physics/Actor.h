@@ -29,21 +29,18 @@ namespace alcube::physics {
       unsigned short getSubIndex();
       virtual void beforeWrite() = 0;
     protected:
+      utils::AllocationRange* allocationRange = nullptr;
+      utils::AllocationRange* subAllocationRange = nullptr;
       virtual void init(
         gpu::GPUAccessor* gpuAccessor,
         utils::AllocationRange* allocationRange,
         utils::AllocationRange* subAllocationRange
       );
-      virtual void updateIndex() = 0;
-      utils::AllocationRange* allocationRange = nullptr;
-      utils::AllocationRange* subAllocationRange = nullptr;
-
     private:
       utils::GPUBasedStruct<gpu::dtos::Actor> actorStruct = {};
-      utils::EventHandler beforeGc;
+      utils::EventHandler beforeGc = {};
   };
 }
-
 #define INIT_GPU_BASED_ACTOR_PROPERTY(propName, value) { INIT_GPU_BASED_PROPERTY(gpu::dtos::Actor, actorStruct, propName); (propName).set(value);}
 
 #endif //ALCUBE_PHYSICS_ACTOR_H

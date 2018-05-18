@@ -15,20 +15,16 @@ namespace alcube::physics::fluid {
       static float stiffness;
       static float viscosity;
       static float mass;
-
+      utils::GPUBasedReference<gpu::dtos::Fluid> actorIndex = {};
       void init(
         gpu::GPUAccessor* gpuAccessor,
         utils::AllocationRange* allocationRange,
         utils::AllocationRange* subAllocationRange
       ) override;
-
-      gpu::dtos::Fluid* getSubState();
       void beforeWrite() override;
     private:
-      utils::ResourceAllocation<gpu::dtos::Fluid> hostSubState = {};
-      utils::ResourceAllocation<gpu::dtos::Fluid> subState = {};
+      utils::GPUBasedStruct<gpu::dtos::Fluid> subStateStruct = {};
       gpu::GPUAccessor* gpuAccessor = nullptr;
-      void updateIndex() override;
   };
 }
 

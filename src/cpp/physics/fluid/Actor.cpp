@@ -7,24 +7,15 @@ namespace alcube::physics::fluid {
     utils::AllocationRange* subAllocationRange
   ) {
     physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange);
+    subStateStruct.init(gpuAccessor->dtos.hostFluids, gpuAccessor->dtos.fluids, subAllocationRange);
     type.set(FLUID);
-    this->hostSubState.init(subAllocationRange, gpuAccessor->dtos.hostFluids);
-    this->subState.init(subAllocationRange, gpuAccessor->dtos.fluids);
     this->gpuAccessor = gpuAccessor;
-    updateIndex();
-  }
-
-  gpu::dtos::Fluid* Actor::getSubState() {
-    return this->hostSubState.getPtr();
+    INIT_GPU_BASED_REFERENCE(gpu::dtos::Fluid, subStateStruct, actorIndex, allocationRange);
   }
 
   void Actor::beforeWrite() {
     radius.set(gpuAccessor->memories.fluidSettings.at(0)->effectiveRadius / 2.0f);
     physics::Actor::mass.set(gpuAccessor->memories.fluidSettings.at(0)->particleMass);
-  }
-
-  void Actor::updateIndex() {
-    this->hostSubState.getPtr()->actorIndex = (unsigned short)allocationRange->getIndex();
   }
 
   float Actor::stiffness = 64.0f;
