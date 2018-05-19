@@ -77,19 +77,22 @@ namespace alcube::utils {
       void init(GPUBasedStruct<T>& owner, size_t position, AllocationRange* referenceAllocationRange) {
         GPUBasedProperty<T, unsigned int>::init(owner, position);
         this->referenceAllocationRange = referenceAllocationRange;
-        afterMove.f = [&]{
+        afterMoveReference.f = [&]{
           if (this->owner->isFree()) {
-            this->referenceAllocationRange->onAfterMove.unsubscribe(&afterMove);
+            this->referenceAllocationRange->onAfterMove.unsubscribe(&afterMoveReference);
           } else {
-            this->set(referenceAllocationRange->getIndex());
+            this->value = this->referenceAllocationRange->getIndex();
           }
         };
-        this->referenceAllocationRange->onAfterMove.subscribe(&afterMove);
-        this->set(referenceAllocationRange->getIndex());
+        this->referenceAllocationRange->onAfterMove.subscribe(&afterMoveReference);
+        this->value = referenceAllocationRange->getIndex();
+        this->set(value);
       }
     private:
+      unsigned int value = 0;
       AllocationRange* referenceAllocationRange = nullptr;
-      EventHandler afterMove = {};
+      EventHandler afterMoveReference = {};
+      EventHandler beforeGcOwner = {};
   };
 }
 
