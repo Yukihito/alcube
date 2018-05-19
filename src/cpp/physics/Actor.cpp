@@ -40,8 +40,4 @@ namespace alcube::physics {
     INIT_GPU_BASED_ACTOR_PROPERTY(isAlive, true);
     INIT_GPU_BASED_REFERENCE(gpu::dtos::Actor, actorStruct, subIndex, subAllocationRange);
   }
-
-  unsigned short Actor::getIndex() {
-    return (unsigned short)allocationRange->getIndex();
-  }
 }

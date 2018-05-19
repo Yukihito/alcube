@@ -27,7 +27,6 @@ namespace alcube::physics {
       utils::GPUBasedProperty<gpu::dtos::Actor, cl_float3> angularMomentum = {};
       utils::GPUBasedProperty<gpu::dtos::Actor, int> isAlive = {};
       utils::GPUBasedReference<gpu::dtos::Actor> subIndex = {};
-      unsigned short getIndex();
       virtual void beforeWrite() = 0;
     protected:
       void init(
