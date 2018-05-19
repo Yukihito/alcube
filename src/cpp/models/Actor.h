@@ -13,7 +13,7 @@
 #include "v8.h"
 
 namespace alcube::models {
-  class Actor : public physics::Accessors, public drawing::IndexHolder {
+  class Actor : public physics::Accessors {
     public:
       int getId();
       glm::vec3 getPosition() override;
@@ -31,7 +31,6 @@ namespace alcube::models {
       void setModel3D(alcube::models::drawing::Model3D* model3D);
 
       alcube::physics::Actor* getPhysicsActor();
-      unsigned int getIndex() override;
       alcube::models::drawing::Model3D* getModel3D();
 
     private:

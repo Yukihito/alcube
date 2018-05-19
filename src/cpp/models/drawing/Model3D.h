@@ -21,11 +21,6 @@ namespace alcube::models::drawing {
     INSTANCE_COLOR_TYPE_LINEAR_MOMENTUM
   };
 
-  class IndexHolder {
-    public:
-      virtual unsigned int getIndex() = 0;
-  };
-
   class RenderingGroupSettings {
     public:
       virtual InstanceColorType getInstanceColorType() = 0;

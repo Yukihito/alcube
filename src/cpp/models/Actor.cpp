@@ -62,10 +62,6 @@ namespace alcube::models {
     model3D->setColor(arg);
   }
 
-  unsigned int Actor::getIndex() {
-    return physicsActor->getIndex();
-  }
-
   alcube::models::drawing::Model3D* Actor::getModel3D() {
     return model3D;
   }
