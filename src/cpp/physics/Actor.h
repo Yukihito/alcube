@@ -16,6 +16,8 @@ namespace alcube::physics {
 
   class Actor {
     public:
+      utils::AllocationRange* allocationRange = nullptr;
+      utils::AllocationRange* subAllocationRange = nullptr;
       utils::GPUBasedProperty<gpu::dtos::Actor, unsigned short> type = {};
       utils::GPUBasedProperty<gpu::dtos::Actor, float> radius = {};
       utils::GPUBasedProperty<gpu::dtos::Actor, float> mass = {};
@@ -29,8 +31,6 @@ namespace alcube::physics {
       unsigned short getSubIndex();
       virtual void beforeWrite() = 0;
     protected:
-      utils::AllocationRange* allocationRange = nullptr;
-      utils::AllocationRange* subAllocationRange = nullptr;
       virtual void init(
         gpu::GPUAccessor* gpuAccessor,
         utils::AllocationRange* allocationRange,

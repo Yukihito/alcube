@@ -4,21 +4,21 @@ namespace alcube::physics::softbody {
   using namespace utils::opencl::conversions;
   void SpringNode::init(
     utils::AllocationRange* allocationRange,
-    alcube::utils::ResourceAllocation<alcube::gpu::dtos::Spring> *spring,
+    utils::GPUBasedStruct<gpu::dtos::Spring>& springStruct,
     unsigned char nodeIndex
   ) {
+    this->springStruct = &springStruct;
     this->allocationRange = allocationRange;
-    this->spring = spring;
     this->nodeIndex = nodeIndex;
+    INIT_GPU_BASED_PROPERTY(gpu::dtos::Spring, springStruct, nodePositionsModelSpace);
   }
 
   void SpringNode::setPosition(glm::vec3 position) {
-    spring->getPtr()->nodePositionsModelSpace[nodeIndex] = toCl(position);
+    nodePositionsModelSpace.getArray()[nodeIndex] = toCl(position);
   }
 
   void SpringNode::setActor(alcube::physics::softbody::Actor *actor) {
-    this->actor = actor;
-    spring->getPtr()->actorIndices[nodeIndex] = actor->getIndex();
+    INIT_GPU_BASED_REFERENCE_AT(gpu::dtos::Spring, unsigned short, *springStruct, actorIndices, actor->allocationRange, nodeIndex);
     auto springCount = actor->springCount.get();
     actor->springIndices.getArray()[springCount] = allocationRange->getIndex();
     actor->springNodeIndices.getArray()[springCount] = nodeIndex;
@@ -26,14 +26,15 @@ namespace alcube::physics::softbody {
   }
 
   void Spring::setK(float k) {
-    spring.getPtr()->k = k;
+     this->k.set(k);
   }
 
   void Spring::init(gpu::GPUAccessor *gpuAccessor, utils::AllocationRange *allocationRange) {
-    spring.init(allocationRange, gpuAccessor->dtos.springs);
+    springStruct.init(gpuAccessor->dtos.springs, gpuAccessor->dtos.springs, allocationRange);
+    INIT_GPU_BASED_PROPERTY(gpu::dtos::Spring, springStruct, k);
     this->allocationRange = allocationRange;
     for (unsigned char i = 0; i < 2; i++) {
-      nodes[i].init(allocationRange, &spring, i);
+      nodes[i].init(allocationRange, springStruct, i);
     }
   }
 
