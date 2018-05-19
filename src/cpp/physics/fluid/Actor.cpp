@@ -4,9 +4,15 @@ namespace alcube::physics::fluid {
   void Actor::init(
     gpu::GPUAccessor* gpuAccessor,
     utils::AllocationRange* allocationRange,
-    utils::AllocationRange* subAllocationRange
+    utils::AllocationRange* subAllocationRange,
+    physics::Actor** actors,
+    physics::fluid::Actor** subActors
   ) {
-    physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange);
+    physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange, actors);
+    subActors[subAllocationRange->getIndex()] = this;
+    afterMoveSub.f = [&]{
+      subActors[this->subAllocationRange->getIndex()] = this;
+    };
     subStateStruct.init(gpuAccessor->dtos.hostFluids, gpuAccessor->dtos.fluids, subAllocationRange);
     type.set(FLUID);
     this->gpuAccessor = gpuAccessor;

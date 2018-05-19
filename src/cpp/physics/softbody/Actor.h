@@ -15,8 +15,10 @@ namespace alcube::physics::softbody {
       void init(
         gpu::GPUAccessor* gpuAccessor,
         utils::AllocationRange* allocationRange,
-        utils::AllocationRange* subAllocationRange
-      ) override;
+        utils::AllocationRange* subAllocationRange,
+        physics::Actor** actors,
+        physics::softbody::Actor** subActors
+      );
       void beforeWrite() override;
     private:
       utils::GPUBasedStruct<gpu::dtos::SoftBody> subStateStruct = {};

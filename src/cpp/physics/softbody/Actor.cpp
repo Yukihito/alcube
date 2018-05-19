@@ -4,9 +4,15 @@ namespace alcube::physics::softbody {
   void Actor::init(
     gpu::GPUAccessor* gpuAccessor,
     utils::AllocationRange* allocationRange,
-    utils::AllocationRange* subAllocationRange
+    utils::AllocationRange* subAllocationRange,
+    physics::Actor** actors,
+    physics::softbody::Actor** subActors
   ) {
-    physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange);
+    physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange, actors);
+    subActors[subAllocationRange->getIndex()] = this;
+    afterMoveSub.f = [&]{
+      subActors[this->subAllocationRange->getIndex()] = this;
+    };
     subStateStruct.init(gpuAccessor->dtos.hostSoftBodies, gpuAccessor->dtos.softBodies, subAllocationRange);
     type.set(SOFT_BODY);
     INIT_GPU_BASED_SOFTBODY_PROPERTY(elasticity, 1.0f);

@@ -11,17 +11,25 @@ namespace alcube::physics {
 
   fluid::Actor* ActorFactory::createFluid() {
     auto entity = actorResources->fluidResource->memoryPool->allocate();
-    entity->init(gpuAccessor, actorResources->allocationRange->allocate(1), actorResources->fluidResource->allocationRange->allocate(1));
-    actorResources->entities[entity->getIndex()] = entity;
-    actorResources->fluidResource->entities[entity->getSubIndex()] = entity;
+    entity->init(
+      gpuAccessor,
+      actorResources->allocationRange->allocate(1),
+      actorResources->fluidResource->allocationRange->allocate(1),
+      actorResources->entities,
+      actorResources->fluidResource->entities
+    );
     return entity;
   }
 
   softbody::Actor* ActorFactory::createSoftbody() {
     auto entity = actorResources->softbodyResource->memoryPool->allocate();
-    entity->init(gpuAccessor, actorResources->allocationRange->allocate(1), actorResources->softbodyResource->allocationRange->allocate(1));
-    actorResources->entities[entity->getIndex()] = entity;
-    actorResources->softbodyResource->entities[entity->getSubIndex()] = entity;
+    entity->init(
+      gpuAccessor,
+      actorResources->allocationRange->allocate(1),
+      actorResources->softbodyResource->allocationRange->allocate(1),
+      actorResources->entities,
+      actorResources->softbodyResource->entities
+    );
     return entity;
   }
 

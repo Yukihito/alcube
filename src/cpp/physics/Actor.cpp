@@ -4,17 +4,29 @@ namespace alcube::physics {
   void Actor::init(
     alcube::gpu::GPUAccessor *gpuAccessor,
     alcube::utils::AllocationRange *allocationRange,
-    utils::AllocationRange* subAllocationRange
+    utils::AllocationRange* subAllocationRange,
+    Actor** actors
   ) {
     this->allocationRange = allocationRange;
     this->subAllocationRange = subAllocationRange;
     subAllocationRange->syncDeallocation(allocationRange);
+    actors[this->allocationRange->getIndex()] = this;
+    afterMove.f = [&]{
+      actors[this->allocationRange->getIndex()] = this;
+    };
+    this->allocationRange->onAfterMove.subscribe(&afterMove);
+    this->subAllocationRange->onAfterMove.subscribe(&afterMoveSub);
+
     beforeGc.f = [&]{
       if (!this->isAlive.get()) {
         this->allocationRange->deallocate();
+        this->allocationRange->onBeforeGc.unsubscribe(&beforeGc);
+        this->allocationRange->onAfterMove.unsubscribe(&afterMove);
+        this->subAllocationRange->onAfterMove.unsubscribe(&afterMoveSub);
       }
     };
     this->allocationRange->onBeforeGc.subscribe(&beforeGc);
+
     this->actorStruct.init(gpuAccessor->dtos.hostActors, gpuAccessor->dtos.actors, allocationRange);
     cl_float3 vec3Zero = {0.0f, 0.0f, 0.0f};
     cl_float4 quatIdent = {0.0f, 0.0f, 0.0f, 1.0f};
@@ -31,9 +43,5 @@ namespace alcube::physics {
 
   unsigned short Actor::getIndex() {
     return (unsigned short)allocationRange->getIndex();
-  }
-
-  unsigned short Actor::getSubIndex() {
-    return (unsigned short)subAllocationRange->getIndex();
   }
 }
