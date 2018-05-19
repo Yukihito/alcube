@@ -95,6 +95,6 @@ namespace alcube::utils {
 
 #define INIT_GPU_BASED_PROPERTY(T, argOwner, argName) { T tmp = {}; this->argName.init(argOwner, (char*)&tmp.argName - (char*)&tmp); }
 #define INIT_GPU_BASED_REFERENCE(T, argOwner, argName, referenceAllocationRange) { T tmp = {}; this->argName.init(argOwner, (char*)&tmp.argName - (char*)&tmp, referenceAllocationRange); }
-#define INIT_GPU_BASED_REFERENCE_AT(T, U, argOwner, argName, referenceAllocationRange, index) { T tmp = {}; this->argName.init(argOwner, (char*)&tmp.argName - (char*)&tmp + sizeof(U) * index, referenceAllocationRange); }
+#define INIT_GPU_BASED_REFERENCE_AT(T, U, argOwner, argName, referenceAllocationRange, index) { T tmp = {}; this->argName.init(argOwner, (char*)&tmp.argName - (char*)&tmp + sizeof(U) * (index), referenceAllocationRange); }
 
 #endif //ALCUBE_GPUBASEDPROPERTY_H
