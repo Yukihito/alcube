@@ -4,6 +4,7 @@
 #include "../../gpu/GPUAccessor.h"
 #include "../../utils/ResourceAllocation.h"
 #include "../../utils/MemoryPool.h"
+#include "../../utils/GPUBasedProperty.h"
 #include <glm/vec3.hpp>
 #include <random>
 
@@ -31,15 +32,10 @@ namespace alcube::models::drawing {
       virtual bool refersToRotations() = 0;
   };
 
-  struct Model3DAllocations {
-    utils::ResourceAllocation<cl_float3> colors;
-    utils::ResourceAllocation<gpu::dtos::Renderer> features;
-  };
-
   class Model3D {
     public:
       void init(
-        IndexHolder* actorIndexHolder,
+        utils::AllocationRange* actorAllocationRange,
         utils::AllocationRange* allocationRange,
         RenderingGroupSettings* groupSettings,
         gpu::GPUAccessor* gpuAccessor
@@ -48,17 +44,25 @@ namespace alcube::models::drawing {
       void setColor(glm::vec3 v);
 
     private:
-      IndexHolder* actorIndexHolder;
+      utils::AllocationRange* actorAllocationRange;
       utils::AllocationRange* allocationRange;
-      Model3DAllocations allocations;
       models::drawing::RenderingGroupSettings* groupSettings;
+      utils::GPUBasedStruct<gpu::dtos::Renderer> featuresStruct = {};
+      utils::GPUBasedStruct<cl_float3> colorsStruct = {};
+      utils::GPUBasedReference<gpu::dtos::Renderer> actorIndex = {};
+      utils::GPUBasedProperty<gpu::dtos::Renderer, int> refersToRotations = {};
+      utils::GPUBasedProperty<gpu::dtos::Renderer, unsigned int> instanceColorType = {};
       void setUpAllocations(gpu::GPUAccessor* gpuAccessor);
   };
 
   class Model3DFactory {
     public:
       explicit Model3DFactory(utils::MemoryPool<Model3D>* memoryPool, gpu::GPUAccessor* gpuAccessor);
-      Model3D* create(IndexHolder* actorIndexHolder, utils::AllocationRange* groupAllocationRange, RenderingGroupSettings* groupSettings);
+      Model3D* create(
+        utils::AllocationRange* actorAllocationRange,
+        utils::AllocationRange* groupAllocationRange,
+        RenderingGroupSettings* groupSettings
+      );
 
     private:
       utils::MemoryPool<Model3D>* memoryPool;

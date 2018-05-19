@@ -80,7 +80,7 @@ namespace alcube::models {
     int nextId = instanceCount;
     actor->init(nextId);
     actor->setPhysicsActor(physicsActor);
-    auto m = renderingGroup->createModel3D(actor);
+    auto m = renderingGroup->createModel3D(actor->getPhysicsActor()->allocationRange);
     actor->setModel3D(m);
     instanceCount++;
     return actor;

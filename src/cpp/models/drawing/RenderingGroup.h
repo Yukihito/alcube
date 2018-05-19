@@ -44,7 +44,7 @@ namespace alcube::models::drawing {
       void setInstanceColorType(InstanceColorType v);
       bool refersToRotations() override;
 
-      Model3D* createModel3D(IndexHolder *indexHolder);
+      Model3D* createModel3D(utils::AllocationRange* actorAllocationRange);
       alcube::drawing::Drawable* getDrawable();
       void input();
       void updateGPU();

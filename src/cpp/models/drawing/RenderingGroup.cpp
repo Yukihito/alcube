@@ -65,8 +65,8 @@ namespace alcube::models::drawing {
     return drawable;
   }
 
-  Model3D* RenderingGroup::createModel3D(IndexHolder *indexHolder) {
-    auto entity = model3DFactory->create(indexHolder, allocationRange, this);
+  Model3D* RenderingGroup::createModel3D(utils::AllocationRange* actorAllocationRange) {
+    auto entity = model3DFactory->create(actorAllocationRange, allocationRange, this);
     return entity;
   }
 

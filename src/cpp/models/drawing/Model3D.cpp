@@ -3,42 +3,43 @@
 
 namespace alcube::models::drawing {
   void Model3D::init(
-    alcube::models::drawing::IndexHolder *actorIndexHolder,
+    utils::AllocationRange* actorAllocationRange,
     utils::AllocationRange* allocationRange,
     RenderingGroupSettings* groupSettings,
     gpu::GPUAccessor* gpuAccessor
   ) {
-    this->actorIndexHolder = actorIndexHolder;
+    this->actorAllocationRange = actorAllocationRange;
     this->allocationRange = allocationRange;
     this->groupSettings = groupSettings;
     setUpAllocations(gpuAccessor);
   }
 
   void Model3D::setUpAllocations(alcube::gpu::GPUAccessor *gpuAccessor) {
-    allocations = {};
-    allocations.colors.init(allocationRange, gpuAccessor->dtos.hostColors);
-    allocations.features.init(allocationRange, gpuAccessor->dtos.hostRenderers);
+    featuresStruct.init(gpuAccessor->dtos.hostRenderers, gpuAccessor->dtos.renderers, allocationRange);
+    colorsStruct.init(gpuAccessor->dtos.hostColors, gpuAccessor->dtos.colors, allocationRange);
+    INIT_GPU_BASED_REFERENCE(gpu::dtos::Renderer, featuresStruct, actorIndex, actorAllocationRange);
+    INIT_GPU_BASED_PROPERTY(gpu::dtos::Renderer, featuresStruct, refersToRotations);
+    INIT_GPU_BASED_PROPERTY(gpu::dtos::Renderer, featuresStruct, instanceColorType);
 
     if (groupSettings->getInstanceColorType() == INSTANCE_COLOR_TYPE_RANDOM) {
       std::random_device rnd;
       std::mt19937 mt(rnd());
       std::uniform_real_distribution<float> randReal(0, 1);
-      allocations.colors.getPtr()[0] = {randReal(mt), randReal(mt), randReal(mt)};
+      colorsStruct.getInputPtr()[0] = {randReal(mt), randReal(mt), randReal(mt)};
     } else {
-      allocations.colors.getPtr()[0] = {0.0f, 0.0f, 0.0f};
+      colorsStruct.getInputPtr()[0] = {0.0f, 0.0f, 0.0f};
     }
-    allocations.features.getPtr()->refersToRotations = groupSettings->refersToRotations();
-    allocations.features.getPtr()->instanceColorType = groupSettings->getInstanceColorType();
-    allocations.features.getPtr()->actorIndex = (unsigned short)actorIndexHolder->getIndex();
+    refersToRotations.set(groupSettings->refersToRotations());
+    instanceColorType.set(groupSettings->getInstanceColorType());
   }
 
   glm::vec3 Model3D::getColor() {
-    auto raw = allocations.colors.get();
+    auto raw = *colorsStruct.getInputPtr();
     return glm::vec3(raw.x, raw.y, raw.z);
   }
 
   void Model3D::setColor(glm::vec3 v) {
-    allocations.colors.getPtr()[0] = {v.x, v.y, v.z};
+    colorsStruct.getInputPtr()[0] = {v.x, v.y, v.z};
   }
 
   Model3DFactory::Model3DFactory(
@@ -50,13 +51,13 @@ namespace alcube::models::drawing {
   }
 
   Model3D* Model3DFactory::create(
-    alcube::models::drawing::IndexHolder *actorIndexHolder,
+    utils::AllocationRange* actorAllocationRange,
     utils::AllocationRange* groupAllocationRange,
     RenderingGroupSettings* groupSettings
   ) {
     auto entity = memoryPool->allocate();
     entity->init(
-      actorIndexHolder,
+      actorAllocationRange,
       groupAllocationRange->allocate(1),
       groupSettings,
       gpuAccessor
