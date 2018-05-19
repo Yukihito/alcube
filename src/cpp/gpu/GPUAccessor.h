@@ -20,6 +20,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(Actor* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -34,6 +35,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(ActorState* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -48,6 +50,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(Constants* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -62,6 +65,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(Fluid* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -76,6 +80,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(FluidSettings* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -90,6 +95,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(Grid* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -104,6 +110,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(GridAndActorRelation* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -118,6 +125,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(Intersection* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -132,6 +140,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(Renderer* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -146,6 +155,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(SoftBody* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -160,6 +170,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(Spring* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -174,6 +185,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(SpringState* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -188,6 +200,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(CharMemory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -202,6 +215,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(DoubleMemory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -216,6 +230,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(FloatMemory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -230,6 +245,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(Float16Memory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -244,6 +260,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(Float3Memory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -258,6 +275,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(Float4Memory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -272,6 +290,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(IntMemory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -286,6 +305,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(LongMemory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -300,6 +320,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(ShortMemory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -314,6 +335,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(UcharMemory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -328,6 +350,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(UintMemory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -342,6 +365,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(UlongMemory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);
@@ -356,6 +380,7 @@ namespace alcube::gpu {
         void write();
         void write(size_t offset);
         void read();
+        void read(UshortMemory* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);

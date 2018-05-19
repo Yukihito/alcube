@@ -19,8 +19,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void Actor::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void Actor::read(Actor* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void Actor::readRange(size_t min, size_t length) {
@@ -47,8 +47,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void ActorState::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void ActorState::read(ActorState* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void ActorState::readRange(size_t min, size_t length) {
@@ -75,8 +75,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void Constants::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void Constants::read(Constants* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void Constants::readRange(size_t min, size_t length) {
@@ -103,8 +103,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void Fluid::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void Fluid::read(Fluid* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void Fluid::readRange(size_t min, size_t length) {
@@ -131,8 +131,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void FluidSettings::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void FluidSettings::read(FluidSettings* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void FluidSettings::readRange(size_t min, size_t length) {
@@ -159,8 +159,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void Grid::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void Grid::read(Grid* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void Grid::readRange(size_t min, size_t length) {
@@ -187,8 +187,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void GridAndActorRelation::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void GridAndActorRelation::read(GridAndActorRelation* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void GridAndActorRelation::readRange(size_t min, size_t length) {
@@ -215,8 +215,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void Intersection::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void Intersection::read(Intersection* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void Intersection::readRange(size_t min, size_t length) {
@@ -243,8 +243,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void Renderer::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void Renderer::read(Renderer* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void Renderer::readRange(size_t min, size_t length) {
@@ -271,8 +271,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void SoftBody::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void SoftBody::read(SoftBody* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void SoftBody::readRange(size_t min, size_t length) {
@@ -299,8 +299,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void Spring::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void Spring::read(Spring* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void Spring::readRange(size_t min, size_t length) {
@@ -327,8 +327,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void SpringState::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void SpringState::read(SpringState* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void SpringState::readRange(size_t min, size_t length) {
@@ -355,8 +355,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void CharMemory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void CharMemory::read(CharMemory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void CharMemory::readRange(size_t min, size_t length) {
@@ -383,8 +383,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void DoubleMemory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void DoubleMemory::read(DoubleMemory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void DoubleMemory::readRange(size_t min, size_t length) {
@@ -411,8 +411,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void FloatMemory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void FloatMemory::read(FloatMemory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void FloatMemory::readRange(size_t min, size_t length) {
@@ -439,8 +439,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void Float16Memory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void Float16Memory::read(Float16Memory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void Float16Memory::readRange(size_t min, size_t length) {
@@ -467,8 +467,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void Float3Memory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void Float3Memory::read(Float3Memory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void Float3Memory::readRange(size_t min, size_t length) {
@@ -495,8 +495,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void Float4Memory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void Float4Memory::read(Float4Memory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void Float4Memory::readRange(size_t min, size_t length) {
@@ -523,8 +523,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void IntMemory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void IntMemory::read(IntMemory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void IntMemory::readRange(size_t min, size_t length) {
@@ -551,8 +551,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void LongMemory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void LongMemory::read(LongMemory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void LongMemory::readRange(size_t min, size_t length) {
@@ -579,8 +579,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void ShortMemory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void ShortMemory::read(ShortMemory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void ShortMemory::readRange(size_t min, size_t length) {
@@ -607,8 +607,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void UcharMemory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void UcharMemory::read(UcharMemory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void UcharMemory::readRange(size_t min, size_t length) {
@@ -635,8 +635,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void UintMemory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void UintMemory::read(UintMemory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void UintMemory::readRange(size_t min, size_t length) {
@@ -663,8 +663,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void UlongMemory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void UlongMemory::read(UlongMemory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void UlongMemory::readRange(size_t min, size_t length) {
@@ -691,8 +691,8 @@ namespace alcube::gpu {
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void UshortMemory::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void UshortMemory::read(UshortMemory* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void UshortMemory::readRange(size_t min, size_t length) {

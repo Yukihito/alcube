@@ -6,6 +6,7 @@
         void write();
         void write(size_t offset);
         void read();
+        void read(${name}* dst);
         void readRange(size_t min, size_t length);
         void zeroFill();
         void setCount(size_t count);

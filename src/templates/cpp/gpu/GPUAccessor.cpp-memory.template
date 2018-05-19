@@ -14,8 +14,8 @@
       resourcesProvider->queue->pushZeroFill(this->memory);
     }
 
-    void ${memory_type_name}::read() {
-      resourcesProvider->queue->read(this->memory, this->dto);
+    void ${memory_type_name}::read(${memory_type_name}* dst) {
+      resourcesProvider->queue->read(this->memory, dst->dto);
     }
 
     void ${memory_type_name}::readRange(size_t min, size_t length) {
