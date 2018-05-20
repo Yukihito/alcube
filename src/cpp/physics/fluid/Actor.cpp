@@ -3,7 +3,7 @@
 namespace alcube::physics::fluid {
   Actor::Actor(): physics::Actor() {
     this->moveSubEventHandler.f = [&](utils::AllocationMoveEvent &e) {
-      this->subActors[e.dst] = this;
+      this->subEntities[e.dst] = this;
     };
 
     this->subDeallocationEventHandler.f = [&](utils::DeallocationEvent &e) {
@@ -17,13 +17,13 @@ namespace alcube::physics::fluid {
     utils::AllocationRange* allocationRange,
     utils::AllocationRange* subAllocationRange,
     physics::Actor** actors,
-    physics::fluid::Actor** subActors
+    physics::fluid::Actor** subEntities
   ) {
     physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange, actors);
     this->subAllocationRange->onMove.subscribe(moveSubEventHandler);
     this->subAllocationRange->onDeallocate.subscribe(subDeallocationEventHandler);
-    this->subActors = subActors;
-    this->subActors[subAllocationRange->getIndex()] = this;
+    this->subEntities = subEntities;
+    this->subEntities[subAllocationRange->getIndex()] = this;
     this->subAllocation.init(subAllocationRange, gpuAccessor->dtos.hostFluids);
     this->gpuAccessor = gpuAccessor;
     type.set(FLUID);

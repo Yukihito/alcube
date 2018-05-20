@@ -21,11 +21,11 @@ namespace alcube::physics::fluid {
         utils::AllocationRange* allocationRange,
         utils::AllocationRange* subAllocationRange,
         physics::Actor** actors,
-        physics::fluid::Actor** subActors
+        physics::fluid::Actor** subEntities
       );
       void beforeWrite() override;
     private:
-      physics::fluid::Actor** subActors = nullptr;
+      physics::fluid::Actor** subEntities = nullptr;
       utils::ResourceAllocation<gpu::dtos::Fluid> subAllocation;
       utils::EventHandler<utils::AllocationMoveEvent> moveSubEventHandler = {};
       utils::EventHandler<utils::DeallocationEvent> subDeallocationEventHandler = {};

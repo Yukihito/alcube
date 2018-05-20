@@ -18,12 +18,13 @@ namespace alcube::physics::softbody {
         utils::AllocationRange* allocationRange,
         utils::AllocationRange* subAllocationRange,
         physics::Actor** actors,
-        physics::softbody::Actor** subActors
+        physics::softbody::Actor** subEntities
       );
       void beforeWrite() override;
+      void addSpring(utils::AllocationRange* springAllocationRange, unsigned char nodeIndex);
     private:
       utils::ResourceAllocation<gpu::dtos::SoftBody> subAllocation;
-      physics::softbody::Actor** subActors = nullptr;
+      physics::softbody::Actor** subEntities = nullptr;
       utils::EventHandler<utils::AllocationMoveEvent> moveSubEventHandler = {};
       utils::EventHandler<utils::DeallocationEvent> subDeallocationEventHandler = {};
   };

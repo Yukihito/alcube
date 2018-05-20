@@ -34,13 +34,13 @@ namespace alcube::physics {
         gpu::GPUAccessor* gpuAccessor,
         utils::AllocationRange* allocationRange,
         utils::AllocationRange* subAllocationRange,
-        Actor** actors
+        Actor** entities
       );
     private:
       utils::ResourceAllocation<gpu::dtos::Actor> allocation;
       utils::EventHandler<utils::AllocationMoveEvent> moveEventHandler = {};
       utils::EventHandler<utils::DeallocationEvent> deallocationEventHandler = {};
-      Actor** actors;
+      Actor** entities;
   };
 }
 #define INIT_GPU_BASED_ACTOR_PROPERTY(typeName, propName, value) { INIT_GPU_BASED_PROPERTY(typeName, allocation, propName); (propName).set(value); }

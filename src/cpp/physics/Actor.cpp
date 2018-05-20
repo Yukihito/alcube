@@ -3,7 +3,7 @@
 namespace alcube::physics {
   Actor::Actor() {
     this->moveEventHandler.f = [&](utils::AllocationMoveEvent &e) {
-      this->actors[e.dst] = this;
+      this->entities[e.dst] = this;
     };
 
     this->deallocationEventHandler.f = [&](utils::DeallocationEvent &e) {
@@ -16,15 +16,15 @@ namespace alcube::physics {
     alcube::gpu::GPUAccessor *gpuAccessor,
     alcube::utils::AllocationRange *allocationRange,
     utils::AllocationRange* subAllocationRange,
-    Actor** actors
+    Actor** entities
   ) {
     this->allocationRange = allocationRange;
     this->subAllocationRange = subAllocationRange;
     this->allocationRange->deallocateOn([&]{ return !this->isAlive.get(); });
     this->subAllocationRange->deallocateOn([&]{ return !this->isAlive.get(); });
     this->allocation.init(allocationRange, gpuAccessor->dtos.hostActors);
-    this->actors = actors;
-    this->actors[this->allocationRange->getIndex()] = this;
+    this->entities = entities;
+    this->entities[this->allocationRange->getIndex()] = this;
     this->allocationRange->onMove.subscribe(moveEventHandler);
     this->allocationRange->onDeallocate.subscribe(deallocationEventHandler);
     cl_float3 vec3Zero = {0.0f, 0.0f, 0.0f};
