@@ -33,11 +33,11 @@ namespace alcube::utils {
   class GPUBasedReference : public GPUBasedProperty<T, unsigned int> {
     public:
       explicit GPUBasedReference() {
-        moveReferenceEventHandler.f = [&](AllocationMoveEvent &e) {
-          this->value = e.dst;
+        moveReferenceEventHandler.f = [this](AllocationMoveEvent &e) {
+          this->set(e.dst);
         };
 
-        deallocationEventHandler.f = [&](DeallocationEvent &e) {
+        deallocationEventHandler.f = [this](DeallocationEvent &e) {
           this->referenceAllocationRange->onMove.unsubscribe(this->moveReferenceEventHandler);
           this->owner->range->onDeallocate.unsubscribe(this->deallocationEventHandler);
         };
@@ -48,16 +48,10 @@ namespace alcube::utils {
         this->referenceAllocationRange = referenceAllocationRange;
         this->owner->range->onDeallocate.subscribe(deallocationEventHandler);
         this->referenceAllocationRange->onMove.subscribe(moveReferenceEventHandler);
-        this->value = referenceAllocationRange->getIndex();
-        this->set(value);
-      }
-
-      void update() {
-        this->set(value);
+        this->set(referenceAllocationRange->getIndex());
       }
 
     private:
-      unsigned int value = 0;
       AllocationRange* referenceAllocationRange = nullptr;
       EventHandler<AllocationMoveEvent> moveReferenceEventHandler = {};
       EventHandler<DeallocationEvent> deallocationEventHandler = {};
