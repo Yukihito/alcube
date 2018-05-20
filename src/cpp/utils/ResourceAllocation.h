@@ -15,9 +15,6 @@ namespace alcube::utils {
 
   class AllocationRange {
     public:
-      //EventEmitter<void()> onBeforeMove;
-      //EventEmitter<void()> onAfterMove;
-      //EventEmitter<void()> onBeforeGc;
       EventEmitter<AllocationMoveEvent> onMove = {};
       EventEmitter<DeallocationEvent> onDeallocate = {};
 
@@ -30,11 +27,8 @@ namespace alcube::utils {
       unsigned int getAllocatedLength();
       void gc();
       bool isFree();
-      //void syncDeallocation(AllocationRange *other);
 
     private:
-      //AllocationRange* linkedAllocationRanges[4];
-      //unsigned int linkedAllocationRangeCount = 0;
       unsigned int minIndex = 0;
       unsigned int length = 0;
       unsigned int allocatedLength = 0;
