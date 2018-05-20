@@ -45,10 +45,10 @@ namespace alcube::utils {
     public:
       AllocationRange* range = nullptr;
       explicit ResourceAllocation() {
-        this->moveEventHandler.f = [&](AllocationMoveEvent &e){
+        this->moveEventHandler.f = [this](AllocationMoveEvent &e){
           this->values[e.dst] = this->values[e.src];
         };
-        this->deallocationEventHandler.f = [&](DeallocationEvent &e) {
+        this->deallocationEventHandler.f = [this](DeallocationEvent &e) {
           this->range->onMove.unsubscribe(this->moveEventHandler);
           this->range->onDeallocate.unsubscribe(this->deallocationEventHandler);
         };

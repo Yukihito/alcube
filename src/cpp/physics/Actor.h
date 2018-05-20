@@ -28,7 +28,7 @@ namespace alcube::physics {
       utils::GPUBasedProperty<gpu::dtos::Actor, int> isAlive;
       utils::GPUBasedReference<gpu::dtos::Actor> subIndex;
       virtual void beforeWrite() = 0;
-      explicit Actor();
+      explicit Actor() = default;
     protected:
       void init(
         gpu::GPUAccessor* gpuAccessor,
@@ -38,9 +38,7 @@ namespace alcube::physics {
       );
     private:
       utils::ResourceAllocation<gpu::dtos::Actor> allocation;
-      utils::EventHandler<utils::AllocationMoveEvent> moveEventHandler = {};
-      utils::EventHandler<utils::DeallocationEvent> deallocationEventHandler = {};
-      Actor** entities;
+      utils::ResourceAllocation<physics::Actor*> entityAllocation;
   };
 }
 #define INIT_GPU_BASED_ACTOR_PROPERTY(typeName, propName, value) { INIT_GPU_BASED_PROPERTY(typeName, allocation, propName); (propName).set(value); }
