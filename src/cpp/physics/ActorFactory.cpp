@@ -35,8 +35,11 @@ namespace alcube::physics {
 
   softbody::Spring* ActorFactory::createSpring() {
     auto entity = actorResources->springResource->memoryPool->allocate();
-    entity->init(gpuAccessor, actorResources->springResource->allocationRange->allocate(1));
-    actorResources->springResource->entities[entity->getIndex()] = entity;
+    entity->init(
+      gpuAccessor,
+      actorResources->springResource->allocationRange->allocate(1),
+      actorResources->springResource->entities
+    );
     return entity;
   }
 }

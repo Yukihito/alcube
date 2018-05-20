@@ -27,15 +27,22 @@ namespace alcube::physics::softbody {
 
   class Spring {
     public:
-      void init(gpu::GPUAccessor* gpuAccessor, utils::AllocationRange* allocationRange);
+      explicit Spring();
+      void init(
+        gpu::GPUAccessor* gpuAccessor,
+        utils::AllocationRange* allocationRange,
+        physics::softbody::Spring** entities
+      );
       void setK(float k);
-      unsigned int getIndex();
       SpringNode* getNode(unsigned int index);
     private:
       utils::AllocationRange* allocationRange = {};
       utils::ResourceAllocation<gpu::dtos::Spring> allocation;
       utils::GPUBasedProperty<gpu::dtos::Spring, float> k;
       SpringNode nodes[2];
+      physics::softbody::Spring** entities = nullptr;
+      utils::EventHandler<utils::AllocationMoveEvent> moveEventHandler = {};
+      utils::EventHandler<utils::DeallocationEvent> deallocationEventHandler = {};
   };
 }
 
