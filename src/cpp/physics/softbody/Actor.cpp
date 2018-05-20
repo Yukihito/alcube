@@ -2,11 +2,11 @@
 
 namespace alcube::physics::softbody {
   Actor::Actor(): physics::Actor() {
-    this->moveSubEventHandler.f = [&](utils::AllocationMoveEvent &e) {
+    this->moveSubEventHandler.f = [this](utils::AllocationMoveEvent &e) {
       this->subEntities[e.dst] = this;
     };
 
-    this->subDeallocationEventHandler.f = [&](utils::DeallocationEvent &e) {
+    this->subDeallocationEventHandler.f = [this](utils::DeallocationEvent &e) {
       this->subAllocationRange->onMove.unsubscribe(this->moveSubEventHandler);
       this->subAllocationRange->onDeallocate.unsubscribe(this->subDeallocationEventHandler);
     };
@@ -44,7 +44,6 @@ namespace alcube::physics::softbody {
         this->subAllocation.getPtr()->springIndices[springCount] = arg;
       }
     );
-    this->springIndices[springCount].set(springAllocationRange->getIndex());
     springNodeIndices.get()[springCount] = nodeIndex;
     this->springCount.set(springCount + 1);
   }

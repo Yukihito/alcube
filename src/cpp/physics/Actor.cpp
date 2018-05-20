@@ -2,11 +2,11 @@
 
 namespace alcube::physics {
   Actor::Actor() {
-    this->moveEventHandler.f = [&](utils::AllocationMoveEvent &e) {
+    this->moveEventHandler.f = [this](utils::AllocationMoveEvent &e) {
       this->entities[e.dst] = this;
     };
 
-    this->deallocationEventHandler.f = [&](utils::DeallocationEvent &e) {
+    this->deallocationEventHandler.f = [this](utils::DeallocationEvent &e) {
       this->allocationRange->onMove.unsubscribe(this->moveEventHandler);
       this->allocationRange->onDeallocate.unsubscribe(this->deallocationEventHandler);
     };

@@ -2,11 +2,11 @@
 
 namespace alcube::physics::fluid {
   Actor::Actor(): physics::Actor() {
-    this->moveSubEventHandler.f = [&](utils::AllocationMoveEvent &e) {
+    this->moveSubEventHandler.f = [this](utils::AllocationMoveEvent &e) {
       this->subEntities[e.dst] = this;
     };
 
-    this->subDeallocationEventHandler.f = [&](utils::DeallocationEvent &e) {
+    this->subDeallocationEventHandler.f = [this](utils::DeallocationEvent &e) {
       this->subAllocationRange->onMove.unsubscribe(this->moveSubEventHandler);
       this->subAllocationRange->onDeallocate.unsubscribe(this->subDeallocationEventHandler);
     };
