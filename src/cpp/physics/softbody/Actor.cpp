@@ -30,7 +30,7 @@ namespace alcube::physics::softbody {
     INIT_GPU_BASED_ARRAY_PROPERTY(unsigned int*, subAllocation, springIndices);
     INIT_GPU_BASED_ARRAY_PROPERTY(unsigned char*, subAllocation, springNodeIndices);
     INIT_GPU_BASED_SOFTBODY_PROPERTY(unsigned int, springCount, 0);
-    INIT_GPU_BASED_REFERENCE(gpu::dtos::SoftBody, subAllocation, actorIndex, allocationRange);
+    INIT_GPU_BASED_REFERENCE(subAllocation, actorIndex, allocationRange);
   }
 
   void Actor::beforeWrite() {}

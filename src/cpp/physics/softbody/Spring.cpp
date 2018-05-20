@@ -18,7 +18,7 @@ namespace alcube::physics::softbody {
   }
 
   void SpringNode::setActor(alcube::physics::softbody::Actor *actor) {
-    INIT_GPU_BASED_REFERENCE_AT(unsigned short, *allocation, actorIndices, actor->allocationRange, nodeIndex);
+    INIT_GPU_BASED_REFERENCE_AT(*allocation, actorIndices, actor->allocationRange, nodeIndex);
     auto springCount = actor->springCount.get();
     actor->springIndices.get()[springCount] = allocationRange->getIndex();
     actor->springNodeIndices.get()[springCount] = nodeIndex;

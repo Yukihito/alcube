@@ -17,7 +17,7 @@ namespace alcube::models::drawing {
   void Model3D::setUpAllocations(alcube::gpu::GPUAccessor *gpuAccessor) {
     featuresAllocation.init(allocationRange, gpuAccessor->dtos.hostRenderers);
     colorsAllocation.init(allocationRange, gpuAccessor->dtos.hostColors);
-    INIT_GPU_BASED_REFERENCE(gpu::dtos::Renderer, featuresAllocation, actorIndex, actorAllocationRange);
+    INIT_GPU_BASED_REFERENCE(featuresAllocation, actorIndex, actorAllocationRange);
     INIT_GPU_BASED_PROPERTY(int, featuresAllocation, refersToRotations);
     INIT_GPU_BASED_PROPERTY(unsigned int, featuresAllocation, instanceColorType);
 

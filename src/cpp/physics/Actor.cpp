@@ -37,6 +37,6 @@ namespace alcube::physics {
     INIT_GPU_BASED_ACTOR_PROPERTY(cl_float3, linearMomentum, vec3Zero);
     INIT_GPU_BASED_ACTOR_PROPERTY(cl_float3, angularMomentum, vec3Zero);
     INIT_GPU_BASED_ACTOR_PROPERTY(int, isAlive, true);
-    INIT_GPU_BASED_REFERENCE(gpu::dtos::Actor, allocation, subIndex, subAllocationRange);
+    INIT_GPU_BASED_REFERENCE(allocation, subIndex, subAllocationRange);
   }
 }

@@ -27,7 +27,7 @@ namespace alcube::physics::fluid {
     this->subAllocation.init(subAllocationRange, gpuAccessor->dtos.hostFluids);
     this->gpuAccessor = gpuAccessor;
     type.set(FLUID);
-    INIT_GPU_BASED_REFERENCE(gpu::dtos::Fluid, subAllocation, actorIndex, allocationRange);
+    INIT_GPU_BASED_REFERENCE(subAllocation, actorIndex, allocationRange);
   }
 
   void Actor::beforeWrite() {
