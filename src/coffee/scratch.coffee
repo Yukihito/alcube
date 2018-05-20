@@ -1,5 +1,6 @@
-for i in [0...128]
-  pos = vec3Rand().multiplyScalar(10)
-  fluid pos
-
+# for i in [0...128]
+#   pos = vec3Rand().multiplyScalar(10)
+#   fluid pos
+#
+cube.gc()
 print cube.actorCount()

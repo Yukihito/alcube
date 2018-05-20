@@ -148,6 +148,9 @@ class Alcube
     @underlying = constructAlcube()
     primitiveAccessor this, 'actorCount'
 
+  gc: () =>
+    @underlying.gc()
+
 fluidFeaturesFactory = new FluidFeaturesFactory()
 fluidFeaturesFactory.wrap()
 

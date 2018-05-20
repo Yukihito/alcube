@@ -9,10 +9,7 @@ namespace alcube::physics {
   ) {
     this->allocationRange = allocationRange;
     this->subAllocationRange = subAllocationRange;
-
     this->allocationRange->deallocateOn([&]{ return !this->isAlive.get(); });
-    this->subAllocationRange->deallocateOn([&]{ return !this->isAlive.get(); });
-
     this->allocation.init(allocationRange, gpuAccessor->dtos.hostActors);
     this->entityAllocation.init(allocationRange, entities);
     this->entityAllocation.set(this);

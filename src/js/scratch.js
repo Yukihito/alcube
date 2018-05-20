@@ -1,8 +1,7 @@
-var i, j, pos;
+// for i in [0...128]
+//   pos = vec3Rand().multiplyScalar(10)
+//   fluid pos
 
-for (i = j = 0; j < 128; i = ++j) {
-  pos = vec3Rand().multiplyScalar(10);
-  fluid(pos);
-}
+cube.gc();
 
 print(cube.actorCount());

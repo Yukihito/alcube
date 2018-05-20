@@ -257,11 +257,16 @@ Renderer = class Renderer {
 Alcube = class Alcube {
   constructor() {
     this.wrap = this.wrap.bind(this);
+    this.gc = this.gc.bind(this);
   }
 
   wrap() {
     this.underlying = constructAlcube();
     return primitiveAccessor(this, 'actorCount');
+  }
+
+  gc() {
+    return this.underlying.gc();
   }
 
 };

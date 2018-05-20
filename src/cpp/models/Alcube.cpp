@@ -28,6 +28,11 @@ namespace alcube::models {
     renderer->update();
   }
 
+  void Alcube::gc() {
+    physicsSimulator->gc();
+    renderer->gc();
+  }
+
   unsigned int Alcube::getActorCount() {
     return physicsSimulator->getActorCount();
   }

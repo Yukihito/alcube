@@ -70,6 +70,10 @@ namespace alcube::models::drawing {
     return entity;
   }
 
+  void RenderingGroup::resetInput() {
+    activeModel3DCount = 0;
+  }
+
   void RenderingGroup::input() {
     allModel3DCount = allocationRange->getAllocatedLength();
     auto updateCount = allModel3DCount - activeModel3DCount;

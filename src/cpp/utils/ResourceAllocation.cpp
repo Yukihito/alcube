@@ -44,6 +44,7 @@ namespace alcube::utils {
         part->onDeallocate.emit(e);
         memoryPool->deallocate(part);
       } else {
+        unsigned int currentMinIndex = part->minIndex;
         unsigned int nextMinIndex = minIndex + allocatedLength;
         part->minIndex = nextMinIndex;
         part->gc();
@@ -51,8 +52,10 @@ namespace alcube::utils {
         parts[nextPartsCount] = part;
         AllocationMoveEvent e;
         e.dst = nextMinIndex;
-        e.src = i;
-        part->onMove.emit(e);
+        e.src = currentMinIndex;
+        if (e.dst != e.src) {
+          part->onMove.emit(e);
+        }
         nextPartsCount++;
       }
     }

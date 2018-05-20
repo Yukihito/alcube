@@ -18,6 +18,7 @@ namespace alcube::physics::softbody {
     INIT_GPU_BASED_ARRAY_PROPERTY(unsigned char*, subAllocation, springNodeIndices);
     INIT_GPU_BASED_SOFTBODY_PROPERTY(unsigned int, springCount, 0);
     INIT_GPU_BASED_REFERENCE(subAllocation, actorIndex, allocationRange);
+    actorIndex.enableLifeSync();
   }
 
   void Actor::addSpring(alcube::utils::AllocationRange *springAllocationRange, unsigned char nodeIndex) {

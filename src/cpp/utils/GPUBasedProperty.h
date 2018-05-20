@@ -39,7 +39,14 @@ namespace alcube::utils {
 
         deallocationEventHandler.f = [this](DeallocationEvent &e) {
           this->referenceAllocationRange->onMove.unsubscribe(this->moveReferenceEventHandler);
+          if (lifeSyncEnabled) {
+            this->referenceAllocationRange->onDeallocate.unsubscribe(this->referenceDeallocationEventHandler);
+          }
           this->owner->range->onDeallocate.unsubscribe(this->deallocationEventHandler);
+        };
+
+        referenceDeallocationEventHandler.f = [this](DeallocationEvent &e) {
+          this->owner->range->deallocate();
         };
       }
 
@@ -49,11 +56,19 @@ namespace alcube::utils {
         this->owner->range->onDeallocate.subscribe(deallocationEventHandler);
         this->referenceAllocationRange->onMove.subscribe(moveReferenceEventHandler);
         this->set(referenceAllocationRange->getIndex());
+        this->lifeSyncEnabled = false;
+      }
+
+      void enableLifeSync() {
+        referenceAllocationRange->onDeallocate.subscribe(referenceDeallocationEventHandler);
+        lifeSyncEnabled = true;
       }
 
     private:
       AllocationRange* referenceAllocationRange = nullptr;
+      bool lifeSyncEnabled = false;
       EventHandler<AllocationMoveEvent> moveReferenceEventHandler = {};
+      EventHandler<DeallocationEvent> referenceDeallocationEventHandler = {};
       EventHandler<DeallocationEvent> deallocationEventHandler = {};
   };
 }

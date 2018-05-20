@@ -21,6 +21,7 @@ namespace alcube::models {
       void setUp();
       void render();
       void update();
+      void gc();
 
     private:
       alcube::physics::fluid::Simulator* fluidSimulator;

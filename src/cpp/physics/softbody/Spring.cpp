@@ -55,6 +55,7 @@ namespace alcube::physics::softbody {
         this->allocation.getPtr()->actorIndices[nodeIndex] = (unsigned short)arg;
       }
     );
+    actorIndices[nodeIndex].enableLifeSync();
     actor->addSpring(allocationRange, nodeIndex);
   }
 }

@@ -18,6 +18,7 @@ namespace alcube::models::drawing {
       RenderingGroup* createGroup();
       void update();
       void render();
+      void gc();
 
     private:
       utils::AllocationRange* allocationRange;

@@ -46,6 +46,7 @@ namespace alcube::models::drawing {
 
       Model3D* createModel3D(utils::AllocationRange* actorAllocationRange);
       alcube::drawing::Drawable* getDrawable();
+      void resetInput();
       void input();
       void updateGPU();
       void updateHost();

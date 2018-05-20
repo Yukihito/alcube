@@ -20,7 +20,7 @@ namespace alcube::models::drawing {
     INIT_GPU_BASED_REFERENCE(featuresAllocation, actorIndex, actorAllocationRange);
     INIT_GPU_BASED_PROPERTY(int, featuresAllocation, refersToRotations);
     INIT_GPU_BASED_PROPERTY(unsigned int, featuresAllocation, instanceColorType);
-
+    actorIndex.enableLifeSync();
     if (groupSettings->getInstanceColorType() == INSTANCE_COLOR_TYPE_RANDOM) {
       std::random_device rnd;
       std::mt19937 mt(rnd());

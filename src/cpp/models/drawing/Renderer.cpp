@@ -38,4 +38,13 @@ namespace alcube::models::drawing {
     }
     clFinish(resourcesProvider->queue->queue);
   }
+
+  void Renderer::gc() {
+    allocationRange->gc();
+    for (auto renderingGroup : renderingGroups) {
+      renderingGroup->resetInput();
+      renderingGroup->updateGPU();
+    }
+    clFinish(resourcesProvider->queue->queue);
+  }
 }

@@ -15,6 +15,7 @@ namespace alcube::physics::fluid {
     this->gpuAccessor = gpuAccessor;
     type.set(FLUID);
     INIT_GPU_BASED_REFERENCE(subAllocation, actorIndex, allocationRange);
+    actorIndex.enableLifeSync();
   }
 
   void Actor::beforeWrite() {

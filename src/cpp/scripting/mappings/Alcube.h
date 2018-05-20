@@ -9,6 +9,7 @@ namespace alcube::scripting::mappings {
     public:
       DEFGETTER(models::Alcube, int, ActorCount);
       void init() override;
+      static void gc(const v8::FunctionCallbackInfo<v8::Value>& info);
   };
 }
 
