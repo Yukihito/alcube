@@ -463,6 +463,7 @@ namespace alcube::gpu {
       cl_kernel updateBySpringImpulse;
       cl_kernel postProcessing;
       cl_kernel collectIntersections;
+      cl_kernel outputActors;
       cl_kernel collectCollisions;
       cl_kernel updateByConstraintImpulse;
       cl_kernel updateDensityAndPressure;
@@ -486,7 +487,7 @@ namespace alcube::gpu {
       void inputPhysicsConstants(unsigned int workSize, memories::Constants& constants, memories::Grid& grid, float gravityAcceleration, float deltaTime, float sphericalShellRadius);
       void inputFluidConstants(unsigned int workSize, memories::Constants& constants, memories::FluidSettings& fluidSettings);
       void inputSoftbodyConstants(unsigned int workSize, memories::Constants& constants, float splitDeltaTime);
-      void inputActors(unsigned int workSize, memories::Actor& hostActors, memories::Actor& actors, memories::ActorState& actorStates, unsigned short offset);
+      void inputActors(unsigned int workSize, memories::Actor& hostActors, memories::ActorState& actorStates, unsigned short offset);
       void inputSoftBodies(unsigned int workSize, memories::SoftBody& hostSoftBodies, memories::SoftBody& softBodies, unsigned short offset);
       void inputSprings(unsigned int workSize, memories::Spring& springs, memories::SpringState& springStates, unsigned int offset);
       void inputFluids(unsigned int workSize, memories::Fluid& hostFluids, memories::Fluid& fluids, unsigned short offset);
@@ -495,6 +496,7 @@ namespace alcube::gpu {
       void updateBySpringImpulse(unsigned int workSize, memories::Constants& constants, memories::SoftBody& softBodies, memories::ActorState& actorStates, memories::SpringState& springStates);
       void postProcessing(unsigned int workSize, memories::Constants& constants, memories::ActorState& actorStates);
       void collectIntersections(unsigned int workSize, memories::ActorState& actorStates, memories::GridAndActorRelation& relations, memories::UintMemory& gridStartIndices, memories::UintMemory& gridEndIndices, memories::Constants& constants);
+      void outputActors(unsigned int workSize, memories::Actor& actors, memories::ActorState& actorStates);
       void collectCollisions(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodies);
       void updateByConstraintImpulse(unsigned int workSize, memories::ActorState& actorStates, memories::SoftBody& softBodies);
       void updateDensityAndPressure(unsigned int workSize, memories::ActorState& actorStates, memories::Fluid& fluids, memories::Constants& constants);

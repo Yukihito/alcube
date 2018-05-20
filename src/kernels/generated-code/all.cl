@@ -181,15 +181,13 @@ __kernel void inputSoftbodyConstants(
 
 __kernel void inputActors(
   __global const Actor* hostActors,
-  __global Actor* actors,
   __global ActorState* actorStates,
   unsigned short offset
 ) {
   size_t i = get_global_id(0) + offset;
-  actors[i] = hostActors[i];
-  actorStates[i].constants = actors[i];
-  actorStates[i].radius = actors[i].radius;
-  actorStates[i].mass = actors[i].mass;
+  actorStates[i].constants = hostActors[i];
+  actorStates[i].radius = hostActors[i].radius;
+  actorStates[i].mass = hostActors[i].mass;
 }
 
 __kernel void inputSoftBodies(
@@ -641,6 +639,14 @@ __kernel void updateFluidForce(
       + viscosityPart1 * ((otherVelocity - velocity) / otherDensity) * fluidSettings->viscosityLaplacianConstant * q;
   }
   actorState->fluidForce = force;
+}
+
+__kernel void outputActors(
+  __global Actor* actors,
+  __global ActorState* actorStates
+) {
+  size_t i = get_global_id(0);
+  actors[i] = actorStates[i].constants;
 }
 
 __kernel void moveFluid(

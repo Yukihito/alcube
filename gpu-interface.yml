@@ -68,14 +68,6 @@ dto-structs:
     - float            density
     - float3           fluidForce
 
-# PhysicalQuantity: # Basic physical quantities
-#   - float  radius
-#   - float  mass
-#   - float3 position
-#   - float4 rotation
-#   - float3 linearMomentum
-#   - float3 angularMomentum
-
   # Variables for soft body actors
   SoftBody: # Physical quantity 0
     - float     elasticity
@@ -143,15 +135,6 @@ dto-instances:
   - name: actorStates
     type: ActorState
     length: maxActorCount
-
-#  - name: hostPhysicalQuantities
-#    type: PhysicalQuantity
-#    length: maxActorCount
-#    host-ptr: true
-#
-#  - name: physicalQuantities
-#    type: PhysicalQuantity
-#    length: maxActorCount
 
   # Variables for soft body actors
   - name: hostSoftBodies

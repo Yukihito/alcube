@@ -835,7 +835,6 @@ namespace alcube::gpu {
   void Kernels::inputActors(
     unsigned int workSize,
     memories::Actor& hostActors,
-    memories::Actor& actors,
     memories::ActorState& actorStates,
     unsigned short offset
   ) {
@@ -844,7 +843,6 @@ namespace alcube::gpu {
     }
     queue->push(rawKernels.inputActors, {workSize}, {
       memArg(hostActors.memory),
-      memArg(actors.memory),
       memArg(actorStates.memory),
       ushortArg(offset)
     });
@@ -979,6 +977,20 @@ namespace alcube::gpu {
       memArg(gridStartIndices.memory),
       memArg(gridEndIndices.memory),
       memArg(constants.memory)
+    });
+  }
+
+  void Kernels::outputActors(
+    unsigned int workSize,
+    memories::Actor& actors,
+    memories::ActorState& actorStates
+  ) {
+    if (workSize == 0) {
+        return;
+    }
+    queue->push(rawKernels.outputActors, {workSize}, {
+      memArg(actors.memory),
+      memArg(actorStates.memory)
     });
   }
 
@@ -1163,6 +1175,7 @@ namespace alcube::gpu {
     kernels.rawKernels.updateBySpringImpulse = resourcesProvider->kernelFactory->create(program, "updateBySpringImpulse");
     kernels.rawKernels.postProcessing = resourcesProvider->kernelFactory->create(program, "postProcessing");
     kernels.rawKernels.collectIntersections = resourcesProvider->kernelFactory->create(program, "collectIntersections");
+    kernels.rawKernels.outputActors = resourcesProvider->kernelFactory->create(program, "outputActors");
     kernels.rawKernels.collectCollisions = resourcesProvider->kernelFactory->create(program, "collectCollisions");
     kernels.rawKernels.updateByConstraintImpulse = resourcesProvider->kernelFactory->create(program, "updateByConstraintImpulse");
     kernels.rawKernels.updateDensityAndPressure = resourcesProvider->kernelFactory->create(program, "updateDensityAndPressure");

@@ -27,15 +27,13 @@ __kernel void inputSoftbodyConstants(
 
 __kernel void inputActors(
   __global const Actor* hostActors,
-  __global Actor* actors,
   __global ActorState* actorStates,
   unsigned short offset
 ) {
   size_t i = get_global_id(0) + offset;
-  actors[i] = hostActors[i];
-  actorStates[i].constants = actors[i];
-  actorStates[i].radius = actors[i].radius;
-  actorStates[i].mass = actors[i].mass;
+  actorStates[i].constants = hostActors[i];
+  actorStates[i].radius = hostActors[i].radius;
+  actorStates[i].mass = hostActors[i].mass;
 }
 
 __kernel void inputSoftBodies(

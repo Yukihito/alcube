@@ -60,7 +60,6 @@ namespace alcube::physics {
     kernels.inputActors(
       updateCount,
       memories.hostActors,
-      memories.actors,
       memories.actorStates,
       (unsigned short)activeActorCount
     );
@@ -74,7 +73,6 @@ namespace alcube::physics {
   void Simulator::updateGPUResourcesCount() {
     unsigned int actorCountForBitonicSort = utils::math::powerOf2(allActorCount);
     memories.hostActors.setCount(allActorCount);
-    memories.actors.setCount(allActorCount);
     memories.actorStates.setCount(allActorCount);
     memories.gridAndActorRelations.setCount(actorCountForBitonicSort);
   }
@@ -192,6 +190,17 @@ namespace alcube::physics {
   }
 
   void Simulator::gc() {
-
+    memories.actors.setCount(activeActorCount);
+    kernels.outputActors(activeActorCount, memories.actors, memories.actorStates);
+    memories.actors.read(&memories.hostActors);
+    memories.softBodies.read(&memories.hostSoftBodies);
+    memories.fluids.read(&memories.hostFluids);
+    memories.springs.read(&memories.springs);
+    actorResources->allocationRange->gc();
+    actorResources->softbodyResource->allocationRange->gc();
+    actorResources->fluidResource->allocationRange->gc();
+    actorResources->springResource->allocationRange->gc();
+    activeActorCount = 0;
+    input();
   }
 }

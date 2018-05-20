@@ -57,6 +57,7 @@ gulp.task 'concat-clc', ->
     'src/kernels/physics/force-calculation/friction.cl',
     'src/kernels/physics/force-calculation/constraint.cl',
     'src/kernels/physics/force-calculation/fluid.cl',
+    'src/kernels/physics/output.cl',
     'src/kernels/physics/motion.cl',
     'src/kernels/drawing/drawing.cl'
   ]
