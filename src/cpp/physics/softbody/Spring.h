@@ -30,7 +30,7 @@ namespace alcube::physics::softbody {
 
   class Spring: public ActorPair {
     public:
-      explicit Spring();
+      explicit Spring() = default;
       void init(
         gpu::GPUAccessor* gpuAccessor,
         utils::AllocationRange* allocationRange,
@@ -42,13 +42,11 @@ namespace alcube::physics::softbody {
     private:
       utils::AllocationRange* allocationRange = {};
       utils::ResourceAllocation<gpu::dtos::Spring> allocation;
+      utils::ResourceAllocation<physics::softbody::Spring*> entityAllocation;
       utils::GPUBasedProperty<gpu::dtos::Spring, float> k;
       utils::GPUBasedProperty<gpu::dtos::Spring, cl_float3*> nodePositionsModelSpace;
       utils::GPUBasedReference<gpu::dtos::Spring> actorIndices[2];
       SpringNode nodes[2];
-      physics::softbody::Spring** entities = nullptr;
-      utils::EventHandler<utils::AllocationMoveEvent> moveEventHandler = {};
-      utils::EventHandler<utils::DeallocationEvent> deallocationEventHandler = {};
   };
 }
 

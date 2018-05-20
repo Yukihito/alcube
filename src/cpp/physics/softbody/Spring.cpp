@@ -24,17 +24,6 @@ namespace alcube::physics::softbody {
     return &nodes[index];
   }
 
-  Spring::Spring() {
-    this->moveEventHandler.f = [&](utils::AllocationMoveEvent &e) {
-      this->entities[e.dst] = this;
-    };
-
-    this->deallocationEventHandler.f = [&](utils::DeallocationEvent &e) {
-      this->allocationRange->onMove.unsubscribe(this->moveEventHandler);
-      this->allocationRange->onDeallocate.unsubscribe(this->deallocationEventHandler);
-    };
-  }
-
   void Spring::setK(float k) {
      this->k.set(k);
   }
@@ -46,10 +35,8 @@ namespace alcube::physics::softbody {
   ) {
     this->allocationRange = allocationRange;
     this->allocation.init(allocationRange, gpuAccessor->dtos.springs);
-    this->entities = entities;
-    this->entities[allocationRange->getIndex()] = this;
-    this->allocationRange->onMove.subscribe(moveEventHandler);
-    this->allocationRange->onDeallocate.subscribe(deallocationEventHandler);
+    this->entityAllocation.init(allocationRange, entities);
+    this->entityAllocation.set(this);
     INIT_GPU_BASED_PROPERTY(float, allocation, k);
     INIT_GPU_BASED_ARRAY_PROPERTY(cl_float3*, allocation, nodePositionsModelSpace);
     for (unsigned char i = 0; i < 2; i++) {
