@@ -55,6 +55,7 @@ namespace alcube::utils {
       };
       T get();
       T* getPtr();
+      void set(T);
       void init(AllocationRange* range, T* values);
     private:
       T* values = nullptr;
@@ -77,6 +78,11 @@ namespace alcube::utils {
   template <class T>
   T* ResourceAllocation<T>::getPtr() {
     return &values[range->getIndex()];
+  }
+
+  template <class T>
+  void ResourceAllocation<T>::set(T arg) {
+    values[range->getIndex()] = arg;
   }
 }
 

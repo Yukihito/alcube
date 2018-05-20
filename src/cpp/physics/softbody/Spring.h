@@ -38,7 +38,7 @@ namespace alcube::physics::softbody {
       );
       void setK(float k);
       SpringNode* getNode(unsigned int index);
-      void setActor(physics::softbody::Actor* actor, unsigned char nodeIndex);
+      void setActor(physics::softbody::Actor* actor, unsigned char nodeIndex) override;
     private:
       utils::AllocationRange* allocationRange = {};
       utils::ResourceAllocation<gpu::dtos::Spring> allocation;

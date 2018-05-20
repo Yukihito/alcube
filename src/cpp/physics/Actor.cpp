@@ -15,7 +15,7 @@ namespace alcube::physics {
 
     this->allocation.init(allocationRange, gpuAccessor->dtos.hostActors);
     this->entityAllocation.init(allocationRange, entities);
-    this->entityAllocation.getPtr()[0] = this;
+    this->entityAllocation.set(this);
 
     cl_float3 vec3Zero = {0.0f, 0.0f, 0.0f};
     cl_float4 quatIdent = {0.0f, 0.0f, 0.0f, 1.0f};

@@ -1,17 +1,6 @@
 #include "Actor.h"
 
 namespace alcube::physics::softbody {
-  Actor::Actor(): physics::Actor() {
-    this->moveSubEventHandler.f = [this](utils::AllocationMoveEvent &e) {
-      this->subEntities[e.dst] = this;
-    };
-
-    this->subDeallocationEventHandler.f = [this](utils::DeallocationEvent &e) {
-      this->subAllocationRange->onMove.unsubscribe(this->moveSubEventHandler);
-      this->subAllocationRange->onDeallocate.unsubscribe(this->subDeallocationEventHandler);
-    };
-  }
-
   void Actor::init(
     gpu::GPUAccessor* gpuAccessor,
     utils::AllocationRange* allocationRange,
@@ -20,11 +9,10 @@ namespace alcube::physics::softbody {
     physics::softbody::Actor** subEntities
   ) {
     physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange, actors);
-    this->subAllocationRange->onMove.subscribe(moveSubEventHandler);
-    this->subAllocationRange->onDeallocate.subscribe(subDeallocationEventHandler);
-    this->subEntities = subEntities;
-    this->subEntities[subAllocationRange->getIndex()] = this;
-    subAllocation.init(subAllocationRange, gpuAccessor->dtos.hostSoftBodies);
+    this->subAllocation.init(subAllocationRange, gpuAccessor->dtos.hostSoftBodies);
+    this->subEntityAllocation.init(subAllocationRange, subEntities);
+    this->subEntityAllocation.set(this);
+
     type.set(SOFT_BODY);
     INIT_GPU_BASED_SOFTBODY_PROPERTY(float, elasticity, 1.0f);
     INIT_GPU_BASED_ARRAY_PROPERTY(unsigned char*, subAllocation, springNodeIndices);
@@ -37,10 +25,10 @@ namespace alcube::physics::softbody {
     this->springIndices[springCount].init(
       subAllocation,
       springAllocationRange,
-      [&, springCount]{
+      [this, springCount]{
         return this->subAllocation.getPtr()->springIndices[springCount];
       },
-      [&, springCount](unsigned int arg){
+      [this, springCount](unsigned int arg){
         this->subAllocation.getPtr()->springIndices[springCount] = arg;
       }
     );
