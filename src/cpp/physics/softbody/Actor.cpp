@@ -1,6 +1,17 @@
 #include "Actor.h"
 
 namespace alcube::physics::softbody {
+  Actor::Actor(): physics::Actor() {
+    this->moveSubEventHandler.f = [&](utils::AllocationMoveEvent &e) {
+      this->subActors[e.dst] = this;
+    };
+
+    this->subDeallocationEventHandler.f = [&](utils::DeallocationEvent &e) {
+      this->subAllocationRange->onMove.unsubscribe(this->moveSubEventHandler);
+      this->subAllocationRange->onDeallocate.unsubscribe(this->subDeallocationEventHandler);
+    };
+  }
+
   void Actor::init(
     gpu::GPUAccessor* gpuAccessor,
     utils::AllocationRange* allocationRange,
@@ -9,17 +20,17 @@ namespace alcube::physics::softbody {
     physics::softbody::Actor** subActors
   ) {
     physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange, actors);
-    subActors[subAllocationRange->getIndex()] = this;
-    afterMoveSub.f = [&]{
-      subActors[this->subAllocationRange->getIndex()] = this;
-    };
-    subStateStruct.init(gpuAccessor->dtos.hostSoftBodies, gpuAccessor->dtos.softBodies, subAllocationRange);
+    this->subAllocationRange->onMove.subscribe(moveSubEventHandler);
+    this->subAllocationRange->onDeallocate.subscribe(subDeallocationEventHandler);
+    this->subActors = subActors;
+    this->subActors[subAllocationRange->getIndex()] = this;
+    subAllocation.init(subAllocationRange, gpuAccessor->dtos.hostSoftBodies);
     type.set(SOFT_BODY);
-    INIT_GPU_BASED_SOFTBODY_PROPERTY(elasticity, 1.0f);
-    INIT_GPU_BASED_SOFTBODY_PROPERTY(springIndices, {});
-    INIT_GPU_BASED_SOFTBODY_PROPERTY(springNodeIndices, {});
-    INIT_GPU_BASED_SOFTBODY_PROPERTY(springCount, 0);
-    INIT_GPU_BASED_REFERENCE(gpu::dtos::SoftBody, subStateStruct, actorIndex, allocationRange);
+    INIT_GPU_BASED_SOFTBODY_PROPERTY(float, elasticity, 1.0f);
+    INIT_GPU_BASED_ARRAY_PROPERTY(unsigned int*, subAllocation, springIndices);
+    INIT_GPU_BASED_ARRAY_PROPERTY(unsigned char*, subAllocation, springNodeIndices);
+    INIT_GPU_BASED_SOFTBODY_PROPERTY(unsigned int, springCount, 0);
+    INIT_GPU_BASED_REFERENCE(gpu::dtos::SoftBody, subAllocation, actorIndex, allocationRange);
   }
 
   void Actor::beforeWrite() {}

@@ -39,14 +39,14 @@ namespace alcube::models::drawing {
       void setColor(glm::vec3 v);
 
     private:
-      utils::AllocationRange* actorAllocationRange;
-      utils::AllocationRange* allocationRange;
-      models::drawing::RenderingGroupSettings* groupSettings;
-      utils::GPUBasedStruct<gpu::dtos::Renderer> featuresStruct = {};
-      utils::GPUBasedStruct<cl_float3> colorsStruct = {};
-      utils::GPUBasedReference<gpu::dtos::Renderer> actorIndex = {};
-      utils::GPUBasedProperty<gpu::dtos::Renderer, int> refersToRotations = {};
-      utils::GPUBasedProperty<gpu::dtos::Renderer, unsigned int> instanceColorType = {};
+      utils::AllocationRange* actorAllocationRange = nullptr;
+      utils::AllocationRange* allocationRange = nullptr;
+      models::drawing::RenderingGroupSettings* groupSettings = nullptr;
+      utils::ResourceAllocation<gpu::dtos::Renderer> featuresAllocation;
+      utils::ResourceAllocation<cl_float3> colorsAllocation;
+      utils::GPUBasedReference<gpu::dtos::Renderer> actorIndex;
+      utils::GPUBasedProperty<gpu::dtos::Renderer, int> refersToRotations;
+      utils::GPUBasedProperty<gpu::dtos::Renderer, unsigned int> instanceColorType;
       void setUpAllocations(gpu::GPUAccessor* gpuAccessor);
   };
 

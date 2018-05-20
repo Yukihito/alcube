@@ -89,7 +89,6 @@ namespace alcube::models::drawing {
   }
 
   void RenderingGroup::setUpAllocations() {
-    allocations = {};
     allocations.colors.init(allocationRange, gpuAccessor->dtos.colors);
     allocations.positions.init(allocationRange, gpuAccessor->dtos.positions);
     allocations.rotations0.init(allocationRange, gpuAccessor->dtos.rotations0);

@@ -12,16 +12,16 @@ namespace alcube::physics::softbody {
     public:
       void init(
         utils::AllocationRange* allocationRange,
-        utils::GPUBasedStruct<gpu::dtos::Spring>& springStruct,
+        utils::ResourceAllocation<gpu::dtos::Spring>& allocation,
         unsigned char nodeIndex
       );
       void setPosition(glm::vec3 position);
       void setActor(physics::softbody::Actor* actor);
     private:
       utils::AllocationRange* allocationRange = nullptr;
-      utils::GPUBasedStruct<gpu::dtos::Spring>* springStruct = nullptr;
-      utils::GPUBasedProperty<gpu::dtos::Spring, cl_float3*> nodePositionsModelSpace = {};
-      utils::GPUBasedReference<gpu::dtos::Spring> actorIndices = {};
+      utils::ResourceAllocation<gpu::dtos::Spring>* allocation = nullptr;
+      utils::GPUBasedProperty<gpu::dtos::Spring, cl_float3*> nodePositionsModelSpace;
+      utils::GPUBasedReference<gpu::dtos::Spring> actorIndices;
       unsigned char nodeIndex = 0;
   };
 
@@ -33,8 +33,8 @@ namespace alcube::physics::softbody {
       SpringNode* getNode(unsigned int index);
     private:
       utils::AllocationRange* allocationRange = {};
-      utils::GPUBasedStruct<gpu::dtos::Spring> springStruct = {};
-      utils::GPUBasedProperty<gpu::dtos::Spring, float> k = {};
+      utils::ResourceAllocation<gpu::dtos::Spring> allocation;
+      utils::GPUBasedProperty<gpu::dtos::Spring, float> k;
       SpringNode nodes[2];
   };
 }

@@ -176,6 +176,7 @@ namespace alcube::physics {
 
   void Simulator::setUp() {
     setUpConstants();
+    clFinish(gpuAccessor->resourcesProvider->queue->queue);
   }
 
   void Simulator::update() {

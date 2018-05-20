@@ -4,24 +4,24 @@ namespace alcube::physics::softbody {
   using namespace utils::opencl::conversions;
   void SpringNode::init(
     utils::AllocationRange* allocationRange,
-    utils::GPUBasedStruct<gpu::dtos::Spring>& springStruct,
+    utils::ResourceAllocation<gpu::dtos::Spring>& allocation,
     unsigned char nodeIndex
   ) {
-    this->springStruct = &springStruct;
+    this->allocation = &allocation;
     this->allocationRange = allocationRange;
     this->nodeIndex = nodeIndex;
-    INIT_GPU_BASED_PROPERTY(gpu::dtos::Spring, springStruct, nodePositionsModelSpace);
+    INIT_GPU_BASED_ARRAY_PROPERTY(cl_float3*, allocation, nodePositionsModelSpace);
   }
 
   void SpringNode::setPosition(glm::vec3 position) {
-    nodePositionsModelSpace.getArray()[nodeIndex] = toCl(position);
+    nodePositionsModelSpace.get()[nodeIndex] = toCl(position);
   }
 
   void SpringNode::setActor(alcube::physics::softbody::Actor *actor) {
-    INIT_GPU_BASED_REFERENCE_AT(gpu::dtos::Spring, unsigned short, *springStruct, actorIndices, actor->allocationRange, nodeIndex);
+    INIT_GPU_BASED_REFERENCE_AT(unsigned short, *allocation, actorIndices, actor->allocationRange, nodeIndex);
     auto springCount = actor->springCount.get();
-    actor->springIndices.getArray()[springCount] = allocationRange->getIndex();
-    actor->springNodeIndices.getArray()[springCount] = nodeIndex;
+    actor->springIndices.get()[springCount] = allocationRange->getIndex();
+    actor->springNodeIndices.get()[springCount] = nodeIndex;
     actor->springCount.set(springCount + 1);
   }
 
@@ -30,11 +30,11 @@ namespace alcube::physics::softbody {
   }
 
   void Spring::init(gpu::GPUAccessor *gpuAccessor, utils::AllocationRange *allocationRange) {
-    springStruct.init(gpuAccessor->dtos.springs, gpuAccessor->dtos.springs, allocationRange);
-    INIT_GPU_BASED_PROPERTY(gpu::dtos::Spring, springStruct, k);
+    allocation.init(allocationRange, gpuAccessor->dtos.springs);
+    INIT_GPU_BASED_PROPERTY(float, allocation, k);
     this->allocationRange = allocationRange;
     for (unsigned char i = 0; i < 2; i++) {
-      nodes[i].init(allocationRange, springStruct, i);
+      nodes[i].init(allocationRange, allocation, i);
     }
   }
 

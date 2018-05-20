@@ -1,6 +1,17 @@
 #include "Actor.h"
 
 namespace alcube::physics {
+  Actor::Actor() {
+    this->moveEventHandler.f = [&](utils::AllocationMoveEvent &e) {
+      this->actors[e.dst] = this;
+    };
+
+    this->deallocationEventHandler.f = [&](utils::DeallocationEvent &e) {
+      this->allocationRange->onMove.unsubscribe(this->moveEventHandler);
+      this->allocationRange->onDeallocate.unsubscribe(this->deallocationEventHandler);
+    };
+  }
+
   void Actor::init(
     alcube::gpu::GPUAccessor *gpuAccessor,
     alcube::utils::AllocationRange *allocationRange,
@@ -9,35 +20,23 @@ namespace alcube::physics {
   ) {
     this->allocationRange = allocationRange;
     this->subAllocationRange = subAllocationRange;
-    subAllocationRange->syncDeallocation(allocationRange);
-    actors[this->allocationRange->getIndex()] = this;
-    afterMove.f = [&]{
-      actors[this->allocationRange->getIndex()] = this;
-    };
-    this->allocationRange->onAfterMove.subscribe(&afterMove);
-    this->subAllocationRange->onAfterMove.subscribe(&afterMoveSub);
-
-    beforeGc.f = [&]{
-      if (!this->isAlive.get()) {
-        this->allocationRange->deallocate();
-        this->allocationRange->onBeforeGc.unsubscribe(&beforeGc);
-        this->allocationRange->onAfterMove.unsubscribe(&afterMove);
-        this->subAllocationRange->onAfterMove.unsubscribe(&afterMoveSub);
-      }
-    };
-    this->allocationRange->onBeforeGc.subscribe(&beforeGc);
-
-    this->actorStruct.init(gpuAccessor->dtos.hostActors, gpuAccessor->dtos.actors, allocationRange);
+    this->allocationRange->deallocateOn([&]{ return !this->isAlive.get(); });
+    this->subAllocationRange->deallocateOn([&]{ return !this->isAlive.get(); });
+    this->allocation.init(allocationRange, gpuAccessor->dtos.hostActors);
+    this->actors = actors;
+    this->actors[this->allocationRange->getIndex()] = this;
+    this->allocationRange->onMove.subscribe(moveEventHandler);
+    this->allocationRange->onDeallocate.subscribe(deallocationEventHandler);
     cl_float3 vec3Zero = {0.0f, 0.0f, 0.0f};
     cl_float4 quatIdent = {0.0f, 0.0f, 0.0f, 1.0f};
-    INIT_GPU_BASED_ACTOR_PROPERTY(type, 0)
-    INIT_GPU_BASED_ACTOR_PROPERTY(radius, 1.0f);
-    INIT_GPU_BASED_ACTOR_PROPERTY(mass, 1.0f);
-    INIT_GPU_BASED_ACTOR_PROPERTY(position, vec3Zero);
-    INIT_GPU_BASED_ACTOR_PROPERTY(rotation, quatIdent);
-    INIT_GPU_BASED_ACTOR_PROPERTY(linearMomentum, vec3Zero);
-    INIT_GPU_BASED_ACTOR_PROPERTY(angularMomentum, vec3Zero);
-    INIT_GPU_BASED_ACTOR_PROPERTY(isAlive, true);
-    INIT_GPU_BASED_REFERENCE(gpu::dtos::Actor, actorStruct, subIndex, subAllocationRange);
+    INIT_GPU_BASED_ACTOR_PROPERTY(unsigned short, type, 0)
+    INIT_GPU_BASED_ACTOR_PROPERTY(float, radius, 1.0f);
+    INIT_GPU_BASED_ACTOR_PROPERTY(float, mass, 1.0f);
+    INIT_GPU_BASED_ACTOR_PROPERTY(cl_float3, position, vec3Zero);
+    INIT_GPU_BASED_ACTOR_PROPERTY(cl_float4, rotation, quatIdent);
+    INIT_GPU_BASED_ACTOR_PROPERTY(cl_float3, linearMomentum, vec3Zero);
+    INIT_GPU_BASED_ACTOR_PROPERTY(cl_float3, angularMomentum, vec3Zero);
+    INIT_GPU_BASED_ACTOR_PROPERTY(int, isAlive, true);
+    INIT_GPU_BASED_REFERENCE(gpu::dtos::Actor, allocation, subIndex, subAllocationRange);
   }
 }

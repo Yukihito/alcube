@@ -56,7 +56,7 @@ namespace alcube::models::drawing {
       alcube::drawing::shaders::Shaders* shaders = nullptr;
       Settings* settings = nullptr;
       utils::AllocationRange* allocationRange = nullptr;
-      RenderingGroupAllocations allocations = {};
+      RenderingGroupAllocations allocations;
       gpu::GPUAccessor* gpuAccessor = nullptr;
       Model3DFactory* model3DFactory = nullptr;
       unsigned int allModel3DCount = 0;
