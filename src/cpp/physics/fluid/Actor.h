@@ -10,7 +10,7 @@
 namespace alcube::physics::fluid {
   class Actor: public physics::Actor {
     public:
-      explicit Actor();
+      explicit Actor() = default;
       static float density;
       static float stiffness;
       static float viscosity;
@@ -25,10 +25,8 @@ namespace alcube::physics::fluid {
       );
       void beforeWrite() override;
     private:
-      physics::fluid::Actor** subEntities = nullptr;
       utils::ResourceAllocation<gpu::dtos::Fluid> subAllocation;
-      utils::EventHandler<utils::AllocationMoveEvent> moveSubEventHandler = {};
-      utils::EventHandler<utils::DeallocationEvent> subDeallocationEventHandler = {};
+      utils::ResourceAllocation<physics::fluid::Actor*> subEntityAllocation;
       gpu::GPUAccessor* gpuAccessor = nullptr;
   };
 }

@@ -1,17 +1,6 @@
 #include "Actor.h"
 
 namespace alcube::physics::fluid {
-  Actor::Actor(): physics::Actor() {
-    this->moveSubEventHandler.f = [this](utils::AllocationMoveEvent &e) {
-      this->subEntities[e.dst] = this;
-    };
-
-    this->subDeallocationEventHandler.f = [this](utils::DeallocationEvent &e) {
-      this->subAllocationRange->onMove.unsubscribe(this->moveSubEventHandler);
-      this->subAllocationRange->onDeallocate.unsubscribe(this->subDeallocationEventHandler);
-    };
-  }
-
   void Actor::init(
     gpu::GPUAccessor* gpuAccessor,
     utils::AllocationRange* allocationRange,
@@ -20,11 +9,9 @@ namespace alcube::physics::fluid {
     physics::fluid::Actor** subEntities
   ) {
     physics::Actor::init(gpuAccessor, allocationRange, subAllocationRange, actors);
-    this->subAllocationRange->onMove.subscribe(moveSubEventHandler);
-    this->subAllocationRange->onDeallocate.subscribe(subDeallocationEventHandler);
-    this->subEntities = subEntities;
-    this->subEntities[subAllocationRange->getIndex()] = this;
     this->subAllocation.init(subAllocationRange, gpuAccessor->dtos.hostFluids);
+    this->subEntityAllocation.init(subAllocationRange, subEntities);
+    this->subEntityAllocation.set(this);
     this->gpuAccessor = gpuAccessor;
     type.set(FLUID);
     INIT_GPU_BASED_REFERENCE(subAllocation, actorIndex, allocationRange);

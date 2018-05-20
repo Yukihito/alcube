@@ -25,9 +25,6 @@ namespace alcube::physics::softbody {
     private:
       utils::ResourceAllocation<gpu::dtos::SoftBody> subAllocation;
       utils::ResourceAllocation<physics::softbody::Actor*> subEntityAllocation;
-      //physics::softbody::Actor** subEntities = nullptr;
-      //utils::EventHandler<utils::AllocationMoveEvent> moveSubEventHandler = {};
-      //utils::EventHandler<utils::DeallocationEvent> subDeallocationEventHandler = {};
   };
 }
 #define INIT_GPU_BASED_SOFTBODY_PROPERTY(typeName, propName, value) { INIT_GPU_BASED_PROPERTY(typeName, subAllocation, propName); (propName).set(value);}
