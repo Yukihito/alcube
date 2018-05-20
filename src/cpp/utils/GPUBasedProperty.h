@@ -9,7 +9,7 @@ namespace alcube::utils {
     public:
       explicit GPUBasedProperty() = default;
 
-      void init(ResourceAllocation<T>& owner, size_t position, std::function<U()> getter, std::function<void(U)> setter) {
+      void init(ResourceAllocation<T>& owner, std::function<U()> getter, std::function<void(U)> setter) {
         this->getter = std::move(getter);
         this->setter = std::move(setter);
         this->owner = &owner;
@@ -43,8 +43,8 @@ namespace alcube::utils {
         };
       }
 
-      void init(ResourceAllocation<T>& owner, size_t position, AllocationRange* referenceAllocationRange, std::function<unsigned int()> getter, std::function<void(unsigned int)> setter) {
-        GPUBasedProperty<T, unsigned int>::init(owner, position, getter, setter);
+      void init(ResourceAllocation<T>& owner, AllocationRange* referenceAllocationRange, std::function<unsigned int()> getter, std::function<void(unsigned int)> setter) {
+        GPUBasedProperty<T, unsigned int>::init(owner, getter, setter);
         this->referenceAllocationRange = referenceAllocationRange;
         this->owner->range->onDeallocate.subscribe(deallocationEventHandler);
         this->referenceAllocationRange->onMove.subscribe(moveReferenceEventHandler);
@@ -64,9 +64,8 @@ namespace alcube::utils {
   };
 }
 
-#define INIT_GPU_BASED_PROPERTY(T, argOwner, argName) { this->argName.init(argOwner, 0, [&]{return (argOwner).getPtr()->argName;}, [&](T arg){(argOwner).getPtr()->argName = arg;}); }
-#define INIT_GPU_BASED_ARRAY_PROPERTY(T, argOwner, argName) { this->argName.init(argOwner, 0, [&]{return (argOwner).getPtr()->argName;}, [&](T arg){}); }
-#define INIT_GPU_BASED_REFERENCE(argOwner, argName, referenceAllocationRange) { this->argName.init(argOwner, 0, referenceAllocationRange, [&]{return (argOwner).getPtr()->argName;}, [&](unsigned int arg){(argOwner).getPtr()->argName = arg;}); }
-#define INIT_GPU_BASED_REFERENCE_AT(argOwner, argName, referenceAllocationRange, index) { this->argName.init(argOwner, 0, referenceAllocationRange, [&]{return (argOwner).getPtr()->argName[index];}, [&](unsigned int arg){(argOwner).getPtr()->argName[index] = arg;}); }
+#define INIT_GPU_BASED_PROPERTY(T, argOwner, argName) { this->argName.init(argOwner, [this]{ return this->argOwner.getPtr()->argName; }, [this](T arg){ this->argOwner.getPtr()->argName = arg; }); }
+#define INIT_GPU_BASED_ARRAY_PROPERTY(T, argOwner, argName) { this->argName.init(argOwner, [this]{ return this->argOwner.getPtr()->argName; }, [](T arg){}); }
+#define INIT_GPU_BASED_REFERENCE(argOwner, argName, referenceAllocationRange) { this->argName.init(argOwner, referenceAllocationRange, [&]{return (argOwner).getPtr()->argName;}, [&](unsigned int arg){(argOwner).getPtr()->argName = arg;}); }
 
 #endif //ALCUBE_GPUBASEDPROPERTY_H

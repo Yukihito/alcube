@@ -8,8 +8,9 @@ namespace alcube::physics::softbody {
   class Actor : public physics::Actor {
     public:
       utils::GPUBasedProperty<gpu::dtos::SoftBody, float> elasticity;
-      utils::GPUBasedProperty<gpu::dtos::SoftBody, unsigned int*> springIndices;
+      //utils::GPUBasedProperty<gpu::dtos::SoftBody, unsigned int*> springIndices;
       utils::GPUBasedProperty<gpu::dtos::SoftBody, unsigned char*> springNodeIndices;
+      utils::GPUBasedReference<gpu::dtos::SoftBody> springIndices[16];
       utils::GPUBasedProperty<gpu::dtos::SoftBody, unsigned int> springCount;
       utils::GPUBasedReference<gpu::dtos::SoftBody> actorIndex;
       explicit Actor();

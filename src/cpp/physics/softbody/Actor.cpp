@@ -27,7 +27,6 @@ namespace alcube::physics::softbody {
     subAllocation.init(subAllocationRange, gpuAccessor->dtos.hostSoftBodies);
     type.set(SOFT_BODY);
     INIT_GPU_BASED_SOFTBODY_PROPERTY(float, elasticity, 1.0f);
-    INIT_GPU_BASED_ARRAY_PROPERTY(unsigned int*, subAllocation, springIndices);
     INIT_GPU_BASED_ARRAY_PROPERTY(unsigned char*, subAllocation, springNodeIndices);
     INIT_GPU_BASED_SOFTBODY_PROPERTY(unsigned int, springCount, 0);
     INIT_GPU_BASED_REFERENCE(subAllocation, actorIndex, allocationRange);
@@ -35,7 +34,17 @@ namespace alcube::physics::softbody {
 
   void Actor::addSpring(alcube::utils::AllocationRange *springAllocationRange, unsigned char nodeIndex) {
     auto springCount = this->springCount.get();
-    springIndices.get()[springCount] = springAllocationRange->getIndex();
+    this->springIndices[springCount].init(
+      subAllocation,
+      springAllocationRange,
+      [&, springCount]{
+        return this->subAllocation.getPtr()->springIndices[springCount];
+      },
+      [&, springCount](unsigned int arg){
+        this->subAllocation.getPtr()->springIndices[springCount] = arg;
+      }
+    );
+    this->springIndices[springCount].set(springAllocationRange->getIndex());
     springNodeIndices.get()[springCount] = nodeIndex;
     this->springCount.set(springCount + 1);
   }

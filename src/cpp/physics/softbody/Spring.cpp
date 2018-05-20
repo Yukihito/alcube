@@ -3,23 +3,25 @@
 namespace alcube::physics::softbody {
   using namespace utils::opencl::conversions;
   void SpringNode::init(
-    utils::AllocationRange* allocationRange,
-    utils::ResourceAllocation<gpu::dtos::Spring>& allocation,
+    ActorPair* actorPair,
+    utils::GPUBasedProperty<gpu::dtos::Spring, cl_float3*>* nodePositionsModelSpace,
     unsigned char nodeIndex
   ) {
-    this->allocation = &allocation;
-    this->allocationRange = allocationRange;
+    this->actorPair = actorPair;
+    this->nodePositionsModelSpace = nodePositionsModelSpace;
     this->nodeIndex = nodeIndex;
-    INIT_GPU_BASED_ARRAY_PROPERTY(cl_float3*, allocation, nodePositionsModelSpace);
   }
 
   void SpringNode::setPosition(glm::vec3 position) {
-    nodePositionsModelSpace.get()[nodeIndex] = toCl(position);
+    nodePositionsModelSpace->get()[nodeIndex] = toCl(position);
   }
 
   void SpringNode::setActor(alcube::physics::softbody::Actor *actor) {
-    INIT_GPU_BASED_REFERENCE_AT(*allocation, actorIndices, actor->allocationRange, nodeIndex);
-    actor->addSpring(allocationRange, nodeIndex);
+    actorPair->setActor(actor, nodeIndex);
+  }
+
+  SpringNode* Spring::getNode(unsigned int index) {
+    return &nodes[index];
   }
 
   Spring::Spring() {
@@ -49,12 +51,23 @@ namespace alcube::physics::softbody {
     this->allocationRange->onMove.subscribe(moveEventHandler);
     this->allocationRange->onDeallocate.subscribe(deallocationEventHandler);
     INIT_GPU_BASED_PROPERTY(float, allocation, k);
+    INIT_GPU_BASED_ARRAY_PROPERTY(cl_float3*, allocation, nodePositionsModelSpace);
     for (unsigned char i = 0; i < 2; i++) {
-      nodes[i].init(allocationRange, allocation, i);
+      nodes[i].init(this, &nodePositionsModelSpace, i);
     }
   }
 
-  SpringNode* Spring::getNode(unsigned int index) {
-    return &nodes[index];
+  void Spring::setActor(alcube::physics::softbody::Actor *actor, unsigned char nodeIndex) {
+    actorIndices[nodeIndex].init(
+      allocation,
+      actor->allocationRange,
+      [this, nodeIndex] {
+        return this->allocation.getPtr()->actorIndices[nodeIndex];
+      },
+      [this, nodeIndex] (unsigned int arg) {
+        this->allocation.getPtr()->actorIndices[nodeIndex] = (unsigned short)arg;
+      }
+    );
+    actor->addSpring(allocationRange, nodeIndex);
   }
 }
